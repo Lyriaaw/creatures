@@ -1,0 +1,5 @@
+.env
+cmake-build-debug
+.idea/
+
+libraries/
