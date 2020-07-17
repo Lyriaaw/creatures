@@ -14,19 +14,19 @@ Point::Point(int x, int y) {
 
 
 
-int Point::getX() const {
+float Point::getX() const {
     return x;
 }
 
-void Point::setX(int x) {
+void Point::setX(float x) {
     Point::x = x;
 }
 
-int Point::getY() const {
+float Point::getY() const {
     return y;
 }
 
-void Point::setY(int y) {
+void Point::setY(float y) {
     Point::y = y;
 }
 

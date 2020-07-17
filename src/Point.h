@@ -12,18 +12,18 @@ public:
     Point(int x, int y);
 
 
-    int getX() const;
+    float getX() const;
 
-    void setX(int x);
+    void setX(float x);
 
-    int getY() const;
+    float getY() const;
 
-    void setY(int y);
+    void setY(float y);
 
 
 private:
-    int x;
-    int y;
+    float x;
+    float y;
 };
 
 

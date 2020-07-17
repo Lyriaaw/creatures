@@ -1,7 +1,6 @@
 #include <iostream>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
+
 #include <tiff.h>
 #include <random>
 #include <array>
@@ -9,15 +8,29 @@
 
 #include "src/Entity.h"
 
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+
 using namespace std;
 using namespace std::chrono;
+using namespace sf;
 
 int WINDOW_WIDTH = 1920;
 int WINDOW_HEIGHT = 1080;
 
 
 
-void runLoop(SDL_Surface *mainSurface, SDL_Renderer *renderer) {
+
+
+void runLoop(RenderWindow *window) {
+    bool done(false);
+
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> distWidth(0, WINDOW_WIDTH);
+    uniform_real_distribution<double> distHeight(0, WINDOW_HEIGHT);
+
+    std::uniform_real_distribution<float> distMovement(-1, 1);
 
     auto start = chrono::system_clock::now();
     auto end = chrono::system_clock::now();
@@ -25,126 +38,66 @@ void runLoop(SDL_Surface *mainSurface, SDL_Renderer *renderer) {
     vector<Entity> entities;
 
 
-    for (int it = 0; it < 1000; it++) {
-        random_device rd;
-        mt19937 mt(rd());
-        uniform_real_distribution<double> dist(0, WINDOW_HEIGHT);
-        int x = dist(mt) + it;
-        int y = dist(mt);
+    for (int it = 0; it < 100; it++) {
+        int x = distWidth(mt);
+        int y = distHeight(mt);
 
         Point point(x, y);
 
-        Entity entity(point, 10);
+        Entity entity(point, 20);
+        entities.push_back(entity);
 
     }
 
 
 
-
-    bool done(false);
-    SDL_Event events;
     while (!done) {
-
-
-
-        while (SDL_PollEvent(&events) != 0) {
-            switch (events.type) {
-                case SDL_QUIT:
+        // check all the window's events that were triggered since the last iteration of the loop
+        Event event;
+        while (window->pollEvent(event))
+        {
+            switch (event.type) {
+                case Event::Closed:
                     done = true;
                     break;
-                case SDL_MOUSEMOTION:
-                    cout << "Mouse moved to X: " << events.motion.x << " Y: " << events.motion.y << endl;
-                    break;
-                default:
+                case Event::Resized:
+                    cout << "New Width: " << event.size.width << " height: " << event.size.height << endl;
                     break;
             }
         }
 
-
-
-        SDL_Color color = {255, 255, 255};
-        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-        SDL_RenderClear(renderer);
-
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-//        for (int it = 0; it < 1000; it++) {
-//            move(&movableRect + it);
-//        }
-
-        for (int it = 0; it < 1000; it++) {
-//            cout << "Drawing " << it << endl;
-            Entity entity = entities.at(it);
-            entity.draw(renderer);
-
-//            drawRect(renderer, movableRect[it]);
+        for (int it = 0; it < entities.size(); it++) {
+            entities.at(it).move();
         }
 
-        chrono::duration<double> elapsed_time = start - end;
 
-        short vxs[4] = {100, 200, 200, 100};
-        short vys[4] = {200, 200, 100, 100};
+        window->clear(sf::Color::Black);
 
-        filledPolygonRGBA(mainSurface, vxs, vys, 5, 255, 0, 0, 255);
 
-        SDL_RenderPresent(renderer);
+        for (int it = 0; it < entities.size(); it++) {
+            entities.at(it).draw(window);
+        }
+
+        window->display();
 
         end = chrono::system_clock::now();
-        cout << "Time : " << elapsed_time.count() << "s" << endl;
+        chrono::duration<double> elapsed_time = end - start;
+//        cout << "Time : " << elapsed_time.count() << "s" << endl;
 
 
         start = chrono::system_clock::now();
     }
 
+    window->close();
 }
+
 
 int main(int argc, char **argv)
 {
-    SDL_Window* window(nullptr);
-    SDL_Surface *mainSurface(nullptr);
-    SDL_Renderer *renderer(nullptr);
+    srand((unsigned) time(0));
+    RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
+    window.setVerticalSyncEnabled(true);
 
-
-
-    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        cout << "Error while SDL init : " << SDL_GetError() << endl;
-        SDL_Quit();
-        return -1;
-    }
-
-
-    window = SDL_CreateWindow("Creatures", 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-
-    if (window == nullptr) {
-        cout << "Error while creating the window" << endl;
-        SDL_Quit();
-        return -1;
-    }
-
-
-    mainSurface = SDL_GetWindowSurface(window);
-
-    if (mainSurface == nullptr) {
-        cout << "Error while creating the main surface" << endl;
-        SDL_Quit();
-        return -1;
-    }
-
-
-    renderer = SDL_GetRenderer(window);
-    if (renderer == nullptr) {
-        cout << "Error while creating the renderer: " << SDL_GetError() << endl;
-        SDL_Quit();
-        return -1;
-    }
-
-
-    runLoop(mainSurface, renderer);
-
-
-
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    runLoop(&window);
     return 0;
 }
