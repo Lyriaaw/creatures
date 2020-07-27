@@ -4,6 +4,8 @@
 
 #include "Farm.h"
 
+#include <utility>
+#include <iostream>
 
 
 using namespace std;
@@ -12,9 +14,10 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
+    map = Map();
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            map[it][jt] = (rand() % 21) - 10;
+            map.setTileAt(it, jt, (rand() % 21) - 10);
         }
     }
 }
@@ -34,7 +37,7 @@ void Farm::InitFromRandom() {
 
         Point point(x, y);
 
-        Entity entity(point, 20);
+        Entity entity(point, 10);
         entities.push_back(entity);
 
     }
@@ -48,9 +51,6 @@ void Farm::Tick() {
     }
 }
 
-float Farm::getMapAt(int chunkX, int chunkY) {
-    return map[chunkX][chunkY];
-}
 
 const vector<Entity> &Farm::getEntities() const {
     return entities;
@@ -60,11 +60,15 @@ void Farm::setEntities(const vector<Entity> &entities) {
     Farm::entities = entities;
 }
 
-FarmUI *Farm::getUi() const {
-    return ui;
+void Farm::setUi(FarmUI ui) {
+    Farm::ui = ui;
 }
 
-void Farm::setUi(FarmUI *ui) {
-    Farm::ui = ui;
+Map Farm::getMap() {
+    return map;
+}
+
+const FarmUI &Farm::getUi() const {
+    return ui;
 }
 

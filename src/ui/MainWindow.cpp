@@ -8,6 +8,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <random>
+#include <iostream>
 
 
 int WINDOW_WIDTH = 1920;
@@ -19,17 +20,25 @@ using namespace std;
 
 MainWindow::MainWindow() {
 
+    farm = Farm();
+    farm.InitFromRandom();
+
+    FarmUI farmUi = FarmUI();
+    farmUi.loadMap(farm.getMap());
+
+
+    farm.setUi(farmUi);
+
 }
 
 
 void MainWindow::start() {
+
     RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
     window.setVerticalSyncEnabled(true);
 
-    farm = Farm();
-    farm.InitFromRandom();
 
-    FarmUI farmUi = FarmUI(farm);
+
 
     running = true;
 
@@ -64,7 +73,8 @@ void MainWindow::draw(RenderWindow *window) {
 
     std::vector<Entity> currentEntities = farm.getEntities();
 
-    farm.getUi()->draw(window);
+    FarmUI farmUI = farm.getUi();
+    farmUI.draw(window);
 
     for (int it = 0; it < currentEntities.size(); it++) {
         currentEntities.at(it).draw(window);

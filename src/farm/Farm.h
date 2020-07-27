@@ -5,24 +5,19 @@
 #ifndef CREATURES_FARM_H
 #define CREATURES_FARM_H
 
-#define CHUNK_SIZE 60
 
-#define CHUNK_COUNT_WIDTH 16 * 10
-#define CHUNK_COUNT_HEIGHT 16 * 10
-
-#define FARM_WIDTH CHUNK_COUNT_WIDTH * CHUNK_SIZE
-#define FARM_HEIGHT CHUNK_COUNT_HEIGHT * CHUNK_SIZE
 
 
 #include "../Entity.h"
 #include "../ui/FarmUI.h"
+#include "../World.h"
+#include "Map.h"
 
 class Farm {
 private:
-    float map[CHUNK_COUNT_WIDTH][CHUNK_COUNT_HEIGHT];
     std::vector<Entity> entities;
-    FarmUI *ui;
-
+    FarmUI ui;
+    Map map;
 
 public:
     Farm();
@@ -31,12 +26,11 @@ public:
     void Tick();
 
 
-    float getMapAt(int chunkX, int chunkY);
+    const FarmUI &getUi() const;
 
-    FarmUI *getUi() const;
+    void setUi(FarmUI ui);
 
-    void setUi(FarmUI *ui);
-
+    Map getMap();
     const std::vector<Entity> &getEntities() const;
     void setEntities(const std::vector<Entity> &entities);
 

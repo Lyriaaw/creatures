@@ -7,6 +7,8 @@
 #include <iostream>
 #include <math.h>
 
+#include "world.h"
+
 Entity::Entity(Point point, float size): point(point) {
     this->size = size;
     this->vertexArray = sf::VertexArray(sf::Quads, 4);
@@ -54,16 +56,16 @@ void Entity::move() {
     this->point.setY(this->point.getY() + (this->speed * sin(this->rotation)));
 
     if (this->point.getX() < 0) {
-        this->point.setX(1920);
+        this->point.setX(FARM_WIDTH);
     }
-    if (this->point.getX() > 1920) {
+    if (this->point.getX() > FARM_WIDTH) {
         this->point.setX(0);
     }
 
     if (this->point.getY() < 0) {
-        this->point.setY(1080);
+        this->point.setY(FARM_HEIGHT);
     }
-    if (this->point.getY() > 1080) {
+    if (this->point.getY() > FARM_HEIGHT) {
         this->point.setY(0);
     }
 }

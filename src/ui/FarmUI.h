@@ -7,16 +7,18 @@
 
 
 #include <SFML/Graphics.hpp>
-#include "../farm/Farm.h"
+#include "../World.h"
+#include "../farm/Map.h"
 
 class FarmUI {
 private:
-    sf::RectangleShape rectanglesMap[CHUNK_COUNT_WIDTH][CHUNK_COUNT_HEIGHT];
-    Farm *farm;
+    std::vector<std::vector<sf::RectangleShape>> tiles;
+public:
 
 public:
-    FarmUI(Farm *farm);
+    FarmUI();
     void draw(sf::RenderWindow *window);
+    void loadMap(Map map);
 
 };
 
