@@ -12,7 +12,7 @@ include_directories(SFML_INCLUDE_DIR)
 
 find_package(SFML 2.5.1 COMPONENTS system window graphics network audio)
 
-add_executable(Creatures main.cpp src/Entity.cpp src/Entity.h src/Point.cpp src/Point.h src/farm/Farm.cpp src/farm/Farm.h src/farm/Map.cpp src/farm/Map.h src/ui/MainWindow.cpp src/ui/MainWindow.h src/ui/FarmUI.cpp src/ui/FarmUI.h src/World.h src/ui/Camera.cpp src/ui/Camera.h)
+add_executable(Creatures main.cpp src/Entity.cpp src/Entity.h src/Point.cpp src/Point.h src/farm/Farm.cpp src/farm/Farm.h src/farm/Map.cpp src/farm/Map.h src/ui/MainWindow.cpp src/ui/MainWindow.h src/ui/FarmUI.cpp src/ui/FarmUI.h src/World.h src/ui/Camera.cpp src/ui/Camera.h src/PerlinNoise.cpp src/PerlinNoise.h src/Utils.h src/colors/RGBColor.cpp src/colors/RGBColor.h)
 
 target_link_libraries (Creatures sfml-graphics sfml-window sfml-system)
 

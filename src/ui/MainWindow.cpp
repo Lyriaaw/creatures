@@ -11,6 +11,7 @@
 #include <iostream>
 
 
+
 int WINDOW_WIDTH = 2560;
 int WINDOW_HEIGHT = 1440;
 
@@ -31,7 +32,12 @@ MainWindow::MainWindow() {
     mainCamera = new Camera(center, topLeft);
     mainCamera->setWidth(1920);
     mainCamera->setHeight(1080);
-    mainCamera->setZoom(1.f);
+    mainCamera->setZoom(.4f);
+
+
+
+
+
 
 
     farm.setUi(farmUi);
@@ -43,9 +49,6 @@ void MainWindow::start() {
 
     RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
     window.setVerticalSyncEnabled(true);
-
-
-
 
     running = true;
 
@@ -65,6 +68,14 @@ void MainWindow::handleEvents(RenderWindow *window) {
         switch (event.type) {
             case Event::KeyPressed:
                 handleKeyboardEvents(event.key);
+                break;
+            case Event::MouseWheelScrolled:
+                if (event.mouseWheelScroll.delta < 0) {
+                    mainCamera->changeZoom(0.9f);
+                } else if (event.mouseWheelScroll.delta > 0) {
+                    mainCamera->changeZoom(1.1f);
+                }
+
                 break;
             case Event::Closed:
                 running = false;
@@ -103,14 +114,11 @@ void MainWindow::draw(RenderWindow *window) {
     FarmUI farmUI = farm.getUi();
     farmUI.draw(window, mainCamera);
 
-    for (int it = 0; it < currentEntities.size(); it++) {
-        currentEntities.at(it).draw(window);
+    for (auto & currentEntity : currentEntities) {
+        currentEntity.draw(window, mainCamera);
     }
 
     window->display();
-
-
-
 
 
     renderDurationEnd = chrono::system_clock::now();

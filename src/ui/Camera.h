@@ -52,7 +52,7 @@ public:
 
 
 
-    Point getWorldCoordinates(Point point);
+    Point getScreenCoordinates(Point point);
 };
 
 

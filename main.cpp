@@ -20,6 +20,7 @@ using namespace sf;
 
 int main(int argc, char **argv)
 {
+
     srand((unsigned) time(0));
 
     cout << "Hello ?" << endl;

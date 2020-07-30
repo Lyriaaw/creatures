@@ -7,21 +7,35 @@
 #include <iostream>
 #include <math.h>
 
-#include "world.h"
+#include "World.h"
+#include "ui/Camera.h"
+#include "colors/RGBColor.h"
+
+#include "Utils.h"
 
 Entity::Entity(Point point, float size): point(point) {
     this->size = size;
     this->vertexArray = sf::VertexArray(sf::Quads, 4);
-    this->color = sf::Color(rand() % 255, rand() % 255, rand() % 255);
+
+
+    float hue = (rand() % 1000) / 1000.f;
+    std::cout << "Color : " << hue << std::endl;
+    RGBColor color = hslToRgb(hue, 1.f, 0.5f);
+
+    this->color = sf::Color(color.getRed(), color.getGreen(), color.getBlue());
 }
 
-void Entity::draw(sf::RenderWindow *window) {
+void Entity::draw(sf::RenderWindow *window, Camera *camera) {
+
+    Point screenPoint = camera->getScreenCoordinates(this->point);
+
+    float screenSize = this->size * camera->getZoom();
 
     for (int it = 0; it < 4; it++) {
         double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + this->rotation;
 
-        float currentX = this->point.getX() + (this->size * cos(angle));
-        float currentY = this->point.getY() + (this->size * sin(angle));
+        float currentX = screenPoint.getX() + (screenSize * cos(angle));
+        float currentY = screenPoint.getY() + (screenSize * sin(angle));
         vertexArray[it] = sf::Vector2f(currentX, currentY);
         vertexArray[it].color = this->color;
     }

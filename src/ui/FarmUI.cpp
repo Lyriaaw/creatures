@@ -42,7 +42,7 @@ void FarmUI::setPositions(Camera *camera) {
 
             rectangle->setSize(sf::Vector2f(CHUNK_SIZE * camera->getZoom(), CHUNK_SIZE * camera->getZoom()));
 
-            Point point = camera->getWorldCoordinates({float(it) * CHUNK_SIZE, float(jt) * CHUNK_SIZE});
+            Point point = camera->getScreenCoordinates({float(it) * CHUNK_SIZE, float(jt) * CHUNK_SIZE});
 
             rectangle->setPosition(point.getX(), point.getY());
 

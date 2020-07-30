@@ -52,16 +52,13 @@ void Camera::changeZoom(float ratio) {
 }
 
 void Camera::move(float x, float y) {
-    center.setX(center.getX() + (x / zoom));
-    center.setY(center.getY() + (y / zoom));
+    center.setX(center.getX() + (x));
+    center.setY(center.getY() + (y));
 }
 
-Point Camera::getWorldCoordinates(Point point) {
+Point Camera::getScreenCoordinates(Point point) {
     float x = (topLeft.getX() + (float(width) / 2.0f)) + ((point.getX() - center.getX()) * zoom);
     float y = (topLeft.getY() + (float(height) / 2.0f)) + ((point.getY() - center.getY()) * zoom);
-
-
-    std::cout << "Inputs => X:" << point.getX() << " Y: " << point.getY() << " | Outputs => X:" << x << " Y: " << y << std::endl;
 
     return {x, y};
 }

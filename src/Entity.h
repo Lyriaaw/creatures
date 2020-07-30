@@ -7,6 +7,7 @@
 
 
 #include "Point.h"
+#include "ui/Camera.h"
 #include <SFML/Graphics.hpp>
 #include <random>
 
@@ -15,7 +16,7 @@ class Entity {
 public:
     Entity(Point point, float size);
 
-    void draw(sf::RenderWindow *window);
+    void draw(sf::RenderWindow *window, Camera *camera);
 
 private:
     Point point;
