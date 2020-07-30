@@ -9,7 +9,7 @@
 
 class Point {
 public:
-    Point(int x, int y);
+    Point(float x, float y);
 
 
     float getX() const;

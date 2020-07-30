@@ -2,9 +2,11 @@
 // Created by Amalric Lombard de Buffières on 7/17/20.
 //
 
+#include <iostream>
 #include "FarmUI.h"
 #include "../farm/Farm.h"
 #include "../World.h"
+#include "Camera.h"
 
 FarmUI::FarmUI() {}
 
@@ -29,7 +31,29 @@ void FarmUI::loadMap(Map map) {
     }
 }
 
-void FarmUI::draw(sf::RenderWindow *window) {
+void FarmUI::setPositions(Camera *camera) {
+//     std::cout << "Setting positions " << camera->getZoom() << std::endl;
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<sf::RectangleShape> line;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+
+            sf::RectangleShape *rectangle = &tiles.at(it).at(jt);
+
+            rectangle->setSize(sf::Vector2f(CHUNK_SIZE * camera->getZoom(), CHUNK_SIZE * camera->getZoom()));
+
+            Point point = camera->getWorldCoordinates({float(it) * CHUNK_SIZE, float(jt) * CHUNK_SIZE});
+
+            rectangle->setPosition(point.getX(), point.getY());
+
+
+        }
+    }
+}
+
+void FarmUI::draw(sf::RenderWindow *window, Camera *camera) {
+    setPositions(camera);
+
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
             window->draw(tiles.at(it).at(jt));

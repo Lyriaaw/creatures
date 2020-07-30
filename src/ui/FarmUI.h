@@ -9,6 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include "../World.h"
 #include "../farm/Map.h"
+#include "Camera.h"
 
 class FarmUI {
 private:
@@ -17,8 +18,9 @@ public:
 
 public:
     FarmUI();
-    void draw(sf::RenderWindow *window);
+    void draw(sf::RenderWindow *window, Camera *camera);
     void loadMap(Map map);
+    void setPositions(Camera *camera);
 
 };
 

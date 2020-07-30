@@ -6,6 +6,7 @@
 #define CREATURES_MAINWINDOW_H
 #include <SFML/Graphics.hpp>
 #include "../farm/Farm.h"
+#include "Camera.h"
 
 
 class MainWindow {
@@ -23,9 +24,11 @@ public:
 private:
 
     Farm farm;
+    Camera *mainCamera;
 
     void runLoop(sf::RenderWindow *window);
     void handleEvents(sf::RenderWindow *window);
+    void handleKeyboardEvents(sf::Event::KeyEvent event);
     void draw(sf::RenderWindow *window);
 };
 
