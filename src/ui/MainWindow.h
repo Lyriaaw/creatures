@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "../farm/Farm.h"
 #include "Camera.h"
+#include "../UiEntity.h"
 
 
 class MainWindow {
@@ -20,6 +21,8 @@ public:
 
     std::chrono::system_clock::time_point renderDurationStart;
     std::chrono::system_clock::time_point renderDurationEnd;
+
+
 
 private:
 

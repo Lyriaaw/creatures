@@ -4,6 +4,7 @@
 
 #include "MainWindow.h"
 #include "../Entity.h"
+#include "../UiEntity.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -24,6 +25,16 @@ MainWindow::MainWindow() {
     farm = Farm();
     farm.InitFromRandom();
 
+    for (int it = 0; it < farm.getEntities().size(); it++) {
+        Entity currentEntity = farm.getEntities().at(it);
+
+        auto currentEntityUI =  UiEntity();
+        currentEntityUI.initialize(currentEntity.getColor());
+
+        currentEntity.setEntityUi(currentEntityUI);
+
+    }
+
     FarmUI farmUi = FarmUI();
     farmUi.loadMap(farm.getMap());
 
@@ -33,11 +44,6 @@ MainWindow::MainWindow() {
     mainCamera->setWidth(1920);
     mainCamera->setHeight(1080);
     mainCamera->setZoom(.4f);
-
-
-
-
-
 
 
     farm.setUi(farmUi);
@@ -115,7 +121,9 @@ void MainWindow::draw(RenderWindow *window) {
     farmUI.draw(window, mainCamera);
 
     for (auto & currentEntity : currentEntities) {
-        currentEntity.draw(window, mainCamera);
+        UiEntity currentEntityUI = currentEntity.getEntityUi();
+
+        currentEntityUI.draw(window, mainCamera, currentEntity.getPosition(), currentEntity.getSize(), currentEntity.getRotation(), currentEntity.getColor());
     }
 
     window->display();
