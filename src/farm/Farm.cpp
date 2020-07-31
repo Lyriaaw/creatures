@@ -47,9 +47,9 @@ void Farm::InitFromRandom() {
 
         Point point(x, y);
 
-        Entity entity(point, 10);
-        entities.push_back(entity);
 
+        Entity * entity = new Entity(point, 10);
+        entities.push_back(entity);
     }
 
 }
@@ -57,18 +57,19 @@ void Farm::InitFromRandom() {
 
 void Farm::Tick() {
     for (int it = 0; it < entities.size(); it++) {
-        entities.at(it).move();
+        entities.at(it)->move();
     }
 }
 
 
-const vector<Entity> &Farm::getEntities() const {
+void Farm::setEntities(const vector<Entity *> entities) {
+    Farm::entities = entities;
+}
+
+std::vector<Entity *> Farm::getEntities() const {
     return entities;
 }
 
-void Farm::setEntities(const vector<Entity> &entities) {
-    Farm::entities = entities;
-}
 
 void Farm::setUi(FarmUI ui) {
     Farm::ui = ui;

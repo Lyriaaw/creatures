@@ -8,27 +8,38 @@
 
 #include "Point.h"
 #include "ui/Camera.h"
-#include <SFML/Graphics.hpp>
 #include <random>
 
 
 class Entity {
 public:
-    Entity(Point point, float size);
+    Entity(Point position, float size);
 
-    void draw(sf::RenderWindow *window, Camera *camera);
+
+    void move();
+
+    float getColor() const;
+
+    const Point &getPosition() const;
+
+    float getSize() const;
+
+    float getRotation() const;
+
+    float getSpeed() const;
+
 
 private:
-    Point point;
+    Point position;
     float size;
 
     float rotation;
     float speed;
 
-    sf::VertexArray vertexArray;
-    sf::Color color;
-public:
-    void move();
+    float color;
+
+
+
 };
 
 

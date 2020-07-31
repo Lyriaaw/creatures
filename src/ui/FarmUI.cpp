@@ -4,8 +4,6 @@
 
 #include <iostream>
 #include "FarmUI.h"
-#include "../farm/Farm.h"
-#include "../World.h"
 #include "Camera.h"
 
 FarmUI::FarmUI() {}
@@ -59,5 +57,15 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera) {
             window->draw(tiles.at(it).at(jt));
         }
     }
+
+    for (int it = 0; it < entities.size(); it++) {
+        entities.at(it)->draw(window, camera);
+    }
+
 }
+
+void FarmUI::setEntities(const std::vector<EntityUI *> entities) {
+    FarmUI::entities = entities;
+}
+
 

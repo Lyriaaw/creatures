@@ -15,7 +15,7 @@
 
 class Farm {
 private:
-    std::vector<Entity> entities;
+    std::vector<Entity *> entities;
     FarmUI ui;
     Map map;
 
@@ -31,8 +31,8 @@ public:
     void setUi(FarmUI ui);
 
     Map getMap();
-    const std::vector<Entity> &getEntities() const;
-    void setEntities(const std::vector<Entity> &entities);
+    std::vector<Entity *> getEntities() const;
+    void setEntities(const std::vector<Entity *> entities);
 
 };
 

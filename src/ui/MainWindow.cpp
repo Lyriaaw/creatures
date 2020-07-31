@@ -4,6 +4,7 @@
 
 #include "MainWindow.h"
 #include "../Entity.h"
+#include "EntityUI.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -21,11 +22,24 @@ using namespace std;
 
 MainWindow::MainWindow() {
 
-    farm = Farm();
-    farm.InitFromRandom();
 
-    FarmUI farmUi = FarmUI();
-    farmUi.loadMap(farm.getMap());
+
+    farm = new Farm();
+    farm->InitFromRandom();
+
+    FarmUI *farmUi = new FarmUI();
+    farmUi->loadMap(farm->getMap());
+
+    std::vector<EntityUI *> entityUis;
+    for (int it = 0; it < farm->getEntities().size(); it++) {
+        Entity *entity = farm->getEntities().at(it);
+
+        EntityUI *entityUi = new EntityUI(entity);
+        entityUis.push_back(entityUi);
+
+
+    }
+    farmUi->setEntities(entityUis);
 
     Point center = Point(FARM_WIDTH / 2.f, FARM_HEIGHT / 2.f);
     Point topLeft = Point(0, 0);
@@ -35,32 +49,32 @@ MainWindow::MainWindow() {
     mainCamera->setZoom(.4f);
 
 
+    farm->setUi(*farmUi);
 
-
-
-
-
-    farm.setUi(farmUi);
 
 }
 
 
 void MainWindow::start() {
 
-    RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
-    window.setVerticalSyncEnabled(true);
+    std::cout << "Fucking shit !" << std::endl;
+
+
+    std::cout << "Fucking little shit !" << std::endl;
+
+    window = new RenderWindow(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
+    window->setVerticalSyncEnabled(true);
+
+
 
     running = true;
 
-    renderDurationStart = chrono::system_clock::now();
-    renderDurationEnd = chrono::system_clock::now();
 
-
-    runLoop(&window);
+    runLoop();
 }
 
 
-void MainWindow::handleEvents(RenderWindow *window) {
+void MainWindow::handleEvents() {
     // check all the window's events that were triggered since the last iteration of the loop
     Event event;
     while (window->pollEvent(event))
@@ -106,17 +120,12 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
     }
 }
 
-void MainWindow::draw(RenderWindow *window) {
+void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
-    std::vector<Entity> currentEntities = farm.getEntities();
-
-    FarmUI farmUI = farm.getUi();
+    FarmUI farmUI = farm->getUi();
     farmUI.draw(window, mainCamera);
 
-    for (auto & currentEntity : currentEntities) {
-        currentEntity.draw(window, mainCamera);
-    }
 
     window->display();
 
@@ -127,11 +136,11 @@ void MainWindow::draw(RenderWindow *window) {
 }
 
 
-void MainWindow::runLoop(RenderWindow *window) {
+void MainWindow::runLoop() {
     while (running) {
-        handleEvents(window);
-        farm.Tick();
-        draw(window);
+        handleEvents();
+        farm->Tick();
+        draw();
     }
 
     window->close();

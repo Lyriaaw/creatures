@@ -10,10 +10,12 @@
 #include "../World.h"
 #include "../farm/Map.h"
 #include "Camera.h"
+#include "EntityUI.h"
 
 class FarmUI {
 private:
     std::vector<std::vector<sf::RectangleShape>> tiles;
+    std::vector<EntityUI *> entities;
 public:
 
 public:
@@ -21,6 +23,8 @@ public:
     void draw(sf::RenderWindow *window, Camera *camera);
     void loadMap(Map map);
     void setPositions(Camera *camera);
+
+    void setEntities(const std::vector<EntityUI *> entities);
 
 };
 

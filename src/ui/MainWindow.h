@@ -23,13 +23,15 @@ public:
 
 private:
 
-    Farm farm;
+    Farm *farm;
     Camera *mainCamera;
 
-    void runLoop(sf::RenderWindow *window);
-    void handleEvents(sf::RenderWindow *window);
+    sf::RenderWindow *window;
+
+    void runLoop();
+    void handleEvents();
     void handleKeyboardEvents(sf::Event::KeyEvent event);
-    void draw(sf::RenderWindow *window);
+    void draw();
 };
 
 
