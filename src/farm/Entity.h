@@ -6,8 +6,8 @@
 #define CREATURES_ENTITY_H
 
 
-#include "Point.h"
-#include "ui/Camera.h"
+#include "../Point.h"
+#include "../ui/Camera.h"
 #include <random>
 
 

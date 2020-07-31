@@ -6,7 +6,7 @@
 #include <iostream>
 #include <math.h>
 
-#include "World.h"
+#include "../World.h"
 
 
 Entity::Entity(Point position, float size): position(position) {

@@ -6,7 +6,7 @@
 #define CREATURES_ENTITYUI_H
 
 
-#include "../Entity.h"
+#include "../farm/Entity.h"
 #include <SFML/Graphics.hpp>
 
 

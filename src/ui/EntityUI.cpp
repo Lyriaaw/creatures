@@ -4,8 +4,7 @@
 
 #include <iostream>
 #include "EntityUI.h"
-#include "../colors/RGBColor.h"
-#include "../Utils.h"
+#include "colors/ColorUtils.h"
 
 EntityUI::EntityUI(Entity *entity) : entity(entity) {
     this->vertexArray = sf::VertexArray(sf::Quads, 12);

@@ -4,7 +4,7 @@
 #include <array>
 #include <ctime>
 
-#include "src/Entity.h"
+#include "src/farm/Entity.h"
 #include "src/ui/MainWindow.h"
 
 

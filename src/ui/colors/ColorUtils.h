@@ -4,7 +4,8 @@
 
 
 
-#include "colors/RGBColor.h"
+
+#include "RGBColor.h"
 
 float checkIfBetween0And1(float value) {
     if (value > 1)

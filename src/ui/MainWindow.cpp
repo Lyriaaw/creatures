@@ -3,7 +3,7 @@
 //
 
 #include "MainWindow.h"
-#include "../Entity.h"
+#include "../farm/Entity.h"
 #include "EntityUI.h"
 
 #include <SFML/Window.hpp>
@@ -21,9 +21,6 @@ using namespace std;
 
 
 MainWindow::MainWindow() {
-
-
-
     farm = new Farm();
     farm->InitFromRandom();
 
