@@ -120,6 +120,9 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::Space:
             this->paused = !this->paused;
             break;
+        case Keyboard::Key::G:
+            this->mainCamera->switchGrid();
+            break;
 
     }
 }

@@ -21,6 +21,8 @@ class Camera {
 
     float zoom;
 
+    bool showGrid;
+
 public:
     Camera(Point center, Point topLeft);
 
@@ -43,6 +45,12 @@ public:
     float getZoom() const;
 
     void setZoom(float zoom);
+
+    bool isShowGrid() const;
+
+    void setShowGrid(bool showGrid);
+
+    void switchGrid();
 
 
     void changeZoom(float ratio);

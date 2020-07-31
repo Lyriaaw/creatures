@@ -63,7 +63,19 @@ Point Camera::getScreenCoordinates(Point point) {
     return {x, y};
 }
 
+void Camera::switchGrid() {
+    showGrid = !showGrid;
+}
+
 
 
 Camera::Camera(Point center, Point topLeft) : center(center), topLeft(topLeft) {
+}
+
+bool Camera::isShowGrid() const {
+    return showGrid;
+}
+
+void Camera::setShowGrid(bool showGrid) {
+    Camera::showGrid = showGrid;
 }

@@ -38,7 +38,13 @@ void FarmUI::setPositions(Camera *camera) {
 
             sf::RectangleShape *rectangle = &tiles.at(it).at(jt);
 
-            rectangle->setSize(sf::Vector2f(CHUNK_SIZE * camera->getZoom(), CHUNK_SIZE * camera->getZoom()));
+            int gridRatio = 0;
+
+            if (camera->isShowGrid()) {
+                gridRatio = 1;
+            }
+
+            rectangle->setSize(sf::Vector2f(CHUNK_SIZE * camera->getZoom() - gridRatio, CHUNK_SIZE * camera->getZoom() - gridRatio));
 
             Point point = camera->getScreenCoordinates({float(it) * CHUNK_SIZE, float(jt) * CHUNK_SIZE});
 
