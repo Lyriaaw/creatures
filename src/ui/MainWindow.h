@@ -17,6 +17,7 @@ public:
     void start();
 
     bool running = false;
+    bool paused = false;
 
     std::chrono::system_clock::time_point renderDurationStart;
     std::chrono::system_clock::time_point renderDurationEnd;

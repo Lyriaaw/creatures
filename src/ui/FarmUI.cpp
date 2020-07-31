@@ -18,9 +18,9 @@ void FarmUI::loadMap(Map map) {
             rectangle.setPosition((float(it) * CHUNK_SIZE) + 1, (float(jt) * CHUNK_SIZE) + 1);
 
             if (height > 0) {
-                rectangle.setFillColor(sf::Color(100, 100, 100, 255));
+                rectangle.setFillColor(sf::Color(128, 128, 128, 255));
             } else {
-                rectangle.setFillColor(sf::Color(0, 0, 100, 255));
+                rectangle.setFillColor(sf::Color(0, 9, 128, 255));
             }
 
             line.emplace_back(rectangle);

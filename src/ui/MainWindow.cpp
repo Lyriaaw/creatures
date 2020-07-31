@@ -106,10 +106,10 @@ void MainWindow::handleEvents() {
 void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
     switch (event.code) {
         case Keyboard::Key::Up:
-            mainCamera->move(0, 10);
+            mainCamera->move(0, -10);
             break;
         case Keyboard::Key::Down:
-            mainCamera->move(0, -10);
+            mainCamera->move(0, +10);
             break;
         case Keyboard::Key::Left:
             mainCamera->move(-10, 0);
@@ -117,6 +117,10 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::Right:
             mainCamera->move(10, 0);
             break;
+        case Keyboard::Key::Space:
+            this->paused = !this->paused;
+            break;
+
     }
 }
 
@@ -139,7 +143,9 @@ void MainWindow::draw() {
 void MainWindow::runLoop() {
     while (running) {
         handleEvents();
-        farm->Tick();
+        if (!paused) {
+            farm->Tick();
+        }
         draw();
     }
 
