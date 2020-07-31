@@ -6,7 +6,7 @@
 #define CREATURES_CAMERA_H
 
 
-#include "../Point.h"
+#include "../utils/Point.h"
 
 class Camera {
     // Center of the camera in the world
