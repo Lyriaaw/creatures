@@ -4,7 +4,7 @@
 
 #include "MainWindow.h"
 #include "../farm/Entity.h"
-#include "EntityUI.h"
+#include "CreatureUI.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -28,10 +28,10 @@ MainWindow::MainWindow() {
     farmUi->loadMap(farm->getMap());
 
     std::vector<EntityUI *> entityUis;
-    for (int it = 0; it < farm->getEntities().size(); it++) {
-        Entity *entity = farm->getEntities().at(it);
+    for (int it = 0; it < farm->getCreatures().size(); it++) {
+        Creature *entity = farm->getCreatures().at(it);
 
-        EntityUI *entityUi = new EntityUI(entity);
+        CreatureUI *entityUi = new CreatureUI(entity);
         entityUis.push_back(entityUi);
 
 

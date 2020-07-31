@@ -3,6 +3,7 @@
 //
 
 #include "Farm.h"
+#include "Creature.h"
 #include "perlin/PerlinNoise.h"
 
 #include <utility>
@@ -48,27 +49,20 @@ void Farm::InitFromRandom() {
         Point point(x, y);
 
 
-        Entity * entity = new Entity(point, 10);
-        entities.push_back(entity);
+        Creature * entity = new Creature(point, 10);
+        creatures.push_back(entity);
     }
 
 }
 
 
 void Farm::Tick() {
-    for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->move();
+    for (int it = 0; it < creatures.size(); it++) {
+        creatures.at(it)->move();
     }
 }
 
 
-void Farm::setEntities(const vector<Entity *> entities) {
-    Farm::entities = entities;
-}
-
-std::vector<Entity *> Farm::getEntities() const {
-    return entities;
-}
 
 
 void Farm::setUi(FarmUI ui) {
@@ -81,5 +75,13 @@ Map Farm::getMap() {
 
 const FarmUI &Farm::getUi() const {
     return ui;
+}
+
+const vector<Creature *> &Farm::getCreatures() const {
+    return creatures;
+}
+
+void Farm::setCreatures(const vector<Creature *> &creatures) {
+    Farm::creatures = creatures;
 }
 

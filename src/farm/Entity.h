@@ -16,7 +16,6 @@ public:
     Entity(Point position, float size);
 
 
-    void move();
 
     float getColor() const;
 
@@ -29,7 +28,7 @@ public:
     float getSpeed() const;
 
 
-private:
+protected:
     Point position;
     float size;
 

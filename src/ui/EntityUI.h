@@ -11,7 +11,7 @@
 
 
 class EntityUI {
-private:
+protected:
     Entity *entity;
 
     sf::VertexArray vertexArray;
@@ -19,9 +19,9 @@ private:
 
 
 public:
-    EntityUI(Entity *entity);
+    EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type);
 
-    void draw(sf::RenderWindow *window, Camera *camera);
+    virtual void draw(sf::RenderWindow *window, Camera *camera) = 0;
 
 
 };
