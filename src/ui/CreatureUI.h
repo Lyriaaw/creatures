@@ -10,6 +10,10 @@
 #include "../farm/Creature.h"
 
 class CreatureUI: public EntityUI {
+private:
+    sf::VertexArray sensors;
+    Creature * creature;
+
 public:
     CreatureUI(Creature *entity);
 

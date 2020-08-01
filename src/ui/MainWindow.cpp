@@ -88,7 +88,7 @@ void MainWindow::handleScroll(float delta) {
         deltaRatio = 1.1;
     } else if (delta > 0) {
         mainCamera->changeZoom(1.1f);
-        deltaRatio = 0.90909090909;
+        deltaRatio = 0.9;
     } else {
         return;
     }
@@ -275,6 +275,11 @@ void MainWindow::draw() {
     if (selectedCreature != nullptr) {
         mainCamera->setCenter(selectedCreature->getPosition());
     }
+
+//    Entity * glggobalSelectedEntity = getSelectedEntity();
+//    if (globalSelectedEntity != nullptr) {
+////        cout << "Selected entity: X:" << globalSelectedEntity->getSimpleCoordinates().getX() << " Y: " << globalSelectedEntity->getSimpleCoordinates().getY() << endl;
+//    }
 
     FarmUI farmUI = farm->getUi();
     farmUI.draw(window, mainCamera, getSelectedEntity());

@@ -7,6 +7,7 @@
 
 
 #include "../ui/Camera.h"
+#include "../World.h"
 #include <random>
 
 
@@ -28,6 +29,8 @@ public:
     float getBrightness() const;
 
     void setPosition(const Point &position);
+
+    Point getSimpleCoordinates();
 
 
 protected:

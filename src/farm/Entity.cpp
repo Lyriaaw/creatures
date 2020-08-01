@@ -8,7 +8,6 @@
 
 Entity::Entity(Point position, float size): position(position) {
     this->size = size;
-
 }
 
 
@@ -39,4 +38,9 @@ float Entity::getBrightness() const {
 
 void Entity::setPosition(const Point &position) {
     Entity::position = position;
+}
+
+
+Point Entity::getSimpleCoordinates() {
+    return {float(int(this->getPosition().getX() / float(CHUNK_SIZE))), float(int(this->getPosition().getY() / float(CHUNK_SIZE)))};
 }
