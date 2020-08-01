@@ -107,6 +107,26 @@ void MainWindow::handleScroll(float delta) {
     mainCamera->setCenter(newCameraCenter);
 }
 
+void MainWindow::handleMouseMove(int x, int y) {
+    if (rightMouseButtonDown) {
+        Point lastMousePosition = mainCamera->getWorldCoordinates({mouseX, mouseY});
+        Point newMousePosition = mainCamera->getWorldCoordinates({float(x), float(y)});
+
+        float deltaX = lastMousePosition.getX() - newMousePosition.getX();
+        float deltaY = lastMousePosition.getY() - newMousePosition.getY();
+
+        Point newCenter = {mainCamera->getCenter().getX() + deltaX, mainCamera->getCenter().getY() + deltaY};
+
+        this->mainCamera->setCenter(newCenter);
+    }
+
+
+
+    this->mouseX = float(x);
+    this->mouseY = float(y);
+
+}
+
 void MainWindow::handleEvents() {
     // check all the window's events that were triggered since the last iteration of the loop
     Event event;
@@ -121,11 +141,19 @@ void MainWindow::handleEvents() {
                 break;
             }
             case Event::MouseMoved: {
-                this->mouseX = float(event.mouseMove.x);
-                this->mouseY = float(event.mouseMove.y);
-                Point mouseWorldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
+                handleMouseMove(event.mouseMove.x, event.mouseMove.y);
                 break;
             }
+            case Event::MouseButtonPressed:
+                if (event.mouseButton.button == Mouse::Right) {
+                    rightMouseButtonDown = true;
+                }
+                break;
+            case Event::MouseButtonReleased:
+                if (event.mouseButton.button == Mouse::Right) {
+                    rightMouseButtonDown = false;
+                }
+                break;
             case Event::Closed:
                 running = false;
                 break;

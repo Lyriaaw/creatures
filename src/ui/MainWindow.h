@@ -23,6 +23,7 @@ public:
     std::chrono::system_clock::time_point renderDurationEnd;
 
     float mouseX, mouseY;
+    bool rightMouseButtonDown;
 
 private:
 
@@ -35,6 +36,7 @@ private:
     void handleEvents();
     void handleKeyboardEvents(sf::Event::KeyEvent event);
     void handleScroll(float delta);
+    void handleMouseMove(int x, int y);
     void draw();
 };
 
