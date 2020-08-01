@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "EntityUI.h"
+#include "colors/RGBColor.h"
 #include "colors/ColorUtils.h"
 
 EntityUI::EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type) : entity(entity) {

@@ -2,9 +2,7 @@
 // Created by Amalric Lombard de Buffières on 7/27/20.
 //
 
-#include <iostream>
 #include "Camera.h"
-#include "../World.h"
 
 
 const Point &Camera::getCenter() const {

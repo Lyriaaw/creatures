@@ -3,10 +3,8 @@
 //
 
 #include "Farm.h"
-#include "Creature.h"
 #include "perlin/PerlinNoise.h"
 
-#include <utility>
 #include <iostream>
 
 

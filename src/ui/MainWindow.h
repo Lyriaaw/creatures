@@ -33,6 +33,7 @@ private:
 
     float mouseX, mouseY;
     bool rightMouseButtonDown;
+    bool leftMouseButtonDown;
 
     Creature * selectedCreature = nullptr;
     Entity * selectedEntity = nullptr;
@@ -45,6 +46,8 @@ private:
     void handleMousePressed(sf::Mouse::Button button) ;
     void handleMouseReleased(sf::Mouse::Button button) ;
     void draw();
+
+    Entity * getSelectedEntity();
 };
 
 

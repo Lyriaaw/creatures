@@ -6,7 +6,6 @@
 #define CREATURES_ENTITY_H
 
 
-#include "../utils/Point.h"
 #include "../ui/Camera.h"
 #include <random>
 
@@ -27,6 +26,8 @@ public:
 
     float getSpeed() const;
     float getBrightness() const;
+
+    void setPosition(const Point &position);
 
 
 protected:

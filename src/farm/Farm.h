@@ -10,7 +10,6 @@
 
 #include "Entity.h"
 #include "../ui/FarmUI.h"
-#include "../World.h"
 #include "Map.h"
 #include "Creature.h"
 #include "Food.h"

@@ -36,3 +36,7 @@ float Entity::getSpeed() const {
 float Entity::getBrightness() const {
     return brightness;
 }
+
+void Entity::setPosition(const Point &position) {
+    Entity::position = position;
+}

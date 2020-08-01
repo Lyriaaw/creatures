@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 
 
+
 class EntityUI {
 protected:
     Entity *entity;

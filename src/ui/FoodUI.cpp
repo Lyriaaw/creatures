@@ -4,6 +4,7 @@
 
 #include "FoodUI.h"
 
+
 FoodUI::FoodUI(Food *entity): EntityUI(entity, 15, sf::TriangleFan) {
 }
 
@@ -27,7 +28,7 @@ void FoodUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEnt
         vertexArray[it] = sf::Vector2f(currentX, currentY);
 
         if (isSelected) {
-            vertexArray[it].color = sf::Color(255, 255, 255, 255);
+            vertexArray[it].color = sf::Color(255, 255, 255);
         } else {
             vertexArray[it].color = this->color;
         }

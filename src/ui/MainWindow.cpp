@@ -3,7 +3,6 @@
 //
 
 #include "MainWindow.h"
-#include "../farm/Entity.h"
 #include "CreatureUI.h"
 #include "FoodUI.h"
 
@@ -108,9 +107,9 @@ void MainWindow::handleScroll(float delta) {
 }
 
 void MainWindow::handleMouseMove(int x, int y) {
+    Point lastMousePosition = mainCamera->getWorldCoordinates({mouseX, mouseY});
+    Point newMousePosition = mainCamera->getWorldCoordinates({float(x), float(y)});
     if (rightMouseButtonDown) {
-        Point lastMousePosition = mainCamera->getWorldCoordinates({mouseX, mouseY});
-        Point newMousePosition = mainCamera->getWorldCoordinates({float(x), float(y)});
 
         float deltaX = lastMousePosition.getX() - newMousePosition.getX();
         float deltaY = lastMousePosition.getY() - newMousePosition.getY();
@@ -125,12 +124,22 @@ void MainWindow::handleMouseMove(int x, int y) {
     this->mouseX = float(x);
     this->mouseY = float(y);
 
+    Entity * globalSelectedEntity = getSelectedEntity();
+    if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
+        globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
+    }
+
+
 }
 
 void MainWindow::handleMousePressed(sf::Mouse::Button button) {
     if (button == Mouse::Right) {
         rightMouseButtonDown = true;
     }
+    if (button == Mouse::Left) {
+        leftMouseButtonDown = true;
+    }
+
 }
 void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     if (button == Mouse::Right) {
@@ -138,8 +147,16 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     }
 
     if (button == Mouse::Left) {
+        leftMouseButtonDown = false;
+    }
+
+
+
+
+    if (button == Mouse::Left) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
 
+        bool found = false;
         for (int it = 0; it < farm->getCreatures().size(); it++) {
             Creature * entity = farm->getCreatures().at(it);
 
@@ -148,8 +165,31 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
             if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
                 selectedCreature = entity;
+                selectedEntity = nullptr;
+                found = true;
             }
         }
+
+        for (int it = 0; it < farm->getFoods().size(); it++) {
+            Entity * entity = farm->getFoods().at(it);
+
+            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
+            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+
+            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+                selectedEntity = entity;
+                selectedCreature = nullptr;
+                found = true;
+            }
+        }
+
+        if (!found) {
+            selectedEntity = nullptr;
+            selectedCreature = nullptr;
+        }
+
+
+
     }
 }
 
@@ -209,15 +249,35 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::G:
             this->mainCamera->switchGrid();
             break;
+        case Keyboard::Key::C:
+            this->selectedEntity = nullptr;
+            this->selectedCreature = nullptr;
+            break;
+
 
     }
+}
+
+Entity * MainWindow::getSelectedEntity() {
+    if (selectedCreature != nullptr) {
+        return selectedCreature;
+    }
+    if (selectedEntity != nullptr) {
+        return selectedEntity;
+    }
+
+    return nullptr;
 }
 
 void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
+    if (selectedCreature != nullptr) {
+        mainCamera->setCenter(selectedCreature->getPosition());
+    }
+
     FarmUI farmUI = farm->getUi();
-    farmUI.draw(window, mainCamera, selectedCreature);
+    farmUI.draw(window, mainCamera, getSelectedEntity());
 
 
     window->display();

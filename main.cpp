@@ -4,7 +4,6 @@
 #include <array>
 #include <ctime>
 
-#include "src/farm/Entity.h"
 #include "src/ui/MainWindow.h"
 
 
@@ -22,8 +21,6 @@ int main(int argc, char **argv)
 {
 
     srand((unsigned) time(0));
-
-    cout << "Hello ?" << endl;
 
     MainWindow window = MainWindow();
     window.start();
