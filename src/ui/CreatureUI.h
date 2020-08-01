@@ -13,7 +13,7 @@ class CreatureUI: public EntityUI {
 public:
     CreatureUI(Creature *entity);
 
-    void draw(sf::RenderWindow *window, Camera *camera);
+    void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
 };
 
 

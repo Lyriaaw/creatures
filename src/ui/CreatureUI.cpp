@@ -7,7 +7,7 @@
 CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 12, sf::Quads) {
 }
 
-void CreatureUI::draw(sf::RenderWindow *window, Camera *camera) {
+void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) {
 
     Point screenPoint = camera->getScreenCoordinates(this->entity->getPosition());
 
@@ -20,7 +20,12 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera) {
         float currentX = screenPoint.getX() + (screenSize * cos(angle));
         float currentY = screenPoint.getY() + (screenSize * sin(angle));
         vertexArray[it] = sf::Vector2f(currentX, currentY);
-        vertexArray[it].color = this->color;
+
+        if (selectedEntity == this->entity) {
+            vertexArray[it].color = sf::Color(255, 255, 255, 255);
+        } else {
+            vertexArray[it].color = this->color;
+        }
     }
 
 

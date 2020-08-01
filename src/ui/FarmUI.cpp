@@ -55,7 +55,7 @@ void FarmUI::setPositions(Camera *camera) {
     }
 }
 
-void FarmUI::draw(sf::RenderWindow *window, Camera *camera) {
+void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) {
     setPositions(camera);
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
@@ -65,7 +65,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera) {
     }
 
     for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->draw(window, camera);
+        entities.at(it)->draw(window, camera, selectedEntity);
     }
 
 }

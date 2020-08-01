@@ -9,10 +9,11 @@
 #include "EntityUI.h"
 #include "../farm/Food.h"
 
+
 class FoodUI: public EntityUI {
 public:
     FoodUI(Food *food);
-    void draw(sf::RenderWindow *window, Camera *camera);
+    void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
 };
 
 

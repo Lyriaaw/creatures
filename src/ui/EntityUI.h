@@ -21,7 +21,7 @@ protected:
 public:
     EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type);
 
-    virtual void draw(sf::RenderWindow *window, Camera *camera) = 0;
+    virtual void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) = 0;
 
 
 };

@@ -16,6 +16,15 @@ public:
 
     void start();
 
+
+
+private:
+
+    Farm *farm;
+    Camera *mainCamera;
+
+    sf::RenderWindow *window;
+
     bool running = false;
     bool paused = false;
 
@@ -25,18 +34,16 @@ public:
     float mouseX, mouseY;
     bool rightMouseButtonDown;
 
-private:
-
-    Farm *farm;
-    Camera *mainCamera;
-
-    sf::RenderWindow *window;
+    Creature * selectedCreature = nullptr;
+    Entity * selectedEntity = nullptr;
 
     void runLoop();
     void handleEvents();
     void handleKeyboardEvents(sf::Event::KeyEvent event);
     void handleScroll(float delta);
     void handleMouseMove(int x, int y);
+    void handleMousePressed(sf::Mouse::Button button) ;
+    void handleMouseReleased(sf::Mouse::Button button) ;
     void draw();
 };
 

@@ -20,7 +20,7 @@ public:
 
 public:
     FarmUI();
-    void draw(sf::RenderWindow *window, Camera *camera);
+    void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
     void loadMap(Map map);
     void setPositions(Camera *camera);
 

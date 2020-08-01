@@ -127,6 +127,33 @@ void MainWindow::handleMouseMove(int x, int y) {
 
 }
 
+void MainWindow::handleMousePressed(sf::Mouse::Button button) {
+    if (button == Mouse::Right) {
+        rightMouseButtonDown = true;
+    }
+}
+void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
+    if (button == Mouse::Right) {
+        rightMouseButtonDown = false;
+    }
+
+    if (button == Mouse::Left) {
+        Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
+
+        for (int it = 0; it < farm->getCreatures().size(); it++) {
+            Creature * entity = farm->getCreatures().at(it);
+
+            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
+            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+
+            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+                selectedCreature = entity;
+            }
+        }
+    }
+}
+
+
 void MainWindow::handleEvents() {
     // check all the window's events that were triggered since the last iteration of the loop
     Event event;
@@ -145,14 +172,10 @@ void MainWindow::handleEvents() {
                 break;
             }
             case Event::MouseButtonPressed:
-                if (event.mouseButton.button == Mouse::Right) {
-                    rightMouseButtonDown = true;
-                }
+                handleMousePressed(event.mouseButton.button);
                 break;
             case Event::MouseButtonReleased:
-                if (event.mouseButton.button == Mouse::Right) {
-                    rightMouseButtonDown = false;
-                }
+                handleMouseReleased(event.mouseButton.button);
                 break;
             case Event::Closed:
                 running = false;
@@ -194,7 +217,7 @@ void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
     FarmUI farmUI = farm->getUi();
-    farmUI.draw(window, mainCamera);
+    farmUI.draw(window, mainCamera, selectedCreature);
 
 
     window->display();
@@ -203,10 +226,7 @@ void MainWindow::draw() {
     renderDurationEnd = chrono::system_clock::now();
     chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
     renderDurationStart = chrono::system_clock::now();
-
-//    cout << "Time: " << elapsed_time.count() << endl;
 }
-
 
 void MainWindow::runLoop() {
     while (running) {
