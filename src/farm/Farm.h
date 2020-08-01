@@ -13,10 +13,12 @@
 #include "../World.h"
 #include "Map.h"
 #include "Creature.h"
+#include "Food.h"
 
 class Farm {
 private:
     std::vector<Creature *> creatures;
+    std::vector<Food *> foods;
     FarmUI ui;
     Map map;
 
@@ -34,6 +36,8 @@ public:
     Map getMap();
 
     const std::vector<Creature *> &getCreatures() const;
+
+    const std::vector<Food *> &getFoods() const;
 
     void setCreatures(const std::vector<Creature *> &creatures);
 };

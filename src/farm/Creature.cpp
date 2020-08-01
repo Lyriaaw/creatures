@@ -2,11 +2,13 @@
 // Created by Amalric Lombard de Buffières on 8/1/20.
 //
 
+#include <iostream>
 #include "Creature.h"
 #include "../World.h"
 
 Creature::Creature(Point position, float size): Entity(position, size) {
-
+    this->color = (rand() % 1000) / 1000.f;
+    this->brightness = 0.5f;
 }
 
 void Creature::move() {
@@ -24,21 +26,25 @@ void Creature::move() {
     }
 
 
+    float nextX = this->position.getX() + (this->speed * cos(this->rotation));
+    float nextY = this->position.getY() + (this->speed * sin(this->rotation));
 
-    this->position.setX(this->position.getX() + (this->speed * cos(this->rotation)));
-    this->position.setY(this->position.getY() + (this->speed * sin(this->rotation)));
+
 
     if (this->position.getX() < 0) {
-        this->position.setX(FARM_WIDTH);
+        nextX = 0;
     }
     if (this->position.getX() > FARM_WIDTH) {
-        this->position.setX(0);
+        nextX = FARM_WIDTH;
     }
 
     if (this->position.getY() < 0) {
-        this->position.setY(FARM_HEIGHT);
+        nextY = 0;
     }
     if (this->position.getY() > FARM_HEIGHT) {
-        this->position.setY(0);
+        nextY = FARM_HEIGHT;
     }
+
+    this->position.setX(nextX);
+    this->position.setY(nextY);
 }

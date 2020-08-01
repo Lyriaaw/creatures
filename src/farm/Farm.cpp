@@ -53,6 +53,19 @@ void Farm::InitFromRandom() {
         creatures.push_back(entity);
     }
 
+    for (int it = 0; it < 10000; it++) {
+        int x = distWidth(mt);
+        int y = distHeight(mt);
+
+        Point point(x, y);
+
+
+        Food * entity = new Food(point, 5);
+        foods.push_back(entity);
+    }
+
+
+
 }
 
 
@@ -83,5 +96,9 @@ const vector<Creature *> &Farm::getCreatures() const {
 
 void Farm::setCreatures(const vector<Creature *> &creatures) {
     Farm::creatures = creatures;
+}
+
+const vector<Food *> &Farm::getFoods() const {
+    return foods;
 }
 

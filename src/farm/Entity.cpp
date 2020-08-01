@@ -8,7 +8,6 @@
 
 Entity::Entity(Point position, float size): position(position) {
     this->size = size;
-    this->color = (rand() % 1000) / 1000.f;
 
 }
 
@@ -32,4 +31,8 @@ float Entity::getRotation() const {
 
 float Entity::getSpeed() const {
     return speed;
+}
+
+float Entity::getBrightness() const {
+    return brightness;
 }

@@ -5,6 +5,7 @@
 #include "MainWindow.h"
 #include "../farm/Entity.h"
 #include "CreatureUI.h"
+#include "FoodUI.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -28,14 +29,24 @@ MainWindow::MainWindow() {
     farmUi->loadMap(farm->getMap());
 
     std::vector<EntityUI *> entityUis;
+
+
+    for (int it = 0; it < farm->getFoods().size(); it++) {
+        Food *entity = farm->getFoods().at(it);
+
+        FoodUI *entityUi = new FoodUI(entity);
+        entityUis.push_back(entityUi);
+    }
+
     for (int it = 0; it < farm->getCreatures().size(); it++) {
         Creature *entity = farm->getCreatures().at(it);
 
         CreatureUI *entityUi = new CreatureUI(entity);
         entityUis.push_back(entityUi);
-
-
     }
+
+
+
     farmUi->setEntities(entityUis);
 
     Point center = Point(FARM_WIDTH / 2.f, FARM_HEIGHT / 2.f);
@@ -61,7 +72,6 @@ void MainWindow::start() {
 
     window = new RenderWindow(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
     window->setVerticalSyncEnabled(true);
-
 
 
     running = true;
@@ -137,6 +147,8 @@ void MainWindow::draw() {
     renderDurationEnd = chrono::system_clock::now();
     chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
     renderDurationStart = chrono::system_clock::now();
+
+    cout << "Time: " << elapsed_time.count() << endl;
 }
 
 

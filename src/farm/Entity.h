@@ -26,6 +26,7 @@ public:
     float getRotation() const;
 
     float getSpeed() const;
+    float getBrightness() const;
 
 
 protected:
@@ -36,7 +37,7 @@ protected:
     float speed;
 
     float color;
-
+    float brightness;
 
 
 };

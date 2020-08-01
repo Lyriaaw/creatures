@@ -7,9 +7,9 @@
 #include "colors/ColorUtils.h"
 
 EntityUI::EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type) : entity(entity) {
-    this->vertexArray = sf::VertexArray(sf::Quads, vertexCount);
+    this->vertexArray = sf::VertexArray(type, vertexCount);
 
-    RGBColor color = hslToRgb(entity->getColor(), 1.f, 0.5f);
+    RGBColor color = hslToRgb(entity->getColor(), 1.f, entity->getBrightness());
     this->color = sf::Color(color.getRed(), color.getGreen(), color.getBlue());
 }
 
