@@ -61,6 +61,7 @@ public:
 
 
     Point getScreenCoordinates(Point point);
+    Point getWorldCoordinates(Point point);
 };
 
 

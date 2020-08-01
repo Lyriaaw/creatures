@@ -57,11 +57,21 @@ void Camera::move(float x, float y) {
 }
 
 Point Camera::getScreenCoordinates(Point point) {
-    float x = (topLeft.getX() + (float(width) / 2.0f)) + ((point.getX() - center.getX()) * zoom);
+    float x = (topLeft.getX() + (float(width ) / 2.0f)) + ((point.getX() -  center.getX()) * zoom);
     float y = (topLeft.getY() + (float(height) / 2.0f)) + ((point.getY() - center.getY()) * zoom);
 
     return {x, y};
 }
+
+Point Camera::getWorldCoordinates(Point result) {
+
+    float pointX = center.getX() - (((topLeft.getX() + (float(width ) / 2.0f)) - result.getX()) / zoom);
+    float pointY = center.getY() - (((topLeft.getY() + (float(height) / 2.0f)) - result.getY()) / zoom);
+
+    return {pointX, pointY};
+}
+
+
 
 void Camera::switchGrid() {
     showGrid = !showGrid;

@@ -22,6 +22,8 @@ public:
     std::chrono::system_clock::time_point renderDurationStart;
     std::chrono::system_clock::time_point renderDurationEnd;
 
+    float mouseX, mouseY;
+
 private:
 
     Farm *farm;
@@ -32,6 +34,7 @@ private:
     void runLoop();
     void handleEvents();
     void handleKeyboardEvents(sf::Event::KeyEvent event);
+    void handleScroll(float delta);
     void draw();
 };
 

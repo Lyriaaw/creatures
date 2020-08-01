@@ -80,6 +80,32 @@ void MainWindow::start() {
     runLoop();
 }
 
+void MainWindow::handleScroll(float delta) {
+
+
+    float deltaRatio;
+    if (delta < 0) {
+        mainCamera->changeZoom(0.9f);
+        deltaRatio = 1.1;
+    } else if (delta > 0) {
+        mainCamera->changeZoom(1.1f);
+        deltaRatio = 0.90909090909;
+    } else {
+        return;
+    }
+
+    Point cameraCenter = mainCamera->getCenter();
+    Point mouseWorldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
+
+    float deltaX = cameraCenter.getX() - mouseWorldCoordinates.getX();
+    float deltaY = cameraCenter.getY() - mouseWorldCoordinates.getY();
+
+    float newX = mouseWorldCoordinates.getX() + (deltaX * (deltaRatio));
+    float newY = mouseWorldCoordinates.getY() + (deltaY * (deltaRatio));
+
+    Point newCameraCenter = {newX, newY};
+    mainCamera->setCenter(newCameraCenter);
+}
 
 void MainWindow::handleEvents() {
     // check all the window's events that were triggered since the last iteration of the loop
@@ -90,14 +116,16 @@ void MainWindow::handleEvents() {
             case Event::KeyPressed:
                 handleKeyboardEvents(event.key);
                 break;
-            case Event::MouseWheelScrolled:
-                if (event.mouseWheelScroll.delta < 0) {
-                    mainCamera->changeZoom(0.9f);
-                } else if (event.mouseWheelScroll.delta > 0) {
-                    mainCamera->changeZoom(1.1f);
-                }
-
+            case Event::MouseWheelScrolled: {
+                handleScroll(event.mouseWheelScroll.delta);
                 break;
+            }
+            case Event::MouseMoved: {
+                this->mouseX = float(event.mouseMove.x);
+                this->mouseY = float(event.mouseMove.y);
+                Point mouseWorldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
+                break;
+            }
             case Event::Closed:
                 running = false;
                 break;
@@ -148,7 +176,7 @@ void MainWindow::draw() {
     chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
     renderDurationStart = chrono::system_clock::now();
 
-    cout << "Time: " << elapsed_time.count() << endl;
+//    cout << "Time: " << elapsed_time.count() << endl;
 }
 
 
