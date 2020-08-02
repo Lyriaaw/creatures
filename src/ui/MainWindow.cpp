@@ -273,7 +273,7 @@ void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
     if (selectedCreature != nullptr) {
-        mainCamera->setCenter(selectedCreature->getPosition());
+//        mainCamera->setCenter(selectedCreature->getPosition());
     }
 
 //    Entity * glggobalSelectedEntity = getSelectedEntity();
@@ -282,7 +282,7 @@ void MainWindow::draw() {
 //    }
 
     FarmUI farmUI = farm->getUi();
-    farmUI.draw(window, mainCamera, getSelectedEntity());
+    farmUI.draw(window, mainCamera, selectedCreature);
 
 
     window->display();
@@ -296,9 +296,7 @@ void MainWindow::draw() {
 void MainWindow::runLoop() {
     while (running) {
         handleEvents();
-        if (!paused) {
-            farm->Tick();
-        }
+        farm->Tick(paused, selectedCreature);
         draw();
     }
 

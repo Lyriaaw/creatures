@@ -16,6 +16,13 @@ public:
 
     float getSensorRotation(int index);
     float getSensorLength(int index);
+    float getSensorDistance(int index);
+
+    void findSelectedChunks();
+    void getSensorCoordinates(std::vector<Entity *> entites, Creature * selectedCreature);
+
+    const std::vector<Point> &getSelectedChunks() const;
+    const std::vector<Entity *> &getAccessibleEntities() const;
 
 
 private:
@@ -26,6 +33,9 @@ private:
     std::vector<float> sensorColors;
     std::vector<float> sensorHue;
 
+    std::vector<Point> selectedChunks;
+
+    std::vector<Entity *> accessibleEntities;
 
 };
 

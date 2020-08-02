@@ -20,6 +20,10 @@ public:
 
     void setY(float y);
 
+    Point getSimpleCoordinates();
+
+    bool equals(Point point) const;
+
 
 private:
     float x;

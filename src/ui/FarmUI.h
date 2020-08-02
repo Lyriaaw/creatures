@@ -11,18 +11,21 @@
 #include "../farm/Map.h"
 #include "Camera.h"
 #include "EntityUI.h"
+#include "../farm/Creature.h"
 
 class FarmUI {
 private:
+    Map * map;
+
     std::vector<std::vector<sf::RectangleShape>> tiles;
     std::vector<EntityUI *> entities;
 public:
 
 public:
     FarmUI();
-    void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
-    void loadMap(Map map);
-    void setPositions(Camera *camera);
+    void draw(sf::RenderWindow *window, Camera *camera, Creature * selectedEntity);
+    void loadMap(Map *map);
+    void setPositions(Camera *camera, Creature * selectedEntity);
 
     void setEntities(const std::vector<EntityUI *> entities);
 

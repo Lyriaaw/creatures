@@ -62,19 +62,22 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
 
 
     // Sensors
-    sf::Color sensorColor = sf::Color(0, 0, 0, 255);
 
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {
-        float sensorDistance = creature->getSensorLength(sensorIndex) * camera->getZoom();
+        sf::Color sensorColor = sf::Color(0, 0, 0, 255);
+        if (this->creature->getSensorDistance(sensorIndex) == 1) {
+            sensorColor = sf::Color(255, 0, 0, 255);
+        }
 
-        float sensorRotation = creature->getSensorRotation(sensorIndex) + this->entity->getRotation();
+        float currentSensorLength = creature->getSensorLength(sensorIndex);
+        float currentSensorRotation = creature->getSensorRotation(sensorIndex) + creature->getRotation();
 
-        float sensorX = (cos(sensorRotation) * sensorDistance) + screenPoint.getX();
-        float sensorY = (sin(sensorRotation) * sensorDistance) + screenPoint.getY();
+        float sensorX = (cos(currentSensorRotation) * currentSensorLength) + creature->getPosition().getX();
+        float sensorY = (sin(currentSensorRotation) * currentSensorLength) + creature->getPosition().getY();
 
-
-        float currentX = sensorX + ((2 * camera->getZoom()) * cos(sensorRotation));
-        float currentY = sensorY + ((2 * camera->getZoom()) * sin(sensorRotation));
+        Point sensorScreenPlace = camera->getScreenCoordinates(Point(sensorX, sensorY));
+        float currentX = sensorScreenPlace.getX();
+        float currentY = sensorScreenPlace.getY();
 
         sensors[2 * sensorIndex].position = sf::Vector2f(currentX, currentY);
         sensors[2 * sensorIndex].color = sensorColor;

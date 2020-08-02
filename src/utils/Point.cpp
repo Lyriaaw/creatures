@@ -3,6 +3,7 @@
 //
 
 #include "Point.h"
+#include "../World.h"
 
 
 Point::Point(float x, float y) {
@@ -28,6 +29,14 @@ float Point::getY() const {
 
 void Point::setY(float y) {
     Point::y = y;
+}
+
+Point Point::getSimpleCoordinates() {
+    return {float(int(this->x / float(CHUNK_SIZE))), float(int(this->y / float(CHUNK_SIZE)))};
+}
+
+bool Point::equals(Point point) const {
+    return (point.x == this->x && point.y == this->y);
 }
 
 

@@ -27,7 +27,7 @@ public:
     Farm();
     void InitFromRandom();
     void InitRandomMap();
-    void Tick();
+    void Tick(bool paused, Creature * selectedCreature);
     void generateEntityGrid();
 
 
@@ -36,7 +36,7 @@ public:
 
     void setUi(FarmUI ui);
 
-    Map getMap();
+    Map * getMap();
 
     const std::vector<Creature *> &getCreatures() const;
 

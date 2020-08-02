@@ -14,7 +14,7 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
-    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145};
+    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117 };
     float seed = rand() % 1000000;
 //    float seed = 1568;
     PerlinNoise perlin(seed);
@@ -29,6 +29,15 @@ void Farm::InitRandomMap() {
 
             map.setTileAt(it, jt, height);
         }
+    }
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<std::vector<Entity *>> line;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            std::vector<Entity *> currentChunk;
+            line.push_back(currentChunk);
+        }
+        entityGrid.push_back(line);
     }
 }
 
@@ -52,7 +61,7 @@ void Farm::InitFromRandom() {
         creatures.push_back(entity);
     }
 
-    for (int it = 0; it < 10000; it++) {
+    for (int it = 0; it < 1000; it++) {
         int x = distWidth(mt);
         int y = distHeight(mt);
 
@@ -65,37 +74,46 @@ void Farm::InitFromRandom() {
 }
 
 
-void Farm::Tick() {
+void Farm::Tick(bool paused, Creature * selectedCreature) {
     for (int it = 0; it < creatures.size(); it++) {
-        creatures.at(it)->move();
+        Creature * currentCreature = creatures.at(it);
+        if (!paused) {
+            currentCreature->move();
+        }
+
+        currentCreature->findSelectedChunks();
+
+        std::vector<Entity *> accessibleEntities;
+        for (int jt = 0; jt < currentCreature->getSelectedChunks().size(); jt++) {
+            Point currentChunk = currentCreature->getSelectedChunks().at(jt);
+
+            std::vector<Entity *> chunkEntities = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+            accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
+        }
+
+        currentCreature->getSensorCoordinates(accessibleEntities, selectedCreature);
     }
 
     generateEntityGrid();
 }
 
 void Farm::generateEntityGrid() {
-
-    std::vector<std::vector<std::vector<Entity *>>> newEntityGrid;
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        std::vector<std::vector<Entity *>> line;
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            std::vector<Entity *> currentChunk;
-            line.push_back(currentChunk);
+            entityGrid.at(it).at(jt).clear();
         }
-        newEntityGrid.push_back(line);
     }
 
     for (int it = 0; it < creatures.size(); it++) {
         Point simpleCoordinates = creatures.at(it)->getSimpleCoordinates();
-        newEntityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(creatures.at(it));
+        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(creatures.at(it));
     }
 
     for (int it = 0; it < foods.size(); it++) {
         Point simpleCoordinates = foods.at(it)->getSimpleCoordinates();
-        newEntityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(foods.at(it));
+        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(foods.at(it));
     }
 
-    entityGrid = newEntityGrid;
 }
 
 
@@ -105,8 +123,8 @@ void Farm::setUi(FarmUI ui) {
     Farm::ui = ui;
 }
 
-Map Farm::getMap() {
-    return map;
+Map * Farm::getMap() {
+    return &map;
 }
 
 const FarmUI &Farm::getUi() const {
