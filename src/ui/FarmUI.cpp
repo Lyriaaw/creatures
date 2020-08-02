@@ -41,7 +41,7 @@ void FarmUI::setPositions(Camera *camera, Creature * selectedEntity) {
                 rectangle->setFillColor(sf::Color(0, 9, 128, 255));
             }
 
-            if (selectedEntity != nullptr) {
+            if (selectedEntity != nullptr && camera->isShowGrid()) {
                 for (int kt = 0; kt < selectedEntity->getSelectedChunks().size(); kt++) {
                     if (selectedEntity->getSelectedChunks().at(kt).equals(Point(it, jt))) {
                         rectangle->setFillColor(sf::Color(200, 200, 200, 255));

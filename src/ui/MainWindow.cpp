@@ -51,8 +51,14 @@ MainWindow::MainWindow() {
     Point center = Point(FARM_WIDTH / 2.f, FARM_HEIGHT / 2.f);
     Point topLeft = Point(0, 0);
     mainCamera = new Camera(center, topLeft);
-    mainCamera->setWidth(1920);
-    mainCamera->setHeight(1080);
+
+//    mainCamera->setWidth(1920);
+//    mainCamera->setHeight(1080);
+
+    mainCamera->setWidth(WINDOW_WIDTH);
+    mainCamera->setHeight(WINDOW_HEIGHT);
+
+
     mainCamera->setZoom(.4f);
 
 
@@ -222,6 +228,9 @@ void MainWindow::handleEvents() {
                 break;
             case Event::Resized:
                 View view = View(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f), sf::Vector2f(event.size.width, event.size.height));
+
+                mainCamera->setWidth(event.size.width);
+                mainCamera->setHeight(event.size.height);
                 window->setView(view);
                 break;
         }
@@ -272,8 +281,8 @@ Entity * MainWindow::getSelectedEntity() {
 void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
-    if (selectedCreature != nullptr) {
-//        mainCamera->setCenter(selectedCreature->getPosition());
+    if (selectedCreature != nullptr && !mainCamera->isShowGrid()) {
+        mainCamera->setCenter(selectedCreature->getPosition());
     }
 
 //    Entity * glggobalSelectedEntity = getSelectedEntity();

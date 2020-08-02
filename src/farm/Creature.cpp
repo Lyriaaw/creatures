@@ -9,22 +9,24 @@
 Creature::Creature(Point position, float size): Entity(position, size) {
     this->color = (rand() % 1000) / 1000.f;
     this->brightness = 0.5f;
-    this->rotation = (rand() % 628) / 100.f;
+//    this->rotation = ((rand() % 200) / 100.f) - 1.f;
+    this->rotation = 0.f;
 
 
 
-    int sensorCount = rand() % 5 + 3;
+    int sensorCount = rand() % 7 + 3;
 //    int sensorCount = 1;
     for (int it = 0; it < sensorCount; it++) {
         float currentSensorLength = (((rand() % 300) / 100.f) + 2) * this->size;
 
 
         float randomRotation = ((rand() % 200) / 100.f) - 1.f ;
+//        float randomRotation = 0.f ;
 
         float randomColor = ((rand() % 999) / 1000.f);
 //        float randomColor = 0.40f;
 
-        float currentSensorRotation =  randomRotation * M_PI;
+        float currentSensorRotation =  randomRotation;
         sensorRotations.push_back(currentSensorRotation);
         sensorLengths.push_back(currentSensorLength);
         sensorColors.push_back(randomColor);
@@ -50,8 +52,8 @@ void Creature::move() {
     }
 
 
-    float nextX = this->position.getX() + (this->speed * cos(this->rotation));
-    float nextY = this->position.getY() + (this->speed * sin(this->rotation));
+    float nextX = this->position.getX() + (this->speed * cos((this->rotation * M_PI)));
+    float nextY = this->position.getY() + (this->speed * sin((this->rotation * M_PI)));
 
 
 
@@ -84,7 +86,7 @@ void Creature::findSelectedChunks() {
     int sensorCount = getSensorCount();
     for (int it = 0; it < sensorCount; it++) {
         float currentLength = getSensorLength(it);
-        float currentRotation = getSensorRotation(it) + this->rotation;
+        float currentRotation = (getSensorRotation(it)  + this->rotation) * float(M_PI);
 
         float sensorX = (cos(currentRotation) * currentLength) + this->position.getX();
         float sensorY = (sin(currentRotation) * currentLength) + this->position.getY();
@@ -147,7 +149,7 @@ void Creature::getSensorCoordinates(std::vector<Entity *> accessibleEntities, Cr
     for (int it = 0; it < sensorCount; it++) {
 
         float currentLength = getSensorLength(it);
-        float currentRotation = getSensorRotation(it) + this->rotation;
+        float currentRotation = (sensorRotations.at(it) + this->rotation) * float(M_PI);
 
         float sensorX = (cos(currentRotation) * currentLength) + this->position.getX();
         float sensorY = (sin(currentRotation) * currentLength) + this->position.getY();
@@ -187,6 +189,12 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
             continue;
         }
 
+        float entitiesDistance = sqrt(pow(this->position.getX() - currentAccessibleEntity->getPosition().getX(), 2) + pow(this->position.getY() - currentAccessibleEntity->getPosition().getY(), 2));
+
+        if (entitiesDistance > this->sensorLengths.at(sensorIndex) + currentAccessibleEntity->getSize()) {
+            continue;
+        }
+
         // Check if the entity is between the two ends of the sensor
         // Add the size of the entity for margin purposes
         if (
@@ -212,11 +220,11 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
 
         float closestX = ((currentAccessibleEntity->getPosition().getX() + m * currentAccessibleEntity->getPosition().getY()) - (m * p)) / float(pow(m, 2) + 1);
         float closestY = (m * (currentAccessibleEntity->getPosition().getX() + m * currentAccessibleEntity->getPosition().getY()) + p) / float(pow(m, 2) + 1);
-        float entitiesDistance = sqrt(pow(closestX - position.getX(), 2) + pow(closestY - position.getY(), 2));
+        float preciseEntitiesDistance = sqrt(pow(closestX - position.getX(), 2) + pow(closestY - position.getY(), 2));
 
         float currentSensorLength = sensorLengths[sensorIndex];
 
-        float sensorCurrentDistanceValue = 1.f - (entitiesDistance / currentSensorLength);
+        float sensorCurrentDistanceValue = 1.f - (preciseEntitiesDistance / currentSensorLength);
 
         if (sensorCurrentDistanceValue <= sensorDistanceValue) {
             continue;
@@ -224,8 +232,8 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
 
         sensorDistanceValue = sensorCurrentDistanceValue;
 
-        float hueDistances = std::min(abs(currentAccessibleEntity->getColor() - this->sensorColors.at(sensorIndex)), 1 - abs(currentAccessibleEntity->getColor() - this->sensorColors.at(sensorIndex)));
-        sensorDistanceBrightness = pow(1.f - hueDistances, 2);
+        float hueDistances = std::min(abs(currentAccessibleEntity->getColor() - this->sensorColors.at(sensorIndex)), 1.f - abs(currentAccessibleEntity->getColor() - this->sensorColors.at(sensorIndex)));
+        sensorDistanceBrightness = float(pow(2, - (hueDistances * 5)));
     }
 
     this->sensorDistances.insert(this->sensorDistances.begin() + sensorIndex, sensorDistanceValue);
