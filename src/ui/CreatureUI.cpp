@@ -64,9 +64,9 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
 
 
 
-    if (selectedEntity != this->creature) {
-        return;
-    }
+//    if (selectedEntity != this->creature) {
+//        return;
+//    }
 
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {

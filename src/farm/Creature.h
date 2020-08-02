@@ -7,6 +7,7 @@
 
 
 #include "Entity.h"
+#include "brain/Brain.h"
 
 class Creature: public Entity {
 public:
@@ -24,12 +25,19 @@ public:
     void findSelectedChunks();
     void getSensorCoordinates(std::vector<Entity *> entites, Creature * selectedCreature);
 
+    int addVisionSensorSensor(float length, float rotation, float color);
     const std::vector<Point> &getSelectedChunks() const;
 
-    void getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
+    Brain *getBrain() const;
+    void setBrain(Brain *brain);
+
+//    std::vector<Evolution *> evolutions;
 
 
 private:
+    Brain * brain;
+
+
     std::vector<float> sensorRotations;
     std::vector<float> sensorLengths;
     std::vector<float> sensorColors;
@@ -39,6 +47,7 @@ private:
 
     std::vector<Point> selectedChunks;
 
+    void getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
 };
 
 

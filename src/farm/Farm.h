@@ -13,6 +13,7 @@
 #include "Map.h"
 #include "Creature.h"
 #include "Food.h"
+#include "brain/CreatureNursery.h"
 
 class Farm {
 private:
@@ -22,6 +23,8 @@ private:
     Map map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
+
+    CreatureNursery * nursery;
 
 public:
     Farm();
@@ -43,6 +46,8 @@ public:
     const std::vector<Food *> &getFoods() const;
 
     void setCreatures(const std::vector<Creature *> &creatures);
+
+    CreatureNursery *getNursery() const;
 };
 
 

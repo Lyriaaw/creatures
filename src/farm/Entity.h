@@ -32,8 +32,14 @@ public:
 
     Point getSimpleCoordinates();
 
+    int getId() const;
+
 
 protected:
+    static int GLOBAL_INDEX;
+
+    int id;
+
     Point position;
     float size;
 

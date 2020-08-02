@@ -14,7 +14,7 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
-    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575, 391032, 660340, 526115};
+    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575, 391032, 660340, 526115, 218205, 890683};
     float seed = rand() % 1000000;
 //    float seed = 1568;
     PerlinNoise perlin(seed);
@@ -50,15 +50,9 @@ void Farm::InitFromRandom() {
     InitRandomMap();
 
     std::uniform_real_distribution<float> distMovement(-1, 1);
+    nursery = new CreatureNursery();
     for (int it = 0; it < 1000; it++) {
-        int x = distWidth(mt);
-        int y = distHeight(mt);
-
-        Point point(x, y);
-
-
-        Creature * entity = new Creature(point, 10);
-        creatures.push_back(entity);
+        creatures.push_back(nursery->generateFromRandom());
     }
 
     for (int it = 0; it < 10000; it++) {
@@ -81,7 +75,9 @@ void Farm::Tick(bool paused, Creature * selectedCreature) {
             currentCreature->move();
         }
 
+
         currentCreature->findSelectedChunks();
+
 
         std::vector<Entity *> accessibleEntities;
         for (int jt = 0; jt < currentCreature->getSelectedChunks().size(); jt++) {
@@ -141,5 +137,9 @@ void Farm::setCreatures(const vector<Creature *> &creatures) {
 
 const vector<Food *> &Farm::getFoods() const {
     return foods;
+}
+
+CreatureNursery *Farm::getNursery() const {
+    return nursery;
 }
 

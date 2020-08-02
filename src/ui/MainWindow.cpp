@@ -42,6 +42,7 @@ MainWindow::MainWindow() {
 
         CreatureUI *entityUi = new CreatureUI(entity);
         entityUis.push_back(entityUi);
+
     }
 
 
@@ -171,6 +172,14 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
             if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
                 selectedCreature = entity;
+
+//                std::vector<Evolution *> genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getId());
+//
+//                for (int evolutionIndex = 0; evolutionIndex < genome.size(); evolutionIndex++) {
+//                    genome.at(evolutionIndex)->describe();
+//                }
+
+
                 selectedEntity = nullptr;
                 found = true;
             }

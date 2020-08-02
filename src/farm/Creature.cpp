@@ -4,9 +4,8 @@
 
 #include <iostream>
 #include "Creature.h"
-#include "../World.h"
 
-Creature::Creature(Point position, float size): Entity(position, size) {
+Creature::Creature(Point position, float size): Entity(position, size), brain(new Brain()) {
     this->color = (rand() % 1000) / 1000.f;
     this->brightness = 0.5f;
 //    this->rotation = ((rand() % 200) / 100.f) - 1.f;
@@ -14,27 +13,18 @@ Creature::Creature(Point position, float size): Entity(position, size) {
 
 
 
-    int sensorCount = rand() % 7 + 3;
-//    int sensorCount = 1;
-    for (int it = 0; it < sensorCount; it++) {
-        float currentSensorLength = (((rand() % 300) / 100.f) + 2) * this->size;
 
+}
 
-        float randomRotation = ((rand() % 200) / 100.f) - 1.f ;
-//        float randomRotation = 0.f ;
+int Creature::addVisionSensorSensor(float length, float rotation, float color) {
+    sensorLengths.push_back(length);
+    sensorRotations.push_back(rotation);
+    sensorColors.push_back(color);
 
-        float randomColor = ((rand() % 999) / 1000.f);
-//        float randomColor = 0.40f;
+    sensorDistances.push_back(0);
+    sensorBrightness.push_back(0);
 
-        float currentSensorRotation =  randomRotation;
-        sensorRotations.push_back(currentSensorRotation);
-        sensorLengths.push_back(currentSensorLength);
-        sensorColors.push_back(randomColor);
-
-        sensorDistances.push_back(0);
-        sensorBrightness.push_back(0);
-
-    }
+    return getSensorCount() - 1;
 }
 
 void Creature::move() {
@@ -142,9 +132,8 @@ void Creature::findSelectedChunks() {
     }
 }
 
-void Creature::getSensorCoordinates(std::vector<Entity *> accessibleEntities, Creature * selectedCreature) {
-    Point currentCreaturePosition = this->position.getSimpleCoordinates();
 
+void Creature::getSensorCoordinates(std::vector<Entity *> accessibleEntities, Creature * selectedCreature) {
     int sensorCount = getSensorCount();
     for (int it = 0; it < sensorCount; it++) {
 
@@ -269,5 +258,13 @@ float Creature::getSensorColor(int index) {
 
 const std::vector<Point> &Creature::getSelectedChunks() const {
     return selectedChunks;
+}
+
+Brain *Creature::getBrain() const {
+    return brain;
+}
+
+void Creature::setBrain(Brain *brain) {
+    Creature::brain = brain;
 }
 
