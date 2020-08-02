@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "CreatureNursery.h"
+#include "BrainConnector.h"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ using namespace std;
 CreatureNursery::CreatureNursery(): evolutionLibrary(EvolutionLibrary()){
 }
 
-Creature * CreatureNursery::generateFromRandom() {
+BrainConnector * CreatureNursery::generateFromRandom() {
     random_device rd;
     mt19937 mt(rd());
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
@@ -21,7 +22,9 @@ Creature * CreatureNursery::generateFromRandom() {
     int y = distHeight(mt);
 
     Creature * creature = new Creature(Point(x, y), 10);
+    Brain * brain = new Brain();
 
+    BrainConnector * connector = new BrainConnector(creature, brain);
 
     std::vector<Evolution *> creatureGenome;
     int sensorCount = rand() % 7 + 3;
@@ -29,9 +32,9 @@ Creature * CreatureNursery::generateFromRandom() {
         SensorEvolution * sensorEvol = new SensorEvolution();
 
         sensorEvol->setGenerationNumber(it);
-        sensorEvol->generateFromRandom(creature);
+        sensorEvol->generateFromRandom(connector);
 
-        sensorEvol->perform(creature);
+        sensorEvol->perform(connector);
 
         creatureGenome.emplace_back(sensorEvol);
     }
@@ -39,7 +42,7 @@ Creature * CreatureNursery::generateFromRandom() {
     evolutionLibrary.addGenome(creature->getId(), creatureGenome);
 
 
-    return creature;
+    return connector;
 }
 
 const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {

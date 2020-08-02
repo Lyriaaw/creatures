@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "../farm/Farm.h"
 #include "Camera.h"
+#include "BrainUI.h"
 
 
 class MainWindow {
@@ -35,8 +36,11 @@ private:
     bool rightMouseButtonDown;
     bool leftMouseButtonDown;
 
-    Creature * selectedCreature = nullptr;
+    BrainConnector * selectedCreature = nullptr;
     Entity * selectedEntity = nullptr;
+
+     BrainUI * brainUi;
+
 
 
     void runLoop();

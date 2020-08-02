@@ -14,7 +14,7 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
-    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575, 391032, 660340, 526115, 218205, 890683};
+    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575, 391032, 660340, 526115, 218205, 890683, 595048};
     float seed = rand() % 1000000;
 //    float seed = 1568;
     PerlinNoise perlin(seed);
@@ -52,7 +52,7 @@ void Farm::InitFromRandom() {
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
     for (int it = 0; it < 1000; it++) {
-        creatures.push_back(nursery->generateFromRandom());
+        connectors.push_back(nursery->generateFromRandom());
     }
 
     for (int it = 0; it < 10000; it++) {
@@ -68,9 +68,9 @@ void Farm::InitFromRandom() {
 }
 
 
-void Farm::Tick(bool paused, Creature * selectedCreature) {
-    for (int it = 0; it < creatures.size(); it++) {
-        Creature * currentCreature = creatures.at(it);
+void Farm::Tick(bool paused) {
+    for (int it = 0; it < connectors.size(); it++) {
+        Creature * currentCreature = connectors.at(it)->getCreature();
         if (!paused) {
             currentCreature->move();
         }
@@ -87,7 +87,8 @@ void Farm::Tick(bool paused, Creature * selectedCreature) {
             accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
         }
 
-        currentCreature->getSensorCoordinates(accessibleEntities, selectedCreature);
+        currentCreature->getSensorCoordinates(accessibleEntities);
+        connectors.at(it)->processBrainInputs();
     }
 
     generateEntityGrid();
@@ -100,9 +101,9 @@ void Farm::generateEntityGrid() {
         }
     }
 
-    for (int it = 0; it < creatures.size(); it++) {
-        Point simpleCoordinates = creatures.at(it)->getSimpleCoordinates();
-        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(creatures.at(it));
+    for (int it = 0; it < connectors.size(); it++) {
+        Point simpleCoordinates = connectors.at(it)->getCreature()->getSimpleCoordinates();
+        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(connectors.at(it)->getCreature());
     }
 
     for (int it = 0; it < foods.size(); it++) {
@@ -127,19 +128,15 @@ const FarmUI &Farm::getUi() const {
     return ui;
 }
 
-const vector<Creature *> &Farm::getCreatures() const {
-    return creatures;
-}
-
-void Farm::setCreatures(const vector<Creature *> &creatures) {
-    Farm::creatures = creatures;
-}
-
 const vector<Food *> &Farm::getFoods() const {
     return foods;
 }
 
 CreatureNursery *Farm::getNursery() const {
     return nursery;
+}
+
+const vector<BrainConnector *> &Farm::getConnectors() const {
+    return connectors;
 }
 

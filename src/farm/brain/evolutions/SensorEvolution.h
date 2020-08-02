@@ -7,12 +7,13 @@
 
 
 #include "Evolution.h"
+#include "../BrainConnector.h"
 
 class SensorEvolution: public Evolution {
 public:
     SensorEvolution();
-    void generateFromRandom(Creature * creature) override;
-    void perform(Creature * creature) override;
+    void generateFromRandom(BrainConnector * connector) override;
+    void perform(BrainConnector * connector) override;
     void describe() override;
 private:
     float sensorLength;

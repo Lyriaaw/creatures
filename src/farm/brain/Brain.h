@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "neurons/Neuron.h"
+#include "neurons/InputNeuron.h"
 
 class Brain {
 
@@ -16,9 +16,14 @@ public:
 
     void setNeurons(const std::vector<Neuron *> &neurons);
     void addNeuron(Neuron * neuron);
+    void addInputNeuron(InputNeuron * neuron);
+
+    const std::vector<InputNeuron *> &getInputNeurons() const;
+
 
 private:
     std::vector<Neuron *> neurons;
+    std::vector<InputNeuron *> inputNeurons;
 };
 
 

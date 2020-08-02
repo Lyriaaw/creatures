@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "EntityUI.h"
 #include "../farm/Creature.h"
+#include "../farm/brain/BrainConnector.h"
 
 class FarmUI {
 private:
@@ -23,7 +24,7 @@ public:
 
 public:
     FarmUI();
-    void draw(sf::RenderWindow *window, Camera *camera, Creature * selectedEntity);
+    void draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity);
     void loadMap(Map *map);
     void setPositions(Camera *camera, Creature * selectedEntity);
 

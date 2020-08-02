@@ -11,6 +11,8 @@
 
 class InputNeuron: public Neuron {
 public:
+    InputNeuron();
+
     virtual void fetchInputValue(Creature * creature) = 0;
 };
 

@@ -3,3 +3,5 @@
 //
 
 #include "InputNeuron.h"
+
+InputNeuron::InputNeuron(): Neuron() {}

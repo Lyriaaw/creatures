@@ -7,7 +7,6 @@
 
 
 #include "../Creature.h"
-#include "evolutions/Evolution.h"
 #include "evolutions/SensorEvolution.h"
 #include "evolutions/EvolutionLibrary.h"
 
@@ -17,7 +16,7 @@ private:
 public:
     CreatureNursery();
 
-    Creature * generateFromRandom();
+    BrainConnector * generateFromRandom();
 
     const EvolutionLibrary &getEvolutionLibrary() const;
 };

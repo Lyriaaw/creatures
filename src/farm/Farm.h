@@ -17,7 +17,7 @@
 
 class Farm {
 private:
-    std::vector<Creature *> creatures;
+    std::vector<BrainConnector *> connectors;
     std::vector<Food *> foods;
     FarmUI ui;
     Map map;
@@ -30,7 +30,7 @@ public:
     Farm();
     void InitFromRandom();
     void InitRandomMap();
-    void Tick(bool paused, Creature * selectedCreature);
+    void Tick(bool paused);
     void generateEntityGrid();
 
 
@@ -41,13 +41,13 @@ public:
 
     Map * getMap();
 
-    const std::vector<Creature *> &getCreatures() const;
 
     const std::vector<Food *> &getFoods() const;
 
-    void setCreatures(const std::vector<Creature *> &creatures);
 
     CreatureNursery *getNursery() const;
+
+    const std::vector<BrainConnector *> &getConnectors() const;
 };
 
 

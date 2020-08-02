@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Creature.h"
 
-Creature::Creature(Point position, float size): Entity(position, size), brain(new Brain()) {
+Creature::Creature(Point position, float size): Entity(position, size) {
     this->color = (rand() % 1000) / 1000.f;
     this->brightness = 0.5f;
 //    this->rotation = ((rand() % 200) / 100.f) - 1.f;
@@ -133,7 +133,7 @@ void Creature::findSelectedChunks() {
 }
 
 
-void Creature::getSensorCoordinates(std::vector<Entity *> accessibleEntities, Creature * selectedCreature) {
+void Creature::getSensorCoordinates(std::vector<Entity *> accessibleEntities) {
     int sensorCount = getSensorCount();
     for (int it = 0; it < sensorCount; it++) {
 
@@ -229,10 +229,6 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
     this->sensorBrightness.insert(this->sensorBrightness.begin() + sensorIndex, sensorDistanceBrightness);
 }
 
-
-
-
-
 int Creature::getSensorCount() {
     return sensorRotations.size();
 }
@@ -260,11 +256,4 @@ const std::vector<Point> &Creature::getSelectedChunks() const {
     return selectedChunks;
 }
 
-Brain *Creature::getBrain() const {
-    return brain;
-}
-
-void Creature::setBrain(Brain *brain) {
-    Creature::brain = brain;
-}
 

@@ -10,17 +10,28 @@ SensorEvolution::SensorEvolution(): Evolution() {
 
 }
 
-void SensorEvolution::generateFromRandom(Creature * creature) {
-    sensorLength = (((rand() % 300) / 100.f) + 2) * creature->getSize();
+void SensorEvolution::generateFromRandom(BrainConnector * connector) {
+    sensorLength = (((rand() % 300) / 100.f) + 2) * connector->getCreature()->getSize();
     sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     sensorColor = ((rand() % 999) / 1000.f);
 }
 
-void SensorEvolution::perform(Creature * creature) {
-    int index = creature->addVisionSensorSensor(sensorLength, sensorRotation, sensorColor);
-    Neuron * neuron = new DistanceSensorNeuron(index);
+void SensorEvolution::perform(BrainConnector * connector) {
+    int index = connector->getCreature()->addVisionSensorSensor(sensorLength, sensorRotation, sensorColor);
 
-    creature->getBrain()->addNeuron(neuron);
+    InputNeuron * distanceNeuron = new DistanceSensorNeuron(index);
+    distanceNeuron->setHueOutline(sensorColor);
+    distanceNeuron->setBrightnessOutline(0.5);
+    distanceNeuron->setName("Sensor distance");
+    connector->getBrain()->addInputNeuron(distanceNeuron);
+
+    InputNeuron * brightnessNeuron = new BrightnessSensorNeuron(index);
+    brightnessNeuron->setHueOutline(sensorColor);
+    brightnessNeuron->setBrightnessOutline(0.5);
+    distanceNeuron->setName("Sensor brightness");
+    connector->getBrain()->addInputNeuron(brightnessNeuron);
+
+
 }
 
 void SensorEvolution::describe() {

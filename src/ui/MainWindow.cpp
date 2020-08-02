@@ -21,6 +21,8 @@ using namespace std;
 
 
 MainWindow::MainWindow() {
+
+
     farm = new Farm();
     farm->InitFromRandom();
 
@@ -37,8 +39,8 @@ MainWindow::MainWindow() {
         entityUis.push_back(entityUi);
     }
 
-    for (int it = 0; it < farm->getCreatures().size(); it++) {
-        Creature *entity = farm->getCreatures().at(it);
+    for (int it = 0; it < farm->getConnectors().size(); it++) {
+        Creature *entity = farm->getConnectors().at(it)->getCreature();
 
         CreatureUI *entityUi = new CreatureUI(entity);
         entityUis.push_back(entityUi);
@@ -70,6 +72,12 @@ MainWindow::MainWindow() {
 
 
 void MainWindow::start() {
+
+//    if (!font.loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
+//        std::cout << "Font not loaded properly !" << std::endl;
+//        return;
+//    }
+
 
     std::cout << "Fucking shit !" << std::endl;
 
@@ -164,20 +172,25 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
 
         bool found = false;
-        for (int it = 0; it < farm->getCreatures().size(); it++) {
-            Creature * entity = farm->getCreatures().at(it);
+        for (int it = 0; it < farm->getConnectors().size(); it++) {
+            Creature * entity = farm->getConnectors().at(it)->getCreature();
 
             double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
             double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
 
             if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
-                selectedCreature = entity;
+                selectedCreature = farm->getConnectors().at(it);
 
-//                std::vector<Evolution *> genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getId());
-//
-//                for (int evolutionIndex = 0; evolutionIndex < genome.size(); evolutionIndex++) {
-//                    genome.at(evolutionIndex)->describe();
-//                }
+                std::vector<Neuron *> neurons = selectedCreature->getBrain()->getNeurons();
+
+                for (int evolutionIndex = 0; evolutionIndex < neurons.size(); evolutionIndex++) {
+                    std::cout << "Neuron #" << evolutionIndex << " value: " << neurons.at(evolutionIndex)->getValue() << std::endl;
+                }
+
+                if (brainUi != nullptr) {
+                    delete brainUi;
+                }
+                brainUi = new BrainUI(selectedCreature->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y);
 
 
                 selectedEntity = nullptr;
@@ -270,6 +283,8 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::C:
             this->selectedEntity = nullptr;
             this->selectedCreature = nullptr;
+            delete brainUi;
+            brainUi = nullptr;
             break;
 
 
@@ -278,7 +293,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 
 Entity * MainWindow::getSelectedEntity() {
     if (selectedCreature != nullptr) {
-        return selectedCreature;
+        return selectedCreature->getCreature();
     }
     if (selectedEntity != nullptr) {
         return selectedEntity;
@@ -291,7 +306,7 @@ void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
     if (selectedCreature != nullptr && !mainCamera->isShowGrid()) {
-        mainCamera->setCenter(selectedCreature->getPosition());
+        mainCamera->setCenter(selectedCreature->getCreature()->getPosition());
     }
 
 //    Entity * glggobalSelectedEntity = getSelectedEntity();
@@ -301,6 +316,10 @@ void MainWindow::draw() {
 
     FarmUI farmUI = farm->getUi();
     farmUI.draw(window, mainCamera, selectedCreature);
+
+    if (brainUi != nullptr) {
+        brainUi->draw(window);
+    }
 
 
     window->display();
@@ -314,7 +333,7 @@ void MainWindow::draw() {
 void MainWindow::runLoop() {
     while (running) {
         handleEvents();
-        farm->Tick(paused, selectedCreature);
+        farm->Tick(paused);
         draw();
     }
 

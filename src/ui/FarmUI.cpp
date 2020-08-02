@@ -5,6 +5,7 @@
 #include <iostream>
 #include "FarmUI.h"
 #include "Camera.h"
+#include "../farm/brain/BrainConnector.h"
 
 FarmUI::FarmUI() {}
 
@@ -66,8 +67,14 @@ void FarmUI::setPositions(Camera *camera, Creature * selectedEntity) {
     }
 }
 
-void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Creature * selectedEntity) {
-    setPositions(camera, selectedEntity);
+void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity) {
+    Creature * selectedCreature = nullptr;
+
+    if (selectedEntity != nullptr) {
+        selectedCreature = selectedEntity->getCreature();
+    }
+
+    setPositions(camera, selectedCreature);
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
@@ -76,9 +83,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Creature * selectedE
     }
 
     for (int it = 0; it < entities.size(); it++) {
-        Entity * currentEntity = entities.at(it)->getEntity();
-
-        entities.at(it)->draw(window, camera, selectedEntity);
+        entities.at(it)->draw(window, camera, selectedCreature);
     }
 
 }

@@ -12,6 +12,21 @@ void Brain::addNeuron(Neuron * neuron){
     this->neurons.push_back(neuron);
 }
 
+void Brain::addInputNeuron(InputNeuron * neuron){
+    int inputNeuronCount = inputNeurons.size();
+
+    neuron->setX(0.f);
+    neuron->setY(10.f * float(inputNeuronCount));
+
+    this->inputNeurons.push_back(neuron);
+    this->neurons.push_back(neuron);
+}
+
+
 void Brain::setNeurons(const std::vector<Neuron *> &neurons) {
     Brain::neurons = neurons;
+}
+
+const std::vector<InputNeuron *> &Brain::getInputNeurons() const {
+    return inputNeurons;
 }

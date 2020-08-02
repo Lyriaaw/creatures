@@ -7,6 +7,7 @@
 
 
 #include "../../Creature.h"
+#include "../BrainConnector.h"
 
 class Evolution {
 protected:
@@ -17,9 +18,9 @@ public:
 
     Evolution();
 
-    virtual void generateFromRandom(Creature * creature) = 0;
+    virtual void generateFromRandom(BrainConnector * connector) = 0;
 
-    virtual void perform(Creature * creature) = 0;
+    virtual void perform(BrainConnector * connector) = 0;
 
     virtual void describe() = 0;
 
