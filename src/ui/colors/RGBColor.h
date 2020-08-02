@@ -13,6 +13,7 @@ private:
     int blue;
 
 public:
+    RGBColor (float hue, float saturation, float light);
     RGBColor(int red, int green, int blue);
 
     int getRed() const;

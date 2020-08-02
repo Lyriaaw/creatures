@@ -14,7 +14,7 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
-    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117 };
+    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575};
     float seed = rand() % 1000000;
 //    float seed = 1568;
     PerlinNoise perlin(seed);
@@ -61,7 +61,7 @@ void Farm::InitFromRandom() {
         creatures.push_back(entity);
     }
 
-    for (int it = 0; it < 1000; it++) {
+    for (int it = 0; it < 10000; it++) {
         int x = distWidth(mt);
         int y = distHeight(mt);
 

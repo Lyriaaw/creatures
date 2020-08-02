@@ -2,10 +2,12 @@
 // Created by Amalric Lombard de Buffières on 8/1/20.
 //
 
+#include <iostream>
 #include "CreatureUI.h"
+#include "colors/RGBColor.h"
 
 CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 12, sf::Quads), creature(entity)  {
-    sensors = sf::VertexArray(sf::Lines, entity->getSensorCount() * 2);
+    sensors = sf::VertexArray(sf::Lines, entity->getSensorCount() * 4);
 }
 
 void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) {
@@ -25,7 +27,7 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         if (selectedEntity == this->entity) {
             vertexArray[it].color = sf::Color(255, 255, 255, 255);
         } else {
-            vertexArray[it].color = this->color;
+            vertexArray[it].color =  this->color;
         }
     }
 
@@ -58,16 +60,19 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         index++;
     }
 
+    window->draw(vertexArray);
 
 
+
+    if (selectedEntity != this->creature) {
+        return;
+    }
 
     // Sensors
 
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {
-        sf::Color sensorColor = sf::Color(0, 0, 0, 255);
-        if (this->creature->getSensorDistance(sensorIndex) == 1) {
-            sensorColor = sf::Color(255, 0, 0, 255);
-        }
+        RGBColor sensorRGB = RGBColor(this->creature->getSensorColor(sensorIndex), 1.f, 0.5f);
+        sf::Color sensorColor = sf::Color(sensorRGB.getRed(), sensorRGB.getGreen(), sensorRGB.getBlue(), 255);
 
         float currentSensorLength = creature->getSensorLength(sensorIndex);
         float currentSensorRotation = creature->getSensorRotation(sensorIndex) + creature->getRotation();
@@ -79,20 +84,45 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         float currentX = sensorScreenPlace.getX();
         float currentY = sensorScreenPlace.getY();
 
-        sensors[2 * sensorIndex].position = sf::Vector2f(currentX, currentY);
-        sensors[2 * sensorIndex].color = sensorColor;
+        sensors[4 * sensorIndex].position = sf::Vector2f(currentX, currentY);
+        sensors[4 * sensorIndex].color = sensorColor;
 
-        sensors[(2 * sensorIndex) + 1].position = sf::Vector2f(screenPoint.getX(), screenPoint.getY());
-        sensors[(2 * sensorIndex) + 1].color = sensorColor;
+        sensors[(4 * sensorIndex) + 1].position = sf::Vector2f(screenPoint.getX(), screenPoint.getY());
+        sensors[(4 * sensorIndex) + 1].color = sensorColor;
 
+
+
+
+        sf::Color sensorDistanceColor = sf::Color(0, 0, 0, 255);
+        float currentSensorDistance = creature->getSensorLength(sensorIndex) * (1.f - creature->getSensorDistance(sensorIndex));
+
+        if (creature->getSensorDistance(sensorIndex) > 0) {
+            std::cout << "Brightness: " << this->creature->getSensorBrightness(sensorIndex) << std::endl;
+            RGBColor sensorDistanceRGBColor = RGBColor(this->creature->getSensorColor(sensorIndex), 1.f, this->creature->getSensorBrightness(sensorIndex));
+            sensorDistanceColor = sf::Color(sensorDistanceRGBColor.getRed(), sensorDistanceRGBColor.getGreen(), sensorDistanceRGBColor.getBlue(), 255);
+        } else {
+            currentSensorDistance = 0;
+        }
+        float sensorDistanceX = (cos(currentSensorRotation) * currentSensorDistance) + creature->getPosition().getX();
+        float sensorDistanceY = (sin(currentSensorRotation) * currentSensorDistance) + creature->getPosition().getY();
+
+        Point sensorDistanceScreenPlace = camera->getScreenCoordinates(Point(sensorDistanceX, sensorDistanceY));
+        float currentDistanceX = sensorDistanceScreenPlace.getX();
+        float currentDistanceY = sensorDistanceScreenPlace.getY();
+
+        sensors[4 * sensorIndex + 2].position = sf::Vector2f(currentDistanceX, currentDistanceY);
+        sensors[4 * sensorIndex + 2].color = sensorDistanceColor;
+
+        sensors[(4 * sensorIndex) + 3].position = sf::Vector2f(screenPoint.getX(), screenPoint.getY());
+        sensors[(4 * sensorIndex) + 3].color = sensorDistanceColor;
 
         index++;
     }
-
-
-
-
-    window->draw(vertexArray);
     window->draw(sensors);
+
+
+
+
+
 
 }

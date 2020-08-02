@@ -16,26 +16,28 @@ public:
 
     float getSensorRotation(int index);
     float getSensorLength(int index);
+    float getSensorColor(int index);
+
     float getSensorDistance(int index);
+    float getSensorBrightness(int index);
 
     void findSelectedChunks();
     void getSensorCoordinates(std::vector<Entity *> entites, Creature * selectedCreature);
 
     const std::vector<Point> &getSelectedChunks() const;
-    const std::vector<Entity *> &getAccessibleEntities() const;
+
+    void getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
 
 
 private:
     std::vector<float> sensorRotations;
     std::vector<float> sensorLengths;
+    std::vector<float> sensorColors;
 
     std::vector<float> sensorDistances;
-    std::vector<float> sensorColors;
-    std::vector<float> sensorHue;
+    std::vector<float> sensorBrightness;
 
     std::vector<Point> selectedChunks;
-
-    std::vector<Entity *> accessibleEntities;
 
 };
 

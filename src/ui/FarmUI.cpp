@@ -78,23 +78,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Creature * selectedE
     for (int it = 0; it < entities.size(); it++) {
         Entity * currentEntity = entities.at(it)->getEntity();
 
-        bool found = false;
-
-        if (selectedEntity != nullptr) {
-            for (int jt = 0; jt < selectedEntity->getAccessibleEntities().size(); jt++) {
-                Entity * currentAccessibleEntity = selectedEntity->getAccessibleEntities().at(jt);
-                if (currentAccessibleEntity == currentEntity) {
-                    found = true;
-                }
-            }
-        }
-
-        if (found) {
-            entities.at(it)->draw(window, camera, currentEntity);
-
-        } else {
-            entities.at(it)->draw(window, camera, selectedEntity);
-        }
+        entities.at(it)->draw(window, camera, selectedEntity);
     }
 
 }
