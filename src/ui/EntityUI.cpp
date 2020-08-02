@@ -14,3 +14,7 @@ EntityUI::EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type) : en
     this->color = sf::Color(color.getRed(), color.getGreen(), color.getBlue());
 }
 
+Entity *EntityUI::getEntity() const {
+    return entity;
+}
+

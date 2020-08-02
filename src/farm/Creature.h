@@ -21,6 +21,7 @@ public:
 private:
     std::vector<float> sensorRotations;
     std::vector<float> sensorLengths;
+
     std::vector<float> sensorDistances;
     std::vector<float> sensorColors;
     std::vector<float> sensorHue;

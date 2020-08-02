@@ -9,6 +9,7 @@
 Creature::Creature(Point position, float size): Entity(position, size) {
     this->color = (rand() % 1000) / 1000.f;
     this->brightness = 0.5f;
+    this->rotation = (rand() % 628) / 100.f;
 
 
 
@@ -19,8 +20,6 @@ Creature::Creature(Point position, float size): Entity(position, size) {
 
         float randomRotation = ((rand() % 200) / 100.f) - 1.f ;
 
-        std::cout << "Random rotation:" << randomRotation << std::endl;
-//        float randomRotation = 0;
         float currentSensorRotation =  randomRotation * M_PI;
         sensorRotations.push_back(currentSensorRotation);
         sensorLengths.push_back(currentSensorLength);
@@ -47,22 +46,22 @@ void Creature::move() {
 
 
 
-    if (this->position.getX() < 0) {
+    if (nextX < 0) {
         nextX = 0;
     }
-    if (this->position.getX() > FARM_WIDTH) {
-        nextX = FARM_WIDTH;
+    if (int(nextX) >= FARM_WIDTH) {
+        nextX = FARM_WIDTH - 1;
     }
-
-    if (this->position.getY() < 0) {
+    if (nextY < 0) {
         nextY = 0;
     }
-    if (this->position.getY() > FARM_HEIGHT) {
-        nextY = FARM_HEIGHT;
+    if (int(nextY) >= FARM_HEIGHT) {
+        nextY = FARM_HEIGHT - 1;
     }
 
     this->position.setX(nextX);
     this->position.setY(nextY);
+
 }
 
 int Creature::getSensorCount() {

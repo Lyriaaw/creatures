@@ -38,6 +38,7 @@ private:
     Creature * selectedCreature = nullptr;
     Entity * selectedEntity = nullptr;
 
+
     void runLoop();
     void handleEvents();
     void handleKeyboardEvents(sf::Event::KeyEvent event);

@@ -21,11 +21,15 @@ private:
     FarmUI ui;
     Map map;
 
+    std::vector<std::vector<std::vector<Entity *>>> entityGrid;
+
 public:
     Farm();
     void InitFromRandom();
     void InitRandomMap();
     void Tick();
+    void generateEntityGrid();
+
 
 
     const FarmUI &getUi() const;

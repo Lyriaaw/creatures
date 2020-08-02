@@ -24,6 +24,8 @@ public:
 
     virtual void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) = 0;
 
+    Entity *getEntity() const;
+
 
 };
 

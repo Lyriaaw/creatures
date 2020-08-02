@@ -14,8 +14,9 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
-//    float seed = rand() % 10000;
-    float seed = 7980;
+    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145};
+    float seed = rand() % 1000000;
+//    float seed = 1568;
     PerlinNoise perlin(seed);
 
     cout << "Map generated with seed " << seed << endl;
@@ -61,9 +62,6 @@ void Farm::InitFromRandom() {
         Food * entity = new Food(point, 5);
         foods.push_back(entity);
     }
-
-
-
 }
 
 
@@ -71,6 +69,33 @@ void Farm::Tick() {
     for (int it = 0; it < creatures.size(); it++) {
         creatures.at(it)->move();
     }
+
+    generateEntityGrid();
+}
+
+void Farm::generateEntityGrid() {
+
+    std::vector<std::vector<std::vector<Entity *>>> newEntityGrid;
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<std::vector<Entity *>> line;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            std::vector<Entity *> currentChunk;
+            line.push_back(currentChunk);
+        }
+        newEntityGrid.push_back(line);
+    }
+
+    for (int it = 0; it < creatures.size(); it++) {
+        Point simpleCoordinates = creatures.at(it)->getSimpleCoordinates();
+        newEntityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(creatures.at(it));
+    }
+
+    for (int it = 0; it < foods.size(); it++) {
+        Point simpleCoordinates = foods.at(it)->getSimpleCoordinates();
+        newEntityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(foods.at(it));
+    }
+
+    entityGrid = newEntityGrid;
 }
 
 
