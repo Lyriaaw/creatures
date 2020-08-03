@@ -13,7 +13,8 @@
 
 class Entity {
 public:
-    Entity(Point position, float size);
+    Entity(Point position);
+
 
 
 
@@ -40,7 +41,7 @@ public:
 
     int getId() const;
 
-
+    void setSize(float size);
 
 
 protected:

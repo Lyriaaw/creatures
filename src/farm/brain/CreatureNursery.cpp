@@ -23,7 +23,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     int x = distWidth(mt);
     int y = distHeight(mt);
 
-    Creature * creature = new Creature(Point(x, y), 10);
+    Creature * creature = new Creature(Point(x, y));
     Brain * brain = new Brain();
 
     BrainConnector * connector = new BrainConnector(creature, brain);
@@ -35,8 +35,16 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     colorEvolution->perform(connector);
     creatureGenome.emplace_back(colorEvolution);
 
+    SizeEvolution * sizeEvolution = new SizeEvolution();
+    sizeEvolution->setGenerationNumber(2);
+    sizeEvolution->generateFromRandom(connector);
+    sizeEvolution->perform(connector);
+    creatureGenome.emplace_back(sizeEvolution);
+
+
+
     BiasInputEvolution * biasInputEvolution = new BiasInputEvolution();
-    biasInputEvolution->setGenerationNumber(2);
+    biasInputEvolution->setGenerationNumber(3);
     biasInputEvolution->perform(connector);
     creatureGenome.emplace_back(biasInputEvolution);
 
@@ -44,7 +52,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     for (int it = 0; it < sensorCount; it++) {
 
         SensorEvolution * sensorEvol = new SensorEvolution();
-        sensorEvol->setGenerationNumber((it * 2) + 3);
+        sensorEvol->setGenerationNumber((it * 2) + 4);
         sensorEvol->generateFromRandom(connector);
         sensorEvol->perform(connector);
         creatureGenome.emplace_back(sensorEvol);
@@ -52,17 +60,17 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     }
 
     SpeedEvolution * speedEvolution = new SpeedEvolution();
-    speedEvolution->setGenerationNumber(23);
+    speedEvolution->setGenerationNumber(24);
     speedEvolution->perform(connector);
     creatureGenome.emplace_back(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(24);
+    rotationEvolution->setGenerationNumber(25);
     rotationEvolution->perform(connector);
     creatureGenome.emplace_back(rotationEvolution);
 
 
-    int generationNumberIndex(25);
+    int generationNumberIndex(26);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
@@ -146,7 +154,7 @@ BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector *
     (father->getCreature()->getPosition().getY() + mother->getCreature()->getPosition().getY()) / 2,
     };
 
-    Creature * childCreature = new Creature(childSpawn, 10);
+    Creature * childCreature = new Creature(childSpawn);
     Brain * childBrain = new Brain();
     BrainConnector * connector = new BrainConnector(childCreature, childBrain);
 

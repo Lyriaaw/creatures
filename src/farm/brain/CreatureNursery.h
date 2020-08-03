@@ -14,6 +14,7 @@
 #include "evolutions/SpeedEvolution.h"
 #include "evolutions/EvolutionLibrary.h"
 #include "evolutions/ColorEvolution.h"
+#include "evolutions/SizeEvolution.h"
 
 class CreatureNursery {
 private:

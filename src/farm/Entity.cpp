@@ -7,11 +7,9 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position, float size): position(position) {
+Entity::Entity(Point position): position(position) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
-
-    this->size = size;
 }
 
 
@@ -63,4 +61,8 @@ void Entity::setSpeed(float speed) {
 
 void Entity::setColor(float color) {
     Entity::color = color;
+}
+
+void Entity::setSize(float size) {
+    Entity::size = size;
 }

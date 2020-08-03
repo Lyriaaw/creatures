@@ -44,6 +44,17 @@ Evolution * ColorEvolution::generateFromCastedMate(ColorEvolution * mate) {
         return childColorEvolution;
     }
 
+    // 3 chances out of 4 to simply select one of the parent's sensor
+    if (rand() % 4 != 0) {
+        if (rand() % 2 == 0) {
+            childColorEvolution->hue = this->hue;
+        } else {
+            childColorEvolution->hue = mate->hue;
+        }
+
+        return childColorEvolution;
+    }
+
     float newHue;
 
     float smallestHue = this->hue;

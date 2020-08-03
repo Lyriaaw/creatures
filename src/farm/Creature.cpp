@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Creature.h"
 
-Creature::Creature(Point position, float size): Entity(position, size) {
+Creature::Creature(Point position): Entity(position) {
     this->brightness = 0.5f;
 //    this->rotation = ((rand() % 200) / 100.f) - 1.f;
     this->rotation = 0.f;

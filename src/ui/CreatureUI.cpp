@@ -49,8 +49,8 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         for (int it = 0; it < 4; it++) {
             double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
 
-            float currentX = eyeX + ((2 * camera->getZoom()) * cos(angle));
-            float currentY = eyeY + ((2 * camera->getZoom()) * sin(angle));
+            float currentX = eyeX + (((this->entity->getSize() / 5.f) * camera->getZoom()) * cos(angle));
+            float currentY = eyeY + (((this->entity->getSize() / 5.f) * camera->getZoom()) * sin(angle));
 
             int currentIt = it + (index * 4);
             vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
@@ -65,9 +65,9 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
 
 
 
-//    if (selectedEntity != this->creature) {
-//        return;
-//    }
+    if (selectedEntity != this->creature) {
+        return;
+    }
 
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {

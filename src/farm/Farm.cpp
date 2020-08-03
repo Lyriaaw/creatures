@@ -55,7 +55,7 @@ void Farm::InitFromRandom() {
         connectors.push_back(nursery->generateFromRandom());
     }
 
-    for (int it = 0; it < 10000; it++) {
+    for (int it = 0; it < 10; it++) {
         int x = distWidth(mt);
         int y = distHeight(mt);
 

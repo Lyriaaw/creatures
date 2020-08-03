@@ -10,7 +10,7 @@
 
 class Creature: public Entity {
 public:
-    Creature(Point position, float size);
+    Creature(Point position);
     void move();
     int getSensorCount();
 
@@ -26,6 +26,8 @@ public:
 
     void addSpeed(float speedToAdd);
     void addRotation(float rotationToAdd);
+
+
 
 
 
