@@ -69,8 +69,6 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         return;
     }
 
-    std::cout << "Speed: " << this->creature->getSpeed() << std::endl;
-
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {
         if (creature->getSensorDistance(sensorIndex) > 0) {

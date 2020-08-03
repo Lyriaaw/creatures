@@ -8,6 +8,7 @@
 
 #include "../Creature.h"
 #include "evolutions/SensorEvolution.h"
+#include "evolutions/BiasInputEvolution.h"
 #include "evolutions/EvolutionLibrary.h"
 
 class CreatureNursery {

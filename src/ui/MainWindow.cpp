@@ -178,10 +178,11 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
             if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
                 selectedCreature = farm->getConnectors().at(it);
 
+                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getCreature()->getId());
                 std::vector<Neuron *> neurons = selectedCreature->getBrain()->getNeurons();
 
-                for (int evolutionIndex = 0; evolutionIndex < neurons.size(); evolutionIndex++) {
-                    std::cout << "Neuron #" << evolutionIndex << " value: " << neurons.at(evolutionIndex)->getValue() << std::endl;
+                for (int evolutionIndex = 0; evolutionIndex < genome.size(); evolutionIndex++) {
+                    genome.at(evolutionIndex)->describe();
                 }
 
                 if (brainUi != nullptr) {

@@ -17,7 +17,7 @@ int Evolution::getGenerationNumber() {
 void Evolution::setGenerationNumber(int newGenerationNumber) {
     generationNumber = newGenerationNumber;
 
-    if (Evolution::nextEvolutionNumber < newGenerationNumber) {
+    if (Evolution::nextEvolutionNumber <= newGenerationNumber) {
         Evolution::nextEvolutionNumber = newGenerationNumber + 1;
     }
 }

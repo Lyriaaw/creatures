@@ -71,10 +71,17 @@ void Farm::InitFromRandom() {
 void Farm::Tick(bool paused) {
     for (int it = 0; it < connectors.size(); it++) {
         Creature * currentCreature = connectors.at(it)->getCreature();
+
+        connectors.at(it)->processBrainInputs();
+        connectors.at(it)->processBrain();
+
+        if (!paused) {
+            connectors.at(it)->processBrainOutputs();
+        }
+
         if (!paused) {
             currentCreature->move();
         }
-
 
         currentCreature->findSelectedChunks();
 
@@ -88,12 +95,6 @@ void Farm::Tick(bool paused) {
         }
 
         currentCreature->getSensorCoordinates(accessibleEntities);
-        connectors.at(it)->processBrainInputs();
-        connectors.at(it)->processBrain();
-
-        if (!paused) {
-            connectors.at(it)->processBrainOutputs();
-        }
     }
 
     generateEntityGrid();
