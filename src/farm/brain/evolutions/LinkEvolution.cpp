@@ -51,5 +51,46 @@ std::string LinkEvolution::describe() {
 }
 
 Evolution * LinkEvolution::generateWithMate(Evolution * mate) {
-    return nullptr;
+    LinkEvolution * mateSensorEvolution(nullptr);
+
+    if (mate == nullptr) {
+        std::cout << "NULL POINTER OF MATE SENSOR: " << generationNumber << std::endl;
+    } else {
+        mateSensorEvolution = dynamic_cast<LinkEvolution *>(mate);
+        if (mateSensorEvolution == nullptr) {
+            std::cout << "UNABLE TO CAST FATHER COLOR EVOLUTION" << std::endl;
+        }
+    }
+    return generateFromCastedMate(mateSensorEvolution);
+}
+
+Evolution * LinkEvolution::generateFromCastedMate(LinkEvolution * mate) {
+    LinkEvolution * childSensorEvolution = new LinkEvolution();
+    childSensorEvolution->setGenerationNumber(getGenerationNumber());
+
+    childSensorEvolution->inputGenerationNumber = inputGenerationNumber;
+    childSensorEvolution->outputGenerationNumber = outputGenerationNumber;
+
+    if (mate == nullptr) {
+        childSensorEvolution->weight = this->weight;
+        return childSensorEvolution;
+    }
+
+
+    // 3 chances out of 4 to simply select one of the parent's sensor
+    if (rand() % 4 != 0) {
+        if (rand() % 2 == 0) {
+            childSensorEvolution->weight = this->weight;
+        } else {
+            childSensorEvolution->weight = mate->weight;
+        }
+
+        return childSensorEvolution;
+    }
+
+    float newWeight = (this->weight + mate->weight) / 2.f;
+
+    childSensorEvolution->weight = newWeight;
+
+    return childSensorEvolution;
 }

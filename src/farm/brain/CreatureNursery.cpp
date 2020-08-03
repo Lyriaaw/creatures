@@ -150,12 +150,14 @@ BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector *
     Brain * childBrain = new Brain();
     BrainConnector * connector = new BrainConnector(childCreature, childBrain);
 
-    evolutionLibrary.addGenome(childCreature->getId(), childGenome);
 
     for (int it = 0; it < childGenome.size(); it++) {
         childGenome.at(it)->perform(connector);
         std::cout << "Applying evolution on child: " << childGenome.at(it)->describe() << std::endl;
     }
+
+    connector->getBrain()->generateLinkGrid();
+    evolutionLibrary.addGenome(childCreature->getId(), childGenome);
 
     return connector;
 }

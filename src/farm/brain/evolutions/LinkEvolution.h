@@ -18,6 +18,7 @@ public:
     void perform(BrainConnector * connector) override;
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
+    Evolution * generateFromCastedMate(LinkEvolution * mate);
 
     void generateFromNeurons(BrainConnector * connector, Neuron * input, Neuron * output);
 
