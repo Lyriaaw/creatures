@@ -13,6 +13,7 @@
 #include "EntityUI.h"
 #include "../farm/Creature.h"
 #include "../farm/brain/BrainConnector.h"
+#include "CreatureUI.h"
 
 class FarmUI {
 private:
@@ -29,6 +30,8 @@ public:
     void setPositions(Camera *camera, Creature * selectedEntity);
 
     void setEntities(const std::vector<EntityUI *> entities);
+
+    void addCreature(CreatureUI * creatureUI);
 
 };
 

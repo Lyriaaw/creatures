@@ -19,6 +19,12 @@ void BiasInputEvolution::perform(BrainConnector * connector) {
     connector->getBrain()->addInputNeuron(bias);
 }
 
-void BiasInputEvolution::describe() {
-    std::cout << this->generationNumber << " => Bias Input" << std::endl;
+std::string BiasInputEvolution::describe() {
+    return std::to_string(this->generationNumber) + " => Bias Input";
+}
+
+Evolution * BiasInputEvolution::generateWithMate(Evolution * mate) {
+    BiasInputEvolution * childEvolution = new BiasInputEvolution();
+    childEvolution->setGenerationNumber(getGenerationNumber());
+    return childEvolution;
 }

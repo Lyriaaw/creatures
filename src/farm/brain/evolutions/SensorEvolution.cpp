@@ -36,6 +36,10 @@ void SensorEvolution::perform(BrainConnector * connector) {
 
 }
 
-void SensorEvolution::describe() {
-    std::cout << this->generationNumber << " => Sensor => length: " << sensorLength << " rotation: " << sensorRotation << " color: " << sensorColor << std::endl;
+std::string SensorEvolution::describe() {
+    return std::to_string(this->generationNumber) + " => Sensor => length: " + std::to_string(sensorLength) + " rotation: " + std::to_string(sensorRotation) + " color: " + std::to_string(sensorColor);
+}
+
+Evolution * SensorEvolution::generateWithMate(Evolution * mate) {
+    return nullptr;
 }

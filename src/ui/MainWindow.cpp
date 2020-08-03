@@ -65,7 +65,7 @@ MainWindow::MainWindow() {
     mainCamera->setZoom(.4f);
 
 
-    farm->setUi(*farmUi);
+    farm->setUi(farmUi);
 
 
 }
@@ -136,10 +136,10 @@ void MainWindow::handleMouseMove(int x, int y) {
     this->mouseX = float(x);
     this->mouseY = float(y);
 
-    Entity * globalSelectedEntity = getSelectedEntity();
-    if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
-        globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
-    }
+//    Entity * globalSelectedEntity = getSelectedEntity();
+//    if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
+//        globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
+//    }
 
 
 }
@@ -153,6 +153,7 @@ void MainWindow::handleMousePressed(sf::Mouse::Button button) {
     }
 
 }
+
 void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     if (button == Mouse::Right) {
         rightMouseButtonDown = false;
@@ -177,17 +178,18 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
             if (deltaX < connector->getCreature()->getSize() && deltaY < connector->getCreature()->getSize()) {
                 if (selectedCreature != nullptr) {
-                    farm->getNursery()->Mate(selectedCreature, connector);
+                    BrainConnector * newCreature = farm->getNursery()->Mate(selectedCreature, connector);
+
+                    farm->addConnector(newCreature);
+
+                    CreatureUI *entityUi = new CreatureUI(newCreature->getCreature());
+                    farm->getUi()->addCreature(entityUi);
                 }
 
                 selectedCreature = farm->getConnectors().at(it);
 
                 std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getCreature()->getId());
                 std::vector<Neuron *> neurons = selectedCreature->getBrain()->getNeurons();
-
-                for (int evolutionIndex = 0; evolutionIndex < genome.size(); evolutionIndex++) {
-                    genome.at(evolutionIndex)->describe();
-                }
 
                 if (brainUi != nullptr) {
                     delete brainUi;
@@ -316,8 +318,8 @@ void MainWindow::draw() {
 ////        cout << "Selected entity: X:" << globalSelectedEntity->getSimpleCoordinates().getX() << " Y: " << globalSelectedEntity->getSimpleCoordinates().getY() << endl;
 //    }
 
-    FarmUI farmUI = farm->getUi();
-    farmUI.draw(window, mainCamera, selectedCreature);
+    FarmUI * farmUI = farm->getUi();
+    farmUI->draw(window, mainCamera, selectedCreature);
 
     if (brainUi != nullptr) {
         brainUi->draw(window);

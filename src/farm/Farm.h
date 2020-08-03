@@ -19,7 +19,7 @@ class Farm {
 private:
     std::vector<BrainConnector *> connectors;
     std::vector<Food *> foods;
-    FarmUI ui;
+    FarmUI * ui;
     Map map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
@@ -34,10 +34,9 @@ public:
     void generateEntityGrid();
 
 
+    FarmUI *getUi() const;
 
-    const FarmUI &getUi() const;
-
-    void setUi(FarmUI ui);
+    void setUi(FarmUI *ui);
 
     Map * getMap();
 
@@ -48,6 +47,8 @@ public:
     CreatureNursery *getNursery() const;
 
     const std::vector<BrainConnector *> &getConnectors() const;
+
+    void addConnector(BrainConnector * connector);
 };
 
 

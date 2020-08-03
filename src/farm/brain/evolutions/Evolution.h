@@ -22,7 +22,10 @@ public:
 
     virtual void perform(BrainConnector * connector) = 0;
 
-    virtual void describe() = 0;
+    virtual std::string describe() = 0;
+
+    virtual Evolution * generateWithMate(Evolution * mate) = 0;
+
 
     int getGenerationNumber();
 

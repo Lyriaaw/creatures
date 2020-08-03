@@ -6,14 +6,9 @@
 #include "Creature.h"
 
 Creature::Creature(Point position, float size): Entity(position, size) {
-    this->color = (rand() % 1000) / 1000.f;
     this->brightness = 0.5f;
 //    this->rotation = ((rand() % 200) / 100.f) - 1.f;
     this->rotation = 0.f;
-
-
-
-
 }
 
 int Creature::addVisionSensorSensor(float length, float rotation, float color) {

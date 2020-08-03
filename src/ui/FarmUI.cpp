@@ -6,6 +6,7 @@
 #include "FarmUI.h"
 #include "Camera.h"
 #include "../farm/brain/BrainConnector.h"
+#include "CreatureUI.h"
 
 FarmUI::FarmUI() {}
 
@@ -90,6 +91,10 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * sel
 
 void FarmUI::setEntities(const std::vector<EntityUI *> entities) {
     FarmUI::entities = entities;
+}
+
+void FarmUI::addCreature(CreatureUI * creatureUI) {
+    this->entities.push_back(creatureUI);
 }
 
 

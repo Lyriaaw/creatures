@@ -13,7 +13,8 @@ public:
     RotationEvolution();
     void generateFromRandom(BrainConnector * connector) override;
     void perform(BrainConnector * connector) override;
-    void describe() override;
+    std::string describe() override;
+    Evolution * generateWithMate(Evolution * mate) override;
 };
 
 

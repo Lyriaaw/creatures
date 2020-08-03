@@ -122,16 +122,9 @@ void Farm::generateEntityGrid() {
 
 
 
-void Farm::setUi(FarmUI ui) {
-    Farm::ui = ui;
-}
 
 Map * Farm::getMap() {
     return &map;
-}
-
-const FarmUI &Farm::getUi() const {
-    return ui;
 }
 
 const vector<Food *> &Farm::getFoods() const {
@@ -144,5 +137,17 @@ CreatureNursery *Farm::getNursery() const {
 
 const vector<BrainConnector *> &Farm::getConnectors() const {
     return connectors;
+}
+
+FarmUI *Farm::getUi() const {
+    return ui;
+}
+
+void Farm::setUi(FarmUI *ui) {
+    Farm::ui = ui;
+}
+
+void Farm::addConnector(BrainConnector * connector) {
+    this->connectors.push_back(connector);
 }
 

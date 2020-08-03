@@ -18,6 +18,12 @@ void RotationEvolution::perform(BrainConnector * connector) {
     connector->getBrain()->addOutputNeuron(rotation);
 }
 
-void RotationEvolution::describe() {
-    std::cout << this->generationNumber << " => Rotation output " << std::endl;
+std::string RotationEvolution::describe() {
+    return std::to_string(this->generationNumber) + " => Rotation output ";
+}
+
+Evolution * RotationEvolution::generateWithMate(Evolution * mate) {
+    RotationEvolution * childEvolution = new RotationEvolution();
+    childEvolution->setGenerationNumber(getGenerationNumber());
+    return childEvolution;
 }

@@ -18,6 +18,12 @@ void SpeedEvolution::perform(BrainConnector * connector) {
     connector->getBrain()->addOutputNeuron(speed);
 }
 
-void SpeedEvolution::describe() {
-    std::cout << this->generationNumber << " => Speed output " << std::endl;
+std::string SpeedEvolution::describe() {
+    return std::to_string(this->generationNumber) + " => Speed output ";
+}
+
+Evolution * SpeedEvolution::generateWithMate(Evolution * mate) {
+    SpeedEvolution * childEvolution = new SpeedEvolution();
+    childEvolution->setGenerationNumber(getGenerationNumber());
+    return childEvolution;
 }

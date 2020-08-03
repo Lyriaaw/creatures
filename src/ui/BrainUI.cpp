@@ -74,7 +74,7 @@ void BrainUI::initialize(sf::Font * font) {
 
         sf::Text text;
         text.setFont(*font);
-        text.setString(currentNeuron->getName());
+        text.setString(currentNeuron->getName() + " (" + std::to_string(currentNeuron->getGenerationNumber()) + ")");
         text.setFillColor(sf::Color(255, 255, 255));
         text.setCharacterSize(18);
         text.setPosition(neuronScreenX - text.getGlobalBounds().width - 20, neuronScreenY - (text.getGlobalBounds().height / 4.f));

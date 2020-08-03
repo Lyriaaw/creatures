@@ -13,6 +13,7 @@
 #include "evolutions/LinkEvolution.h"
 #include "evolutions/SpeedEvolution.h"
 #include "evolutions/EvolutionLibrary.h"
+#include "evolutions/ColorEvolution.h"
 
 class CreatureNursery {
 private:

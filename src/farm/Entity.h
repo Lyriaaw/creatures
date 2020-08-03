@@ -19,6 +19,8 @@ public:
 
     float getColor() const;
 
+    void setColor(float color);
+
     const Point &getPosition() const;
 
     float getSize() const;
@@ -37,6 +39,8 @@ public:
     Point getSimpleCoordinates();
 
     int getId() const;
+
+
 
 
 protected:

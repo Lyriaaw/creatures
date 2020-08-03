@@ -60,3 +60,7 @@ void Entity::setRotation(float rotation) {
 void Entity::setSpeed(float speed) {
     Entity::speed = speed;
 }
+
+void Entity::setColor(float color) {
+    Entity::color = color;
+}

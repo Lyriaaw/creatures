@@ -11,11 +11,13 @@
 class LinkEvolution: public Evolution {
 private:
     int inputGenerationNumber, outputGenerationNumber;
+    float weight;
 public:
     LinkEvolution();
     void generateFromRandom(BrainConnector * connector) override;
     void perform(BrainConnector * connector) override;
-    void describe() override;
+    std::string describe() override;
+    Evolution * generateWithMate(Evolution * mate) override;
 
     void generateFromNeurons(BrainConnector * connector, Neuron * input, Neuron * output);
 
