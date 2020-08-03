@@ -9,6 +9,8 @@
 
 class Neuron {
 protected:
+    int generationNumber;
+
     float value;
 
     int x;
@@ -19,7 +21,7 @@ protected:
     std::string name;
 
 public:
-    float getValue() const;
+    virtual float getValue() = 0;
 
     int getX() const;
 
@@ -40,6 +42,10 @@ public:
 
     void clear();
     void addValue(float addedValue);
+
+    int getGenerationNumber() const;
+
+    void setGenerationNumber(int generationNumber);
 };
 
 

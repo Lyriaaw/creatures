@@ -6,7 +6,7 @@
 #include "CreatureNursery.h"
 #include "BrainConnector.h"
 #include "neurons/BiasNeuron.h"
-#include "evolutions/SpeedAndRotationEvolution.h"
+#include "evolutions/SpeedEvolution.h"
 
 using namespace std;
 
@@ -27,13 +27,18 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     Brain * brain = new Brain();
 
     BrainConnector * connector = new BrainConnector(creature, brain);
-
     std::vector<Evolution *> creatureGenome;
+
+    BiasInputEvolution * biasInputEvolution = new BiasInputEvolution();
+    biasInputEvolution->setGenerationNumber(1);
+    biasInputEvolution->perform(connector);
+    creatureGenome.emplace_back(biasInputEvolution);
+
     int sensorCount = rand() % 7 + 4;
     for (int it = 0; it < sensorCount; it++) {
         SensorEvolution * sensorEvol = new SensorEvolution();
 
-        sensorEvol->setGenerationNumber(it + 1);
+        sensorEvol->setGenerationNumber((it * 2) + 2);
         sensorEvol->generateFromRandom(connector);
 
         sensorEvol->perform(connector);
@@ -44,25 +49,31 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
     }
 
-    BiasInputEvolution * biasInputEvolution = new BiasInputEvolution();
-    biasInputEvolution->setGenerationNumber(12);
-    biasInputEvolution->perform(connector);
-    creatureGenome.emplace_back(biasInputEvolution);
+    SpeedEvolution * speedEvolution = new SpeedEvolution();
+    speedEvolution->setGenerationNumber(22);
+    speedEvolution->perform(connector);
+    creatureGenome.emplace_back(speedEvolution);
+
+    RotationEvolution * rotationEvolution = new RotationEvolution();
+    rotationEvolution->setGenerationNumber(23);
+    rotationEvolution->perform(connector);
+    creatureGenome.emplace_back(rotationEvolution);
+
+
+    int generationNumberIndex(24);
+    for (int it = 0; it < brain->getInputNeurons().size(); it++) {
+        for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
+            LinkEvolution * linkEvolution = new LinkEvolution();
+            linkEvolution->setGenerationNumber(generationNumberIndex);
+            linkEvolution->generateFromNeurons(connector, brain->getInputNeurons().at(it), brain->getOutputNeurons().at(jt));
+            generationNumberIndex++;
+            creatureGenome.emplace_back(linkEvolution);
+
+        }
+    }
 
     std::cout << "Global evolution :" << Evolution::nextEvolutionNumber << std::endl;
 
-    SpeedAndRotationEvolution * speedAndRotationEvolution = new SpeedAndRotationEvolution();
-    speedAndRotationEvolution->setGenerationNumber(13);
-    speedAndRotationEvolution->perform(connector);
-    creatureGenome.emplace_back(speedAndRotationEvolution);
-
-    for (int it = 0; it < brain->getInputNeurons().size(); it++) {
-        for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
-            float weight = ((rand() % 200) / 100.f) - 1.f;
-            Link * newLink = new Link(weight, brain->getInputNeurons().at(it), brain->getOutputNeurons().at(jt));
-            brain->addLink(newLink);
-        }
-    }
 
     brain->generateLinkGrid();
 
@@ -71,6 +82,16 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
 
     return connector;
+}
+
+
+BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector * mother) {
+
+    std::vector<Evolution *> fatherGenome = this->getEvolutionLibrary().getGenomeFor(father->getCreature()->getId());
+    std::vector<Evolution *> motherGenome = this->getEvolutionLibrary().getGenomeFor(mother->getCreature()->getId());
+
+    std::cout << "Mating " << std::endl;
+
 }
 
 const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {

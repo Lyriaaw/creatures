@@ -5,3 +5,7 @@
 #include "InputNeuron.h"
 
 InputNeuron::InputNeuron(): Neuron() {}
+
+float InputNeuron::getValue() {
+    return this->value;
+}

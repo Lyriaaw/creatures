@@ -8,6 +8,10 @@ OutputNeuron::OutputNeuron(): Neuron() {
 
 }
 
+float OutputNeuron::getValue() {
+    return tanh(this->value);
+}
+
 
 // #################
 

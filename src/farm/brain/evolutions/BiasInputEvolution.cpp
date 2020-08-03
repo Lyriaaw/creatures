@@ -15,6 +15,7 @@ void BiasInputEvolution::generateFromRandom(BrainConnector * connector) {
 void BiasInputEvolution::perform(BrainConnector * connector) {
     InputNeuron * bias = new BiasNeuron();
     bias->setName("Bias");
+    bias->setGenerationNumber(this->generationNumber);
     connector->getBrain()->addInputNeuron(bias);
 }
 

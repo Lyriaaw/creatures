@@ -170,12 +170,16 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
         bool found = false;
         for (int it = 0; it < farm->getConnectors().size(); it++) {
-            Creature * entity = farm->getConnectors().at(it)->getCreature();
+            BrainConnector * connector = farm->getConnectors().at(it);
 
-            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
-            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+            double deltaX = abs(worldCoordinates.getX() - connector->getCreature()->getPosition().getX());
+            double deltaY = abs(worldCoordinates.getY() - connector->getCreature()->getPosition().getY());
 
-            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+            if (deltaX < connector->getCreature()->getSize() && deltaY < connector->getCreature()->getSize()) {
+                if (selectedCreature != nullptr) {
+                    farm->getNursery()->Mate(selectedCreature, connector);
+                }
+
                 selectedCreature = farm->getConnectors().at(it);
 
                 std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getCreature()->getId());

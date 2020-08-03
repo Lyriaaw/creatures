@@ -2,25 +2,22 @@
 // Created by Amalric Lombard de Buffières on 8/3/20.
 //
 
-#include "SpeedAndRotationEvolution.h"
+#include "SpeedEvolution.h"
 
-SpeedAndRotationEvolution::SpeedAndRotationEvolution(): Evolution() {
+SpeedEvolution::SpeedEvolution(): Evolution() {
 
 }
 
-void SpeedAndRotationEvolution::generateFromRandom(BrainConnector * connector) {
+void SpeedEvolution::generateFromRandom(BrainConnector * connector) {
 }
 
-void SpeedAndRotationEvolution::perform(BrainConnector * connector) {
+void SpeedEvolution::perform(BrainConnector * connector) {
     OutputNeuron * speed = new SpeedOutputNeuron();
     speed->setName("Speed");
+    speed->setGenerationNumber(this->generationNumber);
     connector->getBrain()->addOutputNeuron(speed);
-
-    OutputNeuron * rotation = new RotationOutputNeuron();
-    rotation->setName("Rotation");
-    connector->getBrain()->addOutputNeuron(rotation);
 }
 
-void SpeedAndRotationEvolution::describe() {
-    std::cout << this->generationNumber << " => Speed and rotation from brain " << std::endl;
+void SpeedEvolution::describe() {
+    std::cout << this->generationNumber << " => Speed output " << std::endl;
 }

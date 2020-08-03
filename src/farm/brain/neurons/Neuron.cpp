@@ -5,9 +5,7 @@
 #include <cmath>
 #include "Neuron.h"
 
-float Neuron::getValue() const {
-    return tanh(this->value);
-}
+
 
 int Neuron::getX() const {
     return x;
@@ -56,4 +54,12 @@ void Neuron::clear(){
 
 void Neuron::addValue(float addedValue) {
     this->value += addedValue;
+}
+
+int Neuron::getGenerationNumber() const {
+    return generationNumber;
+}
+
+void Neuron::setGenerationNumber(int generationNumber) {
+    Neuron::generationNumber = generationNumber;
 }

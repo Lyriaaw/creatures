@@ -6,7 +6,18 @@
 #define CREATURES_LINKEVOLUTION_H
 
 
-class LinkEvolution {
+#include "Evolution.h"
+
+class LinkEvolution: public Evolution {
+private:
+    int inputGenerationNumber, outputGenerationNumber;
+public:
+    LinkEvolution();
+    void generateFromRandom(BrainConnector * connector) override;
+    void perform(BrainConnector * connector) override;
+    void describe() override;
+
+    void generateFromNeurons(BrainConnector * connector, Neuron * input, Neuron * output);
 
 };
 

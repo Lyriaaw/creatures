@@ -13,6 +13,8 @@ class OutputNeuron: public Neuron {
 public:
     OutputNeuron();
 
+    float getValue() override;
+
     virtual void transferOutputValue(Creature * creature) = 0;
 
 };

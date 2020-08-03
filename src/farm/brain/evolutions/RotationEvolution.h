@@ -6,8 +6,14 @@
 #define CREATURES_ROTATIONEVOLUTION_H
 
 
-class RotationEvolution {
+#include "Evolution.h"
 
+class RotationEvolution: public Evolution {
+public:
+    RotationEvolution();
+    void generateFromRandom(BrainConnector * connector) override;
+    void perform(BrainConnector * connector) override;
+    void describe() override;
 };
 
 
