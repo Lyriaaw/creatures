@@ -10,7 +10,7 @@ int Entity::GLOBAL_INDEX = 1;
 Entity::Entity(Point position, float size): position(position) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
-    
+
     this->size = size;
 }
 
@@ -51,4 +51,12 @@ Point Entity::getSimpleCoordinates() {
 
 int Entity::getId() const {
     return id;
+}
+
+void Entity::setRotation(float rotation) {
+    Entity::rotation = rotation;
+}
+
+void Entity::setSpeed(float speed) {
+    Entity::speed = speed;
 }

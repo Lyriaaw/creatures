@@ -28,22 +28,16 @@ int Creature::addVisionSensorSensor(float length, float rotation, float color) {
 }
 
 void Creature::move() {
-    float addedSpeed = (float(rand() % 21) - 10.f) / 10.f;
-    float addedRotation = (float(rand() % 21) - 10.f) / 100.f;
 
-    this->rotation += addedRotation;
-    this->speed += addedSpeed;
+    float actualSpeed = this->speed * this->size;
 
-    if (this->speed > 5) {
-        this->speed = 5;
-    }
-    if (this->speed < -2.5f) {
-        this->speed = -2.5f;
+    if (actualSpeed < -1 * (this->size / 2.f)) {
+        actualSpeed = -1 * (this->size / 2.f);
     }
 
 
-    float nextX = this->position.getX() + (this->speed * cos((this->rotation * M_PI)));
-    float nextY = this->position.getY() + (this->speed * sin((this->rotation * M_PI)));
+    float nextX = this->position.getX() + (actualSpeed * cos((this->rotation * M_PI)));
+    float nextY = this->position.getY() + (actualSpeed * sin((this->rotation * M_PI)));
 
 
 
@@ -228,6 +222,16 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
     this->sensorDistances.insert(this->sensorDistances.begin() + sensorIndex, sensorDistanceValue);
     this->sensorBrightness.insert(this->sensorBrightness.begin() + sensorIndex, sensorDistanceBrightness);
 }
+
+
+void Creature::addSpeed(float speedToAdd) {
+    this->speed += speedToAdd;
+}
+
+void Creature::addRotation(float rotationToAdd) {
+    this->rotation += rotationToAdd;
+}
+
 
 int Creature::getSensorCount() {
     return sensorRotations.size();

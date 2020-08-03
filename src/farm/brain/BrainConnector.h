@@ -26,6 +26,8 @@ public:
     void setBrain(Brain *brain);
 
     void processBrainInputs();
+    void processBrain();
+    void processBrainOutputs();
 
 
 };

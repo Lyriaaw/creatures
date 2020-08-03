@@ -73,16 +73,13 @@ MainWindow::MainWindow() {
 
 void MainWindow::start() {
 
-//    if (!font.loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
-//        std::cout << "Font not loaded properly !" << std::endl;
-//        return;
-//    }
+    font = new Font();
+//
+    if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
+        std::cout << "Font not loaded properly !" << std::endl;
+        return;
+    }
 
-
-    std::cout << "Fucking shit !" << std::endl;
-
-
-    std::cout << "Fucking little shit !" << std::endl;
 
     window = new RenderWindow(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
     window->setVerticalSyncEnabled(true);
@@ -190,7 +187,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
                 if (brainUi != nullptr) {
                     delete brainUi;
                 }
-                brainUi = new BrainUI(selectedCreature->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y);
+                brainUi = new BrainUI(selectedCreature->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
 
 
                 selectedEntity = nullptr;

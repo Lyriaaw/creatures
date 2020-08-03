@@ -11,8 +11,8 @@ class Neuron {
 protected:
     float value;
 
-    float x;
-    float y;
+    int x;
+    int y;
 
     float hueOutline;
     float brightnessOutline;
@@ -21,13 +21,13 @@ protected:
 public:
     float getValue() const;
 
-    float getX() const;
+    int getX() const;
 
-    void setX(float x);
+    void setX(int x);
 
-    float getY() const;
+    int getY() const;
 
-    void setY(float y);
+    void setY(int y);
 
     float getHueOutline() const;
     void setHueOutline(float hueOutline);
@@ -37,6 +37,9 @@ public:
 
     const std::string &getName() const;
     void setName(const std::string &name);
+
+    void clear();
+    void addValue(float addedValue);
 };
 
 

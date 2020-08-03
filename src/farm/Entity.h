@@ -28,6 +28,10 @@ public:
     float getSpeed() const;
     float getBrightness() const;
 
+    void setRotation(float rotation);
+
+    void setSpeed(float speed);
+
     void setPosition(const Point &position);
 
     Point getSimpleCoordinates();

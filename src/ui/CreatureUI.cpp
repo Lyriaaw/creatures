@@ -23,12 +23,13 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         float currentX = screenPoint.getX() + (screenSize * cos(angle));
         float currentY = screenPoint.getY() + (screenSize * sin(angle));
         vertexArray[it] = sf::Vector2f(currentX, currentY);
+        vertexArray[it].color =  this->color;
 
-        if (selectedEntity == this->entity) {
-            vertexArray[it].color = sf::Color(255, 255, 255, 255);
-        } else {
-            vertexArray[it].color =  this->color;
-        }
+//        if (selectedEntity == this->entity) {
+//            vertexArray[it].color = sf::Color(255, 255, 255, 255);
+//        } else {
+//            vertexArray[it].color =  this->color;
+//        }
     }
 
 
@@ -64,9 +65,11 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
 
 
 
-//    if (selectedEntity != this->creature) {
-//        return;
-//    }
+    if (selectedEntity != this->creature) {
+        return;
+    }
+
+    std::cout << "Speed: " << this->creature->getSpeed() << std::endl;
 
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {

@@ -16,13 +16,15 @@ private:
 
     sf::RectangleShape background;
     std::vector<sf::CircleShape> neurons;
+    std::vector<sf::Text> neuronNames;
+    sf::VertexArray links;
 
     float x, y, width, height;
 
 public:
-    BrainUI(Brain *brain, float x, float y, float width, float height);
+    BrainUI(Brain *brain, float x, float y, float width, float height, sf::Font * font);
 
-    void initialize();
+    void initialize(sf::Font * font);
     void draw(sf::RenderWindow *window);
 };
 

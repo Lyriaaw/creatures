@@ -2,25 +2,26 @@
 // Created by Amalric Lombard de Buffières on 8/2/20.
 //
 
+#include <cmath>
 #include "Neuron.h"
 
 float Neuron::getValue() const {
-    return value;
+    return tanh(this->value);
 }
 
-float Neuron::getX() const {
+int Neuron::getX() const {
     return x;
 }
 
-void Neuron::setX(float x) {
+void Neuron::setX(int x) {
     Neuron::x = x;
 }
 
-float Neuron::getY() const {
+int Neuron::getY() const {
     return y;
 }
 
-void Neuron::setY(float y) {
+void Neuron::setY(int y) {
     Neuron::y = y;
 }
 
@@ -46,4 +47,13 @@ float Neuron::getBrightnessOutline() const {
 
 void Neuron::setBrightnessOutline(float brightnessOutline) {
     Neuron::brightnessOutline = brightnessOutline;
+}
+
+void Neuron::clear(){
+    this->value = 0;
+}
+
+
+void Neuron::addValue(float addedValue) {
+    this->value += addedValue;
 }

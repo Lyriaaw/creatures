@@ -21,14 +21,14 @@ void SensorEvolution::perform(BrainConnector * connector) {
 
     InputNeuron * distanceNeuron = new DistanceSensorNeuron(index);
     distanceNeuron->setHueOutline(sensorColor);
-    distanceNeuron->setBrightnessOutline(0.5);
-    distanceNeuron->setName("Sensor distance");
+    distanceNeuron->setBrightnessOutline(0.4);
+    distanceNeuron->setName("Distance");
     connector->getBrain()->addInputNeuron(distanceNeuron);
 
     InputNeuron * brightnessNeuron = new BrightnessSensorNeuron(index);
     brightnessNeuron->setHueOutline(sensorColor);
-    brightnessNeuron->setBrightnessOutline(0.5);
-    distanceNeuron->setName("Sensor brightness");
+    brightnessNeuron->setBrightnessOutline(0.4);
+    brightnessNeuron->setName("Brightness");
     connector->getBrain()->addInputNeuron(brightnessNeuron);
 
 

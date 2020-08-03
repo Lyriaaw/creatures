@@ -24,6 +24,12 @@ public:
     void findSelectedChunks();
     void getSensorCoordinates(std::vector<Entity *> entites);
 
+    void addSpeed(float speedToAdd);
+    void addRotation(float rotationToAdd);
+
+
+
+
 
 
     int addVisionSensorSensor(float length, float rotation, float color);

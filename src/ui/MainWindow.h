@@ -39,7 +39,9 @@ private:
     BrainConnector * selectedCreature = nullptr;
     Entity * selectedEntity = nullptr;
 
-     BrainUI * brainUi;
+    BrainUI * brainUi;
+
+    sf::Font * font;
 
 
 
