@@ -16,6 +16,7 @@ public:
     void perform(BrainConnector * connector) override;
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
+    Evolution * generateFromCastedMate(SensorEvolution * mate);
 private:
     float sensorLength;
     float sensorRotation;

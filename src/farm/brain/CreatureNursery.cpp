@@ -139,9 +139,6 @@ BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector *
             childGenome.emplace_back(childEvolution);
         }
 
-
-
-        std::cout << std::endl;
     }
 
     Point childSpawn = {
