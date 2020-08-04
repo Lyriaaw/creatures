@@ -20,6 +20,8 @@ public:
 
     float getSensorDistance(int index);
     float getSensorBrightness(int index);
+    float getSensorSizes(int index);
+
 
     void findSelectedChunks();
     void processSensorsValues(std::vector<Entity *> entites);
@@ -58,6 +60,7 @@ private:
 
     std::vector<float> sensorDistances;
     std::vector<float> sensorBrightness;
+    std::vector<float> sensorSizes;
 
     std::vector<Point> selectedChunks;
 

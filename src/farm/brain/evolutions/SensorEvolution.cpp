@@ -33,6 +33,15 @@ void SensorEvolution::perform(BrainConnector * connector) {
     brightnessNeuron->setGenerationNumber(this->generationNumber + 1);
     connector->getBrain()->addInputNeuron(brightnessNeuron);
 
+    InputNeuron * sizeNeuron = new SizeSensorNeuron(index);
+    sizeNeuron->setHueOutline(sensorColor);
+    sizeNeuron->setBrightnessOutline(0.4);
+    sizeNeuron->setName("Size");
+    sizeNeuron->setGenerationNumber(this->generationNumber + 2);
+    connector->getBrain()->addInputNeuron(sizeNeuron);
+
+
+
 
 }
 

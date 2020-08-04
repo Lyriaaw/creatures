@@ -36,6 +36,14 @@ public:
     void fetchInputValue(Creature * creature);
 };
 
+// ##################
+
+class SizeSensorNeuron: public SensorNeuron {
+public:
+    SizeSensorNeuron(int index);
+    void fetchInputValue(Creature * creature);
+};
+
 
 
 

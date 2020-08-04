@@ -29,3 +29,13 @@ void BrightnessSensorNeuron::fetchInputValue(Creature * creature) {
     this->value = creature->getSensorBrightness(this->sensorIndex);
 }
 
+// ##################
+
+SizeSensorNeuron::SizeSensorNeuron(int index): SensorNeuron(index) {
+
+}
+
+void SizeSensorNeuron::fetchInputValue(Creature * creature) {
+    this->value = creature->getSensorSizes(this->sensorIndex);
+}
+

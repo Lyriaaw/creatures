@@ -159,6 +159,7 @@ void Creature::processSensorsValues(std::vector<Entity *> accessibleEntities) {
 void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities) {
     float sensorDistanceValue(0.f);
     float sensorDistanceBrightness(0.f);
+    float sensorSizeValue(0.f);
 
     for (int jt = 0; jt < accessibleEntities.size(); jt++) {
         Entity * currentAccessibleEntity = accessibleEntities.at(jt);
@@ -212,10 +213,21 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
 
         float hueDistances = std::min(abs(currentAccessibleEntity->getColor() - this->sensorColors.at(sensorIndex)), 1.f - abs(currentAccessibleEntity->getColor() - this->sensorColors.at(sensorIndex)));
         sensorDistanceBrightness = float(pow(2, - (hueDistances * 5)));
+
+        float biggestEntity = std::max(this->size, currentAccessibleEntity->getSize());
+        float smallestEntity = std::min(this->size, currentAccessibleEntity->getSize());
+
+        float sizeRatio = 1 - (smallestEntity / biggestEntity);
+        if (this->size > currentAccessibleEntity->getSize()) {
+            sizeRatio *= -1;
+        }
+        sensorSizeValue = (0.5f + (sizeRatio / 2.f));
+//        sensorSizeValue = sizeRatio;
     }
 
     this->sensorDistances.insert(this->sensorDistances.begin() + sensorIndex, sensorDistanceValue);
     this->sensorBrightness.insert(this->sensorBrightness.begin() + sensorIndex, sensorDistanceBrightness);
+    this->sensorSizes.insert(this->sensorSizes.begin() + sensorIndex, sensorSizeValue);
 }
 
 
@@ -247,6 +259,9 @@ float Creature::getSensorDistance(int index) {
 }
 float Creature::getSensorBrightness(int index) {
     return sensorBrightness.at(index);
+}
+float Creature::getSensorSizes(int index) {
+    return sensorSizes.at(index);
 }
 
 float Creature::getSensorColor(int index) {
@@ -290,5 +305,6 @@ float Creature::getGenitalsValue() const {
 void Creature::setGenitalsValue(float genitalsValue) {
     Creature::genitalsValue = genitalsValue;
 }
+
 
 

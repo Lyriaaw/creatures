@@ -140,10 +140,10 @@ void MainWindow::handleMouseMove(int x, int y) {
     this->mouseX = float(x);
     this->mouseY = float(y);
 
-//    Entity * globalSelectedEntity = getSelectedEntity();
-//    if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
-//        globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
-//    }
+    Entity * globalSelectedEntity = getSelectedEntity();
+    if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
+        globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
+    }
 
 
 }

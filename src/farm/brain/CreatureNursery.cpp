@@ -52,7 +52,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     for (int it = 0; it < sensorCount; it++) {
 
         SensorEvolution * sensorEvol = new SensorEvolution();
-        sensorEvol->setGenerationNumber((it * 2) + 4);
+        sensorEvol->setGenerationNumber((it * 3) + 4);
         sensorEvol->generateFromRandom(connector);
         sensorEvol->perform(connector);
         creatureGenome.emplace_back(sensorEvol);
@@ -60,23 +60,23 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     }
 
     SpeedEvolution * speedEvolution = new SpeedEvolution();
-    speedEvolution->setGenerationNumber(24);
+    speedEvolution->setGenerationNumber(34);
     speedEvolution->perform(connector);
     creatureGenome.emplace_back(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(25);
+    rotationEvolution->setGenerationNumber(35);
     rotationEvolution->perform(connector);
     creatureGenome.emplace_back(rotationEvolution);
 
     MouthEvolution * mouthEvolution = new MouthEvolution();
-    mouthEvolution->setGenerationNumber(26);
+    mouthEvolution->setGenerationNumber(36);
     mouthEvolution->generateFromRandom(connector);
     mouthEvolution->perform(connector);
     creatureGenome.emplace_back(mouthEvolution);
 
     GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
-    genitalsEvolution->setGenerationNumber(27);
+    genitalsEvolution->setGenerationNumber(37);
     genitalsEvolution->generateFromRandom(connector);
     genitalsEvolution->perform(connector);
     creatureGenome.emplace_back(genitalsEvolution);
@@ -86,7 +86,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
 
 
-    int generationNumberIndex(28);
+    int generationNumberIndex(38);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
