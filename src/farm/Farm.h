@@ -28,12 +28,19 @@ private:
 
     float averageSelectedEntities;
 
+    std::vector<ActionDTO> actions;
+
 public:
     Farm();
     void InitFromRandom();
     void InitRandomMap();
     void Tick(bool paused);
     void generateEntityGrid();
+    void executeCreaturesActions();
+    void removeEntity(int id);
+
+    Creature * getCreatureFromId(int id);
+    Entity * getEntityFromId(int id);
 
 
     FarmUI *getUi() const;

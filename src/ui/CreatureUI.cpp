@@ -11,6 +11,10 @@ CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 20, sf::Quads), crea
 }
 
 void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) {
+    if (this->creature == nullptr) {
+        std::cout << "NULL" << std::endl;
+        return;
+    }
 
     Point screenPoint = camera->getScreenCoordinates(this->entity->getPosition());
 

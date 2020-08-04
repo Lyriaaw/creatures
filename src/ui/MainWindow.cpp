@@ -31,13 +31,13 @@ MainWindow::MainWindow() {
 
     std::vector<EntityUI *> entityUis;
 
-
     for (int it = 0; it < farm->getFoods().size(); it++) {
         Food *entity = farm->getFoods().at(it);
 
         FoodUI *entityUi = new FoodUI(entity);
         entityUis.push_back(entityUi);
     }
+
 
     for (int it = 0; it < farm->getConnectors().size(); it++) {
         Creature *entity = farm->getConnectors().at(it)->getCreature();

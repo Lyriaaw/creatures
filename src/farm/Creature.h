@@ -7,6 +7,8 @@
 
 
 #include "Entity.h"
+#include "brain/muscles/Muscle.h"
+#include "brain/ActionDTO.h"
 
 class Creature: public Entity {
 public:
@@ -25,7 +27,7 @@ public:
 
     void findSelectedChunks();
     void processSensorsValues(std::vector<Entity *> entites);
-    void executeAction(std::vector<Entity *> entites);
+    std::vector<ActionDTO> executeAction(std::vector<Entity *> entites);
 
     void addSpeed(float speedToAdd);
     void addRotation(float rotationToAdd);
@@ -69,6 +71,9 @@ private:
 
     float mouthValue;
     float genitalsValue;
+
+
+    std::vector<Muscle *> muscles;
 
     void getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
 };

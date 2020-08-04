@@ -43,6 +43,10 @@ public:
 
     void setSize(float size);
 
+    bool isExists() const;
+
+    void setExists(bool exists);
+
 
 protected:
     static int GLOBAL_INDEX;
@@ -57,6 +61,8 @@ protected:
 
     float color;
     float brightness;
+
+    bool exists;
 
 
 };

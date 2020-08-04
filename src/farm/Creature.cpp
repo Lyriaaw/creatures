@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Creature.h"
 
+
 Creature::Creature(Point position): Entity(position) {
     this->brightness = 0.5f;
 //    this->rotation = ((rand() % 200) / 100.f) - 1.f;
@@ -150,7 +151,7 @@ void Creature::processSensorsValues(std::vector<Entity *> accessibleEntities) {
 
         getSensorValueFromSensorEquation(it, sensorX, sensorY, m, p, accessibleEntities);
 
-     }
+    }
 
 
 
@@ -231,7 +232,45 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
 }
 
 
-void Creature::executeAction(std::vector<Entity *> accessibleEntities) {
+std::vector<ActionDTO> Creature::executeAction(std::vector<Entity *> accessibleEntities) {
+    std::vector<ActionDTO> actions;
+    if (mouthValue < 0.5f) {
+        return actions;
+    }
+
+    float mouthTotalRotation = (float(mouthRotation) + rotation) * float(M_PI);
+
+    float mouthSize = size / 4.f;
+    float mouthX = (cos(mouthTotalRotation) * size) + position.getX();
+    float mouthY = (sin(mouthTotalRotation) * size) + position.getY();
+
+    Entity * closestEntity = nullptr;
+    float smallestDistance = FARM_WIDTH;
+
+    for (int it = 0; it < accessibleEntities.size(); it++) {
+        float distanceX = abs(accessibleEntities.at(it)->getPosition().getX() - mouthX);
+        float distanceY = abs(accessibleEntities.at(it)->getPosition().getY() - mouthY);
+
+        float distance = sqrt(pow(distanceX, 2) + pow(distanceY, 2));
+
+        if (distance <= mouthSize) {
+            if (distance < smallestDistance) {
+                smallestDistance = distance;
+                closestEntity = accessibleEntities.at(it);
+            }
+        }
+    }
+
+    if (closestEntity == nullptr) {
+        return actions;
+    }
+
+    if (closestEntity->getSize() <= mouthSize) {
+        ActionDTO action = ActionDTO(this->id, closestEntity->getId(), "EAT");
+        actions.emplace_back(action);
+    }
+
+    return actions;
 }
 
 

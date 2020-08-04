@@ -10,6 +10,7 @@ int Entity::GLOBAL_INDEX = 1;
 Entity::Entity(Point position): position(position) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
+    this->exists = true;
 }
 
 
@@ -65,4 +66,12 @@ void Entity::setColor(float color) {
 
 void Entity::setSize(float size) {
     Entity::size = size;
+}
+
+bool Entity::isExists() const {
+    return exists;
+}
+
+void Entity::setExists(bool exists) {
+    Entity::exists = exists;
 }

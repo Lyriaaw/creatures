@@ -62,7 +62,7 @@ void Farm::InitFromRandom() {
         Point point(x, y);
 
 
-        float foodSize = ((rand() % 500) / 100.f) + 1;
+        float foodSize = ((rand() % 300) / 100.f) + 1;
 
         Food * entity = new Food(point, foodSize);
         foods.push_back(entity);
@@ -72,44 +72,112 @@ void Farm::InitFromRandom() {
 
 void Farm::Tick(bool paused) {
     averageSelectedEntities = 0;
-    for (int it = 0; it < connectors.size(); it++) {
-        Creature *currentCreature = connectors.at(it)->getCreature();
 
-
-        if (!paused) {
+    if (!paused) {
+        for (int it = 0; it < connectors.size(); it++) {
             connectors.at(it)->processBrainOutputs();
-        }
 
-        if (!paused) {
-            std::vector<Entity *> selectedEntities = getAccessibleEntities(currentCreature);
-            currentCreature->executeAction(selectedEntities);
+            Creature *currentCreature = connectors.at(it)->getCreature();
             currentCreature->move();
+        }
+    }
+
+    generateEntityGrid();
+
+    if (!paused) {
+        for (int it = 0; it < connectors.size(); it++) {
+            Creature *currentCreature = connectors.at(it)->getCreature();
+
+            std::vector<Entity *> selectedEntities = getAccessibleEntities(currentCreature);
+
+            std::vector<ActionDTO> currentCreatureActions = currentCreature->executeAction(selectedEntities);
+            actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
 
             averageSelectedEntities += selectedEntities.size();
         }
     }
 
-    averageSelectedEntities /= float(connectors.size());
-
-
-
-
-    generateEntityGrid();
-
+    executeCreaturesActions();
 
     for (int it = 0; it < connectors.size(); it++) {
-    Creature * currentCreature = connectors.at(it)->getCreature();
-
+        Creature * currentCreature = connectors.at(it)->getCreature();
 
         currentCreature->findSelectedChunks();
         currentCreature->processSensorsValues(getAccessibleEntities(currentCreature));
         connectors.at(it)->processBrainInputs();
         connectors.at(it)->processBrain();
-
-
-
     }
 
+
+    averageSelectedEntities /= float(connectors.size());
+
+    std::cout << "Foods available: " << foods.size() << std::endl;
+}
+
+void Farm::executeCreaturesActions() {
+
+    for (int it = 0; it < actions.size(); it++) {
+        ActionDTO currentAction = actions.at(it);
+        Creature * performer = getCreatureFromId(currentAction.getPerformerId());
+        Entity * subject = getEntityFromId(currentAction.getSubjectId());
+
+        if (performer == nullptr || subject == nullptr) {
+            std::cout << "Unable to perform action " << currentAction.getType() << "(" << currentAction.getPerformerId() << " -> " << currentAction.getSubjectId() << ")" << std::endl;
+            continue;
+        }
+
+        if (currentAction.getType() == "EAT") {
+            removeEntity(subject->getId());
+        }
+    }
+
+
+    actions.clear();
+}
+
+void Farm::removeEntity(int id) {
+
+    for (int it = 0; it < connectors.size(); it++) {
+        if (connectors.at(it)->getCreature()->getId() == id) {
+            connectors.at(it)->getCreature()->setExists(false);
+            connectors.erase(connectors.begin() + it);
+            return;
+        }
+    }
+
+    for (int it = 0; it < foods.size(); it++) {
+        if (foods.at(it)->getId() == id) {
+            foods.at(it)->setExists(false);
+            foods.erase(foods.begin() + it);
+            return;
+        }
+    }
+}
+
+Creature * Farm::getCreatureFromId(int id) {
+    for (int it = 0; it < this->connectors.size(); it++) {
+        if (this->connectors.at(it)->getCreature()->getId() == id) {
+            return this->connectors.at(it)->getCreature();
+        }
+    }
+
+    return nullptr;
+}
+Entity * Farm::getEntityFromId(int id) {
+    for (int it = 0; it < this->connectors.size(); it++) {
+        if (this->connectors.at(it)->getCreature()->getId() == id) {
+            return this->connectors.at(it)->getCreature();
+        }
+    }
+
+    for (int it = 0; it < this->foods.size(); it++) {
+        if (this->foods.at(it)->getId() == id) {
+            return this->foods.at(it);
+        }
+    }
+
+
+    return nullptr;
 }
 
 std::vector<Entity *> Farm::getAccessibleEntities(Creature * creature) {
