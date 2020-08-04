@@ -104,14 +104,14 @@ Evolution * SensorEvolution::generateFromCastedMate(SensorEvolution * mate) {
 
     float newRotation;
     float smallestRotation = (this->sensorRotation + 1) / 2.f;
-    if ((mate->sensorRotation + 1) / 2.f < smallestHue) {
+    if ((mate->sensorRotation + 1) / 2.f < smallestRotation) {
         smallestRotation = (mate->sensorRotation + 1) / 2.f;
     }
 
     float rawRotationDistance =  abs((this->sensorRotation + 1) / 2.f - (mate->sensorRotation + 1) / 2.f);
     float rotationDistances = std::min(rawRotationDistance, 1.f - rawRotationDistance);
 
-    if (rawDistance < 1 - rawDistance) {
+    if (rawRotationDistance < 1 - rawRotationDistance) {
         newRotation = smallestRotation + (rotationDistances / 2.f);
     } else {
         newRotation = 1 + (smallestRotation - (rotationDistances / 2.f));

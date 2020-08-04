@@ -6,7 +6,7 @@
 #include "CreatureUI.h"
 #include "colors/RGBColor.h"
 
-CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 12, sf::Quads), creature(entity)  {
+CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 20, sf::Quads), creature(entity)  {
     sensors = sf::VertexArray(sf::Lines, entity->getSensorCount() * 2);
 }
 
@@ -33,45 +33,93 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
     }
 
 
+    float distance = screenSize;
 
-    // Eyes
-    sf::Color eyeColor = sf::Color(0, 0, 0, 255);
-    float eyeDistance = screenSize - (0.9f * camera->getZoom());
+    // Mouth
+    float rotation = this->creature->getMouthRotation();
+
+    float mouthRotation = (float(rotation) + this->entity->getRotation()) * float(M_PI);
+    sf::Color mouthBackColor = sf::Color(0, 0, 0, 255);
+    sf::Color mouthColor = sf::Color(200, 200, 200, 255);
+
+    float mouthX = (cos(mouthRotation) * distance) + screenPoint.getX();
+    float mouthY = (sin(mouthRotation) * distance) + screenPoint.getY();
+
+    float mouthSize = this->creature->getMouthValue() * (this->entity->getSize() / 3.f);
 
     int index = 1;
-    for (int eyeRotationMultiplier = -1; eyeRotationMultiplier <= 1; eyeRotationMultiplier+= 2) {
-        float eyeRotation = (float(eyeRotationMultiplier) * 0.4f) + (this->entity->getRotation() * float(M_PI));
+    for (int it = 0; it < 4; it++) {
+        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
 
-        float eyeX = (cos(eyeRotation) * eyeDistance) + screenPoint.getX();
-        float eyeY = (sin(eyeRotation) * eyeDistance) + screenPoint.getY();
+        float currentX = mouthX + (((this->entity->getSize() / 3.f) * camera->getZoom()) * cos(angle));
+        float currentY = mouthY + (((this->entity->getSize() / 3.f) * camera->getZoom()) * sin(angle));
 
-
-        for (int it = 0; it < 4; it++) {
-            double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
-
-            float currentX = eyeX + (((this->entity->getSize() / 5.f) * camera->getZoom()) * cos(angle));
-            float currentY = eyeY + (((this->entity->getSize() / 5.f) * camera->getZoom()) * sin(angle));
-
-            int currentIt = it + (index * 4);
-            vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
-            vertexArray[currentIt].color = eyeColor;
-        }
-
-
-        index++;
+        int currentIt = it + (index * 4);
+        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+        vertexArray[currentIt].color = mouthBackColor;
     }
+    index++;
+
+    for (int it = 0; it < 4; it++) {
+        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+
+        float currentX = mouthX + ((mouthSize * camera->getZoom()) * cos(angle));
+        float currentY = mouthY + ((mouthSize * camera->getZoom()) * sin(angle));
+
+        int currentIt = it + (index * 4);
+        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+        vertexArray[currentIt].color = mouthColor;
+    }
+    index++;
+
+
+    // Genitals
+    float genitalsRotation = (float(this->creature->getGenitalsRotation()) + this->entity->getRotation()) * float(M_PI);
+
+    float genitalsX = (cos(genitalsRotation) * distance) + screenPoint.getX();
+    float genitalsY = (sin(genitalsRotation) * distance) + screenPoint.getY();
+
+    float genitalsSize = this->creature->getGenitalsValue() * (this->entity->getSize() / 4.f);
+
+    for (int it = 0; it < 4; it++) {
+        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+
+        float currentX = genitalsX + (((this->creature->getSize() / 4.f) * camera->getZoom()) * cos(angle));
+        float currentY = genitalsY + (((this->creature->getSize() / 4.f) * camera->getZoom()) * sin(angle));
+
+        int currentIt = it + (index * 4);
+        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+        vertexArray[currentIt].color = mouthBackColor;
+    }
+    index++;
+
+    for (int it = 0; it < 4; it++) {
+        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+
+        float currentX = genitalsX + ((genitalsSize * camera->getZoom()) * cos(angle));
+        float currentY = genitalsY + ((genitalsSize * camera->getZoom()) * sin(angle));
+
+        int currentIt = it + (index * 4);
+        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+        vertexArray[currentIt].color = this->color;
+    }
+    index++;
+
+
+
+
+
 
     window->draw(vertexArray);
 
 
 
-    if (selectedEntity != this->creature) {
-        return;
-    }
+
 
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {
-        if (creature->getSensorDistance(sensorIndex) > 0) {
+
+        if (selectedEntity != this->creature && creature->getSensorDistance(sensorIndex) > 0) {
             float currentSensorDistance = creature->getSensorLength(sensorIndex) * (1.f - creature->getSensorDistance(sensorIndex));
 
             RGBColor sensorDistanceRGBColor = RGBColor(this->creature->getSensorColor(sensorIndex), 0.f, this->creature->getSensorBrightness(sensorIndex));
@@ -89,7 +137,10 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         RGBColor sensorRGB = RGBColor(this->creature->getSensorColor(sensorIndex), 1.f, 0.5f);
         sf::Color sensorColor = sf::Color(sensorRGB.getRed(), sensorRGB.getGreen(), sensorRGB.getBlue(), 128);
 
-        float currentSensorLength = creature->getSensorLength(sensorIndex);
+        float currentSensorLength = creature->getSize();
+        if (selectedEntity == this->creature) {
+            currentSensorLength = creature->getSensorLength(sensorIndex);
+        }
         float currentSensorRotation = (creature->getSensorRotation(sensorIndex) + this->entity->getRotation()) * float(M_PI);
 
         float sensorX = (cos(currentSensorRotation) * currentSensorLength) + creature->getPosition().getX();

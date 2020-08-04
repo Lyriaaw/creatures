@@ -37,6 +37,29 @@ public:
 
 };
 
+// #################
+class MouthOutputNeuron: public OutputNeuron {
+public:
+    MouthOutputNeuron();
+
+    void transferOutputValue(Creature * creature);
+
+};
+
+
+// #################
+class GenitalsOutputNeuron: public OutputNeuron {
+public:
+    GenitalsOutputNeuron();
+
+    void transferOutputValue(Creature * creature);
+
+};
+
+
+
+
+
 
 
 

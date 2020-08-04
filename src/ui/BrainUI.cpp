@@ -91,7 +91,7 @@ void BrainUI::draw(sf::RenderWindow *window) {
 
     for (int it = 0; it < neurons.size(); it++) {
         Neuron * currentNeuron = brain->getNeurons().at(it);
-        float currentNeuronValue = currentNeuron->getValue();
+        float currentNeuronValue = (currentNeuron->getValue() / 2.f) + 0.5;
 
         neurons.at(it).setFillColor(sf::Color(currentNeuronValue * 255, currentNeuronValue * 255, currentNeuronValue * 255, 255));
 

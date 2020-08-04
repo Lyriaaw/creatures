@@ -19,7 +19,6 @@ using namespace sf;
 
 int main(int argc, char **argv)
 {
-
     srand((unsigned) time(0));
 
     MainWindow window = MainWindow();

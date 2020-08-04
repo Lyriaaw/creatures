@@ -36,3 +36,26 @@ void RotationOutputNeuron::transferOutputValue(Creature *creature) {
 
 
 
+// #################
+
+MouthOutputNeuron::MouthOutputNeuron(): OutputNeuron() {
+
+}
+
+void MouthOutputNeuron::transferOutputValue(Creature *creature) {
+    creature->setMouthValue((this->getValue() / 2.f) + 0.5f);
+}
+
+
+
+// #################
+GenitalsOutputNeuron::GenitalsOutputNeuron(): OutputNeuron() {
+
+}
+
+void GenitalsOutputNeuron::transferOutputValue(Creature *creature) {
+    creature->setGenitalsValue(this->getValue());
+}
+
+
+

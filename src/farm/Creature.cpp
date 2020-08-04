@@ -219,6 +219,10 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
 }
 
 
+void Creature::executeAction(std::vector<Entity *> accessibleEntities) {
+}
+
+
 void Creature::addSpeed(float speedToAdd) {
     this->speed += speedToAdd;
 }
@@ -253,6 +257,38 @@ float Creature::getSensorColor(int index) {
 
 const std::vector<Point> &Creature::getSelectedChunks() const {
     return selectedChunks;
+}
+
+float Creature::getMouthRotation() const {
+    return mouthRotation;
+}
+
+void Creature::setMouthRotation(float mouthRotation) {
+    Creature::mouthRotation = mouthRotation;
+}
+
+float Creature::getGenitalsRotation() const {
+    return genitalsRotation;
+}
+
+void Creature::setGenitalsRotation(float genitalsRotation) {
+    Creature::genitalsRotation = genitalsRotation;
+}
+
+float Creature::getMouthValue() const {
+    return mouthValue;
+}
+
+void Creature::setMouthValue(float mouthValue) {
+    Creature::mouthValue = mouthValue;
+}
+
+float Creature::getGenitalsValue() const {
+    return genitalsValue;
+}
+
+void Creature::setGenitalsValue(float genitalsValue) {
+    Creature::genitalsValue = genitalsValue;
 }
 
 

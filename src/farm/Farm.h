@@ -49,6 +49,9 @@ public:
     const std::vector<BrainConnector *> &getConnectors() const;
 
     void addConnector(BrainConnector * connector);
+
+    std::vector<Entity *> getAccessibleEntities(Creature * creature);
+
 };
 
 

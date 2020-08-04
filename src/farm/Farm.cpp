@@ -55,7 +55,7 @@ void Farm::InitFromRandom() {
         connectors.push_back(nursery->generateFromRandom());
     }
 
-    for (int it = 0; it < 10; it++) {
+    for (int it = 0; it < 1000; it++) {
         int x = distWidth(mt);
         int y = distHeight(mt);
 
@@ -80,24 +80,29 @@ void Farm::Tick(bool paused) {
         }
 
         if (!paused) {
+            currentCreature->executeAction(getAccessibleEntities(currentCreature));
             currentCreature->move();
         }
 
         currentCreature->findSelectedChunks();
 
 
-        std::vector<Entity *> accessibleEntities;
-        for (int jt = 0; jt < currentCreature->getSelectedChunks().size(); jt++) {
-            Point currentChunk = currentCreature->getSelectedChunks().at(jt);
-
-            std::vector<Entity *> chunkEntities = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
-            accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
-        }
-
-        currentCreature->getSensorCoordinates(accessibleEntities);
+        currentCreature->getSensorCoordinates(getAccessibleEntities(currentCreature));
     }
 
     generateEntityGrid();
+}
+
+std::vector<Entity *> Farm::getAccessibleEntities(Creature * creature) {
+    std::vector<Entity *> accessibleEntities;
+    for (int jt = 0; jt < creature->getSelectedChunks().size(); jt++) {
+        Point currentChunk = creature->getSelectedChunks().at(jt);
+
+        std::vector<Entity *> chunkEntities = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+        accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
+    }
+    return accessibleEntities;
+
 }
 
 void Farm::generateEntityGrid() {

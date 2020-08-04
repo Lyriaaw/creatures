@@ -69,8 +69,24 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     rotationEvolution->perform(connector);
     creatureGenome.emplace_back(rotationEvolution);
 
+    MouthEvolution * mouthEvolution = new MouthEvolution();
+    mouthEvolution->setGenerationNumber(26);
+    mouthEvolution->generateFromRandom(connector);
+    mouthEvolution->perform(connector);
+    creatureGenome.emplace_back(mouthEvolution);
 
-    int generationNumberIndex(26);
+    GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
+    genitalsEvolution->setGenerationNumber(27);
+    genitalsEvolution->generateFromRandom(connector);
+    genitalsEvolution->perform(connector);
+    creatureGenome.emplace_back(genitalsEvolution);
+
+
+
+
+
+
+    int generationNumberIndex(28);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 

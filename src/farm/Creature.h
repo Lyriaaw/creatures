@@ -23,15 +23,24 @@ public:
 
     void findSelectedChunks();
     void getSensorCoordinates(std::vector<Entity *> entites);
+    void executeAction(std::vector<Entity *> entites);
 
     void addSpeed(float speedToAdd);
     void addRotation(float rotationToAdd);
 
+    float getMouthRotation() const;
+    void setMouthRotation(float mouthRotation);
 
+    float getGenitalsRotation() const;
+    void setGenitalsRotation(float genitalsRotation);
 
+    float getMouthValue() const;
 
+    void setMouthValue(float mouthValue);
 
+    float getGenitalsValue() const;
 
+    void setGenitalsValue(float genitalsValue);
 
 
     int addVisionSensorSensor(float length, float rotation, float color);
@@ -51,6 +60,12 @@ private:
     std::vector<float> sensorBrightness;
 
     std::vector<Point> selectedChunks;
+
+    float mouthRotation;
+    float genitalsRotation;
+
+    float mouthValue;
+    float genitalsValue;
 
     void getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
 };
