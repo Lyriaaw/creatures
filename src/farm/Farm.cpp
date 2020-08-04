@@ -55,42 +55,61 @@ void Farm::InitFromRandom() {
         connectors.push_back(nursery->generateFromRandom());
     }
 
-    for (int it = 0; it < 1000; it++) {
+    for (int it = 0; it < 10000; it++) {
         int x = distWidth(mt);
         int y = distHeight(mt);
 
         Point point(x, y);
 
 
-        Food * entity = new Food(point, 5);
+        float foodSize = ((rand() % 500) / 100.f) + 1;
+
+        Food * entity = new Food(point, foodSize);
         foods.push_back(entity);
     }
 }
 
 
 void Farm::Tick(bool paused) {
+    averageSelectedEntities = 0;
     for (int it = 0; it < connectors.size(); it++) {
-        Creature * currentCreature = connectors.at(it)->getCreature();
+        Creature *currentCreature = connectors.at(it)->getCreature();
 
-        connectors.at(it)->processBrainInputs();
-        connectors.at(it)->processBrain();
 
         if (!paused) {
             connectors.at(it)->processBrainOutputs();
         }
 
         if (!paused) {
-            currentCreature->executeAction(getAccessibleEntities(currentCreature));
+            std::vector<Entity *> selectedEntities = getAccessibleEntities(currentCreature);
+            currentCreature->executeAction(selectedEntities);
             currentCreature->move();
+
+            averageSelectedEntities += selectedEntities.size();
         }
-
-        currentCreature->findSelectedChunks();
-
-
-        currentCreature->getSensorCoordinates(getAccessibleEntities(currentCreature));
     }
 
+    averageSelectedEntities /= float(connectors.size());
+
+
+
+
     generateEntityGrid();
+
+
+    for (int it = 0; it < connectors.size(); it++) {
+    Creature * currentCreature = connectors.at(it)->getCreature();
+
+
+        currentCreature->findSelectedChunks();
+        currentCreature->processSensorsValues(getAccessibleEntities(currentCreature));
+        connectors.at(it)->processBrainInputs();
+        connectors.at(it)->processBrain();
+
+
+
+    }
+
 }
 
 std::vector<Entity *> Farm::getAccessibleEntities(Creature * creature) {
@@ -154,5 +173,9 @@ void Farm::setUi(FarmUI *ui) {
 
 void Farm::addConnector(BrainConnector * connector) {
     this->connectors.push_back(connector);
+}
+
+float Farm::getAverageSelectedEntities() const {
+    return averageSelectedEntities;
 }
 

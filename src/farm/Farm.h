@@ -26,6 +26,8 @@ private:
 
     CreatureNursery * nursery;
 
+    float averageSelectedEntities;
+
 public:
     Farm();
     void InitFromRandom();
@@ -51,6 +53,8 @@ public:
     void addConnector(BrainConnector * connector);
 
     std::vector<Entity *> getAccessibleEntities(Creature * creature);
+
+    float getAverageSelectedEntities() const;
 
 };
 

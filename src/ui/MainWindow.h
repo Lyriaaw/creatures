@@ -43,6 +43,9 @@ private:
 
     sf::Font * font;
 
+    int ticksCount;
+    float tickTimeTotal;
+
 
 
     void runLoop();

@@ -119,7 +119,7 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {
 
-        if (selectedEntity != this->creature && creature->getSensorDistance(sensorIndex) > 0) {
+        if (creature->getSensorDistance(sensorIndex) > 0) {
             float currentSensorDistance = creature->getSensorLength(sensorIndex) * (1.f - creature->getSensorDistance(sensorIndex));
 
             RGBColor sensorDistanceRGBColor = RGBColor(this->creature->getSensorColor(sensorIndex), 0.f, this->creature->getSensorBrightness(sensorIndex));

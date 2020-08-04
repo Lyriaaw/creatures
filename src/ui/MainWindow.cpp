@@ -68,6 +68,10 @@ MainWindow::MainWindow() {
     farm->setUi(farmUi);
 
 
+    ticksCount = 0;
+    tickTimeTotal = 0;
+
+
 }
 
 
@@ -329,9 +333,6 @@ void MainWindow::draw() {
     window->display();
 
 
-    renderDurationEnd = chrono::system_clock::now();
-    chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
-    renderDurationStart = chrono::system_clock::now();
 }
 
 void MainWindow::runLoop() {
@@ -339,6 +340,21 @@ void MainWindow::runLoop() {
         handleEvents();
         farm->Tick(paused);
         draw();
+
+
+
+        renderDurationEnd = chrono::system_clock::now();
+        chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
+
+        ticksCount++;
+        tickTimeTotal += elapsed_time.count();
+
+        if (ticksCount % 100 == 0) {
+            std::cout << "Average on last 100 ticks: " << 1.f /(tickTimeTotal / 100.f) << " tps. Average available entities: " << farm->getAverageSelectedEntities() << "," << std::endl;
+            tickTimeTotal = 0;
+        }
+
+        renderDurationStart = chrono::system_clock::now();
     }
 
     window->close();

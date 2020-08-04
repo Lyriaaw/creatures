@@ -22,7 +22,7 @@ public:
     float getSensorBrightness(int index);
 
     void findSelectedChunks();
-    void getSensorCoordinates(std::vector<Entity *> entites);
+    void processSensorsValues(std::vector<Entity *> entites);
     void executeAction(std::vector<Entity *> entites);
 
     void addSpeed(float speedToAdd);

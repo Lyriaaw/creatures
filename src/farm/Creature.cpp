@@ -122,7 +122,7 @@ void Creature::findSelectedChunks() {
 }
 
 
-void Creature::getSensorCoordinates(std::vector<Entity *> accessibleEntities) {
+void Creature::processSensorsValues(std::vector<Entity *> accessibleEntities) {
     int sensorCount = getSensorCount();
     for (int it = 0; it < sensorCount; it++) {
 
