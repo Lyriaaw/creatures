@@ -23,7 +23,7 @@ int Creature::addVisionSensorSensor(float length, float rotation, float color) {
     return getSensorCount() - 1;
 }
 
-void Creature::move() {
+float Creature::move() {
 
     float actualSpeed = this->speed * this->size;
 
@@ -52,6 +52,15 @@ void Creature::move() {
 
     this->position.setX(nextX);
     this->position.setY(nextY);
+
+    float usedEnergy = actualSpeed + (mouthValue * this->size) + (genitalsValue * this->size) + float(getSensorCount()) + 10;
+
+    if (this->energy - usedEnergy < 0) {
+        usedEnergy = this->energy;
+    }
+
+    this->energy -= usedEnergy;
+    return usedEnergy;
 
 }
 
@@ -234,13 +243,27 @@ void Creature::getSensorValueFromSensorEquation(int sensorIndex, float sensorX, 
 
 std::vector<ActionDTO> Creature::executeAction(std::vector<Entity *> accessibleEntities) {
     std::vector<ActionDTO> actions;
+
+    std::vector<ActionDTO> mouthAction = getMouthAction(accessibleEntities);
+    std::vector<ActionDTO> genitalsActions = getGenitalsAction(accessibleEntities);
+
+    actions.insert(actions.begin(), mouthAction.begin(), mouthAction.end());
+    actions.insert(actions.begin(), genitalsActions.begin(), genitalsActions.end());
+
+
+    return actions;
+}
+
+std::vector<ActionDTO> Creature::getMouthAction(std::vector<Entity *> accessibleEntities) {
+    std::vector<ActionDTO> actions;
+
     if (mouthValue < 0.5f) {
         return actions;
     }
 
     float mouthTotalRotation = (float(mouthRotation) + rotation) * float(M_PI);
 
-    float mouthSize = size / 4.f;
+    float mouthSize = size / 3.f;
     float mouthX = (cos(mouthTotalRotation) * size) + position.getX();
     float mouthY = (sin(mouthTotalRotation) * size) + position.getY();
 
@@ -269,9 +292,50 @@ std::vector<ActionDTO> Creature::executeAction(std::vector<Entity *> accessibleE
         ActionDTO action = ActionDTO(this->id, closestEntity->getId(), "EAT");
         actions.emplace_back(action);
     }
-
     return actions;
 }
+
+std::vector<ActionDTO> Creature::getGenitalsAction(std::vector<Entity *> accessibleEntities) {
+    std::vector<ActionDTO> actions;
+
+    if (genitalsValue < 0.5f) {
+        return actions;
+    }
+
+    float genitalsTotalRotation = (float(genitalsRotation) + rotation) * float(M_PI);
+
+    float genitalsSize = size / 4.f;
+    float genitalsX = (cos(genitalsTotalRotation) * size) + position.getX();
+    float genitalsY = (sin(genitalsTotalRotation) * size) + position.getY();
+
+    Entity * closestEntity = nullptr;
+    float smallestDistance = FARM_WIDTH;
+
+    for (int it = 0; it < accessibleEntities.size(); it++) {
+        float distanceX = abs(accessibleEntities.at(it)->getPosition().getX() - genitalsX);
+        float distanceY = abs(accessibleEntities.at(it)->getPosition().getY() - genitalsY);
+
+        float distance = sqrt(pow(distanceX, 2) + pow(distanceY, 2));
+
+        if (distance <= genitalsSize) {
+            if (distance < smallestDistance) {
+                smallestDistance = distance;
+                closestEntity = accessibleEntities.at(it);
+            }
+        }
+    }
+
+    if (closestEntity == nullptr) {
+        return actions;
+    }
+
+    if (smallestDistance <= closestEntity->getSize()) {
+        ActionDTO action = ActionDTO(this->id, closestEntity->getId(), "MATE");
+        actions.emplace_back(action);
+    }
+    return actions;
+}
+
 
 
 void Creature::addSpeed(float speedToAdd) {

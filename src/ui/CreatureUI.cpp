@@ -6,7 +6,7 @@
 #include "CreatureUI.h"
 #include "colors/RGBColor.h"
 
-CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 20, sf::Quads), creature(entity)  {
+CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 28, sf::Quads), creature(entity)  {
     sensors = sf::VertexArray(sf::Lines, entity->getSensorCount() * 2);
 }
 
@@ -51,65 +51,96 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
 
     float mouthSize = this->creature->getMouthValue() * (this->entity->getSize() / 3.f);
 
-    int index = 1;
-    for (int it = 0; it < 4; it++) {
-        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
-
-        float currentX = mouthX + (((this->entity->getSize() / 3.f) * camera->getZoom()) * cos(angle));
-        float currentY = mouthY + (((this->entity->getSize() / 3.f) * camera->getZoom()) * sin(angle));
-
-        int currentIt = it + (index * 4);
-        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
-        vertexArray[currentIt].color = mouthBackColor;
-    }
-    index++;
-
-    for (int it = 0; it < 4; it++) {
-        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
-
-        float currentX = mouthX + ((mouthSize * camera->getZoom()) * cos(angle));
-        float currentY = mouthY + ((mouthSize * camera->getZoom()) * sin(angle));
-
-        int currentIt = it + (index * 4);
-        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
-        vertexArray[currentIt].color = mouthColor;
-    }
-    index++;
-
-
-    // Genitals
-    float genitalsRotation = (float(this->creature->getGenitalsRotation()) + this->entity->getRotation()) * float(M_PI);
-
-    float genitalsX = (cos(genitalsRotation) * distance) + screenPoint.getX();
-    float genitalsY = (sin(genitalsRotation) * distance) + screenPoint.getY();
-
-    float genitalsSize = this->creature->getGenitalsValue() * (this->entity->getSize() / 4.f);
-
-    for (int it = 0; it < 4; it++) {
-        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
-
-        float currentX = genitalsX + (((this->creature->getSize() / 4.f) * camera->getZoom()) * cos(angle));
-        float currentY = genitalsY + (((this->creature->getSize() / 4.f) * camera->getZoom()) * sin(angle));
-
-        int currentIt = it + (index * 4);
-        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
-        vertexArray[currentIt].color = mouthBackColor;
-    }
-    index++;
-
-    for (int it = 0; it < 4; it++) {
-        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
-
-        float currentX = genitalsX + ((genitalsSize * camera->getZoom()) * cos(angle));
-        float currentY = genitalsY + ((genitalsSize * camera->getZoom()) * sin(angle));
-
-        int currentIt = it + (index * 4);
-        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
-        vertexArray[currentIt].color = this->color;
-    }
-    index++;
-
-
+//    int index = 1;
+//    for (int it = 0; it < 4; it++) {
+//        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+//
+//        float currentX = mouthX + (((this->entity->getSize() / 3.f) * camera->getZoom()) * cos(angle));
+//        float currentY = mouthY + (((this->entity->getSize() / 3.f) * camera->getZoom()) * sin(angle));
+//
+//        int currentIt = it + (index * 4);
+//        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+//        vertexArray[currentIt].color = mouthBackColor;
+//    }
+//    index++;
+//
+//    for (int it = 0; it < 4; it++) {
+//        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+//
+//        float currentX = mouthX + ((mouthSize * camera->getZoom()) * cos(angle));
+//        float currentY = mouthY + ((mouthSize * camera->getZoom()) * sin(angle));
+//
+//        int currentIt = it + (index * 4);
+//        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+//        vertexArray[currentIt].color = mouthColor;
+//    }
+//    index++;
+//
+//
+//    // Genitals
+//    float genitalsRotation = (float(this->creature->getGenitalsRotation()) + this->entity->getRotation()) * float(M_PI);
+//
+//    float genitalsX = (cos(genitalsRotation) * distance) + screenPoint.getX();
+//    float genitalsY = (sin(genitalsRotation) * distance) + screenPoint.getY();
+//
+//    float genitalsSize = this->creature->getGenitalsValue() * (this->entity->getSize() / 4.f);
+//
+//    for (int it = 0; it < 4; it++) {
+//        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+//
+//        float currentX = genitalsX + (((this->creature->getSize() / 4.f) * camera->getZoom()) * cos(angle));
+//        float currentY = genitalsY + (((this->creature->getSize() / 4.f) * camera->getZoom()) * sin(angle));
+//
+//        int currentIt = it + (index * 4);
+//        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+//        vertexArray[currentIt].color = mouthBackColor;
+//    }
+//    index++;
+//
+//    for (int it = 0; it < 4; it++) {
+//        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->entity->getRotation() * float(M_PI));
+//
+//        float currentX = genitalsX + ((genitalsSize * camera->getZoom()) * cos(angle));
+//        float currentY = genitalsY + ((genitalsSize * camera->getZoom()) * sin(angle));
+//
+//        int currentIt = it + (index * 4);
+//        vertexArray[currentIt] = sf::Vector2f(currentX, currentY);
+//        vertexArray[currentIt].color = this->color;
+//    }
+//    index++;
+//
+//
+//    float energyDistance = (this->creature->getSize() + 10) * camera->getZoom();
+//    vertexArray[(index * 4) + 0].position = sf::Vector2f(screenPoint.getX() - energyDistance, screenPoint.getY() - energyDistance);
+//    vertexArray[(index * 4) + 0].color =  sf::Color(0, 0, 0, 255);
+//
+//    vertexArray[(index * 4) + 1].position = sf::Vector2f(screenPoint.getX() + energyDistance, screenPoint.getY() - energyDistance);
+//    vertexArray[(index * 4) + 1].color =  sf::Color(0, 0, 0, 255);
+//
+//    vertexArray[(index * 4) + 2].position = sf::Vector2f(screenPoint.getX() + energyDistance, screenPoint.getY() - energyDistance + (5 * camera->getZoom()));
+//    vertexArray[(index * 4) + 2].color =  sf::Color(0, 0, 0, 255);
+//
+//    vertexArray[(index * 4) + 3].position = sf::Vector2f(screenPoint.getX() - energyDistance, screenPoint.getY() - energyDistance + (5 * camera->getZoom()));
+//    vertexArray[(index * 4) + 3].color =  sf::Color(0, 0, 0, 255);
+//
+//    index++;
+//
+//    float energyRatio = (this->getEntity()->getEnergy() / this->getEntity()->getMaxEnergy()) * energyDistance;
+//
+//    vertexArray[(index * 4) + 0].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + 1);
+//    vertexArray[(index * 4) + 0].color =  sf::Color(255, 255, 255, 255);
+//
+//    vertexArray[(index * 4) + 1].position = sf::Vector2f(screenPoint.getX() + energyRatio, screenPoint.getY() - energyDistance + 1);
+//    vertexArray[(index * 4) + 1].color =  sf::Color(255, 255, 255, 255);
+//
+//    vertexArray[(index * 4) + 2].position = sf::Vector2f(screenPoint.getX() + energyRatio, screenPoint.getY() - energyDistance + (5 * camera->getZoom()) - 1);
+//    vertexArray[(index * 4) + 2].color =  sf::Color(255, 255, 255, 255);
+//
+//    vertexArray[(index * 4) + 3].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + (5 * camera->getZoom()) - 1);
+//    vertexArray[(index * 4) + 3].color =  sf::Color(255, 255, 255, 255);
+//
+//
+//
 
 
 
@@ -123,7 +154,8 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
     // Sensors
     for (int sensorIndex = 0; sensorIndex < creature->getSensorCount(); sensorIndex++) {
 
-        if (creature->getSensorDistance(sensorIndex) > 0) {
+//        if (creature->getSensorDistance(sensorIndex) > 0) {
+        if (false) {
             float currentSensorDistance = creature->getSensorLength(sensorIndex) * (1.f - creature->getSensorDistance(sensorIndex));
 
             RGBColor sensorDistanceRGBColor = RGBColor(this->creature->getSensorColor(sensorIndex), 0.f, this->creature->getSensorBrightness(sensorIndex));

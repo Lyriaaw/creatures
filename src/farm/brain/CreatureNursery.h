@@ -17,6 +17,7 @@
 #include "evolutions/SizeEvolution.h"
 #include "evolutions/MouthEvolution.h"
 #include "evolutions/GenitalsEvolution.h"
+#include "evolutions/EnergySensorEvolution.h"
 
 class CreatureNursery {
 private:

@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position) {
+Entity::Entity(Point position): position(position), energy(0), size(0) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -74,4 +74,31 @@ bool Entity::isExists() const {
 
 void Entity::setExists(bool exists) {
     Entity::exists = exists;
+}
+
+float Entity::getEnergy() const {
+    return energy;
+}
+
+void Entity::setEnergy(float energy) {
+    Entity::energy = energy;
+}
+
+float Entity::addEnergy(float addedEnergy) {
+    float remaining = 0.f;
+
+    float newEnergy = this->energy + addedEnergy;
+
+    if (newEnergy > getMaxEnergy()) {
+        remaining = newEnergy - getMaxEnergy();
+        newEnergy = newEnergy - remaining;
+    }
+
+    this->energy = newEnergy;
+
+    return remaining;
+}
+
+float Entity::getMaxEnergy() {
+    return float(int(100.f*size));
 }

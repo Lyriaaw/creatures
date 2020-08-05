@@ -33,6 +33,8 @@ public:
 
     void addCreature(CreatureUI * creatureUI);
 
+    void clearEntities(std::vector<Entity *> toDelete);
+    void addEntities(std::vector<Entity *> toDelete);
 };
 
 

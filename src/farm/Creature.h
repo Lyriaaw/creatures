@@ -13,7 +13,7 @@
 class Creature: public Entity {
 public:
     Creature(Point position);
-    void move();
+    float move();
     int getSensorCount();
 
     float getSensorRotation(int index);
@@ -28,6 +28,8 @@ public:
     void findSelectedChunks();
     void processSensorsValues(std::vector<Entity *> entites);
     std::vector<ActionDTO> executeAction(std::vector<Entity *> entites);
+    std::vector<ActionDTO> getMouthAction(std::vector<Entity *> entites);
+    std::vector<ActionDTO> getGenitalsAction(std::vector<Entity *> entites);
 
     void addSpeed(float speedToAdd);
     void addRotation(float rotationToAdd);

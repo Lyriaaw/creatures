@@ -337,6 +337,9 @@ void MainWindow::draw() {
 
 void MainWindow::runLoop() {
     while (running) {
+        farm->getUi()->clearEntities(farm->getToDelete());
+        farm->getUi()->addEntities(farm->getAdded());
+        farm->clearAdded();
         handleEvents();
         farm->Tick(paused);
         draw();

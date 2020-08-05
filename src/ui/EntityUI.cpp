@@ -6,6 +6,10 @@
 #include "colors/RGBColor.h"
 #include "colors/ColorUtils.h"
 
+EntityUI::~EntityUI() {
+
+}
+
 EntityUI::EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type) : entity(entity) {
     this->vertexArray = sf::VertexArray(type, vertexCount);
 

@@ -89,6 +89,42 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * sel
 
 }
 
+void FarmUI::clearEntities(std::vector<Entity *> toDelete) {
+    for (int it = 0; it < toDelete.size(); it++) {
+        Entity * entityToDelete = toDelete.at(it);
+
+        int index = -1;
+        for (int jt = 0; jt < entities.size(); jt++) {
+            EntityUI * currentEntityUI = entities.at(jt);
+
+            if (currentEntityUI->getEntity()->getId() == entityToDelete->getId()) {
+                index = jt;
+            }
+        }
+
+        if (index != -1) {
+            EntityUI * toDeleteEntityUI = entities.at(it);
+            entities.erase(entities.begin() + index);
+        }
+
+    }
+}
+
+void FarmUI::addEntities(std::vector<Entity *> to_add) {
+    for (int it = 0; it < to_add.size(); it++) {
+        Creature *creature = static_cast<Creature *>(to_add.at(it));
+
+        if (creature == nullptr) {
+            continue;
+        }
+
+        CreatureUI *entityUi = new CreatureUI(creature);
+        entities.push_back(entityUi);
+    }
+}
+
+
+
 void FarmUI::setEntities(const std::vector<EntityUI *> entities) {
     FarmUI::entities = entities;
 }

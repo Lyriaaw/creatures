@@ -47,6 +47,11 @@ public:
 
     void setExists(bool exists);
 
+    float getEnergy() const;
+    void setEnergy(float energy);
+    float addEnergy(float addedEnergy);
+    float getMaxEnergy();
+
 
 protected:
     static int GLOBAL_INDEX;
@@ -61,6 +66,8 @@ protected:
 
     float color;
     float brightness;
+
+    float energy;
 
     bool exists;
 

@@ -53,7 +53,7 @@ Evolution * SensorEvolution::generateWithMate(Evolution * mate) {
     SensorEvolution * mateSensorEvolution(nullptr);
 
     if (mate == nullptr) {
-        std::cout << "NULL POINTER OF MATE SENSOR: " << generationNumber << std::endl;
+//        std::cout << "NULL POINTER OF MATE SENSOR: " << generationNumber << std::endl;
     } else {
         mateSensorEvolution = dynamic_cast<SensorEvolution *>(mate);
         if (mateSensorEvolution == nullptr) {

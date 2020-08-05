@@ -30,6 +30,11 @@ private:
 
     std::vector<ActionDTO> actions;
 
+    float availableEnergy;
+
+    std::vector<Entity *> toDelete;
+    std::vector<Entity *> added;
+
 public:
     Farm();
     void InitFromRandom();
@@ -37,10 +42,13 @@ public:
     void Tick(bool paused);
     void generateEntityGrid();
     void executeCreaturesActions();
-    void removeEntity(int id);
+    void clearDeletedEntities();
 
     Creature * getCreatureFromId(int id);
     Entity * getEntityFromId(int id);
+    BrainConnector * getConnectorFromId(int id);
+
+    static std::string getHumanReadableEnergy(float givenEnergy) ;
 
 
     FarmUI *getUi() const;
@@ -62,6 +70,13 @@ public:
     std::vector<Entity *> getAccessibleEntities(Creature * creature);
 
     float getAverageSelectedEntities() const;
+
+    const std::vector<Entity *> &getToDelete() const;
+
+    const std::vector<Entity *> &getAdded() const;
+
+    void setAdded(const std::vector<Entity *> &added);
+    void clearAdded();
 
 };
 

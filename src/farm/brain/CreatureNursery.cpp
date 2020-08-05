@@ -48,11 +48,18 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     biasInputEvolution->perform(connector);
     creatureGenome.emplace_back(biasInputEvolution);
 
+    EnergySensorEvolution * energySensorInputEvolution = new EnergySensorEvolution();
+    energySensorInputEvolution->setGenerationNumber(4);
+    energySensorInputEvolution->perform(connector);
+    creatureGenome.emplace_back(energySensorInputEvolution);
+
+
+
     int sensorCount = rand() % 7 + 4;
     for (int it = 0; it < sensorCount; it++) {
 
         SensorEvolution * sensorEvol = new SensorEvolution();
-        sensorEvol->setGenerationNumber((it * 3) + 4);
+        sensorEvol->setGenerationNumber((it * 3) + 5);
         sensorEvol->generateFromRandom(connector);
         sensorEvol->perform(connector);
         creatureGenome.emplace_back(sensorEvol);
@@ -60,23 +67,23 @@ BrainConnector * CreatureNursery::generateFromRandom() {
     }
 
     SpeedEvolution * speedEvolution = new SpeedEvolution();
-    speedEvolution->setGenerationNumber(34);
+    speedEvolution->setGenerationNumber(35);
     speedEvolution->perform(connector);
     creatureGenome.emplace_back(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(35);
+    rotationEvolution->setGenerationNumber(36);
     rotationEvolution->perform(connector);
     creatureGenome.emplace_back(rotationEvolution);
 
     MouthEvolution * mouthEvolution = new MouthEvolution();
-    mouthEvolution->setGenerationNumber(36);
+    mouthEvolution->setGenerationNumber(37);
     mouthEvolution->generateFromRandom(connector);
     mouthEvolution->perform(connector);
     creatureGenome.emplace_back(mouthEvolution);
 
     GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
-    genitalsEvolution->setGenerationNumber(37);
+    genitalsEvolution->setGenerationNumber(38);
     genitalsEvolution->generateFromRandom(connector);
     genitalsEvolution->perform(connector);
     creatureGenome.emplace_back(genitalsEvolution);
@@ -86,7 +93,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
 
 
-    int generationNumberIndex(38);
+    int generationNumberIndex(39);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
@@ -102,6 +109,9 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
 
     brain->generateLinkGrid();
+
+    float creatureEnergy = (creature->getSize() * 100.f) / 2.f;
+    creature->setEnergy(creatureEnergy);
 
     evolutionLibrary.addGenome(creature->getId(), creatureGenome);
     return connector;
@@ -162,7 +172,6 @@ BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector *
         if (childEvolution != nullptr) {
             childGenome.emplace_back(childEvolution);
         }
-
     }
 
     Point childSpawn = {
@@ -175,9 +184,10 @@ BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector *
     BrainConnector * connector = new BrainConnector(childCreature, childBrain);
 
 
+
+
     for (int it = 0; it < childGenome.size(); it++) {
         childGenome.at(it)->perform(connector);
-        std::cout << "Applying evolution on child: " << childGenome.at(it)->describe() << std::endl;
     }
 
     connector->getBrain()->generateLinkGrid();

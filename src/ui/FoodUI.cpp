@@ -11,6 +11,7 @@ FoodUI::FoodUI(Food *entity): EntityUI(entity, 15, sf::TriangleFan) {
 
 void FoodUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) {
     if (!this->entity->isExists()) {
+        std::cout << "Does not exists" << std::endl;
         return;
 //        this->color = sf::Color(0, 0, 0, 255);
     }

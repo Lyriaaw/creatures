@@ -54,7 +54,7 @@ Evolution * LinkEvolution::generateWithMate(Evolution * mate) {
     LinkEvolution * mateSensorEvolution(nullptr);
 
     if (mate == nullptr) {
-        std::cout << "NULL POINTER OF MATE LINK: " << generationNumber << std::endl;
+//        std::cout << "NULL POINTER OF MATE LINK: " << generationNumber << std::endl;
     } else {
         mateSensorEvolution = dynamic_cast<LinkEvolution *>(mate);
         if (mateSensorEvolution == nullptr) {
