@@ -16,7 +16,7 @@ Farm::Farm() {
 }
 
 void Farm::InitRandomMap() {
-    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575, 391032, 660340, 526115, 218205, 890683, 595048, 236189, 781676, 260093, 693209, 80826};
+    float coolSeeds[] = {3041, 7980, 4672, 2354, 518, 6237, 868, 3815, 2727, 1568, 5953, 8058, 568654, 787145, 924505, 117802, 523117, 45482, 407575, 391032, 660340, 526115, 218205, 890683, 595048, 236189, 781676, 260093, 693209, 80826, 345867, 758436, 439334 };
     float seed = rand() % 1000000;
 //    float seed = 1568;
     PerlinNoise perlin(seed);
@@ -53,11 +53,16 @@ void Farm::InitFromRandom() {
 
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
-    for (int it = 0; it < 1000; it++) {
-        connectors.push_back(nursery->generateFromRandom());
+    for (int it = 0; it < 100; it++) {
+        BrainConnector * initialCreature = nursery->generateFromRandom();
+
+        float creatureEnergy = initialCreature->getCreature()->getMaxEnergy() / 2.0;
+        initialCreature->getCreature()->setEnergy(creatureEnergy);
+
+        connectors.push_back(initialCreature);
     }
 
-    for (int it = 0; it < 10000; it++) {
+    for (int it = 0; it < 50000; it++) {
         int x = distWidth(mt);
         int y = distHeight(mt);
 
@@ -68,33 +73,52 @@ void Farm::InitFromRandom() {
         float foodSize = 2;
 
         Food * entity = new Food(point, foodSize);
-        entity->setEnergy(foodSize * 100);
+        entity->setEnergy(entity->getMaxEnergy());
         foods.push_back(entity);
     }
 
     availableEnergy = 0.f;
+    tickCount = 0;
 }
 
 
 void Farm::Tick(bool paused) {
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
+    uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
+
+
     averageSelectedEntities = 0;
 
     this->toDelete.clear();
 
     if (!paused) {
 
-        for (int it = 0; it < connectors.size(); it++) {
-            connectors.at(it)->processBrainOutputs();
+        std::vector<BrainConnector *> sortedConnectors = getScoreSortedCreatures();
+
+
+        for (int it = 0; it < sortedConnectors.size(); it++) {
+            sortedConnectors.at(it)->processBrainOutputs();
         }
 
         executeCreaturesActions();
 
-        for (int it = 0; it < connectors.size(); it++) {
+        for (int it = 0; it < sortedConnectors.size(); it++) {
 
-            Creature *currentCreature = connectors.at(it)->getCreature();
-            availableEnergy += currentCreature->move();
+            Creature *currentCreature = sortedConnectors.at(it)->getCreature();
+            float givenEnergy =currentCreature->move();
+            availableEnergy += givenEnergy;
+
+            if (givenEnergy < 0) {
+                std::cout << "Returned negative amount of energy: " << givenEnergy << std::endl;
+
+            }
 
             if (currentCreature->getEnergy() <= 0) {
+                if (currentCreature->getEnergy() < 0) {
+                    std::cout << "Creature with less than 0 energy: " << currentCreature->getEnergy() << std::endl;
+                }
                 toDelete.emplace_back(currentCreature);
             }
         }
@@ -103,44 +127,130 @@ void Farm::Tick(bool paused) {
     clearDeletedEntities();
 
     if (this->connectors.size() < 500) {
-        int newConnectorNeeded = 550 - this->connectors.size();
-        std::cout << newConnectorNeeded << " new creatures needed" << std::endl;
+        std::vector<BrainConnector *> sortedConnectors = getScoreSortedCreatures();
+        int selectedParentCount = sortedConnectors.size() / 2;
+
+        int newConnectorNeeded = 55 - this->connectors.size();
+//        std::cout << newConnectorNeeded << " new creatures needed" << std::endl;
 
         for (int it = 0; it < newConnectorNeeded; it++) {
-            int fatherIndex = rand() % connectors.size();
-            int motherIndex = rand() % connectors.size();
+            int fatherIndex = rand() % selectedParentCount;
+            int motherIndex = rand() % selectedParentCount;
 
-            BrainConnector * father = connectors.at(fatherIndex);
-            BrainConnector * mother = connectors.at(motherIndex);
+            BrainConnector * father = sortedConnectors.at(fatherIndex);
+            BrainConnector * mother = sortedConnectors.at(motherIndex);
 
             BrainConnector * child = this->nursery->Mate(father, mother);
             child->getCreature()->setEnergy(child->getCreature()->getMaxEnergy() / 4.f);
+            Creature * childCreature = child->getCreature();
+
+            float childSpawnX = distWidth(mt);
+            float childSpawnY = distHeight(mt);
+            Point childCreaturePosition = Point(childSpawnX, childSpawnY);
+
+            childCreature->setPosition(childCreaturePosition);
+
+            float energyToRemove = child->getCreature()->getEnergy();
+
+            if (availableEnergy >= energyToRemove) {
+                availableEnergy -= energyToRemove;
+            } else {
+                float totalCollected = 0.f;
+                for (int jt = 0; jt < foods.size(); jt++) {
+                    if (totalCollected >= energyToRemove)
+                        continue;
+
+                    if (foods.at(jt)->getEnergy() <= 0) {
+                        continue;
+                    }
+
+                    totalCollected += foods.at(jt)->removeEnergy(foods.at(jt)->getEnergy());
+
+                    toDelete.emplace_back(foods.at(jt));
+                }
+
+                if (totalCollected > energyToRemove) {
+                    availableEnergy += totalCollected - energyToRemove;
+                }
+
+            }
+
+
             connectors.emplace_back(child);
-            added.emplace_back(child->getCreature());
+            addedCreatures.emplace_back(child->getCreature());
+
+
         }
+    }
+    clearDeletedEntities();
+
+
+    int foodToGenerate = (int(availableEnergy) / 2000) - 1;
+
+    float totalEnergyAdded = 0.f;
+
+
+
+    for (int it = 0; it < foodToGenerate; it++) {
+        int x = distWidth(mt);
+        int y = distHeight(mt);
+
+        Point point(x, y);
+
+
+//        float foodSize = ((rand() % 300) / 100.f) + 2;
+        float foodSize = 2;
+
+        Food * entity = new Food(point, foodSize);
+        entity->setEnergy(entity->getMaxEnergy());
+
+        availableEnergy -= entity->getEnergy();
+        totalEnergyAdded += entity->getEnergy();
+
+
+        foods.emplace_back(entity);
+        addedEntity.emplace_back(entity);
     }
 
 
-//    float totalCreaturesEnergy = 0.f;
-//    float totalFoodsEnergy = 0.f;
-//
-//    for (int it = 0; it < connectors.size(); it++) {
-//        Creature * currentCreature = connectors.at(it)->getCreature();
-//        totalCreaturesEnergy += currentCreature->getEnergy();
-//    }
-//
-//    for (int it = 0; it < foods.size(); it++) {
-//        Entity * entity = foods.at(it);
-//        totalFoodsEnergy += entity->getEnergy();
-//    }
 
-//    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
-//    std::cout << "Total: " << getHumanReadableEnergy(totalEnergy);
-//    std::cout << "  --  available: " << getHumanReadableEnergy(availableEnergy);
-//    std::cout << "  --  creatures: " << getHumanReadableEnergy(totalCreaturesEnergy);
-//    std::cout << "  --  foods: " << getHumanReadableEnergy(totalFoodsEnergy);
-//    std::cout << "  --  raw total: " << totalEnergy;
-//    std::cout << std::endl;
+
+
+
+    if (tickCount % 100 == 0) {
+//    if (true) {
+        double totalCreaturesEnergy = 0.f;
+        double totalFoodsEnergy = 0.f;
+
+        for (int it = 0; it < connectors.size(); it++) {
+            Creature * currentCreature = connectors.at(it)->getCreature();
+            totalCreaturesEnergy += currentCreature->getEnergy();
+        }
+
+        for (int it = 0; it < foods.size(); it++) {
+            Entity * entity = foods.at(it);
+            totalFoodsEnergy += entity->getEnergy();
+        }
+
+
+        std::vector<BrainConnector *> sortedConnectors = getScoreSortedCreatures();
+
+
+
+
+        std::cout << "Creatures: " << connectors.size() << " Entities: " << foods.size();
+
+        int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
+        std::cout << "  | Tick: " << tickCount << " total: " << getHumanReadableEnergy(totalEnergy);
+        std::cout << "  --  available: " << getHumanReadableEnergy(availableEnergy);
+        std::cout << "  --  creatures: " << getHumanReadableEnergy(totalCreaturesEnergy);
+        std::cout << "  --  foods: " << getHumanReadableEnergy(totalFoodsEnergy);
+        std::cout << "  --  raw total: " << totalEnergy;
+        std::cout << std::endl;
+
+
+    }
+
 
 
     generateEntityGrid();
@@ -169,9 +279,20 @@ void Farm::Tick(bool paused) {
     }
 
 
+    for (int it = 0; it < connectors.size(); it++) {
+        connectors.at(it)->getCreature()->aTickHavePassed();
+    }
+    for (int it = 0; it < foods.size(); it++) {
+        foods.at(it)->aTickHavePassed();
+    }
+
+
+
+
     averageSelectedEntities /= float(connectors.size());
 
 
+    tickCount++;
 }
 
 
@@ -185,7 +306,7 @@ void Farm::executeCreaturesActions() {
         bool found = false;
         for (int jt = 0; jt < toDelete.size(); jt++) {
             if (subject->getId() == toDelete.at(jt)->getId()) {
-                std::cout << "Performer is about to be delete" << std::endl;
+//                std::cout << "Performer is about to be delete" << std::endl;
                 found = true;
             }
 
@@ -209,18 +330,32 @@ void Farm::executeCreaturesActions() {
         }
 
         if (currentAction.getType() == "MATE") {
+            // TODO Verify that the partner is trying to reproduce as well (let's implement consentment)
             BrainConnector * foundConnector = getConnectorFromId(subject->getId());
             if (foundConnector == nullptr) {
                 continue;
             }
-//
-            std::cout << "Mating " << std::endl;
+
+            bool fatherCanReproduce = performer->getCreature()->getEnergy() > performer->getCreature()->getMaxEnergy() / 2.f;
+            bool motherCanReproduce = foundConnector->getCreature()->getEnergy() > performer->getCreature()->getMaxEnergy() / 2.f;
+
+            if (!fatherCanReproduce || !motherCanReproduce) {
+                continue;
+            }
+
+//            std::cout << "Mating " << std::endl;
 //
             BrainConnector * child = this->nursery->Mate(performer, foundConnector);
-            child->getCreature()->setEnergy(child->getCreature()->getMaxEnergy() / 4.f);
+
+            float givenEnergyToChildGoal = child->getCreature()->getMaxEnergy() / 4.f;
+
+            float givenFatherEnergy = performer->getCreature()->removeEnergy(givenEnergyToChildGoal / 2.f);
+            float givenMotherEnergy = foundConnector->getCreature()->removeEnergy(givenEnergyToChildGoal / 2.f);
+
+            child->getCreature()->setEnergy(givenFatherEnergy + givenMotherEnergy);
             connectors.emplace_back(child);
 
-            added.emplace_back(child->getCreature());
+            addedCreatures.emplace_back(child->getCreature());
         }
 
 
@@ -415,16 +550,56 @@ std::string Farm::getHumanReadableEnergy(float givenEnergy) {
     return givenEnergyStream.str();
 }
 
-const vector<Entity *> &Farm::getAdded() const {
-    return added;
+void Farm::clearAddedCreatures() {
+    this->addedCreatures.clear();
+}
+void Farm::clearAddedEntities() {
+    this->addedEntity.clear();
 }
 
-void Farm::clearAdded() {
-    this->added.clear();
+std::vector<BrainConnector *> Farm::getScoreSortedCreatures() {
+    std::vector<BrainConnector *> sorted;
+
+    std::vector<BrainConnector *> tmpConnectors = this->connectors;
+
+    while (!tmpConnectors.empty()) {
+
+        int biggestIndex = -1;
+        float biggestScore = 0.f;
+
+        for (int it = 0; it < tmpConnectors.size(); it++) {
+            if (tmpConnectors.at(it)->getCreature()->getAge() >= biggestScore) {
+                biggestIndex = it;
+                biggestScore = tmpConnectors.at(it)->getCreature()->getAge();
+            }
+        }
+
+        if (biggestIndex == -1) {
+            std::cout << "Error while sorting creatures by score - Life will probably crash" << std::endl;
+        }
+
+        sorted.emplace_back(tmpConnectors.at(biggestIndex));
+        tmpConnectors.erase(tmpConnectors.begin() + biggestIndex);
+    }
+
+    return sorted;
 }
 
 
-void Farm::setAdded(const vector<Entity *> &added) {
-    Farm::added = added;
+
+const vector<Food *> &Farm::getAddedEntity() const {
+    return addedEntity;
+}
+
+void Farm::setAddedEntity(const vector<Food *> &addedEntity) {
+    Farm::addedEntity = addedEntity;
+}
+
+const vector<Creature *> &Farm::getAddedCreatures() const {
+    return addedCreatures;
+}
+
+void Farm::setAddedCreatures(const vector<Creature *> &addedCreatures) {
+    Farm::addedCreatures = addedCreatures;
 }
 

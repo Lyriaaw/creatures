@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), energy(0), size(0) {
+Entity::Entity(Point position): position(position), energy(0.0), size(0), age(0) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -80,14 +80,14 @@ float Entity::getEnergy() const {
     return energy;
 }
 
-void Entity::setEnergy(float energy) {
+double Entity::setEnergy(double energy) {
     Entity::energy = energy;
 }
 
-float Entity::addEnergy(float addedEnergy) {
-    float remaining = 0.f;
+double Entity::addEnergy(double addedEnergy) {
+    double remaining = 0.f;
 
-    float newEnergy = this->energy + addedEnergy;
+    double newEnergy = this->energy + addedEnergy;
 
     if (newEnergy > getMaxEnergy()) {
         remaining = newEnergy - getMaxEnergy();
@@ -99,6 +99,32 @@ float Entity::addEnergy(float addedEnergy) {
     return remaining;
 }
 
-float Entity::getMaxEnergy() {
-    return float(int(100.f*size));
+double Entity::removeEnergy(double removedEnergy) {
+    double newEnergy = this->energy - removedEnergy;
+    double returned = 0.f;
+
+    if (newEnergy <= 0) {
+        returned = this->energy;
+        this->energy = 0;
+    }
+
+    return returned;
+}
+
+double Entity::getMaxEnergy() {
+//    double result = this->size * pow(299792458, 2);
+    double result = this->size * 1000;
+    return result;
+}
+
+int Entity::getAge() const {
+    return age;
+}
+
+void Entity::setAge(int age) {
+    Entity::age = age;
+}
+
+void Entity::aTickHavePassed(){
+    Entity::age++;
 }

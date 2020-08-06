@@ -10,6 +10,9 @@ Creature::Creature(Point position): Entity(position) {
     this->brightness = 0.5f;
 //    this->rotation = ((rand() % 200) / 100.f) - 1.f;
     this->rotation = 0.f;
+
+    mouthValue = 0;
+    genitalsValue = 0;
 }
 
 int Creature::addVisionSensorSensor(float length, float rotation, float color) {
@@ -23,7 +26,7 @@ int Creature::addVisionSensorSensor(float length, float rotation, float color) {
     return getSensorCount() - 1;
 }
 
-float Creature::move() {
+double Creature::move() {
 
     float actualSpeed = this->speed * this->size;
 
@@ -53,10 +56,23 @@ float Creature::move() {
     this->position.setX(nextX);
     this->position.setY(nextY);
 
-    float usedEnergy = actualSpeed + (mouthValue * this->size) + (genitalsValue * this->size) + float(getSensorCount()) + 10;
+
+
+    double speedEnergy = abs(actualSpeed);
+    double mouthEnergy = (mouthValue * this->size);
+    double genitalsEnergy = abs(genitalsValue * this->size);
+    double sensorEnergy = getSensorCount();
+    double biasEnergy = 10;
+
+    double usedEnergy =  mouthEnergy + genitalsEnergy + sensorEnergy + speedEnergy + biasEnergy;
 
     if (this->energy - usedEnergy < 0) {
         usedEnergy = this->energy;
+    }
+
+    if (usedEnergy < 0) {
+        std::cout << "Returned negative amount of energy: " << usedEnergy << std::endl;
+
     }
 
     this->energy -= usedEnergy;

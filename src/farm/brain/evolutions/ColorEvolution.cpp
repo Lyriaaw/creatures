@@ -45,7 +45,7 @@ Evolution * ColorEvolution::generateFromCastedMate(ColorEvolution * mate) {
     }
 
     // 3 chances out of 4 to simply select one of the parent's sensor
-    if (rand() % 4 != 0) {
+    if (rand() % MUTATION_RATIO != 0) {
         if (rand() % 2 == 0) {
             childColorEvolution->hue = this->hue;
         } else {

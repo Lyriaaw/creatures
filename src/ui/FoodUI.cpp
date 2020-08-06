@@ -19,7 +19,7 @@ void FoodUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEnt
 
     Point screenPoint = camera->getScreenCoordinates(this->entity->getPosition());
 
-    float screenSize = this->entity->getSize() * camera->getZoom();
+    float screenSize = (this->entity->getSize()) * camera->getZoom();
 
     // Colored body
 

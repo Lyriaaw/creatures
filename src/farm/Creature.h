@@ -13,7 +13,7 @@
 class Creature: public Entity {
 public:
     Creature(Point position);
-    float move();
+    double move();
     int getSensorCount();
 
     float getSensorRotation(int index);

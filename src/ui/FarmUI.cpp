@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "../farm/brain/BrainConnector.h"
 #include "CreatureUI.h"
+#include "FoodUI.h"
 
 FarmUI::FarmUI() {}
 
@@ -110,15 +111,15 @@ void FarmUI::clearEntities(std::vector<Entity *> toDelete) {
     }
 }
 
-void FarmUI::addEntities(std::vector<Entity *> to_add) {
+void FarmUI::addEntities(std::vector<Food *> to_add) {
     for (int it = 0; it < to_add.size(); it++) {
-        Creature *creature = static_cast<Creature *>(to_add.at(it));
-
-        if (creature == nullptr) {
-            continue;
-        }
-
-        CreatureUI *entityUi = new CreatureUI(creature);
+        FoodUI *entityUi = new FoodUI(to_add.at(it));
+        entities.push_back(entityUi);
+    }
+}
+void FarmUI::addCreatures(std::vector<Creature *> to_add) {
+    for (int it = 0; it < to_add.size(); it++) {
+        CreatureUI *entityUi = new CreatureUI(to_add.at(it));
         entities.push_back(entityUi);
     }
 }
@@ -131,6 +132,10 @@ void FarmUI::setEntities(const std::vector<EntityUI *> entities) {
 
 void FarmUI::addCreature(CreatureUI * creatureUI) {
     this->entities.push_back(creatureUI);
+}
+
+const std::vector<EntityUI *> &FarmUI::getEntities() const {
+    return entities;
 }
 
 

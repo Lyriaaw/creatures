@@ -48,9 +48,14 @@ public:
     void setExists(bool exists);
 
     float getEnergy() const;
-    void setEnergy(float energy);
-    float addEnergy(float addedEnergy);
-    float getMaxEnergy();
+    double setEnergy(double energy);
+    double addEnergy(double addedEnergy);
+    double removeEnergy(double removedEnergy);
+    double getMaxEnergy();
+
+    int getAge() const;
+    void setAge(int age);
+    void aTickHavePassed();
 
 
 protected:
@@ -67,10 +72,11 @@ protected:
     float color;
     float brightness;
 
-    float energy;
+    double energy;
 
     bool exists;
 
+    int age;
 
 };
 

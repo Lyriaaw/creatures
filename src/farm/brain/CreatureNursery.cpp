@@ -110,8 +110,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
     brain->generateLinkGrid();
 
-    float creatureEnergy = (creature->getSize() * 100.f) / 2.f;
-    creature->setEnergy(creatureEnergy);
+
 
     evolutionLibrary.addGenome(creature->getId(), creatureGenome);
     return connector;
@@ -174,14 +173,35 @@ BrainConnector * CreatureNursery::Mate(BrainConnector * father, BrainConnector *
         }
     }
 
+    float delta = (((rand() % 400) / 100.f) - 2.f) * father->getCreature()->getSize();
+
     Point childSpawn = {
-    (father->getCreature()->getPosition().getX() + mother->getCreature()->getPosition().getX()) / 2,
-    (father->getCreature()->getPosition().getY() + mother->getCreature()->getPosition().getY()) / 2,
+    father->getCreature()->getPosition().getX() + delta,
+    father->getCreature()->getPosition().getY() + delta,
     };
+
+    if (childSpawn.getX() < 0) {
+        childSpawn.setX(0);
+    }
+    if (childSpawn.getX() >= FARM_WIDTH) {
+        childSpawn.setX(FARM_WIDTH - 1);
+    }
+
+    if (childSpawn.getY() < 0) {
+        childSpawn.setY(0);
+    }
+    if (childSpawn.getY() >= FARM_HEIGHT) {
+        childSpawn.setY(FARM_HEIGHT - 1);
+    }
+
+
+
 
     Creature * childCreature = new Creature(childSpawn);
     Brain * childBrain = new Brain();
     BrainConnector * connector = new BrainConnector(childCreature, childBrain);
+
+    childCreature->setRotation(((std::rand() % 2000) / 1000.f) - 1.f);
 
 
 

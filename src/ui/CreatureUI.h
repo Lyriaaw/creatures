@@ -12,6 +12,7 @@
 class CreatureUI: public EntityUI {
 private:
     sf::VertexArray sensors;
+    sf::VertexArray energy;
     Creature * creature;
 
 public:

@@ -294,6 +294,23 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             delete brainUi;
             brainUi = nullptr;
             break;
+        case Keyboard::Key::R:
+            this->selectedEntity = nullptr;
+            this->selectedCreature = nullptr;
+            delete brainUi;
+            brainUi = nullptr;
+
+            int randomCreatureIndex = rand() % farm->getConnectors().size();
+            BrainConnector * creature = farm->getConnectors().at(randomCreatureIndex);
+
+            selectedCreature = creature;
+
+            brainUi = new BrainUI(selectedCreature->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
+
+
+
+            break;
+
 
 
     }
@@ -337,11 +354,39 @@ void MainWindow::draw() {
 
 void MainWindow::runLoop() {
     while (running) {
-        farm->getUi()->clearEntities(farm->getToDelete());
-        farm->getUi()->addEntities(farm->getAdded());
-        farm->clearAdded();
+
+
         handleEvents();
         farm->Tick(paused);
+
+
+        farm->getUi()->clearEntities(farm->getToDelete());
+
+        farm->getUi()->addEntities(farm->getAddedEntity());
+        farm->clearAddedEntities();
+        farm->getUi()->addCreatures(farm->getAddedCreatures());
+        farm->clearAddedCreatures();
+
+
+
+        if (ticksCount % 100 == 0) {
+//            std::cout << "Average on last 100 ticks: " << 1.f /(tickTimeTotal / 100.f) << " tps. Average available entities: " << farm->getAverageSelectedEntities() << "," << std::endl;
+
+            int totalUIEntities = farm->getUi()->getEntities().size();
+
+            int totalFarmCreatures = farm->getConnectors().size();
+            int totalFarmFood = farm->getFoods().size();
+            int totalFarmEntities = totalFarmCreatures + totalFarmFood;
+
+//            std::cout << "Total entities on map: " << " (Farm =>  T: " << totalFarmEntities << ", C: " << totalFarmCreatures << ", F: " << totalFarmFood << " )" << std::endl;
+//            std::cout << std::endl;
+//            std::cout << std::endl;
+
+            tickTimeTotal = 0;
+        }
+
+
+
         draw();
 
 
@@ -352,10 +397,7 @@ void MainWindow::runLoop() {
         ticksCount++;
         tickTimeTotal += elapsed_time.count();
 
-        if (ticksCount % 100 == 0) {
-            std::cout << "Average on last 100 ticks: " << 1.f /(tickTimeTotal / 100.f) << " tps. Average available entities: " << farm->getAverageSelectedEntities() << "," << std::endl;
-            tickTimeTotal = 0;
-        }
+
 
         renderDurationStart = chrono::system_clock::now();
     }

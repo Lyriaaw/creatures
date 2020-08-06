@@ -30,10 +30,13 @@ private:
 
     std::vector<ActionDTO> actions;
 
-    float availableEnergy;
+    double availableEnergy;
 
     std::vector<Entity *> toDelete;
-    std::vector<Entity *> added;
+    std::vector<Food *> addedEntity;
+    std::vector<Creature *> addedCreatures;
+
+    int tickCount;
 
 public:
     Farm();
@@ -73,10 +76,18 @@ public:
 
     const std::vector<Entity *> &getToDelete() const;
 
-    const std::vector<Entity *> &getAdded() const;
+    const std::vector<Food *> &getAddedEntity() const;
 
-    void setAdded(const std::vector<Entity *> &added);
-    void clearAdded();
+    void setAddedEntity(const std::vector<Food *> &addedEntity);
+
+    const std::vector<Creature *> &getAddedCreatures() const;
+
+    void setAddedCreatures(const std::vector<Creature *> &addedCreatures);
+
+    void clearAddedCreatures();
+    void clearAddedEntities();
+
+    std::vector<BrainConnector *> getScoreSortedCreatures();
 
 };
 
