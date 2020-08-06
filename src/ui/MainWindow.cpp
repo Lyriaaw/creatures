@@ -369,22 +369,6 @@ void MainWindow::runLoop() {
 
 
 
-        if (ticksCount % 100 == 0) {
-//            std::cout << "Average on last 100 ticks: " << 1.f /(tickTimeTotal / 100.f) << " tps. Average available entities: " << farm->getAverageSelectedEntities() << "," << std::endl;
-
-            int totalUIEntities = farm->getUi()->getEntities().size();
-
-            int totalFarmCreatures = farm->getConnectors().size();
-            int totalFarmFood = farm->getFoods().size();
-            int totalFarmEntities = totalFarmCreatures + totalFarmFood;
-
-//            std::cout << "Total entities on map: " << " (Farm =>  T: " << totalFarmEntities << ", C: " << totalFarmCreatures << ", F: " << totalFarmFood << " )" << std::endl;
-//            std::cout << std::endl;
-//            std::cout << std::endl;
-
-            tickTimeTotal = 0;
-        }
-
 
 
         draw();

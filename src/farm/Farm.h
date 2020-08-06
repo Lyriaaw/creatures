@@ -26,8 +26,6 @@ private:
 
     CreatureNursery * nursery;
 
-    float averageSelectedEntities;
-
     std::vector<ActionDTO> actions;
 
     double availableEnergy;
@@ -43,9 +41,25 @@ public:
     void InitFromRandom();
     void InitRandomMap();
     void Tick(bool paused);
-    void generateEntityGrid();
+
+    void brainProcessing();
+    void brainOutput();
+    void moveCreatures();
+
+    void handleActions();
     void executeCreaturesActions();
+    void handleMating(BrainConnector * father, int entityId);
+
+    void populationControl();
+    void vegetalisation();
+    void statistics();
+    void aTickHavePassed();
+
+    void removeEnergyFromFarm(double amount);
+
     void clearDeletedEntities();
+    void generateEntityGrid();
+    bool isEntityAboutToBeDeleted(int id);
 
     Creature * getCreatureFromId(int id);
     Entity * getEntityFromId(int id);
@@ -71,8 +85,6 @@ public:
     void addConnector(BrainConnector * connector);
 
     std::vector<Entity *> getAccessibleEntities(Creature * creature);
-
-    float getAverageSelectedEntities() const;
 
     const std::vector<Entity *> &getToDelete() const;
 
