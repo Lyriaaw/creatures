@@ -7,6 +7,7 @@
 
 
 #include "../utils/Point.h"
+#include "../World.h"
 
 class Camera {
     // Center of the camera in the world
@@ -61,7 +62,16 @@ public:
 
 
     Point getScreenCoordinates(Point point);
+    Point getFlatEarthScreenCoordinates(Point point);
+
     Point getWorldCoordinates(Point point);
+
+    // value : value of the flat earth point
+    // maxValue: bottomRightX or Y of the camera
+    // totalValue: FARM_WITH or FARM_HEIGHT
+    float fixPointCoordinate(float value, float maxValue, float totalValue);
+
+    bool shouldDisplayPoint(Point point);
 };
 
 

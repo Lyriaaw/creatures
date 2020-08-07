@@ -17,7 +17,13 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
         return;
     }
 
+
     Point screenPoint = camera->getScreenCoordinates(this->entity->getPosition());
+
+    if (!camera->shouldDisplayPoint(screenPoint)) {
+        return;
+    }
+
 
     float screenSize = this->entity->getSize() * camera->getZoom();
 
