@@ -8,6 +8,7 @@
 #include "../farm/Farm.h"
 #include "Camera.h"
 #include "BrainUI.h"
+#include "FarmUI.h"
 
 
 class MainWindow {
@@ -20,6 +21,8 @@ public:
 
 
 private:
+
+    FarmUI *farmUi;
 
     Farm *farm;
     Camera *mainCamera;

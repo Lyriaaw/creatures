@@ -9,7 +9,6 @@
 
 
 #include "Entity.h"
-#include "../ui/FarmUI.h"
 #include "Map.h"
 #include "Creature.h"
 #include "Food.h"
@@ -19,7 +18,6 @@ class Farm {
 private:
     std::vector<BrainConnector *> connectors;
     std::vector<Food *> foods;
-    FarmUI * ui;
     Map map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
@@ -67,10 +65,6 @@ public:
 
     static std::string getHumanReadableEnergy(float givenEnergy) ;
 
-
-    FarmUI *getUi() const;
-
-    void setUi(FarmUI *ui);
 
     Map * getMap();
 

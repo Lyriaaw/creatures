@@ -5,6 +5,7 @@
 #include "MainWindow.h"
 #include "CreatureUI.h"
 #include "FoodUI.h"
+#include "FarmUI.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -26,8 +27,8 @@ MainWindow::MainWindow() {
     farm = new Farm();
     farm->InitFromRandom();
 
-    FarmUI *farmUi = new FarmUI();
-    farmUi->loadMap(farm->getMap());
+    farmUi = new FarmUI(farm);
+    farmUi->loadMap();
 
     std::vector<EntityUI *> entityUis;
 
@@ -63,9 +64,6 @@ MainWindow::MainWindow() {
 
 
     mainCamera->setZoom(.4f);
-
-
-    farm->setUi(farmUi);
 
 
     ticksCount = 0;
@@ -187,7 +185,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
                     farm->addConnector(newCreature);
 
                     CreatureUI *entityUi = new CreatureUI(newCreature->getCreature());
-                    farm->getUi()->addCreature(entityUi);
+                    farmUi->addCreature(entityUi);
                 }
 
                 selectedCreature = farm->getConnectors().at(it);
@@ -339,8 +337,7 @@ void MainWindow::draw() {
 ////        cout << "Selected entity: X:" << globalSelectedEntity->getSimpleCoordinates().getX() << " Y: " << globalSelectedEntity->getSimpleCoordinates().getY() << endl;
 //    }
 
-    FarmUI * farmUI = farm->getUi();
-    farmUI->draw(window, mainCamera, selectedCreature);
+    farmUi->draw(window, mainCamera, selectedCreature);
 
     if (brainUi != nullptr) {
         brainUi->draw(window);
@@ -359,16 +356,7 @@ void MainWindow::runLoop() {
         handleEvents();
         farm->Tick(paused);
 
-
-        farm->getUi()->clearEntities(farm->getToDelete());
-
-        farm->getUi()->addEntities(farm->getAddedEntity());
-        farm->clearAddedEntities();
-        farm->getUi()->addCreatures(farm->getAddedCreatures());
-        farm->clearAddedCreatures();
-
-
-
+        farmUi->update();
 
 
         draw();

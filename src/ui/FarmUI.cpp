@@ -9,11 +9,11 @@
 #include "CreatureUI.h"
 #include "FoodUI.h"
 
-FarmUI::FarmUI() {}
+FarmUI::FarmUI(Farm *farm): farm(farm) {
 
-void FarmUI::loadMap(Map *map) {
-    this->map = map;
+}
 
+void FarmUI::loadMap() {
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         std::vector<sf::RectangleShape> line;
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
@@ -28,8 +28,24 @@ void FarmUI::loadMap(Map *map) {
     }
 }
 
+void FarmUI::update() {
+
+    clearEntities(farm->getToDelete());
+
+    addEntities(farm->getAddedEntity());
+    farm->clearAddedEntities();
+
+    addCreatures(farm->getAddedCreatures());
+    farm->clearAddedCreatures();
+
+
+
+}
+
 void FarmUI::setPositions(Camera *camera, Creature * selectedEntity) {
 //     std::cout << "Setting positions " << camera->getZoom() << std::endl;
+
+    Map *map = farm->getMap();
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         std::vector<sf::RectangleShape> line;

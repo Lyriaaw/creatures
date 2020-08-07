@@ -15,19 +15,21 @@
 #include "../farm/brain/BrainConnector.h"
 #include "CreatureUI.h"
 #include "../farm/Food.h"
+#include "../farm/Farm.h"
 
 class FarmUI {
 private:
-    Map * map;
+    Farm *farm;
 
     std::vector<std::vector<sf::RectangleShape>> tiles;
     std::vector<EntityUI *> entities;
 public:
 
 public:
-    FarmUI();
+    FarmUI(Farm *farm);
     void draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity);
-    void loadMap(Map *map);
+    void loadMap();
+    void update();
     void setPositions(Camera *camera, Creature * selectedEntity);
 
     void setEntities(const std::vector<EntityUI *> entities);

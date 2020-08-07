@@ -542,14 +542,6 @@ const vector<BrainConnector *> &Farm::getConnectors() const {
     return connectors;
 }
 
-FarmUI *Farm::getUi() const {
-    return ui;
-}
-
-void Farm::setUi(FarmUI *ui) {
-    Farm::ui = ui;
-}
-
 void Farm::addConnector(BrainConnector * connector) {
     this->connectors.push_back(connector);
 }
