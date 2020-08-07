@@ -35,6 +35,12 @@ Point Point::getSimpleCoordinates() {
     return {float(int(this->x / float(CHUNK_SIZE))), float(int(this->y / float(CHUNK_SIZE)))};
 }
 
+Point Point::getTileCoordinates() {
+    return {float(int(this->x / float(TILE_SIZE))), float(int(this->y / float(TILE_SIZE)))};
+}
+
+
+
 bool Point::equals(Point point) const {
     return (point.x == this->x && point.y == this->y);
 }

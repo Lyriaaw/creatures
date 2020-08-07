@@ -11,7 +11,7 @@
 
 class Map {
 private:
-    float tiles[CHUNK_COUNT_WIDTH][CHUNK_COUNT_HEIGHT];
+    float tiles[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
 public:
     float getTileAt(int chunkX, int chunkY);

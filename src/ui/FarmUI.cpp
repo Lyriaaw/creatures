@@ -5,21 +5,50 @@
 #include <iostream>
 #include "FarmUI.h"
 #include "Camera.h"
-#include "../farm/brain/BrainConnector.h"
 #include "CreatureUI.h"
 #include "FoodUI.h"
+#include "colors/RGBColor.h"
 
-FarmUI::FarmUI(Farm *farm): farm(farm) {
+FarmUI::FarmUI(Farm *farm, sf::Font * font): farm(farm), hoveredTile(Point(-1, -1)) {
+    loadTexts(font);
+}
 
+void FarmUI::loadTexts(sf::Font * font) {
+    hoveredTileInfos.setFont(*font);
+}
+
+void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
+    hoveredTile = worldPosition.getTileCoordinates();
+
+    Point topLeftChunk = Point(hoveredTile.getX() * TILE_SIZE, hoveredTile.getY() * TILE_SIZE);
+    Point screenTopLeft = camera->getScreenCoordinates(topLeftChunk);
+
+
+    hoveredTileInfos.setPosition(screenTopLeft.getX(), screenTopLeft.getY());
+    hoveredTileInfos.setFillColor(sf::Color(100, 0, 0));
+    hoveredTileInfos.setCharacterSize(5 * camera->getZoom());
+    generateTileInfoText();
+}
+
+void FarmUI::generateTileInfoText() {
+
+    std::string tileInfo = "{" + std::to_string(int(hoveredTile.getX())) + "," + std::to_string(int(hoveredTile.getY())) + "}\n";
+
+    float currentHeight = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY());
+    tileInfo = tileInfo + "H: " + std::to_string(currentHeight);
+
+
+
+    hoveredTileInfos.setString(tileInfo);
 }
 
 void FarmUI::loadMap() {
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         std::vector<sf::RectangleShape> line;
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
-            sf::RectangleShape rectangle = sf::RectangleShape(sf::Vector2f(CHUNK_SIZE - 2, CHUNK_SIZE - 2));
-            rectangle.setPosition((float(it) * CHUNK_SIZE) + 1, (float(jt) * CHUNK_SIZE) + 1);
+            sf::RectangleShape rectangle = sf::RectangleShape(sf::Vector2f(TILE_SIZE - 2, TILE_SIZE - 2));
+            rectangle.setPosition((float(it) * TILE_SIZE) + 1, (float(jt) * TILE_SIZE) + 1);
 
 
             line.emplace_back(rectangle);
@@ -29,7 +58,7 @@ void FarmUI::loadMap() {
 }
 
 void FarmUI::update() {
-
+    // TODO OPTI Clear to_delete
     clearEntities(farm->getToDelete());
 
     addEntities(farm->getAddedEntity());
@@ -40,33 +69,31 @@ void FarmUI::update() {
 
 
 
+    generateTileInfoText();
 }
 
-void FarmUI::setPositions(Camera *camera, Creature * selectedEntity) {
+void FarmUI::setPositions(Camera *camera) {
 //     std::cout << "Setting positions " << camera->getZoom() << std::endl;
 
     Map *map = farm->getMap();
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         std::vector<sf::RectangleShape> line;
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
             sf::RectangleShape *rectangle = &tiles.at(it).at(jt);
 
             float height = map->getTileAt(it, jt);
-            if (height > 0) {
-                rectangle->setFillColor(sf::Color(128, 128, 128, 255));
-            } else {
-                rectangle->setFillColor(sf::Color(0, 9, 128, 255));
+            RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
+            if (height < -0.1f) {
+                rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
+            }
+            if (height > 0.7f) {
+                rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
             }
 
-            if (selectedEntity != nullptr && camera->isShowGrid()) {
-                for (int kt = 0; kt < selectedEntity->getSelectedChunks().size(); kt++) {
-                    if (selectedEntity->getSelectedChunks().at(kt).equals(Point(it, jt))) {
-                        rectangle->setFillColor(sf::Color(200, 200, 200, 255));
-                    }
-                }
-            }
+
+            rectangle->setFillColor(sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255));
 
             int gridRatio = 0;
 
@@ -74,9 +101,9 @@ void FarmUI::setPositions(Camera *camera, Creature * selectedEntity) {
                 gridRatio = 1;
             }
 
-            rectangle->setSize(sf::Vector2f(CHUNK_SIZE * camera->getZoom() - gridRatio, CHUNK_SIZE * camera->getZoom() - gridRatio));
+            rectangle->setSize(sf::Vector2f(TILE_SIZE * camera->getZoom() - gridRatio, TILE_SIZE * camera->getZoom() - gridRatio));
 
-            Point point = camera->getScreenCoordinates({float(it) * CHUNK_SIZE, float(jt) * CHUNK_SIZE});
+            Point point = camera->getScreenCoordinates({float(it) * TILE_SIZE, float(jt) * TILE_SIZE});
 
             rectangle->setPosition(point.getX(), point.getY());
 
@@ -88,14 +115,16 @@ void FarmUI::setPositions(Camera *camera, Creature * selectedEntity) {
 void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity) {
     Creature * selectedCreature = nullptr;
 
+
+    setPositions(camera);
+
     if (selectedEntity != nullptr) {
         selectedCreature = selectedEntity->getCreature();
     }
 
-    setPositions(camera, selectedCreature);
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             window->draw(tiles.at(it).at(jt));
         }
     }
@@ -104,6 +133,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * sel
         entities.at(it)->draw(window, camera, selectedCreature);
     }
 
+    window->draw(hoveredTileInfos);
 }
 
 void FarmUI::clearEntities(std::vector<Entity *> toDelete) {

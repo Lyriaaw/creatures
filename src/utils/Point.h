@@ -21,6 +21,7 @@ public:
     void setY(float y);
 
     Point getSimpleCoordinates();
+    Point getTileCoordinates();
 
     bool equals(Point point) const;
 

@@ -21,16 +21,71 @@ void Farm::InitRandomMap() {
     PerlinNoise perlin(seed);
 
     cout << "Map generated with seed " << seed << endl;
+    cout << "Map Width: " << TILE_COUNT_WIDTH << " Map Height: " << TILE_COUNT_HEIGHT << endl;
+
+    float min = 11111110.f;
+    float max = 0.f;
 
     map = Map();
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            float height = perlin.noise(float(it) / float(CHUNK_COUNT_WIDTH) * 2.5, float(jt) / float(CHUNK_COUNT_HEIGHT) * 2.5, 0.8) - 0.4f;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+
+            float xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * 2.5;
+            float yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * 2.5;
+
+            float height = perlin.noise(xComponent, yComponent, 0.8);
+
+
+//            std::cout << "X: " << it << " Y: " << jt << " Value: " << height << " -- Components: x: " << xComponent << " y: " << yComponent << std::endl;
+            if (height < min) {
+                min = height;
+            }
+            if (height > max) {
+                max = height;
+            }
+
 
 
             map.setTileAt(it, jt, height);
         }
     }
+//    std::cout << "Min: " << min << " Max: " << max << " Removed:" << 0 << std::endl;
+
+
+
+    float removed = ((max - min) / 2.f) + min;
+
+    float ratio = (1.f / (max - min)) * 2.f;
+
+    min = 11111110.f;
+    max = 0.f;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            float currentHeight = map.getTileAt(it, jt);
+
+            currentHeight -= removed;
+            currentHeight *= ratio;
+            currentHeight *= abs(currentHeight);// * abs(currentHeight);
+
+
+            if (currentHeight < min) {
+                min = currentHeight;
+            }
+            if (currentHeight > max) {
+                max = currentHeight;
+            }
+
+
+
+            map.setTileAt(it, jt,  currentHeight);
+        }
+    }
+
+
+    std::cout << "Min: " << min << " Max: " << max << " Removed:" << 0 << std::endl;
+
+
+    std::vector<std::vector<std::vector<Entity *>>> testEntites;
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         std::vector<std::vector<Entity *>> line;
@@ -38,8 +93,10 @@ void Farm::InitRandomMap() {
             std::vector<Entity *> currentChunk;
             line.push_back(currentChunk);
         }
-        entityGrid.push_back(line);
+        testEntites.emplace_back(line);
     }
+
+    entityGrid = testEntites;
 }
 
 void Farm::InitFromRandom() {

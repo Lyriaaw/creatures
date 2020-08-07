@@ -23,16 +23,23 @@ private:
 
     std::vector<std::vector<sf::RectangleShape>> tiles;
     std::vector<EntityUI *> entities;
+
+    Point hoveredTile;
+    sf::Text hoveredTileInfos;
 public:
 
 public:
-    FarmUI(Farm *farm);
+    FarmUI(Farm *farm, sf::Font * font);
+    void loadTexts(sf::Font * font);
     void draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity);
     void loadMap();
     void update();
-    void setPositions(Camera *camera, Creature * selectedEntity);
+    void setPositions(Camera *camera);
 
     void setEntities(const std::vector<EntityUI *> entities);
+
+    void mouseMoved(Point worldPosition, Camera * camera);
+    void generateTileInfoText();
 
     void addCreature(CreatureUI * creatureUI);
 

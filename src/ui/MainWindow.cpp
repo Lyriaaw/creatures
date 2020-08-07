@@ -23,11 +23,20 @@ using namespace std;
 
 MainWindow::MainWindow() {
 
+    font = new Font();
+
+
+    if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
+        std::cout << "Font not loaded properly !" << std::endl;
+        return;
+    }
+
+
 
     farm = new Farm();
     farm->InitFromRandom();
 
-    farmUi = new FarmUI(farm);
+    farmUi = new FarmUI(farm, font);
     farmUi->loadMap();
 
     std::vector<EntityUI *> entityUis;
@@ -75,16 +84,13 @@ MainWindow::MainWindow() {
 
 void MainWindow::start() {
 
-    font = new Font();
-//
-    if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
-        std::cout << "Font not loaded properly !" << std::endl;
-        return;
-    }
 
 
     window = new RenderWindow(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
     window->setVerticalSyncEnabled(true);
+
+
+    farmUi->setPositions(mainCamera);
 
 
     running = true;
@@ -118,6 +124,10 @@ void MainWindow::handleScroll(float delta) {
 
     Point newCameraCenter = {newX, newY};
     mainCamera->setCenter(newCameraCenter);
+
+    Point worldMousePosition = mainCamera->getWorldCoordinates({float(mouseX), float(mouseY)});
+
+    farmUi->mouseMoved(worldMousePosition, mainCamera);
 }
 
 void MainWindow::handleMouseMove(int x, int y) {
@@ -143,6 +153,7 @@ void MainWindow::handleMouseMove(int x, int y) {
         globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
     }
 
+    farmUi->mouseMoved(newMousePosition, mainCamera);
 
 }
 
