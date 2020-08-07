@@ -100,6 +100,123 @@ void MainWindow::start() {
     runLoop();
 }
 
+
+void MainWindow::runLoop() {
+
+    std::string details = "Tick Time, Between Ticks, Entity Grid, Brain Output, Move Creature, Handle Actions, Population Control, Vegetalisation, Brain Processing";
+    std::cout << details << endl;
+
+    auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
+        while (*running) {
+            threadedFarm->Tick(*paused);
+
+            threadedFarmUI->update();
+        }
+    };
+
+    std::thread farmThread(f, farm, farmUi, &running, &paused);
+
+
+    while (running) {
+        handleEvents();
+        draw();
+
+
+        renderDurationEnd = chrono::system_clock::now();
+        chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
+
+        ticksCount++;
+        tickTimeTotal += elapsed_time.count();
+
+        renderDurationStart = chrono::system_clock::now();
+    }
+
+    farmThread.join();
+
+    window->close();
+}
+
+
+
+
+
+void MainWindow::draw() {
+    window->clear(sf::Color::Black);
+
+    if (selectedCreature != nullptr && !mainCamera->isShowGrid()) {
+        mainCamera->setCenter(selectedCreature->getCreature()->getPosition());
+    }
+
+//    Entity * glggobalSelectedEntity = getSelectedEntity();
+//    if (globalSelectedEntity != nullptr) {
+////        cout << "Selected entity: X:" << globalSelectedEntity->getSimpleCoordinates().getX() << " Y: " << globalSelectedEntity->getSimpleCoordinates().getY() << endl;
+//    }
+
+    farmUi->draw(window, mainCamera, selectedCreature);
+
+    if (brainUi != nullptr) {
+        brainUi->draw(window);
+    }
+
+
+    window->display();
+
+
+}
+
+
+
+
+Entity * MainWindow::getSelectedEntity() {
+    if (selectedCreature != nullptr) {
+        return selectedCreature->getCreature();
+    }
+    if (selectedEntity != nullptr) {
+        return selectedEntity;
+    }
+
+    return nullptr;
+}
+
+
+void MainWindow::handleEvents() {
+    // check all the window's events that were triggered since the last iteration of the loop
+    Event event;
+    while (window->pollEvent(event))
+    {
+        switch (event.type) {
+            case Event::KeyPressed:
+                handleKeyboardEvents(event.key);
+                break;
+            case Event::MouseWheelScrolled: {
+                handleScroll(event.mouseWheelScroll.delta);
+                break;
+            }
+            case Event::MouseMoved: {
+                handleMouseMove(event.mouseMove.x, event.mouseMove.y);
+                break;
+            }
+            case Event::MouseButtonPressed:
+                handleMousePressed(event.mouseButton.button);
+                break;
+            case Event::MouseButtonReleased:
+                handleMouseReleased(event.mouseButton.button);
+                break;
+            case Event::Closed:
+                running = false;
+                break;
+            case Event::Resized:
+                View view = View(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f), sf::Vector2f(event.size.width, event.size.height));
+
+                mainCamera->setWidth(event.size.width);
+                mainCamera->setHeight(event.size.height);
+                window->setView(view);
+                break;
+        }
+    }
+
+}
+
 void MainWindow::handleScroll(float delta) {
 
 
@@ -239,45 +356,6 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     }
 }
 
-
-void MainWindow::handleEvents() {
-    // check all the window's events that were triggered since the last iteration of the loop
-    Event event;
-    while (window->pollEvent(event))
-    {
-        switch (event.type) {
-            case Event::KeyPressed:
-                handleKeyboardEvents(event.key);
-                break;
-            case Event::MouseWheelScrolled: {
-                handleScroll(event.mouseWheelScroll.delta);
-                break;
-            }
-            case Event::MouseMoved: {
-                handleMouseMove(event.mouseMove.x, event.mouseMove.y);
-                break;
-            }
-            case Event::MouseButtonPressed:
-                handleMousePressed(event.mouseButton.button);
-                break;
-            case Event::MouseButtonReleased:
-                handleMouseReleased(event.mouseButton.button);
-                break;
-            case Event::Closed:
-                running = false;
-                break;
-            case Event::Resized:
-                View view = View(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f), sf::Vector2f(event.size.width, event.size.height));
-
-                mainCamera->setWidth(event.size.width);
-                mainCamera->setHeight(event.size.height);
-                window->setView(view);
-                break;
-        }
-    }
-
-}
-
 void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
     switch (event.code) {
         case Keyboard::Key::Up:
@@ -326,69 +404,3 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
     }
 }
 
-Entity * MainWindow::getSelectedEntity() {
-    if (selectedCreature != nullptr) {
-        return selectedCreature->getCreature();
-    }
-    if (selectedEntity != nullptr) {
-        return selectedEntity;
-    }
-
-    return nullptr;
-}
-
-void MainWindow::draw() {
-    window->clear(sf::Color::Black);
-
-    if (selectedCreature != nullptr && !mainCamera->isShowGrid()) {
-        mainCamera->setCenter(selectedCreature->getCreature()->getPosition());
-    }
-
-//    Entity * glggobalSelectedEntity = getSelectedEntity();
-//    if (globalSelectedEntity != nullptr) {
-////        cout << "Selected entity: X:" << globalSelectedEntity->getSimpleCoordinates().getX() << " Y: " << globalSelectedEntity->getSimpleCoordinates().getY() << endl;
-//    }
-
-    farmUi->draw(window, mainCamera, selectedCreature);
-
-    if (brainUi != nullptr) {
-        brainUi->draw(window);
-    }
-
-
-    window->display();
-
-
-}
-
-void MainWindow::runLoop() {
-
-    auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
-        while (*running) {
-            threadedFarm->Tick(*paused);
-
-            threadedFarmUI->update();
-        }
-    };
-
-    std::thread test_thread(f, farm, farmUi, &running, &paused);
-
-
-    while (running) {
-        handleEvents();
-        draw();
-
-
-        renderDurationEnd = chrono::system_clock::now();
-        chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
-
-        ticksCount++;
-        tickTimeTotal += elapsed_time.count();
-
-        renderDurationStart = chrono::system_clock::now();
-    }
-
-    test_thread.join();
-
-    window->close();
-}

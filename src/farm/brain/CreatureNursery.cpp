@@ -55,7 +55,7 @@ BrainConnector * CreatureNursery::generateFromRandom() {
 
 
 
-    int sensorCount = rand() % 7 + 4;
+    int sensorCount = rand() % 4;
     for (int it = 0; it < sensorCount; it++) {
 
         SensorEvolution * sensorEvol = new SensorEvolution();
