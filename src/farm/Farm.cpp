@@ -388,15 +388,16 @@ void Farm::statistics() {
     }
 
 
+    std::cout << "Tick: " << tickCount;
 
-    std::cout << "Creatures: " << connectors.size() << " Entities: " << foods.size();
+    std::cout << " Creatures: " << connectors.size() << " Entities: " << foods.size();
 
-    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
-    std::cout << "  | Tick: " << tickCount << " total: " << getHumanReadableEnergy(totalEnergy);
-    std::cout << "  --  available: " << getHumanReadableEnergy(availableEnergy);
-    std::cout << "  --  creatures: " << getHumanReadableEnergy(totalCreaturesEnergy);
-    std::cout << "  --  foods: " << getHumanReadableEnergy(totalFoodsEnergy);
-    std::cout << "  --  raw total: " << totalEnergy;
+//    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
+//    std::cout << " total: " << getHumanReadableEnergy(totalEnergy);
+//    std::cout << "  --  available: " << getHumanReadableEnergy(availableEnergy);
+//    std::cout << "  --  creatures: " << getHumanReadableEnergy(totalCreaturesEnergy);
+//    std::cout << "  --  foods: " << getHumanReadableEnergy(totalFoodsEnergy);
+//    std::cout << "  --  raw total: " << totalEnergy;
     std::cout << std::endl;
 
 

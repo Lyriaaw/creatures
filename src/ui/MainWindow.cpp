@@ -11,7 +11,8 @@
 #include <SFML/Graphics.hpp>
 #include <random>
 #include <iostream>
-
+#include <unistd.h>
+#import <thread>
 
 
 int WINDOW_WIDTH = 2560;
@@ -361,17 +362,21 @@ void MainWindow::draw() {
 }
 
 void MainWindow::runLoop() {
+
+    auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
+        while (*running) {
+            threadedFarm->Tick(*paused);
+
+            threadedFarmUI->update();
+        }
+    };
+
+    std::thread test_thread(f, farm, farmUi, &running, &paused);
+
+
     while (running) {
-
-
         handleEvents();
-        farm->Tick(paused);
-
-        farmUi->update();
-
-
         draw();
-
 
 
         renderDurationEnd = chrono::system_clock::now();
@@ -380,10 +385,10 @@ void MainWindow::runLoop() {
         ticksCount++;
         tickTimeTotal += elapsed_time.count();
 
-
-
         renderDurationStart = chrono::system_clock::now();
     }
+
+    test_thread.join();
 
     window->close();
 }
