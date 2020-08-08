@@ -43,7 +43,6 @@ private:
 public:
     Farm();
     void InitFromRandom();
-    void InitRandomMap();
     void Tick(bool paused);
 
     void brainProcessing();

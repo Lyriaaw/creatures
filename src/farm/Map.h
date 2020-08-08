@@ -12,12 +12,17 @@
 class Map {
 private:
     float tiles[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
+    float heat[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
 public:
+    void initRandomMap();
+
+
     float getTileAt(int chunkX, int chunkY);
     float setTileAt(int chunkX, int chunkY, float value);
 
-
+    float getHeatAt(int chunkX, int chunkY);
+    float setHeatAt(int chunkX, int chunkY, float value);
 
 };
 

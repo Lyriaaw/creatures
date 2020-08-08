@@ -3,7 +3,6 @@
 //
 
 #include "Farm.h"
-#include "../utils/perlin/PerlinNoise.h"
 
 #include <iostream>
 #include <sstream>
@@ -17,74 +16,15 @@ Farm::Farm(){
     tickEnd = std::chrono::system_clock::now();
 }
 
-void Farm::InitRandomMap() {
-    float seed = rand() % 1000000;
-//    float seed = 1568;
-    PerlinNoise perlin(seed);
 
-    cout << "Map generated with seed " << seed << endl;
-    cout << "Map Width: " << TILE_COUNT_WIDTH << " Map Height: " << TILE_COUNT_HEIGHT << endl;
-
-    float min = 11111110.f;
-    float max = 0.f;
+void Farm::InitFromRandom() {
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
+    uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
     map = Map();
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-
-            float xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * 2.5;
-            float yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * 2.5;
-
-            float height = perlin.noise(xComponent, yComponent, 0.8);
-
-
-//            std::cout << "X: " << it << " Y: " << jt << " Value: " << height << " -- Components: x: " << xComponent << " y: " << yComponent << std::endl;
-            if (height < min) {
-                min = height;
-            }
-            if (height > max) {
-                max = height;
-            }
-
-
-
-            map.setTileAt(it, jt, height);
-        }
-    }
-//    std::cout << "Min: " << min << " Max: " << max << " Removed:" << 0 << std::endl;
-
-
-
-    float removed = ((max - min) / 2.f) + min;
-
-    float ratio = (1.f / (max - min)) * 2.f;
-
-    min = 11111110.f;
-    max = 0.f;
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            float currentHeight = map.getTileAt(it, jt);
-
-            currentHeight -= removed;
-            currentHeight *= ratio;
-            currentHeight *= abs(currentHeight) * abs(currentHeight);
-
-
-            if (currentHeight < min) {
-                min = currentHeight;
-            }
-            if (currentHeight > max) {
-                max = currentHeight;
-            }
-
-
-
-            map.setTileAt(it, jt,  currentHeight);
-        }
-    }
-
-
-    std::cout << "Min: " << min << " Max: " << max << " Removed:" << 0 << std::endl;
+    map.initRandomMap();
 
 
     std::vector<std::vector<std::vector<Entity *>>> testEntites;
@@ -99,15 +39,7 @@ void Farm::InitRandomMap() {
     }
 
     entityGrid = testEntites;
-}
 
-void Farm::InitFromRandom() {
-    random_device rd;
-    mt19937 mt(rd());
-    uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
-    uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
-
-    InitRandomMap();
 
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
