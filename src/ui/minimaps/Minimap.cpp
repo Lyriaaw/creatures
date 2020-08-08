@@ -14,18 +14,34 @@ Minimap::Minimap(double pixelSize, double positionX, double positionY) :pixelSiz
 }
 
 void Minimap::load() {
+    vertexArray = sf::VertexArray(sf::Quads, TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT * 4);
+
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        std::vector<sf::RectangleShape> line;
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
-            sf::RectangleShape rectangle = sf::RectangleShape(sf::Vector2f(pixelSize, pixelSize));
-
-            rectangle.setPosition((float(it) * pixelSize) + positionX, (float(jt) * pixelSize) + positionY);
+            int vertexArrayIndex = (it * TILE_COUNT_HEIGHT) + jt;
 
 
-            line.emplace_back(rectangle);
+            vertexArray[(vertexArrayIndex * 4) + 0].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX,
+                    (float(jt) * pixelSize) + positionY);
+
+
+            vertexArray[(vertexArrayIndex * 4) + 1].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX + pixelSize,
+                    (float(jt) * pixelSize) + positionY);
+
+
+            vertexArray[(vertexArrayIndex * 4) + 2].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX + pixelSize,
+                    (float(jt) * pixelSize) + positionY + pixelSize);
+
+
+            vertexArray[(vertexArrayIndex * 4) + 3].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX,
+                    (float(jt) * pixelSize) + positionY + pixelSize);
+
         }
-        tiles.emplace_back(line);
     }
 }
 
@@ -33,8 +49,28 @@ void Minimap::load() {
 void Minimap::move(double positionX, double positionY, double width, double height) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            sf::RectangleShape rectangle = tiles.at(it).at(jt);
-            rectangle.setPosition((float(it) * pixelSize) + positionX, (float(jt) * pixelSize) + positionY);
+
+            int vertexArrayIndex = (it * TILE_COUNT_HEIGHT) + jt;
+
+
+            vertexArray[vertexArrayIndex + 0].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX,
+                    (float(jt) * pixelSize) + positionY);
+
+
+            vertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX + pixelSize,
+                    (float(jt) * pixelSize) + positionY);
+
+
+            vertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX + pixelSize,
+                    (float(jt) * pixelSize) + positionY + pixelSize);
+
+
+            vertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
+                    (float(it) * pixelSize) + positionX,
+                    (float(jt) * pixelSize) + positionY + pixelSize);
         }
     }
 }
@@ -59,10 +95,7 @@ std::string WorldMinimap::getName() {
     return "World";
 }
 
-void WorldMinimap::draw(int tileX, int tileY, Farm *farm, sf::RenderWindow *window) {
-    sf::RectangleShape *rectangle = &tiles.at(tileX).at(tileY);
-
-
+void WorldMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     float height = farm->getMap()->getTileAt(tileX, tileY);
     RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
     if (height < -0.1f) {
@@ -72,9 +105,21 @@ void WorldMinimap::draw(int tileX, int tileY, Farm *farm, sf::RenderWindow *wind
         rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
     }
 
-    rectangle->setFillColor(sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255));
+    sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
-    window->draw(*rectangle);
+
+    int vertexArrayIndex = (tileX * TILE_COUNT_HEIGHT) + tileY;
+
+    vertexArray[(vertexArrayIndex * 4) + 0].color = pixelColor;
+    vertexArray[(vertexArrayIndex * 4) + 1].color = pixelColor;
+    vertexArray[(vertexArrayIndex * 4) + 2].color = pixelColor;
+    vertexArray[(vertexArrayIndex * 4) + 3].color = pixelColor;
+}
+
+
+
+void WorldMinimap::draw(sf::RenderWindow *window) {
+    window->draw(vertexArray);
 }
 
 

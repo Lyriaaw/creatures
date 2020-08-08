@@ -16,18 +16,23 @@ std::string CreatureTileCountMinimap::getName() {
     return "Creature count";
 }
 
-void CreatureTileCountMinimap::draw(int tileX, int tileY, Farm *farm, sf::RenderWindow *window) {
-    sf::RectangleShape *rectangle = &tiles.at(tileX).at(tileY);
-
-
-//    float height = farm->getEntityGrid().at(tileX).at(tileY).size() / 10.f;
+void CreatureTileCountMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     float height = values[tileX][tileY] / 5.f;
 
     RGBColor rectangleColor = RGBColor(0.69f, 1.f, height);
 
-    rectangle->setFillColor(sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255));
+    sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
-    window->draw(*rectangle);
+    int vertexArrayIndex = (tileX * TILE_COUNT_HEIGHT) + tileY;
+
+    vertexArray[(vertexArrayIndex * 4) + 0].color = pixelColor;
+    vertexArray[(vertexArrayIndex * 4) + 1].color = pixelColor;
+    vertexArray[(vertexArrayIndex * 4) + 2].color = pixelColor;
+    vertexArray[(vertexArrayIndex * 4) + 3].color = pixelColor;
+}
+
+void CreatureTileCountMinimap::draw(sf::RenderWindow *window) {
+    window->draw(vertexArray);
 }
 
 

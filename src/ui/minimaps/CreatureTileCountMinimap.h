@@ -19,7 +19,9 @@ public:
     std::string getName() override;
 
     void generateValues(Farm * farm);
-    void draw(int tileX, int tileY, Farm * farm, sf::RenderWindow *window);
+
+    void setPixelColor(int tileX, int tileY, Farm * farm) override;
+    void draw(sf::RenderWindow *window) override;
 };
 
 

@@ -34,11 +34,17 @@ void MinimapsScreen::drawMinimaps(sf::RenderWindow *window) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
             for (int kt = 0; kt < minimaps.size(); kt++) {
-                minimaps.at(kt)->draw(it, jt, farm, window);
+                minimaps.at(kt)->setPixelColor(it, jt, farm);
             }
 
         }
     }
+
+
+    for (int kt = 0; kt < minimaps.size(); kt++) {
+        minimaps.at(kt)->draw(window);
+    }
+
 }
 
 

@@ -14,8 +14,6 @@ class Minimap {
 protected:
     double positionX, positionY, width, height;
 
-    std::vector<std::vector<sf::RectangleShape>> tiles;
-
     sf::VertexArray vertexArray;
 
     double pixelSize;
@@ -29,7 +27,8 @@ public:
     void move(double positionX, double positionY, double width, double height);
     void changeSize(double width, double height);
 
-    virtual void draw(int tileX, int tileY, Farm * farm, sf::RenderWindow *window) = 0;
+    virtual void setPixelColor(int tileX, int tileY, Farm * farm) = 0;
+    virtual void draw(sf::RenderWindow *window) = 0;
 
     virtual std::string getName() = 0;
 };
@@ -40,7 +39,8 @@ public:
     WorldMinimap(double pixelSize, double positionX, double positionY);
     std::string getName() override;
 
-    void draw(int tileX, int tileY, Farm * farm, sf::RenderWindow *window);
+    void setPixelColor(int tileX, int tileY, Farm * farm) override;
+    void draw(sf::RenderWindow *window) override;
 
 };
 
