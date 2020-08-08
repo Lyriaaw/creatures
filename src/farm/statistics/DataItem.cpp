@@ -13,7 +13,7 @@ void DataItem::setValues(const std::vector<double> &values) {
     DataItem::values = values;
 }
 
-void DataItem::addValue(double value) {
+void DataItem::addRawValue(double value) {
     values.push_back(value);
 
     if (value > max) {
@@ -23,6 +23,30 @@ void DataItem::addValue(double value) {
     if (value < min) {
         min = value;
     }
+
+
+}
+void DataItem::addValue(double value) {
+    addRawValue(value);
+
+    if (!isAveraged) {
+        return;
+    }
+
+    int averagedOn = 100;
+    int currentCount = getCount();
+
+    if (currentCount <= averagedOn) {
+        averagedOn = currentCount;
+    }
+
+    double totalValue = 0.0;
+    for (int it = currentCount - averagedOn; it < currentCount; it++) {
+        totalValue += values.at(it);
+    }
+    double average = totalValue / double(averagedOn);
+
+    averaged->addRawValue(average);
 }
 
 double DataItem::getLastValue() {
@@ -33,18 +57,37 @@ double DataItem::getLastValue() {
     return values.at(values.size() - 1);
 }
 
-double DataItem::getSecondToLastValue() {
-    return values.at(values.size() - 2);
+double DataItem::getAveragedLastValue() {
+    if (!isAveraged) {
+        return 0;
+    }
+
+    return averaged->getLastValue();
 }
+
 
 
 double DataItem::getValueForTick(int tick) {
     return values.at(tick);
 }
 
-DataItem::DataItem() {
+double DataItem::getAveragedValueForTick(int tick) {
+    if (!isAveraged) {
+        return 0;
+    }
+
+    return averaged->getValueForTick(tick);
+}
+
+
+
+DataItem::DataItem(bool isAveraged): isAveraged(isAveraged) {
     min = 10000000000;
     max = -10000000;
+
+    if (isAveraged) {
+        averaged = new DataItem(false);
+    }
 }
 
 double DataItem::getMin() const {
@@ -57,4 +100,8 @@ double DataItem::getMax() const {
 
 int DataItem::getCount() {
     return this->values.size();
+}
+
+DataItem *DataItem::getAveraged() const {
+    return averaged;
 }

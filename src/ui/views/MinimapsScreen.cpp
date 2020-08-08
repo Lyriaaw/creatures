@@ -13,7 +13,7 @@ int MinimapsScreen::getId() {
 
 
 
-void MinimapsScreen::init() {
+void MinimapsScreen::init(sf::Font *font) {
     WorldMinimap * worldMinimap = new WorldMinimap(2, 10, 70);
     minimaps.emplace_back(worldMinimap);
 

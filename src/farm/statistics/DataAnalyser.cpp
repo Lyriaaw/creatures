@@ -5,24 +5,32 @@
 #include "DataAnalyser.h"
 
 DataAnalyser::DataAnalyser() {
-    tickTime = new DataItem();
-    tickPerSecond = new DataItem();
+    tickTime = new DataItem(true);
+    tickPerSecond = new DataItem(true);
 
-    entityGridTime = new DataItem();
-    brainOutputsTime = new DataItem();
-    moveCreaturesTime = new DataItem();
-    prepareActionsTime = new DataItem();
-    executeActionsTime = new DataItem();
-    populationControlTime = new DataItem();
-    vegetalisationTime = new DataItem();
-    brainProcessingTime = new DataItem();
+    entityGridTime = new DataItem(true);
+    brainOutputsTime = new DataItem(true);
+    moveCreaturesTime = new DataItem(true);
+    prepareActionsTime = new DataItem(true);
+    executeActionsTime = new DataItem(true);
+    populationControlTime = new DataItem(true);
+    vegetalisationTime = new DataItem(true);
+    brainProcessingTime = new DataItem(true);
 
-    population = new DataItem();
+    totalTime = new DataItem(true);
 
-    totalEnergy = new DataItem();
-    availableEnergy = new DataItem();
-    foodEnergy = new DataItem();
-    creaturesEnergy = new DataItem();
+    population = new DataItem(true);
+
+    totalEnergy = new DataItem(true);
+    availableEnergy = new DataItem(true);
+    foodEnergy = new DataItem(true);
+    creaturesEnergy = new DataItem(true);
+
+    averageScore = new DataItem(true);
+    bestScore = new DataItem(true);
+    medianScore = new DataItem(true);
+    firstQuartileScore = new DataItem(true);
+    lastQuartileScore = new DataItem(true);
 }
 
 
@@ -92,3 +100,26 @@ DataItem *DataAnalyser::getTickPerSecond() const {
     return tickPerSecond;
 }
 
+DataItem *DataAnalyser::getAverageScore() const {
+    return averageScore;
+}
+
+DataItem *DataAnalyser::getBestScore() const {
+    return bestScore;
+}
+
+DataItem *DataAnalyser::getMedianScore() const {
+    return medianScore;
+}
+
+DataItem *DataAnalyser::getFirstQuartileScore() const {
+    return firstQuartileScore;
+}
+
+DataItem *DataAnalyser::getLastQuartileScore() const {
+    return lastQuartileScore;
+}
+
+DataItem *DataAnalyser::getTotalTime() const {
+    return totalTime;
+}

@@ -55,12 +55,12 @@ void Graph::addLine(DataItem * item, int red, int green, int blue) {
 
 void Graph::getMinAndMaxValues() {
     for (int it = 0; it < lines.size(); it++) {
-        if (lines.at(it).getItem()->getMin() < min) {
-            min = lines.at(it).getItem()->getMin();
+        if (lines.at(it).getItem()->getAveraged()->getMin() < min) {
+            min = lines.at(it).getItem()->getAveraged()->getMin();
         }
 
-        if (lines.at(it).getItem()->getMax() > max) {
-            max = lines.at(it).getItem()->getMax();
+        if (lines.at(it).getItem()->getAveraged()->getMax() > max) {
+            max = lines.at(it).getItem()->getAveraged()->getMax();
         }
     }
 
@@ -82,7 +82,7 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
 
     for (int it = 0; it < line.getItem()->getCount(); it++) {
         double calculatedX = x + (it * widthRatio);
-        double calculatedY = (y + height) - (line.getItem()->getValueForTick(it) * heightRatio);
+        double calculatedY = (y + height) - (line.getItem()->getAveragedValueForTick(it) * heightRatio);
 
         lineVertexes[it].position = sf::Vector2f(calculatedX, calculatedY);
         lineVertexes[it].color = lineColor;

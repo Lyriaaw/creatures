@@ -86,17 +86,17 @@ void MainWindow::loadFarm() {
 
 void MainWindow::loadScreens() {
     WorldScreen * worldView = new WorldScreen(farm);
-    worldView->init();
+    worldView->init(font);
     worldView->loadCamera();
     screens.emplace_back(worldView);
 
 
     StatisticsScreen * statisticsScreen = new StatisticsScreen(farm);
-    statisticsScreen->init();
+    statisticsScreen->init(font);
     screens.emplace_back(statisticsScreen);
 
     MinimapsScreen * minimapsScreen = new MinimapsScreen(farm);
-    minimapsScreen->init();
+    minimapsScreen->init(font);
     screens.emplace_back(minimapsScreen);
 
 
@@ -401,6 +401,11 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
                 handleButtonClicked(buttons.at(it)->getId());
             }
         }
+
+        for (int it = 0; it < screens.size(); it++) {
+            screens.at(it)->mouseClicked(mouseX, mouseY);
+        }
+
     }
 
     if (button == Mouse::Left && mainCamera != nullptr) {
@@ -519,6 +524,15 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::C:
             this->selectedEntity = nullptr;
             this->selectedCreature = nullptr;
+            delete brainUi;
+            brainUi = nullptr;
+            break;
+        case Keyboard::Key::B:
+            this->selectedEntity = nullptr;
+            this->selectedCreature = farm->getScoreSortedCreatures().at(0);
+            if (mainCamera != nullptr) {
+                this->mainCamera->setCenter(selectedCreature->getCreature()->getPosition());
+            }
             delete brainUi;
             brainUi = nullptr;
             break;

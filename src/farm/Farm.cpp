@@ -432,8 +432,45 @@ void Farm::aTickHavePassed() {
 void Farm::statistics() {
 //    if (tickCount % 10 != 0) return;
 
+    std::vector<BrainConnector *> sortedConnectors = getScoreSortedCreatures();
+    int populationSize = sortedConnectors.size();
 
-    dataAnalyser.getPopulation()->addValue(connectors.size());
+    dataAnalyser.getPopulation()->addValue(populationSize);
+
+    double totalPopulationScore = 0.0;
+    for (int it = 0; it < populationSize; it++) {
+        totalPopulationScore += sortedConnectors.at(it)->getCreature()->getAge();
+    }
+
+    double averagePopulationAge = totalPopulationScore / double(populationSize);
+
+    double maxScore = getScoreSortedCreatures().at(0)->getCreature()->getAge();
+
+    double firstQuartileScore = getScoreSortedCreatures().at(populationSize / 4)->getCreature()->getAge();
+    double median = getScoreSortedCreatures().at(populationSize / 2)->getCreature()->getAge();
+    double lastQuartileScore = getScoreSortedCreatures().at((3 * populationSize) / 4)->getCreature()->getAge();
+
+
+    dataAnalyser.getAverageScore()->addValue(averagePopulationAge);
+    dataAnalyser.getBestScore()->addValue(maxScore);
+    dataAnalyser.getFirstQuartileScore()->addValue(firstQuartileScore);
+    dataAnalyser.getMedianScore()->addValue(median);
+    dataAnalyser.getLastQuartileScore()->addValue(lastQuartileScore);
+
+
+    double totalTime = 0.0;
+    totalTime += dataAnalyser.getEntityGridTime()->getLastValue();
+    totalTime += dataAnalyser.getBrainProcessingTime()->getLastValue();
+    totalTime += dataAnalyser.getBrainOutputsTime()->getLastValue();
+    totalTime += dataAnalyser.getPrepareActionsTime()->getLastValue();
+    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
+    totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
+    totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
+    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
+
+    dataAnalyser.getTotalTime()->addValue(totalTime);
+
+
 
 //    double totalCreaturesEnergy = 0.f;
 //    double totalFoodsEnergy = 0.f;

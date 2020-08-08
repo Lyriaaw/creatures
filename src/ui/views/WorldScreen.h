@@ -16,7 +16,7 @@ public:
 
     int getId() override;
 
-    void init() override;
+    void init(sf::Font *font) override;
 
     Camera *open() override;
 

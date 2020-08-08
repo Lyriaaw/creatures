@@ -15,20 +15,29 @@ private:
     double min;
     double max;
 
+    bool isAveraged;
+    DataItem * averaged;
+
 public:
-    DataItem();
+    DataItem(bool averaged);
 
     const std::vector<double> &getValues() const;
     void setValues(const std::vector<double> &values);
 
     void addValue(double value);
+    void addRawValue(double value);
+
     double getValueForTick(int tick);
+    double getAveragedValueForTick(int tick);
 
     double getLastValue();
-    double getSecondToLastValue();
+    double getAveragedLastValue();
+
 
     double getMin() const;
     double getMax() const;
+
+    DataItem *getAveraged() const;
 
     int getCount();
 

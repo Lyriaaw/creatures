@@ -8,18 +8,23 @@
 
 #include "Screen.h"
 #include "../dashboards/Graph.h"
+#include "../Button.h"
 
 class StatisticsScreen: public Screen {
 private:
     std::vector<Graph *> graphs;
     int windowWidth, windowHeight;
 
+    std::vector<Button *> graphButtons;
+
+    Graph * currentGraph;
+
 public:
     StatisticsScreen(Farm *farm);
 
     int getId() override;
 
-    void init() override;
+    void init(sf::Font *font) override;
 
     Camera *open() override;
 
@@ -32,6 +37,11 @@ public:
     void mouseMoved(int x, int y) override;
 
     void loadGraphs();
+    void loadButtons(sf::Font *font);
+
+    void mouseClicked(int x, int y) override;
+
+    void clickedOnButton(int id);
 
 };
 

@@ -13,6 +13,12 @@ private:
     DataItem * tickTime;
     DataItem * tickPerSecond;
 
+    DataItem * averageScore;
+    DataItem * bestScore;
+    DataItem * medianScore;
+    DataItem * firstQuartileScore;
+    DataItem * lastQuartileScore;
+
     DataItem * entityGridTime;
     DataItem * brainOutputsTime;
     DataItem * moveCreaturesTime;
@@ -21,6 +27,8 @@ private:
     DataItem * populationControlTime;
     DataItem * vegetalisationTime;
     DataItem * brainProcessingTime;
+
+    DataItem * totalTime;
 
     DataItem * population;
 
@@ -61,6 +69,18 @@ public:
     DataItem *getFoodEnergy() const;
 
     DataItem *getCreaturesEnergy() const;
+
+    DataItem *getAverageScore() const;
+
+    DataItem *getBestScore() const;
+
+    DataItem *getMedianScore() const;
+
+    DataItem *getFirstQuartileScore() const;
+
+    DataItem *getLastQuartileScore() const;
+
+    DataItem *getTotalTime() const;
 };
 
 

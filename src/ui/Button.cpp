@@ -14,15 +14,8 @@ Button::Button(std::string text, int id, sf::Font * font, int x, int y, int widt
     load(text, font);
 }
 
-void Button::load(std::string text, sf::Font * font) {
-    background = sf::RectangleShape(sf::Vector2f(width, height));
+void Button::placeOnScreen() {
     background.setPosition(x, y);
-    background.setFillColor(backgroundColor);
-
-    label.setFont(*font);
-    label.setString(text);
-    label.setCharacterSize(18);
-    label.setFillColor(textColor);
 
     float labelWidth = label.getLocalBounds().width;
     float labelHeight = label.getLocalBounds().height;
@@ -31,6 +24,25 @@ void Button::load(std::string text, sf::Font * font) {
     float labelY = y + ((height - labelHeight) / 2.f - 5);
 
     label.setPosition(labelX, labelY);
+}
+
+void Button::move(int x, int y) {
+    this->x = x;
+    this->y = y;
+
+    placeOnScreen();
+}
+
+void Button::load(std::string text, sf::Font * font) {
+    background = sf::RectangleShape(sf::Vector2f(width, height));
+    background.setFillColor(backgroundColor);
+
+    label.setFont(*font);
+    label.setString(text);
+    label.setCharacterSize(18);
+    label.setFillColor(textColor);
+
+    placeOnScreen();
 }
 
 bool Button::clicked(int mouseX, int mouseY) {
@@ -53,4 +65,12 @@ void Button::draw(sf::RenderWindow *window) {
 
 int Button::getId() const {
     return id;
+}
+
+int Button::getX() const {
+    return x;
+}
+
+int Button::getY() const {
+    return y;
 }

@@ -25,6 +25,9 @@ public:
            const sf::Color &backgroundColor,
            const sf::Color &textColor);
 
+    void move(int x, int y);
+    void placeOnScreen();
+
     void load(std::string text, sf::Font * font);
 
     void draw(sf::RenderWindow *window);
@@ -32,6 +35,10 @@ public:
     bool clicked(int mouseX, int mouseY);
 
     int getId() const;
+
+    int getX() const;
+
+    int getY() const;
 };
 
 

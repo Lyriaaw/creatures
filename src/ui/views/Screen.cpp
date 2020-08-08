@@ -5,3 +5,7 @@
 #include "Screen.h"
 
 Screen::Screen(Farm * farm): farm(farm), selectedEntity(nullptr) {}
+
+void Screen::mouseClicked(int x, int y) {
+
+}

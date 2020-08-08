@@ -10,7 +10,7 @@ int WorldScreen::getId() {
     return 1;
 }
 
-void WorldScreen::init() {
+void WorldScreen::init(sf::Font *font) {
 
 }
 
