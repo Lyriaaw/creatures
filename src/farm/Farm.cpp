@@ -344,6 +344,7 @@ void Farm::populationControl() {
 
     int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - this->connectors.size();
 
+    float totalEnergyRemoved = 0.f;
     for (int it = 0; it < newConnectorNeeded; it++) {
         int fatherIndex = rand() % selectedParentCount;
         int motherIndex = rand() % selectedParentCount;
@@ -361,14 +362,14 @@ void Farm::populationControl() {
 
         childCreature->setPosition(childCreaturePosition);
 
-        float energyToRemove = child->getCreature()->getEnergy();
+        totalEnergyRemoved += child->getCreature()->getEnergy();
 
-        removeEnergyFromFarm(energyToRemove);
 
         connectors.emplace_back(child);
         addedCreatures.emplace_back(child->getCreature());
     }
 
+    removeEnergyFromFarm(totalEnergyRemoved);
     clearDeletedEntities();
 
 
@@ -740,5 +741,9 @@ const DataAnalyser &Farm::getDataAnalyser() const {
 
 void Farm::setDataAnalyser(const DataAnalyser &dataAnalyser) {
     Farm::dataAnalyser = dataAnalyser;
+}
+
+const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
+    return entityGrid;
 }
 

@@ -104,6 +104,8 @@ public:
     const DataAnalyser &getDataAnalyser() const;
 
     void setDataAnalyser(const DataAnalyser &dataAnalyser);
+
+    const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 };
 
 

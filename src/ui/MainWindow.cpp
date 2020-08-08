@@ -8,6 +8,7 @@
 #include "FarmUI.h"
 #include "views/WorldScreen.h"
 #include "views/StatisticsScreen.h"
+#include "views/MinimapsScreen.h"
 
 
 #include <SFML/Window.hpp>
@@ -47,9 +48,11 @@ void MainWindow::loadButtons() {
 
     Button * mainWorldButton = new Button("World", 1, font, 0, 0, 100, 50, backgroundColor, textColor);
     Button * statistics = new Button("Statistics", 2, font, 110, 0, 100, 50, backgroundColor, textColor);
+    Button * Minimaps = new Button("Minimaps", 3, font, 220, 0, 100, 50, backgroundColor, textColor);
 
     buttons.emplace_back(mainWorldButton);
     buttons.emplace_back(statistics);
+    buttons.emplace_back(Minimaps);
 }
 
 void MainWindow::loadFarm() {
@@ -92,6 +95,11 @@ void MainWindow::loadScreens() {
     statisticsScreen->init();
     screens.emplace_back(statisticsScreen);
 
+    MinimapsScreen * minimapsScreen = new MinimapsScreen(farm);
+    minimapsScreen->init();
+    screens.emplace_back(minimapsScreen);
+
+
 
     for (int it = 0; it < screens.size(); it++) {
         screens.at(it)->onWindowResize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -113,6 +121,12 @@ void MainWindow::loadUI() {
     generalInformationLabel.setString("Loading");
     generalInformationLabel.setCharacterSize(12);
     generalInformationLabel.setFillColor(textColor);
+
+
+    double positionX = window->getSize().x * 0.9;
+    double positionY = 3;
+
+    generalInformationLabel.setPosition(positionX, positionY);
 }
 
 
@@ -185,13 +199,7 @@ void MainWindow::updateInformationLabel() {
     informationStream << "FPS: " << fps;
     informationStream << std::endl;
 
-
     generalInformationLabel.setString(informationStream.str());
-
-    double positionX = window->getSize().x * 0.9;
-    double positionY = 5;
-
-    generalInformationLabel.setPosition(positionX, positionY);
 }
 
 
@@ -445,6 +453,9 @@ void MainWindow::handleButtonClicked(int id) {
             break;
         case 2:
             openScreen(2);
+            break;
+        case 3:
+            openScreen(3);
             break;
         default:
             std::cout << "BUTTON ID NOT FOUND" << std::endl;
