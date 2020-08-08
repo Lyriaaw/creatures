@@ -90,47 +90,51 @@ Evolution * SensorEvolution::generateFromCastedMate(SensorEvolution * mate) {
         return childSensorEvolution;
     }
 
+    childSensorEvolution->sensorLength = sensorLength;
+    childSensorEvolution->sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
+    childSensorEvolution->sensorColor = ((rand() % 999) / 1000.f);
 
 
-    float newLength = (this->sensorLength + mate->sensorLength) / 2.f;
 
-
-    float newColor;
-    float smallestHue = this->sensorColor;
-    if (mate->sensorColor < smallestHue) {
-        smallestHue = mate->sensorColor;
-    }
-
-    float rawDistance =  abs(this->sensorColor - mate->sensorColor);
-    float hueDistances = std::min(rawDistance, 1.f - rawDistance);
-
-    if (rawDistance < 1 - rawDistance) {
-        newColor = smallestHue + (hueDistances / 2.f);
-    } else {
-        newColor = 1 + (smallestHue - (hueDistances / 2.f));
-    }
-
-
-    float newRotation;
-    float smallestRotation = (this->sensorRotation + 1) / 2.f;
-    if ((mate->sensorRotation + 1) / 2.f < smallestRotation) {
-        smallestRotation = (mate->sensorRotation + 1) / 2.f;
-    }
-
-    float rawRotationDistance =  abs((this->sensorRotation + 1) / 2.f - (mate->sensorRotation + 1) / 2.f);
-    float rotationDistances = std::min(rawRotationDistance, 1.f - rawRotationDistance);
-
-    if (rawRotationDistance < 1 - rawRotationDistance) {
-        newRotation = smallestRotation + (rotationDistances / 2.f);
-    } else {
-        newRotation = 1 + (smallestRotation - (rotationDistances / 2.f));
-    }
-
-    newRotation = (newRotation * 2.f) - 1.f;
-
-    childSensorEvolution->sensorLength = newLength;
-    childSensorEvolution->sensorRotation = newRotation;
-    childSensorEvolution->sensorColor = newColor;
+//    float newLength = (this->sensorLength + mate->sensorLength) / 2.f;
+//
+//
+//    float newColor;
+//    float smallestHue = this->sensorColor;
+//    if (mate->sensorColor < smallestHue) {
+//        smallestHue = mate->sensorColor;
+//    }
+//
+//    float rawDistance =  abs(this->sensorColor - mate->sensorColor);
+//    float hueDistances = std::min(rawDistance, 1.f - rawDistance);
+//
+//    if (rawDistance < 1 - rawDistance) {
+//        newColor = smallestHue + (hueDistances / 2.f);
+//    } else {
+//        newColor = 1 + (smallestHue - (hueDistances / 2.f));
+//    }
+//
+//
+//    float newRotation;
+//    float smallestRotation = (this->sensorRotation + 1) / 2.f;
+//    if ((mate->sensorRotation + 1) / 2.f < smallestRotation) {
+//        smallestRotation = (mate->sensorRotation + 1) / 2.f;
+//    }
+//
+//    float rawRotationDistance =  abs((this->sensorRotation + 1) / 2.f - (mate->sensorRotation + 1) / 2.f);
+//    float rotationDistances = std::min(rawRotationDistance, 1.f - rawRotationDistance);
+//
+//    if (rawRotationDistance < 1 - rawRotationDistance) {
+//        newRotation = smallestRotation + (rotationDistances / 2.f);
+//    } else {
+//        newRotation = 1 + (smallestRotation - (rotationDistances / 2.f));
+//    }
+//
+//    newRotation = (newRotation * 2.f) - 1.f;
+//
+//    childSensorEvolution->sensorLength = newLength;
+//    childSensorEvolution->sensorRotation = newRotation;
+//    childSensorEvolution->sensorColor = newColor;
 
     return childSensorEvolution;
 }

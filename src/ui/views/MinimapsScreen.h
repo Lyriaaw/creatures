@@ -8,11 +8,17 @@
 
 #include "Screen.h"
 #include "../minimaps/Minimap.h"
+#include "../minimaps/CreatureTileCountMinimap.h"
 
 class MinimapsScreen: public Screen {
 private:
-    std::vector<Minimap *> tileMinimaps;
-    std::vector<Minimap *> chunkMinimaps;
+    std::vector<Minimap *> minimaps;
+
+
+
+    CreatureTileCountMinimap * creatureCountMinimap;
+
+    sf::RectangleShape background;
 
 public:
     MinimapsScreen(Farm *farm);

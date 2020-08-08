@@ -15,6 +15,9 @@ protected:
     double positionX, positionY, width, height;
 
     std::vector<std::vector<sf::RectangleShape>> tiles;
+
+    sf::VertexArray vertexArray;
+
     double pixelSize;
 
 
@@ -35,18 +38,6 @@ public:
 class WorldMinimap: public Minimap {
 public:
     WorldMinimap(double pixelSize, double positionX, double positionY);
-    std::string getName() override;
-
-    void draw(int tileX, int tileY, Farm * farm, sf::RenderWindow *window);
-
-};
-
-
-
-
-class CreatureCountMinimap: public Minimap {
-public:
-    CreatureCountMinimap(double pixelSize, double positionX, double positionY);
     std::string getName() override;
 
     void draw(int tileX, int tileY, Farm * farm, sf::RenderWindow *window);

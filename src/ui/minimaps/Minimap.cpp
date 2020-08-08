@@ -78,27 +78,4 @@ void WorldMinimap::draw(int tileX, int tileY, Farm *farm, sf::RenderWindow *wind
 }
 
 
-// Creature count
-CreatureCountMinimap::CreatureCountMinimap(double pixelSize, double positionX, double positionY)
-        : Minimap(pixelSize, positionX, positionY) {
-
-}
-
-std::string CreatureCountMinimap::getName() {
-    return "Creature count";
-}
-
-void CreatureCountMinimap::draw(int tileX, int tileY, Farm *farm, sf::RenderWindow *window) {
-    sf::RectangleShape *rectangle = &tiles.at(tileX).at(tileY);
-
-
-    float height = farm->getEntityGrid().at(tileX).at(tileY).size() / 10.f;
-
-    RGBColor rectangleColor = RGBColor(0.f, 0.2f, height);
-
-    rectangle->setFillColor(sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255));
-
-    window->draw(*rectangle);
-}
-
 

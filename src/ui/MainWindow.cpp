@@ -117,16 +117,26 @@ void MainWindow::loadUI() {
 //
 
     sf::Color textColor = sf::Color(200, 200, 200, 255);
-    generalInformationLabel.setFont(*font);
-    generalInformationLabel.setString("Loading");
-    generalInformationLabel.setCharacterSize(12);
-    generalInformationLabel.setFillColor(textColor);
-
-
-    double positionX = window->getSize().x * 0.9;
     double positionY = 3;
 
+    double positionX = window->getSize().x * 0.88;
+    generalInformationLabel.setFont(*font);
+    generalInformationLabel.setString("Loading");
+    generalInformationLabel.setCharacterSize(15);
+    generalInformationLabel.setFillColor(textColor);
     generalInformationLabel.setPosition(positionX, positionY);
+
+    positionX = window->getSize().x * 0.94;
+    speedInformationLabel.setFont(*font);
+    speedInformationLabel.setString("Loading");
+    speedInformationLabel.setCharacterSize(15);
+    speedInformationLabel.setFillColor(textColor);
+    speedInformationLabel.setPosition(positionX, positionY);
+
+
+
+
+
 }
 
 
@@ -187,16 +197,24 @@ void MainWindow::runLoop() {
 void MainWindow::updateInformationLabel() {
 
 
+    std::stringstream speedStream;
+    speedStream << std::fixed << std::setprecision(2);
+
+    speedStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getLastValue();
+    speedStream << std::endl;
+
+    speedStream << "FPS: " << fps;
+    speedStream << std::endl;
+
+    speedInformationLabel.setString(speedStream.str());
+
+
+
     std::stringstream informationStream;
-    informationStream << std::fixed << std::setprecision(2);
+    informationStream << "Tick: " << farm->getDataAnalyser().getPopulation()->getCount();
+    informationStream << std::endl;
 
     informationStream << "Creatures: " << farm->getDataAnalyser().getPopulation()->getLastValue();
-    informationStream << std::endl;
-
-    informationStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getLastValue();
-    informationStream << std::endl;
-
-    informationStream << "FPS: " << fps;
     informationStream << std::endl;
 
     generalInformationLabel.setString(informationStream.str());
@@ -225,6 +243,7 @@ void MainWindow::draw() {
     }
 
     window->draw(generalInformationLabel);
+    window->draw(speedInformationLabel);
 
     window->display();
 }

@@ -68,6 +68,7 @@ private:
     std::vector<Button *> buttons;
 
     sf::Text generalInformationLabel;
+    sf::Text speedInformationLabel;
 
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
