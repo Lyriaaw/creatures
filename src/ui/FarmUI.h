@@ -21,7 +21,7 @@ class FarmUI {
 private:
     Farm *farm;
 
-    std::vector<std::vector<sf::RectangleShape>> tiles;
+    sf::VertexArray tilesVertexArray;
     std::vector<EntityUI *> entities;
 
     Point hoveredTile;

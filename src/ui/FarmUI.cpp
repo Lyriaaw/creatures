@@ -43,18 +43,20 @@ void FarmUI::generateTileInfoText() {
 }
 
 void FarmUI::loadMap() {
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        std::vector<sf::RectangleShape> line;
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+    tilesVertexArray = sf::VertexArray(sf::Quads, TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT * 4);
 
-            sf::RectangleShape rectangle = sf::RectangleShape(sf::Vector2f(TILE_SIZE - 2, TILE_SIZE - 2));
-            rectangle.setPosition((float(it) * TILE_SIZE) + 1, (float(jt) * TILE_SIZE) + 1);
-
-
-            line.emplace_back(rectangle);
-        }
-        tiles.emplace_back(line);
-    }
+//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+//        std::vector<sf::RectangleShape> line;
+//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+//
+//            sf::RectangleShape rectangle = sf::RectangleShape(sf::Vector2f(TILE_SIZE - 2, TILE_SIZE - 2));
+//            rectangle.setPosition((float(it) * TILE_SIZE) + 1, (float(jt) * TILE_SIZE) + 1);
+//
+//
+//            line.emplace_back(rectangle);
+//        }
+//        tiles.emplace_back(line);
+//    }
 }
 
 void FarmUI::update() {
@@ -85,10 +87,36 @@ void FarmUI::setPositions(Camera *camera) {
     Map *map = farm->getMap();
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        std::vector<sf::RectangleShape> line;
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
-            sf::RectangleShape *rectangle = &tiles.at(it).at(jt);
+            int gridRatio = 0;
+
+            if (camera->isShowGrid()) {
+                gridRatio = 1;
+            }
+
+            int vertexArrayIndex = ((it * TILE_COUNT_HEIGHT) + jt) * 4;
+            Point point = camera->getScreenCoordinates({float(it) * TILE_SIZE, float(jt) * TILE_SIZE});
+            tilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(
+                    point.getX(),
+                    point.getY());
+
+
+            tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
+                    point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio,
+                    point.getY());
+
+
+            tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
+                    point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio,
+                    point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio);
+
+
+            tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
+                    point.getX(),
+                    point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio);
+
+
 
             float height = map->getTileAt(it, jt);
             RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
@@ -99,20 +127,12 @@ void FarmUI::setPositions(Camera *camera) {
                 rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
             }
 
+            sf::Color tileColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
-            rectangle->setFillColor(sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255));
-
-            int gridRatio = 0;
-
-            if (camera->isShowGrid()) {
-                gridRatio = 1;
-            }
-
-            rectangle->setSize(sf::Vector2f(TILE_SIZE * camera->getZoom() - gridRatio, TILE_SIZE * camera->getZoom() - gridRatio));
-
-            Point point = camera->getScreenCoordinates({float(it) * TILE_SIZE, float(jt) * TILE_SIZE});
-
-            rectangle->setPosition(point.getX(), point.getY());
+            tilesVertexArray[vertexArrayIndex + 0].color = tileColor;
+            tilesVertexArray[vertexArrayIndex + 1].color = tileColor;
+            tilesVertexArray[vertexArrayIndex + 2].color = tileColor;
+            tilesVertexArray[vertexArrayIndex + 3].color = tileColor;
 
 
         }
@@ -130,23 +150,25 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * sel
     }
 
 
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+//
+//            Point topLeftTilePoint = Point(it * TILE_SIZE, jt * TILE_SIZE);
+//            Point topLeftScreenPoint = camera->getScreenCoordinates(topLeftTilePoint);
+//
+//            Point bottomRightTilePoint = Point((it + 1) * TILE_SIZE, (jt + 1) * TILE_SIZE);
+//            Point bottomRightScreenPoint = camera->getScreenCoordinates(bottomRightTilePoint);
+//
+//            if (!camera->shouldDisplayPoint(topLeftScreenPoint) && !camera->shouldDisplayPoint(bottomRightScreenPoint)) {
+//                continue;
+//            }
+//
+//            window->draw(tiles.at(it).at(jt));
+//        }
+//    }
 
-            Point topLeftTilePoint = Point(it * TILE_SIZE, jt * TILE_SIZE);
-            Point topLeftScreenPoint = camera->getScreenCoordinates(topLeftTilePoint);
 
-            Point bottomRightTilePoint = Point((it + 1) * TILE_SIZE, (jt + 1) * TILE_SIZE);
-            Point bottomRightScreenPoint = camera->getScreenCoordinates(bottomRightTilePoint);
-
-            if (!camera->shouldDisplayPoint(topLeftScreenPoint) && !camera->shouldDisplayPoint(bottomRightScreenPoint)) {
-                continue;
-            }
-
-            window->draw(tiles.at(it).at(jt));
-        }
-    }
-
+    window->draw(tilesVertexArray);
     for (int it = 0; it < entities.size(); it++) {
         entities.at(it)->draw(window, camera, selectedCreature);
     }
