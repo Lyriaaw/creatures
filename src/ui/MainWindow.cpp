@@ -7,6 +7,8 @@
 #include "FoodUI.h"
 #include "FarmUI.h"
 #include "views/WorldScreen.h"
+#include "views/StatisticsScreen.h"
+
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -33,6 +35,17 @@ void MainWindow::loadFont() {
     if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
         std::cout << "Font not loaded properly !" << std::endl;
     }
+}
+
+void MainWindow::loadButtons() {
+    sf::Color backgroundColor = sf::Color(50, 50, 50, 255);
+    sf::Color textColor = sf::Color(205, 205, 205, 255);
+
+    Button * mainWorldButton = new Button("World", 1, font, 0, 0, 100, 50, backgroundColor, textColor);
+    Button * statistics = new Button("Statistics", 2, font, 110, 0, 100, 50, backgroundColor, textColor);
+
+    buttons.emplace_back(mainWorldButton);
+    buttons.emplace_back(statistics);
 }
 
 void MainWindow::loadFarm() {
@@ -64,19 +77,31 @@ void MainWindow::loadFarm() {
     farmUi->setEntities(entityUis);
 }
 
-void MainWindow::loadViews() {
+void MainWindow::loadScreens() {
     WorldScreen * worldView = new WorldScreen();
     worldView->init();
     worldView->loadCamera();
     screens.emplace_back(worldView);
 
 
+    StatisticsScreen * statisticsScreen = new StatisticsScreen();
+    statisticsScreen->init();
+    screens.emplace_back(statisticsScreen);
+
 
     for (int it = 0; it < screens.size(); it++) {
         screens.at(it)->onWindowResize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
-    mainCamera = worldView->open();
+    openScreen(1);
+}
+
+void MainWindow::loadUI() {
+    topButtonBackground = sf::RectangleShape(sf::Vector2f(FARM_WIDTH, 50));
+    topButtonBackground.setPosition(0, 0);
+
+    sf::Color backgroundColor = sf::Color(25, 25, 25, 255);
+    topButtonBackground.setFillColor(backgroundColor);
 }
 
 
@@ -86,8 +111,10 @@ void MainWindow::start() {
     window->setVerticalSyncEnabled(true);
 
     loadFont();
+    loadButtons();
     loadFarm();
-    loadViews();
+    loadScreens();
+    loadUI();
 
 
     farmUi->setPositions(mainCamera);
@@ -140,6 +167,12 @@ void MainWindow::draw() {
         brainUi->draw(window);
     }
 
+    currentScreen->draw(window);
+
+    window->draw(topButtonBackground);
+    for (int it = 0; it < buttons.size(); it++) {
+        buttons.at(it)->draw(window);
+    }
 
     window->display();
 }
@@ -242,16 +275,19 @@ void MainWindow::handleMouseMove(int x, int y) {
         screens.at(it)->mouseMoved(x, y);
     }
 
+    float previousX = this->mouseX;
+    float previousY = this->mouseY;
 
     this->mouseX = float(x);
     this->mouseY = float(y);
+
 
     if (mainCamera == nullptr) {
         return;
     }
 
-    Point lastMousePosition = mainCamera->getWorldCoordinates({mouseX, mouseY});
-    Point newMousePosition = mainCamera->getWorldCoordinates({float(x), float(y)});
+    Point lastMousePosition = mainCamera->getWorldCoordinates({previousX, previousY});
+    Point newMousePosition = mainCamera->getWorldCoordinates({this->mouseX, this->mouseY});
 
     if (rightMouseButtonDown) {
         float deltaX = lastMousePosition.getX() - newMousePosition.getX();
@@ -293,8 +329,13 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         leftMouseButtonDown = false;
     }
 
-
-
+    if (button == Mouse::Left) {
+        for (int it = 0; it < buttons.size(); it++) {
+            if (buttons.at(it)->clicked(mouseX, mouseY)) {
+                handleButtonClicked(buttons.at(it)->getId());
+            }
+        }
+    }
 
     if (button == Mouse::Left && mainCamera != nullptr) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
@@ -349,10 +390,41 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
             selectedEntity = nullptr;
             selectedCreature = nullptr;
         }
+    }
+}
 
 
+void MainWindow::handleButtonClicked(int id) {
+    switch(id) {
+        case 1:
+            openScreen(1);
+            break;
+        case 2:
+            openScreen(2);
+            break;
+        default:
+            std::cout << "BUTTON ID NOT FOUND" << std::endl;
+            break;
 
     }
+}
+
+void MainWindow::openScreen(int id) {
+    Screen * selectedScreen(nullptr);
+
+    for (int it = 0; it < screens.size(); it++) {
+        if (screens.at(it)->getId() == id) {
+            selectedScreen = screens.at(it);
+        }
+    }
+
+    if (selectedScreen == nullptr) {
+        std::cout << "SCREEN ASKED NOT FOUND WITH ID " << id << std::endl;
+        return;
+    }
+
+    mainCamera = selectedScreen->open();
+    currentScreen = selectedScreen;
 }
 
 void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {

@@ -21,14 +21,6 @@ int main(int argc, char **argv)
 {
     srand((unsigned) time(0));
 
-//    Farm * farm = new Farm();
-//    farm->InitFromRandom();
-//
-//    while (true) {
-//        farm->Tick(false);
-//    }
-
-
     MainWindow window = MainWindow();
     window.start();
 

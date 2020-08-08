@@ -11,6 +11,7 @@
 #include "BrainUI.h"
 #include "FarmUI.h"
 #include "views/Screen.h"
+#include "Button.h"
 
 
 class MainWindow {
@@ -19,7 +20,10 @@ public:
     MainWindow();
 
     void loadFont();
-    void loadViews();
+    void loadButtons();
+    void loadScreens();
+
+    void loadUI();
 
     void loadFarm();
     std::thread runFarmLoop();
@@ -39,8 +43,12 @@ private:
 
     sf::RenderWindow *window;
 
+    sf::RectangleShape topButtonBackground;
 
     std::vector<Screen *> screens;
+    Screen * currentScreen;
+
+    std::vector<Button *> buttons;
 
 
     bool running = false;
@@ -68,6 +76,10 @@ private:
     void handleMousePressed(sf::Mouse::Button button) ;
     void handleMouseReleased(sf::Mouse::Button button) ;
     void draw();
+
+    void handleButtonClicked(int id);
+
+    void openScreen(int id);
 
     Entity * getSelectedEntity();
 };

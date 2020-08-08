@@ -5,7 +5,7 @@
 #include "WorldScreen.h"
 
 int WorldScreen::getId() {
-    return 0;
+    return 1;
 }
 
 void WorldScreen::init() {
@@ -16,7 +16,7 @@ Camera *WorldScreen::open() {
     return camera;
 }
 
-void WorldScreen::draw() {
+void WorldScreen::draw(sf::RenderWindow *window) {
 
 }
 

@@ -6,6 +6,7 @@
 #define CREATURES_SCREEN_H
 
 
+#include <SFML/Graphics.hpp>
 #include "../Camera.h"
 #include "../../farm/brain/BrainConnector.h"
 
@@ -22,7 +23,7 @@ public:
 
     virtual void init() = 0;
     virtual Camera *open() = 0;
-    virtual void draw() = 0;
+    virtual void draw(sf::RenderWindow *window) = 0;
     virtual void updateSelectedCreature(BrainConnector * connector) = 0;
     virtual void onWindowResize(int width, int height) = 0;
     virtual void mouseMoved(int x, int y) = 0;
