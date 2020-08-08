@@ -54,6 +54,7 @@ void StatisticsScreen::loadGraphs() {
 
     timeGraph->addLine(farm->getDataAnalyser().getPopulationControlTime(), 2, 0, 0, 195);
     timeGraph->addLine(farm->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
+    timeGraph->addLine(farm->getDataAnalyser().getStatisticsTime(), 2, 255, 15, 15);
 
     timeGraph->windowResized(windowWidth, windowHeight);
 

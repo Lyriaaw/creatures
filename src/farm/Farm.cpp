@@ -69,6 +69,8 @@ void Farm::InitFromRandom() {
 
     availableEnergy = 0.f;
     tickCount = 0;
+
+    sortCreatures();
 }
 
 
@@ -93,6 +95,7 @@ void Farm::Tick(bool paused) {
         aTickHavePassed();
         statistics();
     }
+    sortCreatures();
 
 
     tickEnd = std::chrono::system_clock::now();
@@ -367,9 +370,11 @@ void Farm::aTickHavePassed() {
 
 
 void Farm::statistics() {
-//    if (tickCount % 10 != 0) return;
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
 
     std::vector<BrainConnector *> sortedConnectors = getScoreSortedCreatures();
+//    std::vector<BrainConnector *> sortedConnectors = connectors;
     int populationSize = sortedConnectors.size();
 
     dataAnalyser.getPopulation()->addValue(populationSize);
@@ -381,11 +386,11 @@ void Farm::statistics() {
 
     double averagePopulationAge = totalPopulationScore / double(populationSize);
 
-    double maxScore = getScoreSortedCreatures().at(0)->getCreature()->getAge();
+    double maxScore = sortedConnectors.at(0)->getCreature()->getAge();
 
-    double firstQuartileScore = getScoreSortedCreatures().at(populationSize / 4)->getCreature()->getAge();
-    double median = getScoreSortedCreatures().at(populationSize / 2)->getCreature()->getAge();
-    double lastQuartileScore = getScoreSortedCreatures().at((3 * populationSize) / 4)->getCreature()->getAge();
+    double firstQuartileScore = sortedConnectors.at(populationSize / 4)->getCreature()->getAge();
+    double median = sortedConnectors.at(populationSize / 2)->getCreature()->getAge();
+    double lastQuartileScore = sortedConnectors.at((3 * populationSize) / 4)->getCreature()->getAge();
 
 
     dataAnalyser.getAverageScore()->addValue(averagePopulationAge);
@@ -394,18 +399,6 @@ void Farm::statistics() {
     dataAnalyser.getMedianScore()->addValue(median);
     dataAnalyser.getLastQuartileScore()->addValue(lastQuartileScore);
 
-
-    double totalTime = 0.0;
-    totalTime += dataAnalyser.getEntityGridTime()->getLastValue();
-    totalTime += dataAnalyser.getBrainProcessingTime()->getLastValue();
-    totalTime += dataAnalyser.getBrainOutputsTime()->getLastValue();
-    totalTime += dataAnalyser.getPrepareActionsTime()->getLastValue();
-    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
-    totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
-    totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
-    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
-
-    dataAnalyser.getTotalTime()->addValue(totalTime);
 
 
 
@@ -428,15 +421,25 @@ void Farm::statistics() {
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
 
-//
-//
-//    std::cout << " total: " << getHumanReadableEnergy(totalEnergy);
-//    std::cout << "  --  available: " << getHumanReadableEnergy(availableEnergy);
-//    std::cout << "  --  creatures: " << getHumanReadableEnergy(totalCreaturesEnergy);
-//    std::cout << "  --  foods: " << getHumanReadableEnergy(totalFoodsEnergy);
-//    std::cout << "  --  raw total: " << totalEnergy;
 
+    double totalTime = 0.0;
+    totalTime += dataAnalyser.getEntityGridTime()->getLastValue();
+    totalTime += dataAnalyser.getBrainProcessingTime()->getLastValue();
+    totalTime += dataAnalyser.getBrainOutputsTime()->getLastValue();
+    totalTime += dataAnalyser.getPrepareActionsTime()->getLastValue();
+    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
+    totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
+    totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
+    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
 
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    double statisticsTime = elapsed_time.count();
+
+    dataAnalyser.getStatisticsTime()->addValue(statisticsTime);
+    totalTime += statisticsTime;
+
+    dataAnalyser.getTotalTime()->addValue(totalTime);
 }
 
 
@@ -558,7 +561,10 @@ std::vector<Entity *> Farm::getAccessibleEntities(Creature * creature) {
 }
 
 std::vector<BrainConnector *> Farm::getScoreSortedCreatures() {
-    std::vector<BrainConnector *> sorted;
+    return sorted;
+}
+void Farm::sortCreatures() {
+    std::vector<BrainConnector *> sortResult;
 
     std::vector<BrainConnector *> tmpConnectors = this->connectors;
 
@@ -578,11 +584,10 @@ std::vector<BrainConnector *> Farm::getScoreSortedCreatures() {
             std::cout << "Error while sorting creatures by score - Life will probably crash" << std::endl;
         }
 
-        sorted.emplace_back(tmpConnectors.at(biggestIndex));
+        sortResult.emplace_back(tmpConnectors.at(biggestIndex));
         tmpConnectors.erase(tmpConnectors.begin() + biggestIndex);
     }
-
-    return sorted;
+    this->sorted = sortResult;
 }
 
 Creature * Farm::getCreatureFromId(int id) {

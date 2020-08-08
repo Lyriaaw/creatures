@@ -17,6 +17,8 @@
 
 class Farm {
 private:
+    std::vector<BrainConnector *> sorted;
+
     std::vector<BrainConnector *> connectors;
     std::vector<Food *> foods;
     Map map;
@@ -44,6 +46,8 @@ public:
     Farm();
     void InitFromRandom();
     void Tick(bool paused);
+
+    void sortCreatures();
 
     void brainProcessing();
     void brainOutput();

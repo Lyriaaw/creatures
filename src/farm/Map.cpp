@@ -9,9 +9,8 @@
 
 using namespace std;
 
-void Map::initRandomMap() {
+void Map::generateRandomTerrain() {
     float seed = rand() % 1000000;
-//    float seed = 1568;
     PerlinNoise perlin(seed);
 
     cout << "Map generated with seed " << seed << endl;
@@ -29,7 +28,6 @@ void Map::initRandomMap() {
             float height = perlin.noise(xComponent, yComponent, 0.8);
 
 
-//            std::cout << "X: " << it << " Y: " << jt << " Value: " << height << " -- Components: x: " << xComponent << " y: " << yComponent << std::endl;
             if (height < min) {
                 min = height;
             }
@@ -73,10 +71,11 @@ void Map::initRandomMap() {
             setTileAt(it, jt,  currentHeight);
         }
     }
+}
 
 
-    std::cout << "Min: " << min << " Max: " << max << " Removed:" << 0 << std::endl;
-
+void Map::initRandomMap() {
+    generateRandomTerrain();
 }
 
 

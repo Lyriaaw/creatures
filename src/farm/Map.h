@@ -16,6 +16,7 @@ private:
 
 public:
     void initRandomMap();
+    void generateRandomTerrain();
 
 
     float getTileAt(int chunkX, int chunkY);

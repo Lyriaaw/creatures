@@ -26,6 +26,7 @@ private:
     DataItem * executeActionsTime;
     DataItem * populationControlTime;
     DataItem * vegetalisationTime;
+    DataItem * statisticsTime;
     DataItem * brainProcessingTime;
 
     DataItem * totalTime;
@@ -81,6 +82,8 @@ public:
     DataItem *getLastQuartileScore() const;
 
     DataItem *getTotalTime() const;
+
+    DataItem *getStatisticsTime() const;
 };
 
 

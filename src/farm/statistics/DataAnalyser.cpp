@@ -18,6 +18,7 @@ DataAnalyser::DataAnalyser() {
     populationControlTime = new DataItem("populationControlTime", true);
     vegetalisationTime = new DataItem("vegetalisationTime", true);
     brainProcessingTime = new DataItem("brainProcessingTime", true);
+    statisticsTime = new DataItem("statisticsTime", true);
 
     totalTime = new DataItem("totalTime", true);
 
@@ -124,4 +125,8 @@ DataItem *DataAnalyser::getLastQuartileScore() const {
 
 DataItem *DataAnalyser::getTotalTime() const {
     return totalTime;
+}
+
+DataItem *DataAnalyser::getStatisticsTime() const {
+    return statisticsTime;
 }
