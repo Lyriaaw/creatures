@@ -18,6 +18,8 @@ private:
 public:
     void initRandomMap();
     void generateRandomTerrain();
+    void processClimate();
+    void processGroundChanges();
 
 
     float getTileAt(int chunkX, int chunkY);

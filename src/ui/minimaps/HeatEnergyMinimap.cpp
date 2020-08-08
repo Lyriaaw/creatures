@@ -20,6 +20,10 @@ void HeatEnergyMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
 
     RGBColor rectangleColor = RGBColor(0.f, 1.f, height);
 
+    if (height > 1.f) {
+        rectangleColor = RGBColor(0.91f, 1.f, height - 1);
+    }
+
     sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
     int vertexArrayIndex = (tileX * TILE_COUNT_HEIGHT) + tileY;

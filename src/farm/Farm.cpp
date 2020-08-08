@@ -213,9 +213,13 @@ void Farm::executeCreaturesActions() {
         BrainConnector * performer = getConnectorFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
+        if (subject->getEnergy() <= 0) {
+            continue;
+        }
 
         if (actionDto.getType() == "EAT") {
             double wastedEnergy = performer->getCreature()->addEnergy(subject->getEnergy());
+            subject->setEnergy(0.0);
 
             Point performerPoint = performer->getCreature()->getPosition();
             Point tilePoint = performerPoint.getTileCoordinates();
@@ -229,8 +233,8 @@ void Farm::executeCreaturesActions() {
 
         }
 
-        clearDeletedEntities();
     }
+    clearDeletedEntities();
 
     actions.clear();
 
@@ -327,6 +331,8 @@ void Farm::populationControl() {
 
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    map.processClimate();
 
     random_device rd;
     mt19937 mt(rd());

@@ -40,8 +40,6 @@ void Map::generateRandomTerrain() {
             setTileAt(it, jt, height);
         }
     }
-//    std::cout << "Min: " << min << " Max: " << max << " Removed:" << 0 << std::endl;
-
 
 
     float removed = ((max - min) / 2.f) + min;
@@ -77,6 +75,50 @@ void Map::generateRandomTerrain() {
 void Map::initRandomMap() {
     generateRandomTerrain();
 }
+
+
+void Map::processGroundChanges(){
+    float newGround[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            newGround[it][jt] = ground[it][jt];
+        }
+    }
+
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            double availableGround = ground[it][jt] / 10;
+
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    if (it + x < 0 || it + x > TILE_COUNT_WIDTH ||jt + y < 0 || jt + y > TILE_COUNT_HEIGHT) {
+                        continue;
+                    }
+
+                    newGround[it + x][jt + y] += availableGround;
+                    newGround[it][jt] -= availableGround;
+                }
+            }
+
+        }
+    }
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            ground[it][jt] = newGround[it][jt];
+        }
+    }
+}
+
+void Map::processClimate() {
+    processGroundChanges();
+
+}
+
+
+
 
 
 
