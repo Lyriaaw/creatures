@@ -5,7 +5,7 @@
 #include "MinimapsScreen.h"
 #include "../minimaps/CreatureTileCountMinimap.h"
 
-MinimapsScreen::MinimapsScreen(Farm *farm) : Screen(farm) {}
+MinimapsScreen::MinimapsScreen(Farm *farm, sf::Font * font) : Screen(farm, font) {}
 
 int MinimapsScreen::getId() {
     return 3;
@@ -13,7 +13,7 @@ int MinimapsScreen::getId() {
 
 
 
-void MinimapsScreen::init(sf::Font *font) {
+void MinimapsScreen::init() {
     WorldMinimap * worldMinimap = new WorldMinimap(2, 10, 70);
     minimaps.emplace_back(worldMinimap);
 

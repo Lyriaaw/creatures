@@ -28,6 +28,8 @@ public:
     void move(int x, int y);
     void placeOnScreen();
 
+    void changeBackgroundColor(sf::Color color);
+
     void load(std::string text, sf::Font * font);
 
     void draw(sf::RenderWindow *window);

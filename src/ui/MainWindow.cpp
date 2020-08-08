@@ -85,18 +85,18 @@ void MainWindow::loadFarm() {
 }
 
 void MainWindow::loadScreens() {
-    WorldScreen * worldView = new WorldScreen(farm);
-    worldView->init(font);
+    WorldScreen * worldView = new WorldScreen(farm, font);
+    worldView->init();
     worldView->loadCamera();
     screens.emplace_back(worldView);
 
 
-    StatisticsScreen * statisticsScreen = new StatisticsScreen(farm);
-    statisticsScreen->init(font);
+    StatisticsScreen * statisticsScreen = new StatisticsScreen(farm, font);
+    statisticsScreen->init();
     screens.emplace_back(statisticsScreen);
 
-    MinimapsScreen * minimapsScreen = new MinimapsScreen(farm);
-    minimapsScreen->init(font);
+    MinimapsScreen * minimapsScreen = new MinimapsScreen(farm, font);
+    minimapsScreen->init();
     screens.emplace_back(minimapsScreen);
 
 

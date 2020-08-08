@@ -5,6 +5,7 @@
 #ifndef CREATURES_DATAITEM_H
 #define CREATURES_DATAITEM_H
 
+#include <string>
 
 #include <vector>
 
@@ -18,8 +19,10 @@ private:
     bool isAveraged;
     DataItem * averaged;
 
+    std::string name;
+
 public:
-    DataItem(bool averaged);
+    DataItem(std::string name, bool averaged);
 
     const std::vector<double> &getValues() const;
     void setValues(const std::vector<double> &values);
@@ -40,6 +43,8 @@ public:
     DataItem *getAveraged() const;
 
     int getCount();
+
+    const std::string &getName() const;
 
 };
 

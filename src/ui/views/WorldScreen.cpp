@@ -4,13 +4,13 @@
 
 #include "WorldScreen.h"
 
-WorldScreen::WorldScreen(Farm *farm) : Screen(farm) {}
+WorldScreen::WorldScreen(Farm *farm, sf::Font * font) : Screen(farm, font) {}
 
 int WorldScreen::getId() {
     return 1;
 }
 
-void WorldScreen::init(sf::Font *font) {
+void WorldScreen::init() {
 
 }
 

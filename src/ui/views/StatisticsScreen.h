@@ -20,11 +20,11 @@ private:
     Graph * currentGraph;
 
 public:
-    StatisticsScreen(Farm *farm);
+    StatisticsScreen(Farm *farm, sf::Font * font);
 
     int getId() override;
 
-    void init(sf::Font *font) override;
+    void init() override;
 
     Camera *open() override;
 

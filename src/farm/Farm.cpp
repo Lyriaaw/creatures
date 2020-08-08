@@ -169,7 +169,12 @@ void Farm::Tick(bool paused) {
 
     if (!paused) {
         double tickTime = elapsed_time.count();
-        dataAnalyser.getTickTime()->addValue(tickTime);
+        if (tickCount == 1) {
+            dataAnalyser.getTickTime()->addValue(0);
+        } else {
+            dataAnalyser.getTickTime()->addValue(tickTime);
+        }
+
         dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
     }
 }
@@ -472,29 +477,27 @@ void Farm::statistics() {
 
 
 
-//    double totalCreaturesEnergy = 0.f;
-//    double totalFoodsEnergy = 0.f;
+    double totalCreaturesEnergy = 0.f;
+    double totalFoodsEnergy = 0.f;
+
+    for (int it = 0; it < connectors.size(); it++) {
+        Creature * currentCreature = connectors.at(it)->getCreature();
+        totalCreaturesEnergy += currentCreature->getEnergy();
+    }
+
+    for (int it = 0; it < foods.size(); it++) {
+        Entity * entity = foods.at(it);
+        totalFoodsEnergy += entity->getEnergy();
+    }
+
+    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
+    dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
+    dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
+    dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
+    dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
+
 //
-//    for (int it = 0; it < connectors.size(); it++) {
-//        Creature * currentCreature = connectors.at(it)->getCreature();
-//        totalCreaturesEnergy += currentCreature->getEnergy();
-//    }
 //
-//    for (int it = 0; it < foods.size(); it++) {
-//        Entity * entity = foods.at(it);
-//        totalFoodsEnergy += entity->getEnergy();
-//    }
-
-
-
-
-//    std::cout << "Tick: " << tickCount;
-
-
-//    std::cout << performanceAnalyser.detailsString() << " ======== ";
-//    std::cout << " Creatures: " << connectors.size() << " Entities: " << foods.size() << std::endl;
-
-//    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
 //    std::cout << " total: " << getHumanReadableEnergy(totalEnergy);
 //    std::cout << "  --  available: " << getHumanReadableEnergy(availableEnergy);
 //    std::cout << "  --  creatures: " << getHumanReadableEnergy(totalCreaturesEnergy);

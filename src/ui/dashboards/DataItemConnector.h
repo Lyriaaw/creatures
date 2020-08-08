@@ -16,8 +16,13 @@ private:
 
     DataItem * item;
 
+    // 0 : Do not show
+    // 1 : Show normal
+    // 2 : Show averaged
+    int displayMode;
+
 public:
-    DataItemConnector(DataItem *item, int red, int green, int blue);
+    DataItemConnector(DataItem *item, int displayMode, int red, int green, int blue);
 
     int getRed() const;
 
@@ -26,6 +31,14 @@ public:
     int getBlue() const;
 
     DataItem *getItem() const;
+
+    int getDisplayMode() const;
+
+    void setDisplayMode(int displayMode);
+
+    double getValueForTick(int tick);
+    double getMin();
+    double getMax();
 };
 
 

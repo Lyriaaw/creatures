@@ -23,11 +23,11 @@ private:
     sf::RectangleShape background;
 
 public:
-    MinimapsScreen(Farm *farm);
+    MinimapsScreen(Farm *farm, sf::Font * font);
 
     int getId() override;
 
-    void init(sf::Font *font) override;
+    void init() override;
 
     Camera *open() override;
 

@@ -2,35 +2,37 @@
 // Created by Amalric Lombard de Buffières on 8/8/20.
 //
 
+#include <string>
 #include "DataAnalyser.h"
 
 DataAnalyser::DataAnalyser() {
-    tickTime = new DataItem(true);
-    tickPerSecond = new DataItem(true);
 
-    entityGridTime = new DataItem(true);
-    brainOutputsTime = new DataItem(true);
-    moveCreaturesTime = new DataItem(true);
-    prepareActionsTime = new DataItem(true);
-    executeActionsTime = new DataItem(true);
-    populationControlTime = new DataItem(true);
-    vegetalisationTime = new DataItem(true);
-    brainProcessingTime = new DataItem(true);
+    tickTime = new DataItem("tickTime", true);
+    tickPerSecond = new DataItem("tickPerSecond", true);
 
-    totalTime = new DataItem(true);
+    entityGridTime = new DataItem("entityGridTime", true);
+    brainOutputsTime = new DataItem("brainOutputsTime", true);
+    moveCreaturesTime = new DataItem("moveCreaturesTime", true);
+    prepareActionsTime = new DataItem("prepareActionsTime", true);
+    executeActionsTime = new DataItem("executeActionsTime", true);
+    populationControlTime = new DataItem("populationControlTime", true);
+    vegetalisationTime = new DataItem("vegetalisationTime", true);
+    brainProcessingTime = new DataItem("brainProcessingTime", true);
 
-    population = new DataItem(true);
+    totalTime = new DataItem("totalTime", true);
 
-    totalEnergy = new DataItem(true);
-    availableEnergy = new DataItem(true);
-    foodEnergy = new DataItem(true);
-    creaturesEnergy = new DataItem(true);
+    population = new DataItem("population", true);
 
-    averageScore = new DataItem(true);
-    bestScore = new DataItem(true);
-    medianScore = new DataItem(true);
-    firstQuartileScore = new DataItem(true);
-    lastQuartileScore = new DataItem(true);
+    totalEnergy = new DataItem("totalEnergy", true);
+    availableEnergy = new DataItem("availableEnergy", true);
+    foodEnergy = new DataItem("foodEnergy", true);
+    creaturesEnergy = new DataItem("creaturesEnergy", true);
+
+    averageScore = new DataItem("averageScore", true);
+    bestScore = new DataItem("bestScore", true);
+    medianScore = new DataItem("medianScore", true);
+    firstQuartileScore = new DataItem("firstQuartileScore", true);
+    lastQuartileScore = new DataItem("lastQuartileScore", true);
 }
 
 

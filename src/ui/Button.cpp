@@ -58,6 +58,15 @@ bool Button::clicked(int mouseX, int mouseY) {
     return true;
 }
 
+void Button::changeBackgroundColor(sf::Color color){
+    if (color == backgroundColor) {
+        return;
+    }
+
+    backgroundColor = color;
+    background.setFillColor(backgroundColor);
+}
+
 void Button::draw(sf::RenderWindow *window) {
     window->draw(background);
     window->draw(label);

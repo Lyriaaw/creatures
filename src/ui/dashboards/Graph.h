@@ -9,6 +9,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "DataItemConnector.h"
+#include "../Button.h"
 
 class Graph {
 private:
@@ -26,8 +27,17 @@ private:
 
     sf::RectangleShape background;
 
+    sf::Font * font;
+
+    std::vector<sf::RectangleShape> linesLegendBackgrounds;
+    std::vector<sf::Text> linesLegendTexts;
+
+    std::vector<Button *> doNotShowButtons;
+    std::vector<Button *> showNormalButtons;
+    std::vector<Button *> showAveragedButtons;
+
 public:
-    Graph(const std::string &name);
+    Graph(const std::string &name, sf::Font *font);
 
     const std::string &getName() const;
 
@@ -37,7 +47,7 @@ public:
 
     void setLines(const std::vector<DataItemConnector> &lines);
 
-    void addLine(DataItem * item, int red, int green, int blue);
+    void addLine(DataItem * item, int displayMode, int red, int green, int blue);
 
     // X and Y are
     void setPosition(float xScreenRatio, float yScreenRatio, float width, float height);
@@ -48,6 +58,10 @@ public:
     void drawStat(sf::RenderWindow *window, DataItemConnector line);
 
     void getMinAndMaxValues();
+
+    void mouseClicked(int x, int y);
+
+    void setLegendsButtonColors();
 
 
 };

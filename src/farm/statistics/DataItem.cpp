@@ -68,6 +68,10 @@ double DataItem::getAveragedLastValue() {
 
 
 double DataItem::getValueForTick(int tick) {
+    if (values.size() - 1 < tick) {
+        tick = values.size() - 1;
+    }
+
     return values.at(tick);
 }
 
@@ -81,12 +85,12 @@ double DataItem::getAveragedValueForTick(int tick) {
 
 
 
-DataItem::DataItem(bool isAveraged): isAveraged(isAveraged) {
+DataItem::DataItem(std::string name, bool isAveraged): isAveraged(isAveraged), name(name) {
     min = 10000000000;
     max = -10000000;
 
     if (isAveraged) {
-        averaged = new DataItem(false);
+        averaged = new DataItem(name + " averaged", false);
     }
 }
 
@@ -104,4 +108,8 @@ int DataItem::getCount() {
 
 DataItem *DataItem::getAveraged() const {
     return averaged;
+}
+
+const std::string &DataItem::getName() const {
+    return name;
 }

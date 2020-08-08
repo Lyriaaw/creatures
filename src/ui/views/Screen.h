@@ -18,13 +18,14 @@ protected:
     BrainConnector * selectedEntity;
 
     Farm * farm;
+    sf::Font * font;
 
 public:
-    Screen(Farm * farm);
+    Screen(Farm * farm, sf::Font * font);
 
     virtual int getId() = 0;
 
-    virtual void init(sf::Font *font) = 0;
+    virtual void init() = 0;
     virtual Camera *open() = 0;
     virtual void draw(sf::RenderWindow *window) = 0;
     virtual void updateSelectedCreature(BrainConnector * connector) = 0;
