@@ -12,7 +12,7 @@
 
 using namespace std;
 
-Farm::Farm(): performanceAnalyser(PerformanceAnalyser()) {
+Farm::Farm(){
 }
 
 void Farm::InitRandomMap() {
@@ -139,7 +139,7 @@ void Farm::InitFromRandom() {
 
 
 void Farm::Tick(bool paused) {
-    this->performanceAnalyser.recordTickStart();
+//    this->performanceAnalyser.recordTickStart();
     this->toDelete.clear();
 
     generateEntityGrid();
@@ -161,7 +161,7 @@ void Farm::Tick(bool paused) {
     }
 
 
-    this->performanceAnalyser.recordTickEnd();
+//    this->performanceAnalyser.recordTickEnd();
 
     statistics();
 }
@@ -181,7 +181,7 @@ void Farm::brainProcessing() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addBrainProcessing(elapsed_time.count());
+    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
 }
 
 void Farm::brainOutput() {
@@ -191,7 +191,7 @@ void Farm::brainOutput() {
     }
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addBrainOutputs(elapsed_time.count());
+    dataAnalyser.getBrainOutputsTime()->addValue(elapsed_time.count());
 }
 
 void Farm::moveCreatures() {
@@ -219,7 +219,7 @@ void Farm::moveCreatures() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addMoveCreatures(elapsed_time.count());
+    dataAnalyser.getMoveCreaturesTime()->addValue(elapsed_time.count());
 }
 
 
@@ -240,7 +240,7 @@ void Farm::handleActions() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addPrepareActions(elapsed_time.count());
+    dataAnalyser.getPrepareActionsTime()->addValue(elapsed_time.count());
 
     executeCreaturesActions();
 
@@ -281,7 +281,7 @@ void Farm::executeCreaturesActions() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addExecuteActions(elapsed_time.count());
+    dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 
 }
 
@@ -320,7 +320,7 @@ void Farm::populationControl() {
     if (this->connectors.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time = end - start;
-        performanceAnalyser.addPopulations(elapsed_time.count());
+        dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
         return;
     }
 
@@ -367,7 +367,7 @@ void Farm::populationControl() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addPopulations(elapsed_time.count());
+    dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
 }
 
 void Farm::vegetalisation() {
@@ -405,7 +405,7 @@ void Farm::vegetalisation() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addVegetalisations(elapsed_time.count());
+    dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
 }
 
 void Farm::aTickHavePassed() {
@@ -424,25 +424,29 @@ void Farm::statistics() {
 //    if (tickCount % 10 != 0) return;
 
 
-    double totalCreaturesEnergy = 0.f;
-    double totalFoodsEnergy = 0.f;
+    dataAnalyser.getPopulation()->addValue(connectors.size());
 
-    for (int it = 0; it < connectors.size(); it++) {
-        Creature * currentCreature = connectors.at(it)->getCreature();
-        totalCreaturesEnergy += currentCreature->getEnergy();
-    }
+//    double totalCreaturesEnergy = 0.f;
+//    double totalFoodsEnergy = 0.f;
+//
+//    for (int it = 0; it < connectors.size(); it++) {
+//        Creature * currentCreature = connectors.at(it)->getCreature();
+//        totalCreaturesEnergy += currentCreature->getEnergy();
+//    }
+//
+//    for (int it = 0; it < foods.size(); it++) {
+//        Entity * entity = foods.at(it);
+//        totalFoodsEnergy += entity->getEnergy();
+//    }
 
-    for (int it = 0; it < foods.size(); it++) {
-        Entity * entity = foods.at(it);
-        totalFoodsEnergy += entity->getEnergy();
-    }
+
 
 
 //    std::cout << "Tick: " << tickCount;
 
 
-    std::cout << performanceAnalyser.detailsString() << " ======== ";
-    std::cout << " Creatures: " << connectors.size() << " Entities: " << foods.size() << std::endl;
+//    std::cout << performanceAnalyser.detailsString() << " ======== ";
+//    std::cout << " Creatures: " << connectors.size() << " Entities: " << foods.size() << std::endl;
 
 //    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
 //    std::cout << " total: " << getHumanReadableEnergy(totalEnergy);
@@ -517,7 +521,7 @@ void Farm::generateEntityGrid() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    performanceAnalyser.addEntityGrids(elapsed_time.count());
+    dataAnalyser.getEntityGridTime()->addValue(elapsed_time.count());
 }
 
 void Farm::clearDeletedEntities() {
@@ -722,6 +726,11 @@ std::string Farm::getHumanReadableEnergy(float givenEnergy) {
     return givenEnergyStream.str();
 }
 
-const PerformanceAnalyser &Farm::getPerformanceAnalyser() const {
-    return performanceAnalyser;
+const DataAnalyser &Farm::getDataAnalyser() const {
+    return dataAnalyser;
 }
+
+void Farm::setDataAnalyser(const DataAnalyser &dataAnalyser) {
+    Farm::dataAnalyser = dataAnalyser;
+}
+

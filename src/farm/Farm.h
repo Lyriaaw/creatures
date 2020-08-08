@@ -13,7 +13,7 @@
 #include "Creature.h"
 #include "Food.h"
 #include "brain/CreatureNursery.h"
-#include "PerformanceAnalyser.h"
+#include "statistics/DataAnalyser.h"
 
 class Farm {
 private:
@@ -35,7 +35,8 @@ private:
 
     int tickCount;
 
-    PerformanceAnalyser performanceAnalyser;
+    DataAnalyser dataAnalyser;
+
 
 public:
     Farm();
@@ -98,8 +99,9 @@ public:
 
     std::vector<BrainConnector *> getScoreSortedCreatures();
 
-    const PerformanceAnalyser &getPerformanceAnalyser() const;
+    const DataAnalyser &getDataAnalyser() const;
 
+    void setDataAnalyser(const DataAnalyser &dataAnalyser);
 };
 
 

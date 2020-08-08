@@ -77,7 +77,7 @@ void Camera::switchGrid() {
 
 
 
-Camera::Camera(Point center, Point topLeft) : center(center), topLeft(topLeft), showGrid(false) {
+Camera::Camera(Point center, Point topLeft) : center(center), topLeft(topLeft), showGrid(false), width(0), height(0) {
 }
 
 bool Camera::isShowGrid() const {

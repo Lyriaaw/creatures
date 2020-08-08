@@ -67,6 +67,9 @@ void FarmUI::update() {
     addCreatures(farm->getAddedCreatures());
     farm->clearAddedCreatures();
 
+    std::vector<Entity *> toDelete = farm->getToDelete();
+    toDelete.clear();
+
 
 
     generateTileInfoText();
@@ -74,6 +77,10 @@ void FarmUI::update() {
 
 void FarmUI::setPositions(Camera *camera) {
 //     std::cout << "Setting positions " << camera->getZoom() << std::endl;
+
+    if (camera == nullptr) {
+        return;
+    }
 
     Map *map = farm->getMap();
 

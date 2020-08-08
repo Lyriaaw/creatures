@@ -5,10 +5,12 @@
 #ifndef CREATURES_MAINWINDOW_H
 #define CREATURES_MAINWINDOW_H
 #include <SFML/Graphics.hpp>
+#include <thread>
 #include "../farm/Farm.h"
 #include "Camera.h"
 #include "BrainUI.h"
 #include "FarmUI.h"
+#include "views/Screen.h"
 
 
 class MainWindow {
@@ -16,24 +18,34 @@ public:
 
     MainWindow();
 
+    void loadFont();
+    void loadViews();
+
+    void loadFarm();
+    std::thread runFarmLoop();
+
+
     void start();
+    void runLoop();
+
 
 
 
 private:
+    Farm *farm;
 
     FarmUI *farmUi;
-
-    Farm *farm;
     Camera *mainCamera;
 
     sf::RenderWindow *window;
 
+
+    std::vector<Screen *> screens;
+
+
     bool running = false;
     bool paused = false;
 
-    std::chrono::system_clock::time_point renderDurationStart;
-    std::chrono::system_clock::time_point renderDurationEnd;
 
     float mouseX, mouseY;
     bool rightMouseButtonDown;
@@ -46,16 +58,13 @@ private:
 
     sf::Font * font;
 
-    int ticksCount;
-    float tickTimeTotal;
 
 
-
-    void runLoop();
     void handleEvents();
     void handleKeyboardEvents(sf::Event::KeyEvent event);
     void handleScroll(float delta);
     void handleMouseMove(int x, int y);
+    void handleResized(int width, int height);
     void handleMousePressed(sf::Mouse::Button button) ;
     void handleMouseReleased(sf::Mouse::Button button) ;
     void draw();

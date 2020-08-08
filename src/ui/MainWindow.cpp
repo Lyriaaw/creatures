@@ -6,6 +6,7 @@
 #include "CreatureUI.h"
 #include "FoodUI.h"
 #include "FarmUI.h"
+#include "views/WorldScreen.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -22,18 +23,19 @@ using namespace sf;
 using namespace std;
 
 
+
 MainWindow::MainWindow() {
+}
 
+void MainWindow::loadFont() {
     font = new Font();
-
 
     if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
         std::cout << "Font not loaded properly !" << std::endl;
-        return;
     }
+}
 
-
-
+void MainWindow::loadFarm() {
     farm = new Farm();
     farm->InitFromRandom();
 
@@ -55,57 +57,51 @@ MainWindow::MainWindow() {
 
         CreatureUI *entityUi = new CreatureUI(entity);
         entityUis.push_back(entityUi);
-
     }
 
 
 
     farmUi->setEntities(entityUis);
+}
 
-    Point center = Point(FARM_WIDTH / 2.f, FARM_HEIGHT / 2.f);
-    Point topLeft = Point(0, 0);
-    mainCamera = new Camera(center, topLeft);
-
-//    mainCamera->setWidth(1920);
-//    mainCamera->setHeight(1080);
-
-    mainCamera->setWidth(WINDOW_WIDTH);
-    mainCamera->setHeight(WINDOW_HEIGHT);
+void MainWindow::loadViews() {
+    WorldScreen * worldView = new WorldScreen();
+    worldView->init();
+    worldView->loadCamera();
+    screens.emplace_back(worldView);
 
 
-    mainCamera->setZoom(.4f);
 
+    for (int it = 0; it < screens.size(); it++) {
+        screens.at(it)->onWindowResize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
 
-    ticksCount = 0;
-    tickTimeTotal = 0;
-
-
+    mainCamera = worldView->open();
 }
 
 
+
 void MainWindow::start() {
-
-
-
     window = new RenderWindow(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Creatures");
     window->setVerticalSyncEnabled(true);
+
+    loadFont();
+    loadFarm();
+    loadViews();
 
 
     farmUi->setPositions(mainCamera);
 
-
     running = true;
-
+    std::thread farmThread = runFarmLoop();
 
     runLoop();
+    farmThread.join();
 }
 
 
-void MainWindow::runLoop() {
 
-    std::string details = "Tick Time, Between Ticks, Entity Grid, Brain Output, Move Creature, Handle Actions, Population Control, Vegetalisation, Brain Processing";
-    std::cout << details << endl;
-
+std::thread MainWindow::runFarmLoop() {
     auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
         while (*running) {
             threadedFarm->Tick(*paused);
@@ -116,22 +112,15 @@ void MainWindow::runLoop() {
 
     std::thread farmThread(f, farm, farmUi, &running, &paused);
 
+    return farmThread;
+}
+
+void MainWindow::runLoop() {
 
     while (running) {
         handleEvents();
         draw();
-
-
-        renderDurationEnd = chrono::system_clock::now();
-        chrono::duration<double> elapsed_time = renderDurationEnd - renderDurationStart;
-
-        ticksCount++;
-        tickTimeTotal += elapsed_time.count();
-
-        renderDurationStart = chrono::system_clock::now();
     }
-
-    farmThread.join();
 
     window->close();
 }
@@ -143,16 +132,9 @@ void MainWindow::runLoop() {
 void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
-    if (selectedCreature != nullptr && !mainCamera->isShowGrid()) {
-        mainCamera->setCenter(selectedCreature->getCreature()->getPosition());
+    if (mainCamera != nullptr) {
+        farmUi->draw(window, mainCamera, selectedCreature);
     }
-
-//    Entity * glggobalSelectedEntity = getSelectedEntity();
-//    if (globalSelectedEntity != nullptr) {
-////        cout << "Selected entity: X:" << globalSelectedEntity->getSimpleCoordinates().getX() << " Y: " << globalSelectedEntity->getSimpleCoordinates().getY() << endl;
-//    }
-
-    farmUi->draw(window, mainCamera, selectedCreature);
 
     if (brainUi != nullptr) {
         brainUi->draw(window);
@@ -160,8 +142,6 @@ void MainWindow::draw() {
 
 
     window->display();
-
-
 }
 
 
@@ -206,19 +186,28 @@ void MainWindow::handleEvents() {
                 running = false;
                 break;
             case Event::Resized:
-                View view = View(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f), sf::Vector2f(event.size.width, event.size.height));
-
-                mainCamera->setWidth(event.size.width);
-                mainCamera->setHeight(event.size.height);
-                window->setView(view);
+                handleResized(event.size.width, event.size.height);
                 break;
         }
     }
 
 }
 
-void MainWindow::handleScroll(float delta) {
+void MainWindow::handleResized(int width, int height) {
+    View view = View(sf::Vector2f(width / 2.f, height / 2.f), sf::Vector2f(width, height));
 
+    for (int it = 0; it < screens.size(); it++) {
+        screens.at(it)->onWindowResize(width, height);
+    }
+
+
+    window->setView(view);
+}
+
+void MainWindow::handleScroll(float delta) {
+    if (mainCamera == nullptr) {
+        return;
+    }
 
     float deltaRatio;
     if (delta < 0) {
@@ -249,10 +238,22 @@ void MainWindow::handleScroll(float delta) {
 }
 
 void MainWindow::handleMouseMove(int x, int y) {
+    for (int it = 0; it < screens.size(); it++) {
+        screens.at(it)->mouseMoved(x, y);
+    }
+
+
+    this->mouseX = float(x);
+    this->mouseY = float(y);
+
+    if (mainCamera == nullptr) {
+        return;
+    }
+
     Point lastMousePosition = mainCamera->getWorldCoordinates({mouseX, mouseY});
     Point newMousePosition = mainCamera->getWorldCoordinates({float(x), float(y)});
-    if (rightMouseButtonDown) {
 
+    if (rightMouseButtonDown) {
         float deltaX = lastMousePosition.getX() - newMousePosition.getX();
         float deltaY = lastMousePosition.getY() - newMousePosition.getY();
 
@@ -263,8 +264,6 @@ void MainWindow::handleMouseMove(int x, int y) {
 
 
 
-    this->mouseX = float(x);
-    this->mouseY = float(y);
 
     Entity * globalSelectedEntity = getSelectedEntity();
     if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
@@ -297,7 +296,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
 
 
-    if (button == Mouse::Left) {
+    if (button == Mouse::Left && mainCamera != nullptr) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
 
         bool found = false;
