@@ -17,9 +17,10 @@ std::string CreatureTileCountMinimap::getName() {
 }
 
 void CreatureTileCountMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
-    float height = values[tileX][tileY] / 5.f;
+    float hue = averageHues[tileX][tileY];
+    float light = values[tileX][tileY] / 5.f;
 
-    RGBColor rectangleColor = RGBColor(0.69f, 1.f, height);
+    RGBColor rectangleColor = RGBColor(hue, 1.f, light);
 
     sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
@@ -39,14 +40,24 @@ void CreatureTileCountMinimap::draw(sf::RenderWindow *window) {
 void CreatureTileCountMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            averageHues[it][jt] = 0;
             values[it][jt] = 0;
         }
     }
 
-    for (int it = 0; it < farm->getConnectors().size(); it++) {
-        Point point = farm->getConnectors().at(it)->getCreature()->getPosition();
+    std::vector<BrainConnector *> currentConnectors = farm->getConnectors();
+
+    for (int it = 0; it < currentConnectors.size(); it++) {
+        Point point = currentConnectors.at(it)->getCreature()->getPosition();
         Point tilePosition = point.getTileCoordinates();
 
         values[int(tilePosition.getX())][int(tilePosition.getY())]++;
+        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentConnectors.at(it)->getCreature()->getColor();
+    }
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            averageHues[it][jt] /= float(values[it][jt]);
+        }
     }
 }

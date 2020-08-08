@@ -67,7 +67,7 @@ void Farm::InitRandomMap() {
 
             currentHeight -= removed;
             currentHeight *= ratio;
-            currentHeight *= abs(currentHeight);// * abs(currentHeight);
+            currentHeight *= abs(currentHeight) * abs(currentHeight);
 
 
             if (currentHeight < min) {

@@ -17,8 +17,11 @@ void MinimapsScreen::init() {
     WorldMinimap * worldMinimap = new WorldMinimap(2, 10, 70);
     minimaps.emplace_back(worldMinimap);
 
-    creatureCountMinimap = new CreatureTileCountMinimap(2, 20 + TILE_COUNT_WIDTH * 2, 70);
+    creatureCountMinimap = new CreatureTileCountMinimap(2, 20 + (TILE_COUNT_WIDTH * 1) * 2, 70);
     minimaps.emplace_back(creatureCountMinimap);
+
+    foodTileCountMinimap = new FoodTileCountMinimap(2, 30 + (TILE_COUNT_WIDTH * 2) * 2, 70);
+    minimaps.emplace_back(foodTileCountMinimap);
 
     background = sf::RectangleShape(sf::Vector2f(0, 0));
     background.setPosition(0, 0);
@@ -51,6 +54,7 @@ void MinimapsScreen::drawMinimaps(sf::RenderWindow *window) {
 
 void MinimapsScreen::draw(sf::RenderWindow *window) {
     creatureCountMinimap->generateValues(farm);
+    foodTileCountMinimap->generateValues(farm);
     window->draw(background);
     drawMinimaps(window);
 }

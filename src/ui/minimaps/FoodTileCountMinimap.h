@@ -2,21 +2,19 @@
 // Created by Amalric Lombard de Buffières on 8/8/20.
 //
 
-#ifndef CREATURES_CREATURETILECOUNTMINIMAP_H
-#define CREATURES_CREATURETILECOUNTMINIMAP_H
+#ifndef CREATURES_FOODTILECOUNTMINIMAP_H
+#define CREATURES_FOODTILECOUNTMINIMAP_H
 
 
-#include "../../farm/Farm.h"
 #include "Minimap.h"
 
-class CreatureTileCountMinimap: public Minimap {
+class FoodTileCountMinimap: public Minimap {
 private:
 
-    float averageHues[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
     double values[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
 public:
-    CreatureTileCountMinimap(double pixelSize, double positionX, double positionY);
+    FoodTileCountMinimap(double pixelSize, double positionX, double positionY);
     std::string getName() override;
 
     void generateValues(Farm * farm);
@@ -26,4 +24,4 @@ public:
 };
 
 
-#endif //CREATURES_CREATURETILECOUNTMINIMAP_H
+#endif //CREATURES_FOODTILECOUNTMINIMAP_H

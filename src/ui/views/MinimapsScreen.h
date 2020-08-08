@@ -9,6 +9,7 @@
 #include "Screen.h"
 #include "../minimaps/Minimap.h"
 #include "../minimaps/CreatureTileCountMinimap.h"
+#include "../minimaps/FoodTileCountMinimap.h"
 
 class MinimapsScreen: public Screen {
 private:
@@ -17,6 +18,7 @@ private:
 
 
     CreatureTileCountMinimap * creatureCountMinimap;
+    FoodTileCountMinimap * foodTileCountMinimap;
 
     sf::RectangleShape background;
 

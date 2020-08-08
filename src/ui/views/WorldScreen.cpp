@@ -32,7 +32,7 @@ void WorldScreen::loadCamera() {
     Point topLeft = Point(0, 0);
 
     camera = new Camera(center, topLeft);
-    camera->setZoom(.4f);
+    camera->setZoom(.48f);
 }
 
 void WorldScreen::onWindowResize(int width, int height) {

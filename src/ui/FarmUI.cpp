@@ -15,6 +15,7 @@ FarmUI::FarmUI(Farm *farm, sf::Font * font): farm(farm), hoveredTile(Point(-1, -
 
 void FarmUI::loadTexts(sf::Font * font) {
     hoveredTileInfos.setFont(*font);
+    hoveredTileInfos.setCharacterSize(0);
 }
 
 void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
@@ -120,7 +121,7 @@ void FarmUI::setPositions(Camera *camera) {
 
             float height = map->getTileAt(it, jt);
             RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
-            if (height < -0.1f) {
+            if (height < -0.05f) {
                 rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
             }
             if (height > 0.7f) {
@@ -148,25 +149,6 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * sel
     if (selectedEntity != nullptr) {
         selectedCreature = selectedEntity->getCreature();
     }
-
-
-//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-//
-//            Point topLeftTilePoint = Point(it * TILE_SIZE, jt * TILE_SIZE);
-//            Point topLeftScreenPoint = camera->getScreenCoordinates(topLeftTilePoint);
-//
-//            Point bottomRightTilePoint = Point((it + 1) * TILE_SIZE, (jt + 1) * TILE_SIZE);
-//            Point bottomRightScreenPoint = camera->getScreenCoordinates(bottomRightTilePoint);
-//
-//            if (!camera->shouldDisplayPoint(topLeftScreenPoint) && !camera->shouldDisplayPoint(bottomRightScreenPoint)) {
-//                continue;
-//            }
-//
-//            window->draw(tiles.at(it).at(jt));
-//        }
-//    }
-
 
     window->draw(tilesVertexArray);
     for (int it = 0; it < entities.size(); it++) {

@@ -132,11 +132,6 @@ void MainWindow::loadUI() {
     speedInformationLabel.setCharacterSize(15);
     speedInformationLabel.setFillColor(textColor);
     speedInformationLabel.setPosition(positionX, positionY);
-
-
-
-
-
 }
 
 
