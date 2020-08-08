@@ -4,6 +4,8 @@
 
 #include "WorldScreen.h"
 
+WorldScreen::WorldScreen(Farm *farm) : Screen(farm) {}
+
 int WorldScreen::getId() {
     return 1;
 }

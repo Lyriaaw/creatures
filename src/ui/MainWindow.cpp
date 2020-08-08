@@ -78,13 +78,13 @@ void MainWindow::loadFarm() {
 }
 
 void MainWindow::loadScreens() {
-    WorldScreen * worldView = new WorldScreen();
+    WorldScreen * worldView = new WorldScreen(farm);
     worldView->init();
     worldView->loadCamera();
     screens.emplace_back(worldView);
 
 
-    StatisticsScreen * statisticsScreen = new StatisticsScreen();
+    StatisticsScreen * statisticsScreen = new StatisticsScreen(farm);
     statisticsScreen->init();
     screens.emplace_back(statisticsScreen);
 

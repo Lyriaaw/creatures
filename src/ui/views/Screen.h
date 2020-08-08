@@ -9,15 +9,18 @@
 #include <SFML/Graphics.hpp>
 #include "../Camera.h"
 #include "../../farm/brain/BrainConnector.h"
+#include "../../farm/Farm.h"
 
 class Screen {
-private:
+protected:
     int id;
 
     BrainConnector * selectedEntity;
 
+    Farm * farm;
+
 public:
-    Screen();
+    Screen(Farm * farm);
 
     virtual int getId() = 0;
 

@@ -12,14 +12,25 @@ class DataItem {
 private:
     std::vector<double> values;
 
+    double min;
+    double max;
+
 public:
+    DataItem();
 
     const std::vector<double> &getValues() const;
     void setValues(const std::vector<double> &values);
 
     void addValue(double value);
-    double getLastValue();
     double getValueForTick(int tick);
+
+    double getLastValue();
+    double getSecondToLastValue();
+
+    double getMin() const;
+    double getMax() const;
+
+    int getCount();
 
 };
 

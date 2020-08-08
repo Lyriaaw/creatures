@@ -12,6 +12,8 @@ class WorldScreen: public Screen {
 private:
     Camera *camera;
 public:
+    WorldScreen(Farm *farm);
+
     int getId() override;
 
     void init() override;

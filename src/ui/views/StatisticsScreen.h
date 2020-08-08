@@ -7,9 +7,16 @@
 
 
 #include "Screen.h"
+#include "../dashboards/Graph.h"
 
 class StatisticsScreen: public Screen {
+private:
+    std::vector<Graph *> graphs;
+    int windowWidth, windowHeight;
+
 public:
+    StatisticsScreen(Farm *farm);
+
     int getId() override;
 
     void init() override;
@@ -23,6 +30,8 @@ public:
     void onWindowResize(int width, int height) override;
 
     void mouseMoved(int x, int y) override;
+
+    void loadGraphs();
 
 };
 

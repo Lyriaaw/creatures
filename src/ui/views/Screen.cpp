@@ -4,4 +4,4 @@
 
 #include "Screen.h"
 
-Screen::Screen(): selectedEntity(nullptr) {}
+Screen::Screen(Farm * farm): farm(farm), selectedEntity(nullptr) {}
