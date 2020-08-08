@@ -38,6 +38,10 @@ private:
     DataItem * foodEnergy;
     DataItem * creaturesEnergy;
 
+    DataItem * heatEnergy;
+    DataItem * groundEnergy;
+
+
 public:
     DataAnalyser();
 
@@ -84,6 +88,10 @@ public:
     DataItem *getTotalTime() const;
 
     DataItem *getStatisticsTime() const;
+
+    DataItem *getHeatEnergy() const;
+
+    DataItem *getGroundEnergy() const;
 };
 
 

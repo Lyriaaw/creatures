@@ -10,6 +10,8 @@
 #include "../minimaps/Minimap.h"
 #include "../minimaps/CreatureTileCountMinimap.h"
 #include "../minimaps/FoodTileCountMinimap.h"
+#include "../minimaps/HeatEnergyMinimap.h"
+#include "../minimaps/GroundEnergyMinimap.h"
 
 class MinimapsScreen: public Screen {
 private:
@@ -19,6 +21,8 @@ private:
 
     CreatureTileCountMinimap * creatureCountMinimap;
     FoodTileCountMinimap * foodTileCountMinimap;
+    HeatEnergyMinimap * heatMinimap;
+    GroundEnergyMinimap * groundMinimap;
 
     sf::RectangleShape background;
 

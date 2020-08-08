@@ -147,12 +147,14 @@ void Farm::moveCreatures() {
 
     for (int it = 0; it < connectors.size(); it++) {
         Creature *currentCreature = connectors.at(it)->getCreature();
+        Point currentCreaturePoint = currentCreature->getPosition();
+        Point tilePoint = currentCreaturePoint.getTileCoordinates();
+
         double givenEnergy = currentCreature->move();
-        availableEnergy += givenEnergy;
+        map.addHeatAt(tilePoint.getX(), tilePoint.getY(), givenEnergy);
 
         if (givenEnergy < 0) {
-            std::cout << "Returned negative amount of energy: " << givenEnergy << std::endl;
-
+            std::cout << "ERROR !!! Returned negative amount of energy: " << givenEnergy << std::endl;
         }
 
         if (currentCreature->getEnergy() <= 0) {
@@ -213,7 +215,12 @@ void Farm::executeCreaturesActions() {
 
 
         if (actionDto.getType() == "EAT") {
-            availableEnergy += performer->getCreature()->addEnergy(subject->getEnergy());
+            double wastedEnergy = performer->getCreature()->addEnergy(subject->getEnergy());
+
+            Point performerPoint = performer->getCreature()->getPosition();
+            Point tilePoint = performerPoint.getTileCoordinates();
+
+            map.addGroundAt(tilePoint.getX(), tilePoint.getY(), wastedEnergy);
             toDelete.emplace_back(subject);
         }
 
@@ -230,7 +237,6 @@ void Farm::executeCreaturesActions() {
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
-
 }
 
 void Farm::handleMating(BrainConnector * father, int entityId) {
@@ -415,11 +421,26 @@ void Farm::statistics() {
         totalFoodsEnergy += entity->getEnergy();
     }
 
-    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy;
+
+    double totalHeat = 0.0;
+    double totalGround = 0.0;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            totalHeat += map.getHeatAt(it, jt);
+            totalGround += map.getGroundAt(it, jt);
+        }
+    }
+
+
+    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy + totalHeat + totalGround;
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
+    dataAnalyser.getHeatEnergy()->addValue(totalHeat);
+    dataAnalyser.getGroundEnergy()->addValue(totalGround);
+
+
 
 
     double totalTime = 0.0;

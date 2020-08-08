@@ -103,3 +103,22 @@ float Map::setHeatAt(int chunkX, int chunkY, float value) {
     heat[chunkX][chunkY] = value;
 }
 
+float Map::addHeatAt(int chunkX, int chunkY, float value) {
+    heat[chunkX][chunkY] += value;
+}
+
+
+
+float Map::getGroundAt(int chunkX, int chunkY) {
+    return ground[chunkX][chunkY];
+}
+
+
+float Map::setGroundAt(int chunkX, int chunkY, float value) {
+    ground[chunkX][chunkY] = value;
+}
+
+float Map::addGroundAt(int chunkX, int chunkY, float value) {
+    ground[chunkX][chunkY] += value;
+}
+

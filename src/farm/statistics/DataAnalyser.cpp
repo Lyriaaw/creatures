@@ -28,12 +28,16 @@ DataAnalyser::DataAnalyser() {
     availableEnergy = new DataItem("availableEnergy", true);
     foodEnergy = new DataItem("foodEnergy", true);
     creaturesEnergy = new DataItem("creaturesEnergy", true);
+    heatEnergy = new DataItem("heatEnergy", true);
+    groundEnergy = new DataItem("groundEnergy", true);
 
     averageScore = new DataItem("averageScore", true);
     bestScore = new DataItem("bestScore", true);
     medianScore = new DataItem("medianScore", true);
     firstQuartileScore = new DataItem("firstQuartileScore", true);
     lastQuartileScore = new DataItem("lastQuartileScore", true);
+
+
 }
 
 
@@ -129,4 +133,12 @@ DataItem *DataAnalyser::getTotalTime() const {
 
 DataItem *DataAnalyser::getStatisticsTime() const {
     return statisticsTime;
+}
+
+DataItem *DataAnalyser::getHeatEnergy() const {
+    return heatEnergy;
+}
+
+DataItem *DataAnalyser::getGroundEnergy() const {
+    return groundEnergy;
 }

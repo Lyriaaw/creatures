@@ -36,7 +36,11 @@ void FarmUI::generateTileInfoText() {
     std::string tileInfo = "{" + std::to_string(int(hoveredTile.getX())) + "," + std::to_string(int(hoveredTile.getY())) + "}\n";
 
     float currentHeight = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY());
-    tileInfo = tileInfo + "H: " + std::to_string(currentHeight);
+    float currentHeat = farm->getMap()->getHeatAt(hoveredTile.getX(), hoveredTile.getY());
+    float currentGround = farm->getMap()->getGroundAt(hoveredTile.getX(), hoveredTile.getY());
+    tileInfo = tileInfo + "Height: " + std::to_string(currentHeight) + "\n";
+    tileInfo = tileInfo + "Heat: " + std::to_string(currentHeat) + "\n";
+    tileInfo = tileInfo + "Ground: " + std::to_string(currentGround) + "\n";
 
 
 
