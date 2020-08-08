@@ -9,7 +9,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "DataItemConnector.h"
-#include "../Button.h"
+#include "../components/Button.h"
 
 class Graph {
 private:

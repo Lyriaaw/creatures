@@ -7,7 +7,7 @@
 
 
 #include "Neuron.h"
-#include "../../Creature.h"
+#include "../../entities/Creature.h"
 
 class InputNeuron: public Neuron {
 public:

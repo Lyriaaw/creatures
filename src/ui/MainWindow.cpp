@@ -3,9 +3,9 @@
 //
 
 #include "MainWindow.h"
-#include "CreatureUI.h"
-#include "FoodUI.h"
-#include "FarmUI.h"
+#include "components/CreatureUI.h"
+#include "components/FoodUI.h"
+#include "components/FarmUI.h"
 #include "views/WorldScreen.h"
 #include "views/StatisticsScreen.h"
 #include "views/MinimapsScreen.h"

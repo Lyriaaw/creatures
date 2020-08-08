@@ -8,7 +8,7 @@
 
 #include "Screen.h"
 #include "../dashboards/Graph.h"
-#include "../Button.h"
+#include "../components/Button.h"
 
 class StatisticsScreen: public Screen {
 private:

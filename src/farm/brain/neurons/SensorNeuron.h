@@ -7,7 +7,7 @@
 
 
 #include "InputNeuron.h"
-#include "../../Creature.h"
+#include "../../entities/Creature.h"
 
 class SensorNeuron: public InputNeuron {
 protected:

@@ -6,7 +6,7 @@
 #define CREATURES_BRAINCONNECTOR_H
 
 
-#include "../Creature.h"
+#include "../entities/Creature.h"
 #include "Brain.h"
 
 class BrainConnector {

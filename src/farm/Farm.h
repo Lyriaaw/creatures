@@ -8,11 +8,11 @@
 
 
 
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "Map.h"
-#include "Creature.h"
-#include "Food.h"
-#include "brain/CreatureNursery.h"
+#include "entities/Creature.h"
+#include "entities/Food.h"
+#include "CreatureNursery.h"
 #include "statistics/DataAnalyser.h"
 
 class Farm {

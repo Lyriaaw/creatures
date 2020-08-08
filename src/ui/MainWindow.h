@@ -7,11 +7,11 @@
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include "../farm/Farm.h"
-#include "Camera.h"
-#include "BrainUI.h"
-#include "FarmUI.h"
+#include "components/Camera.h"
+#include "components/BrainUI.h"
+#include "components/FarmUI.h"
 #include "views/Screen.h"
-#include "Button.h"
+#include "components/Button.h"
 
 
 class MainWindow {

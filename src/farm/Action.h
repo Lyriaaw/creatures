@@ -6,7 +6,7 @@
 #define CREATURES_ACTION_H
 
 
-#include "Creature.h"
+#include "entities/Creature.h"
 
 class Action {
 private:

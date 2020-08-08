@@ -3,7 +3,7 @@
 //
 
 #include "Farm.h"
-#include "perlin/PerlinNoise.h"
+#include "../utils/perlin/PerlinNoise.h"
 
 #include <iostream>
 #include <sstream>

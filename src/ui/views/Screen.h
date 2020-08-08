@@ -7,7 +7,7 @@
 
 
 #include <SFML/Graphics.hpp>
-#include "../Camera.h"
+#include "../components/Camera.h"
 #include "../../farm/brain/BrainConnector.h"
 #include "../../farm/Farm.h"
 
