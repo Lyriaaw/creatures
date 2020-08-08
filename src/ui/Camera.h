@@ -58,7 +58,7 @@ public:
     void move(float x, float y);
 
 
-
+    bool shouldDisplayPoint(Point point);
 
     Point getScreenCoordinates(Point point);
     Point getWorldCoordinates(Point point);

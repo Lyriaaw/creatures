@@ -6,7 +6,7 @@
 
 DataAnalyser::DataAnalyser() {
     tickTime = new DataItem();
-    betweenTickTime = new DataItem();
+    tickPerSecond = new DataItem();
 
     entityGridTime = new DataItem();
     brainOutputsTime = new DataItem();
@@ -35,9 +35,6 @@ DataItem *DataAnalyser::getTickTime() const {
     return tickTime;
 }
 
-DataItem *DataAnalyser::getBetweenTickTime() const {
-    return betweenTickTime;
-}
 
 DataItem *DataAnalyser::getEntityGridTime() const {
     return entityGridTime;
@@ -89,5 +86,9 @@ DataItem *DataAnalyser::getFoodEnergy() const {
 
 DataItem *DataAnalyser::getCreaturesEnergy() const {
     return creaturesEnergy;
+}
+
+DataItem *DataAnalyser::getTickPerSecond() const {
+    return tickPerSecond;
 }
 

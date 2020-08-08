@@ -48,7 +48,6 @@ private:
     std::vector<Screen *> screens;
     Screen * currentScreen;
 
-    std::vector<Button *> buttons;
 
 
     bool running = false;
@@ -66,6 +65,13 @@ private:
 
     sf::Font * font;
 
+    std::vector<Button *> buttons;
+
+    sf::Text generalInformationLabel;
+
+    std::chrono::system_clock::time_point tickStart;
+    std::chrono::system_clock::time_point tickEnd;
+    double fps;
 
 
     void handleEvents();
@@ -82,6 +88,8 @@ private:
     void openScreen(int id);
 
     Entity * getSelectedEntity();
+
+    void updateInformationLabel();
 };
 
 

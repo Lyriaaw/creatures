@@ -69,6 +69,17 @@ Point Camera::getWorldCoordinates(Point result) {
     return {pointX, pointY};
 }
 
+bool Camera::shouldDisplayPoint(Point point) {
+    if (point.getX() < this->topLeft.getX() || point.getX() > topLeft.getX() + width)
+        return false;
+
+    if (point.getY() < topLeft.getY() || point.getY() > topLeft.getY() + height)
+        return false;
+
+
+    return true;
+}
+
 
 
 void Camera::switchGrid() {

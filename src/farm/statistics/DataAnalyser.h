@@ -11,7 +11,7 @@
 class DataAnalyser {
 private:
     DataItem * tickTime;
-    DataItem * betweenTickTime;
+    DataItem * tickPerSecond;
 
     DataItem * entityGridTime;
     DataItem * brainOutputsTime;
@@ -34,7 +34,7 @@ public:
 
     DataItem *getTickTime() const;
 
-    DataItem *getBetweenTickTime() const;
+    DataItem *getTickPerSecond() const;
 
     DataItem *getEntityGridTime() const;
 

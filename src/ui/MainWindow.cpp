@@ -16,6 +16,8 @@
 #include <iostream>
 #include <unistd.h>
 #import <thread>
+#include <sstream>
+#include <iomanip>
 
 
 int WINDOW_WIDTH = 2560;
@@ -26,7 +28,9 @@ using namespace std;
 
 
 
-MainWindow::MainWindow() {
+MainWindow::MainWindow(): brainUi(nullptr), leftMouseButtonDown(false), rightMouseButtonDown(false) {
+    tickStart = std::chrono::system_clock::now();
+    tickEnd = std::chrono::system_clock::now();
 }
 
 void MainWindow::loadFont() {
@@ -102,6 +106,13 @@ void MainWindow::loadUI() {
 
     sf::Color backgroundColor = sf::Color(25, 25, 25, 255);
     topButtonBackground.setFillColor(backgroundColor);
+//
+
+    sf::Color textColor = sf::Color(200, 200, 200, 255);
+    generalInformationLabel.setFont(*font);
+    generalInformationLabel.setString("Loading");
+    generalInformationLabel.setCharacterSize(12);
+    generalInformationLabel.setFillColor(textColor);
 }
 
 
@@ -146,10 +157,41 @@ void MainWindow::runLoop() {
 
     while (running) {
         handleEvents();
+        updateInformationLabel();
         draw();
+
+        tickEnd = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
+        tickStart = std::chrono::system_clock::now();
+
+        fps = 1.f / elapsed_time.count();
     }
 
     window->close();
+}
+
+void MainWindow::updateInformationLabel() {
+
+
+    std::stringstream informationStream;
+    informationStream << std::fixed << std::setprecision(2);
+
+    informationStream << "Creatures: " << farm->getDataAnalyser().getPopulation()->getLastValue();
+    informationStream << std::endl;
+
+    informationStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getLastValue();
+    informationStream << std::endl;
+
+    informationStream << "FPS: " << fps;
+    informationStream << std::endl;
+
+
+    generalInformationLabel.setString(informationStream.str());
+
+    double positionX = window->getSize().x * 0.9;
+    double positionY = 5;
+
+    generalInformationLabel.setPosition(positionX, positionY);
 }
 
 
@@ -173,6 +215,8 @@ void MainWindow::draw() {
     for (int it = 0; it < buttons.size(); it++) {
         buttons.at(it)->draw(window);
     }
+
+    window->draw(generalInformationLabel);
 
     window->display();
 }

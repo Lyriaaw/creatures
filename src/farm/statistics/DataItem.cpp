@@ -26,6 +26,10 @@ void DataItem::addValue(double value) {
 }
 
 double DataItem::getLastValue() {
+    if (values.size() == 0) {
+        return 0;
+    }
+
     return values.at(values.size() - 1);
 }
 

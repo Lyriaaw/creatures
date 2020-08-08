@@ -13,6 +13,8 @@
 using namespace std;
 
 Farm::Farm(){
+    tickStart = std::chrono::system_clock::now();
+    tickEnd = std::chrono::system_clock::now();
 }
 
 void Farm::InitRandomMap() {
@@ -139,7 +141,6 @@ void Farm::InitFromRandom() {
 
 
 void Farm::Tick(bool paused) {
-//    this->performanceAnalyser.recordTickStart();
     this->toDelete.clear();
 
     generateEntityGrid();
@@ -158,12 +159,19 @@ void Farm::Tick(bool paused) {
 
     if (!paused) {
         aTickHavePassed();
+        statistics();
     }
 
 
-//    this->performanceAnalyser.recordTickEnd();
+    tickEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
+    tickStart = std::chrono::system_clock::now();
 
-    statistics();
+    if (!paused) {
+        double tickTime = elapsed_time.count();
+        dataAnalyser.getTickTime()->addValue(tickTime);
+        dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
+    }
 }
 
 

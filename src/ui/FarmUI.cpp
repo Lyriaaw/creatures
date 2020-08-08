@@ -132,6 +132,17 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * sel
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+
+            Point topLeftTilePoint = Point(it * TILE_SIZE, jt * TILE_SIZE);
+            Point topLeftScreenPoint = camera->getScreenCoordinates(topLeftTilePoint);
+
+            Point bottomRightTilePoint = Point((it + 1) * TILE_SIZE, (jt + 1) * TILE_SIZE);
+            Point bottomRightScreenPoint = camera->getScreenCoordinates(bottomRightTilePoint);
+
+            if (!camera->shouldDisplayPoint(topLeftScreenPoint) && !camera->shouldDisplayPoint(bottomRightScreenPoint)) {
+                continue;
+            }
+
             window->draw(tiles.at(it).at(jt));
         }
     }

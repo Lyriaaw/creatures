@@ -36,6 +36,8 @@ private:
     int tickCount;
 
     DataAnalyser dataAnalyser;
+    std::chrono::system_clock::time_point tickStart;
+    std::chrono::system_clock::time_point tickEnd;
 
 
 public:
