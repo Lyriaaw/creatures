@@ -6,8 +6,11 @@
 #include "../utils/perlin/PerlinNoise.h"
 
 #include <iostream>
+#include <zconf.h>
 
 using namespace std;
+
+std::mutex mapMutex;
 
 void Map::generateRandomTerrain() {
     float seed = rand() % 1000000;
@@ -19,7 +22,9 @@ void Map::generateRandomTerrain() {
     float min = 11111110.f;
     float max = 0.f;
 
+
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        std::vector<Tile *> line;
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
             float xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * 2.5;
@@ -36,9 +41,12 @@ void Map::generateRandomTerrain() {
             }
 
 
+            Tile * currentTile = new Tile();
+            currentTile->setHeight(height);
 
-            setTileAt(it, jt, height);
+            line.emplace_back(currentTile);
         }
+        tiles.emplace_back(line);
     }
 
 
@@ -50,7 +58,7 @@ void Map::generateRandomTerrain() {
     max = 0.f;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            float currentHeight = getTileAt(it, jt);
+            float currentHeight = getTileAt(it, jt)->getHeight();
 
             currentHeight -= removed;
             currentHeight *= ratio;
@@ -64,38 +72,75 @@ void Map::generateRandomTerrain() {
                 max = currentHeight;
             }
 
-
-
-            setTileAt(it, jt,  currentHeight);
+            getTileAt(it, jt)->setHeight(currentHeight);
         }
     }
 }
 
 
 void Map::initRandomMap() {
+
     generateRandomTerrain();
+}
+
+void Map::prepareTiles() {
+//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+//
+//        }
+//    }
 }
 
 
 void Map::processGroundChanges(){
+
+}
+void Map::processClimate() {
     float newGround[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
+    float newHeats[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newGround[it][jt] = ground[it][jt];
+            newGround[it][jt] = getTileAt(it, jt)->getGround();
+            newHeats[it][jt] = getTileAt(it, jt)->getHeat();
+
         }
     }
 
 
+
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        std::vector<double> groundsLine;
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            double availableGround = ground[it][jt] / 10;
+            Tile * currentTile = tiles.at(it).at(jt);
+
+            float availableGround = currentTile->getGround() / 50.f;
+
+
+            float currentHeight = currentTile->getHeight();
+            float availableHeat = currentTile->getHeat() / 20.f;
+
+            if (availableGround == 0 && availableHeat == 0) {
+                continue;
+            }
 
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
-                    if (it + x < 0 || it + x > TILE_COUNT_WIDTH ||jt + y < 0 || jt + y > TILE_COUNT_HEIGHT) {
+                    if (it + x < 0 || it + x >= TILE_COUNT_WIDTH ||jt + y < 0 || jt + y >= TILE_COUNT_HEIGHT) {
                         continue;
                     }
+
+                    // If the other tile is lower than this one, we add some heat to be transfer
+                    // the lowest the target tile, the biggest is the added energy
+                    double heightDifference = currentHeight - getTileAt(it + x, jt + y)->getHeight();
+                    double transferedHeat = availableHeat + (heightDifference * availableHeat);
+
+                    newHeats[it + x][jt + y] += transferedHeat;
+                    newHeats[it][jt] -= transferedHeat;
+
+
+
+
 
                     newGround[it + x][jt + y] += availableGround;
                     newGround[it][jt] -= availableGround;
@@ -107,13 +152,21 @@ void Map::processGroundChanges(){
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            ground[it][jt] = newGround[it][jt];
+            tiles.at(it).at(jt)->setGround(newGround[it][jt]);
+            tiles.at(it).at(jt)->setHeat(newHeats[it][jt]);
+
+            if (getTileAt(it, jt)->getHeat() <= 0) {
+                continue;
+            }
+
+            float heatToGroundRatio = 0.05f;
+            float currentTileHeat = getTileAt(it, jt)->getHeat();
+
+            getTileAt(it, jt)->addHeat(- 1 * currentTileHeat * heatToGroundRatio);
+            getTileAt(it, jt)->addGround(currentTileHeat * heatToGroundRatio);
+
         }
     }
-}
-
-void Map::processClimate() {
-    processGroundChanges();
 
 }
 
@@ -125,42 +178,22 @@ void Map::processClimate() {
 
 
 
-float Map::getTileAt(int chunkX, int chunkY) {
-    return tiles[chunkX][chunkY];
+Tile * Map::getTileAt(int tileX, int tileY) {
+    while (!mapMutex.try_lock()) {
+        usleep(10);
+    }
+    Tile * tile = tiles.at(tileX).at(tileY);
+    mapMutex.unlock();
+
+    return tile;
 }
 
 
-float Map::setTileAt(int chunkX, int chunkY, float value) {
-    tiles[chunkX][chunkY] = value;
+Map::Map() {
+    prepareTiles();
 }
 
-
-
-float Map::getHeatAt(int chunkX, int chunkY) {
-    return heat[chunkX][chunkY];
-}
-
-
-float Map::setHeatAt(int chunkX, int chunkY, float value) {
-    heat[chunkX][chunkY] = value;
-}
-
-float Map::addHeatAt(int chunkX, int chunkY, float value) {
-    heat[chunkX][chunkY] += value;
-}
-
-
-
-float Map::getGroundAt(int chunkX, int chunkY) {
-    return ground[chunkX][chunkY];
-}
-
-
-float Map::setGroundAt(int chunkX, int chunkY, float value) {
-    ground[chunkX][chunkY] = value;
-}
-
-float Map::addGroundAt(int chunkX, int chunkY, float value) {
-    ground[chunkX][chunkY] += value;
+void Map::setTiles(const vector<std::vector<Tile *>> &tiles) {
+    Map::tiles = tiles;
 }
 

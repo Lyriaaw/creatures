@@ -23,8 +23,8 @@ void Farm::InitFromRandom() {
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
-    map = Map();
-    map.initRandomMap();
+    map = new Map();
+    map->initRandomMap();
 
 
     std::vector<std::vector<std::vector<Entity *>>> testEntites;
@@ -151,7 +151,7 @@ void Farm::moveCreatures() {
         Point tilePoint = currentCreaturePoint.getTileCoordinates();
 
         double givenEnergy = currentCreature->move();
-        map.addHeatAt(tilePoint.getX(), tilePoint.getY(), givenEnergy);
+        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(givenEnergy);
 
         if (givenEnergy < 0) {
             std::cout << "ERROR !!! Returned negative amount of energy: " << givenEnergy << std::endl;
@@ -224,7 +224,7 @@ void Farm::executeCreaturesActions() {
             Point performerPoint = performer->getCreature()->getPosition();
             Point tilePoint = performerPoint.getTileCoordinates();
 
-            map.addGroundAt(tilePoint.getX(), tilePoint.getY(), wastedEnergy);
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
             toDelete.emplace_back(subject);
         }
 
@@ -332,35 +332,43 @@ void Farm::populationControl() {
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    map.processClimate();
+    map->processClimate();
 
     random_device rd;
     mt19937 mt(rd());
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
-    int foodToGenerate = (int(availableEnergy) / 2000) - 1;
-    float totalEnergyAdded = 0.f;
-    for (int it = 0; it < foodToGenerate; it++) {
-        int x = distWidth(mt);
-        int y = distHeight(mt);
+//    int foodToGenerate = (int(availableEnergy) / 2000) - 1;
+//    float totalEnergyAdded = 0.f;
+//    for (int it = 0; it < foodToGenerate; it++) {
+//        int x = distWidth(mt);
+//        int y = distHeight(mt);
+//
+//        Point point(x, y);
+//
+//
+////        float foodSize = ((rand() % 300) / 100.f) + 2;
+//        float foodSize = 2;
+//
+//        Food * entity = new Food(point, foodSize);
+//        entity->setEnergy(entity->getMaxEnergy());
+//
+//        availableEnergy -= entity->getEnergy();
+//        totalEnergyAdded += entity->getEnergy();
+//
+//
+//        foods.emplace_back(entity);
+//        addedEntity.emplace_back(entity);
+//    }
 
-        Point point(x, y);
 
 
-//        float foodSize = ((rand() % 300) / 100.f) + 2;
-        float foodSize = 2;
-
-        Food * entity = new Food(point, foodSize);
-        entity->setEnergy(entity->getMaxEnergy());
-
-        availableEnergy -= entity->getEnergy();
-        totalEnergyAdded += entity->getEnergy();
 
 
-        foods.emplace_back(entity);
-        addedEntity.emplace_back(entity);
-    }
+
+
+
 
 
 
@@ -432,8 +440,8 @@ void Farm::statistics() {
     double totalGround = 0.0;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            totalHeat += map.getHeatAt(it, jt);
-            totalGround += map.getGroundAt(it, jt);
+            totalHeat += map->getTileAt(it, jt)->getHeat();
+            totalGround += map->getTileAt(it, jt)->getGround();
         }
     }
 
@@ -659,9 +667,7 @@ Entity * Farm::getEntityFromId(int id) {
 
 
 
-Map * Farm::getMap() {
-    return &map;
-}
+
 
 const vector<Food *> &Farm::getFoods() const {
     return foods;
@@ -749,5 +755,9 @@ void Farm::setDataAnalyser(const DataAnalyser &dataAnalyser) {
 
 const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
     return entityGrid;
+}
+
+Map *Farm::getMap() const {
+    return map;
 }
 

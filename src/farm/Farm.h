@@ -21,7 +21,7 @@ private:
 
     std::vector<BrainConnector *> connectors;
     std::vector<Food *> foods;
-    Map map;
+    Map * map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
 
@@ -75,8 +75,7 @@ public:
     static std::string getHumanReadableEnergy(float givenEnergy) ;
 
 
-    Map * getMap();
-
+    Map *getMap() const;
 
     const std::vector<Food *> &getFoods() const;
 

@@ -21,7 +21,7 @@ void HeatEnergyMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     RGBColor rectangleColor = RGBColor(0.f, 1.f, height);
 
     if (height > 1.f) {
-        rectangleColor = RGBColor(0.91f, 1.f, height - 1);
+        rectangleColor = RGBColor(0.68f, 1.f, height - 1);
     }
 
     sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
@@ -42,7 +42,7 @@ void HeatEnergyMinimap::draw(sf::RenderWindow *window) {
 void HeatEnergyMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            values[it][jt] = farm->getMap()->getHeatAt(it, jt) / 100.f;
+            values[it][jt] = farm->getMap()->getTileAt(it, jt)->getHeat() / 100.f;
         }
     }
 }

@@ -96,7 +96,7 @@ std::string WorldMinimap::getName() {
 }
 
 void WorldMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
-    float height = farm->getMap()->getTileAt(tileX, tileY);
+    float height = farm->getMap()->getTileAt(tileX, tileY)->getHeight();
     RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
     if (height < -0.05f) {
         rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));

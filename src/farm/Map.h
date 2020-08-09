@@ -8,32 +8,32 @@
 
 #include <vector>
 #include "../World.h"
+#include "Tile.h"
+#include <shared_mutex>
+#include <iostream>
+
 
 class Map {
 private:
-    float tiles[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
-    float heat[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
-    float ground[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
+    std::vector<std::vector<Tile *>> tiles;
+
 
 public:
+
+
+
+    Map();
+
     void initRandomMap();
     void generateRandomTerrain();
     void processClimate();
     void processGroundChanges();
+    void prepareTiles();
 
 
-    float getTileAt(int chunkX, int chunkY);
-    float setTileAt(int chunkX, int chunkY, float value);
+    Tile * getTileAt(int tileX, int tileY);
 
-    float getHeatAt(int chunkX, int chunkY);
-    float setHeatAt(int chunkX, int chunkY, float value);
-    float addHeatAt(int chunkX, int chunkY, float value);
-
-    float getGroundAt(int chunkX, int chunkY);
-    float setGroundAt(int chunkX, int chunkY, float value);
-    float addGroundAt(int chunkX, int chunkY, float value);
-
-
+    void setTiles(const std::vector<std::vector<Tile *>> &tiles);
 
 };
 

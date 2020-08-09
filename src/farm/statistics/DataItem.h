@@ -6,6 +6,7 @@
 #define CREATURES_DATAITEM_H
 
 #include <string>
+#include <shared_mutex>
 
 #include <vector>
 

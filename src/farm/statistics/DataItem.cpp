@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <zconf.h>
 #include "DataItem.h"
 
 const std::vector<double> &DataItem::getValues() const {
@@ -72,7 +73,9 @@ double DataItem::getValueForTick(int tick) {
         tick = values.size() - 1;
     }
 
-    return values.at(tick);
+    double value = values.at(tick);
+
+    return value;
 }
 
 double DataItem::getAveragedValueForTick(int tick) {

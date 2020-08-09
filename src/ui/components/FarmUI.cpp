@@ -33,11 +33,15 @@ void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
 
 void FarmUI::generateTileInfoText() {
 
+    if (hoveredTile.getX() < 0 || hoveredTile.getX() > TILE_COUNT_WIDTH || hoveredTile.getY() < 0 || hoveredTile.getY() > TILE_COUNT_HEIGHT) {
+        return;
+    }
+
     std::string tileInfo = "{" + std::to_string(int(hoveredTile.getX())) + "," + std::to_string(int(hoveredTile.getY())) + "}\n";
 
-    float currentHeight = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY());
-    float currentHeat = farm->getMap()->getHeatAt(hoveredTile.getX(), hoveredTile.getY());
-    float currentGround = farm->getMap()->getGroundAt(hoveredTile.getX(), hoveredTile.getY());
+    float currentHeight = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getHeight();
+    float currentHeat = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getHeat();
+    float currentGround = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getGround();
     tileInfo = tileInfo + "Height: " + std::to_string(currentHeight) + "\n";
     tileInfo = tileInfo + "Heat: " + std::to_string(currentHeat) + "\n";
     tileInfo = tileInfo + "Ground: " + std::to_string(currentGround) + "\n";
@@ -123,7 +127,7 @@ void FarmUI::setPositions(Camera *camera) {
 
 
 
-            float height = map->getTileAt(it, jt);
+            float height = map->getTileAt(it, jt)->getHeight();
             RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
             if (height < -0.05f) {
                 rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
