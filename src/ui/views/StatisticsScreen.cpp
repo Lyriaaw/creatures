@@ -140,9 +140,7 @@ void StatisticsScreen::mouseClicked(int x, int y) {
         }
     }
 
-    for (int it = 0; it < graphs.size(); it++) {
-        graphs.at(it)->mouseClicked(x, y);
-    }
+    currentGraph->mouseClicked(x, y);
 
 
 }

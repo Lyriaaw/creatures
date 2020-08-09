@@ -30,6 +30,7 @@ public:
     void processGroundChanges();
     void prepareTiles();
 
+    void removeEnergyFromGround(double amount);
 
     Tile * getTileAt(int tileX, int tileY);
 

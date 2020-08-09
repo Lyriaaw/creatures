@@ -536,6 +536,24 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             delete brainUi;
             brainUi = nullptr;
             break;
+        case Keyboard::Key::T:
+            if (this->mainCamera == nullptr) {
+                break;
+            }
+            this->mainCamera->setMapMode(0);
+            break;
+        case Keyboard::Key::H:
+            if (this->mainCamera == nullptr) {
+                break;
+            }
+            this->mainCamera->setMapMode(1);
+            break;
+        case Keyboard::Key::S:
+            if (this->mainCamera == nullptr) {
+                break;
+            }
+            this->mainCamera->setMapMode(2);
+            break;
         case Keyboard::Key::R:
             this->selectedEntity = nullptr;
             this->selectedCreature = nullptr;

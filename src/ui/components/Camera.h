@@ -23,6 +23,11 @@ class Camera {
 
     bool showGrid;
 
+    // 0: Terrain
+    // 1: Heat
+    // 2: Ground
+    int mapMode;
+
 public:
     Camera(Point center, Point topLeft);
 
@@ -62,6 +67,10 @@ public:
 
     Point getScreenCoordinates(Point point);
     Point getWorldCoordinates(Point point);
+
+    int getMapMode() const;
+
+    void setMapMode(int mapMode);
 };
 
 

@@ -83,6 +83,49 @@ void FarmUI::update() {
     generateTileInfoText();
 }
 
+sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
+
+    if (camera->getMapMode() == 0) {
+        float height = map->getTileAt(x, y)->getHeight();
+        RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
+        if (height < -0.05f) {
+            rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
+        }
+        if (height > 0.7f) {
+            rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
+        }
+
+        sf::Color tileColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+        return tileColor;
+    }
+
+    if (camera->getMapMode() == 1) {
+        float heat = map->getTileAt(x, y)->getHeat() / 100.f;
+        RGBColor rectangleColor = RGBColor(0.f, 1.f, heat);
+
+        if (heat > 1.f) {
+            rectangleColor = RGBColor(0.68f, 1.f, heat - 1);
+        }
+
+        sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+        return pixelColor;
+    }
+
+    if (camera->getMapMode() == 2) {
+        float ground = map->getTileAt(x, y)->getGround();
+
+        RGBColor rectangleColor = RGBColor(0.28f, 1.f, ground / 10000.f);
+        sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+
+        return pixelColor;
+    }
+
+
+    return sf::Color(0, 0, 0, 255);
+
+
+}
+
 void FarmUI::setPositions(Camera *camera) {
 //     std::cout << "Setting positions " << camera->getZoom() << std::endl;
 
@@ -124,17 +167,8 @@ void FarmUI::setPositions(Camera *camera) {
 
 
 
-            float height = map->getTileAt(it, jt)->getHeight();
-            RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
-            if (height < -0.05f) {
-                rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
-            }
-            if (height > 0.7f) {
-                rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
-            }
 
-            sf::Color tileColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
-
+            sf::Color tileColor = getColorForTile(it, jt, camera, map);
             tilesVertexArray[vertexArrayIndex + 0].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 1].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 2].color = tileColor;

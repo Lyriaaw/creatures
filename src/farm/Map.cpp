@@ -99,6 +99,24 @@ void Map::prepareTiles() {
 void Map::processGroundChanges(){
 
 }
+
+void Map::removeEnergyFromGround(double amount) {
+
+    double amountPerTile = amount / (TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT);
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            if (getTileAt(it, jt)->getGround() < amountPerTile) {
+//                std::cout << "ERROR WHILE REMOVING GROUND. ADDED ENERGY: " << amountPerTile << std::endl;
+
+                continue;
+            }
+            getTileAt(it, jt)->addGround(-1.f * amountPerTile);
+        }
+    }
+}
+
+
 void Map::processClimate() {
     float newGround[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
     float newHeats[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
@@ -114,15 +132,14 @@ void Map::processClimate() {
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        std::vector<double> groundsLine;
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = tiles.at(it).at(jt);
 
-            float availableGround = currentTile->getGround() / 500.f;
+            float availableGround = currentTile->getGround() / 1000.f;
 
 
             float currentHeight = currentTile->getHeight();
-            float availableHeat = currentTile->getHeat() / 20.f;
+            float availableHeat = currentTile->getHeat() / 10;
 
             if (availableGround == 0 && availableHeat == 0) {
                 continue;
@@ -136,7 +153,7 @@ void Map::processClimate() {
 
                     // If the other tile is lower than this one, we add some heat to be transfer
                     // the lowest the target tile, the biggest is the added energy
-                    double heightDifference = currentHeight - getTileAt(it + x, jt + y)->getHeight();
+                    double heightDifference = (currentHeight - getTileAt(it + x, jt + y)->getHeight()) / 5.f;
 
                     double transferedHeat = availableHeat + (heightDifference * availableHeat);
                     newHeats[it + x][jt + y] += transferedHeat;
@@ -193,6 +210,13 @@ Tile * Map::getTileAt(int tileX, int tileY) {
     while (!mapMutex.try_lock()) {
         usleep(10);
     }
+
+    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
+        std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
+        return tiles.at(0).at(0);
+    }
+
+
     Tile * tile = tiles.at(tileX).at(tileY);
     mapMutex.unlock();
 

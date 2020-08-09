@@ -37,6 +37,7 @@ public:
     void loadMap();
     void update();
     void setPositions(Camera *camera);
+    sf::Color getColorForTile(int x, int y, Camera * camera, Map *map);
 
     void setEntities(const std::vector<EntityUI *> entities);
 

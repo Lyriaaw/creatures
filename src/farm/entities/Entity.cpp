@@ -108,6 +108,8 @@ double Entity::removeEnergy(double removedEnergy) {
         this->energy = 0;
     }
 
+    this->energy = newEnergy;
+
     return returned;
 }
 

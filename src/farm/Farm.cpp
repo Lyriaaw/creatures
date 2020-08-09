@@ -176,13 +176,6 @@ void Farm::executeCreaturesActions() {
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
 
-//        if (isEntityAboutToBeDeleted(actionDto.getPerformerId())) {
-//            continue;
-//        }
-//
-//        if (isEntityAboutToBeDeleted(actionDto.getSubjectId())) {
-//            continue;
-//        }
 
         BrainConnector * performer = getConnectorFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
@@ -321,11 +314,11 @@ void Farm::populationControl() {
         child->getCreature()->setEnergy(child->getCreature()->getMaxEnergy() / 4.f);
         Creature * childCreature = child->getCreature();
 
-        float childSpawnX = distWidth(mt);
-        float childSpawnY = distHeight(mt);
-        Point childCreaturePosition = Point(childSpawnX, childSpawnY);
-
-        childCreature->setPosition(childCreaturePosition);
+//        float childSpawnX = distWidth(mt);
+//        float childSpawnY = distHeight(mt);
+//        Point childCreaturePosition = Point(childSpawnX, childSpawnY);
+//
+//        childCreature->setPosition(childCreaturePosition);
 
         totalEnergyRemoved += child->getCreature()->getEnergy();
 
@@ -334,8 +327,7 @@ void Farm::populationControl() {
         addedCreatures.emplace_back(child->getCreature());
     }
 
-    removeEnergyFromFarm(totalEnergyRemoved);
-    clearDeletedEntities();
+    map->removeEnergyFromGround(totalEnergyRemoved);
 
 
 
@@ -514,6 +506,9 @@ void Farm::statistics() {
 
 
 void Farm::removeEnergyFromFarm(double amount) {
+    if (amount <= 0) {
+        std::cout << "Trying to remove negative energy from farm: " << amount << std::endl;
+    }
     if (availableEnergy >= amount) {
         availableEnergy -= amount;
         return;

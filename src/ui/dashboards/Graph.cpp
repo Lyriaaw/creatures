@@ -134,10 +134,12 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
         return;
     }
 
-    sf::VertexArray lineVertexes = sf::VertexArray(sf::LineStrip, line.getItem()->getCount());
+    int currentLineItemCount = line.getItem()->getCount();
+
+    sf::VertexArray lineVertexes = sf::VertexArray(sf::LineStrip, currentLineItemCount);
     sf::Color lineColor = sf::Color(line.getRed(), line.getGreen(), line.getBlue(), 255);
 
-    for (int it = 0; it < line.getItem()->getCount(); it++) {
+    for (int it = 0; it < currentLineItemCount; it++) {
         double calculatedX = x + (it * widthRatio);
         double calculatedY = (y + height) - (line.getValueForTick(it) * heightRatio);
 

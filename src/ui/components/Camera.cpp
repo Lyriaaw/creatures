@@ -88,7 +88,7 @@ void Camera::switchGrid() {
 
 
 
-Camera::Camera(Point center, Point topLeft) : center(center), topLeft(topLeft), showGrid(false), width(0), height(0) {
+Camera::Camera(Point center, Point topLeft) : center(center), topLeft(topLeft), showGrid(false), width(0), height(0), mapMode(0) {
 }
 
 bool Camera::isShowGrid() const {
@@ -97,4 +97,12 @@ bool Camera::isShowGrid() const {
 
 void Camera::setShowGrid(bool showGrid) {
     Camera::showGrid = showGrid;
+}
+
+int Camera::getMapMode() const {
+    return mapMode;
+}
+
+void Camera::setMapMode(int mapMode) {
+    Camera::mapMode = mapMode;
 }
