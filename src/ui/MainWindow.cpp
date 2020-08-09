@@ -75,7 +75,7 @@ void MainWindow::loadFarm() {
     for (int it = 0; it < farm->getConnectors().size(); it++) {
         Creature *entity = farm->getConnectors().at(it)->getCreature();
 
-        CreatureUI *entityUi = new CreatureUI(entity);
+        CreatureUI *entityUi = new CreatureUI(entity, font);
         entityUis.push_back(entityUi);
     }
 
@@ -424,7 +424,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
                     farm->addConnector(newCreature);
 
-                    CreatureUI *entityUi = new CreatureUI(newCreature->getCreature());
+                    CreatureUI *entityUi = new CreatureUI(newCreature->getCreature(), font);
                     farmUi->addCreature(entityUi);
                 }
 

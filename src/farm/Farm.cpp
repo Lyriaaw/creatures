@@ -75,21 +75,20 @@ void Farm::InitFromRandom() {
 
 
 void Farm::Tick(bool paused) {
-    this->toDelete.clear();
 
     generateEntityGrid();
 
+
     if (!paused) {
-        brainOutput();
+        brainProcessing();
+        executeCreaturesActions();
         moveCreatures();
-        handleActions();
+        populationControl();
+        vegetalisation();
     }
 
 
-    populationControl();
-    vegetalisation();
 
-    brainProcessing();
 
     if (!paused) {
         aTickHavePassed();
@@ -120,11 +119,16 @@ void Farm::brainProcessing() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     for (int it = 0; it < connectors.size(); it++) {
         Creature * currentCreature = connectors.at(it)->getCreature();
+        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentCreature);
 
         currentCreature->findSelectedChunks();
-        currentCreature->processSensorsValues(getAccessibleEntities(currentCreature));
+        currentCreature->processSensorsValues(accessibleEntities);
         connectors.at(it)->processBrainInputs();
         connectors.at(it)->processBrain();
+        connectors.at(it)->processBrainOutputs();
+        std::vector<ActionDTO> currentCreatureActions = currentCreature->executeAction(accessibleEntities);
+        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+
     }
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -132,15 +136,6 @@ void Farm::brainProcessing() {
     dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
 }
 
-void Farm::brainOutput() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-    for (int it = 0; it < connectors.size(); it++) {
-        connectors.at(it)->processBrainOutputs();
-    }
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getBrainOutputsTime()->addValue(elapsed_time.count());
-}
 
 void Farm::moveCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -174,46 +169,25 @@ void Farm::moveCreatures() {
 
 
 
-void Farm::handleActions() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-    std::vector<BrainConnector *> sortedConnectors = getScoreSortedCreatures();
-
-    for (int it = 0; it < sortedConnectors.size(); it++) {
-        Creature *currentCreature = sortedConnectors.at(it)->getCreature();
-
-        std::vector<Entity *> selectedEntities = getAccessibleEntities(currentCreature);
-        std::vector<ActionDTO> currentCreatureActions = currentCreature->executeAction(selectedEntities);
-
-        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
-    }
-
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getPrepareActionsTime()->addValue(elapsed_time.count());
-
-    executeCreaturesActions();
-
-}
-
 void Farm::executeCreaturesActions() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    int naturalMatingCount = 0;
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
 
-        if (isEntityAboutToBeDeleted(actionDto.getPerformerId())) {
-            continue;
-        }
-
-        if (isEntityAboutToBeDeleted(actionDto.getSubjectId())) {
-            continue;
-        }
+//        if (isEntityAboutToBeDeleted(actionDto.getPerformerId())) {
+//            continue;
+//        }
+//
+//        if (isEntityAboutToBeDeleted(actionDto.getSubjectId())) {
+//            continue;
+//        }
 
         BrainConnector * performer = getConnectorFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
-        if (subject->getEnergy() <= 0) {
+        if (subject->getEnergy() <= 0 || performer->getCreature()->getEnergy() <= 0) {
             continue;
         }
 
@@ -229,7 +203,10 @@ void Farm::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "MATE") {
-            handleMating(performer, subject->getId());
+            bool success = handleMating(performer, subject->getId());
+
+            if (success)
+                naturalMatingCount++;
 
         }
 
@@ -237,37 +214,75 @@ void Farm::executeCreaturesActions() {
     clearDeletedEntities();
 
     actions.clear();
+    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 }
 
-void Farm::handleMating(BrainConnector * father, int entityId) {
-// TODO Verify that the partner is trying to reproduce as well (let's implement consentment)
+bool Farm::handleMating(BrainConnector * father, int entityId) {
     BrainConnector * foundConnector = getConnectorFromId(entityId);
     if (foundConnector == nullptr) {
-        return;
+        return false;
     }
 
     bool fatherCanReproduce = father->getCreature()->getEnergy() > father->getCreature()->getMaxEnergy() / 2.f;
     bool motherCanReproduce = foundConnector->getCreature()->getEnergy() > father->getCreature()->getMaxEnergy() / 2.f;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
-        return;
+        return false;
     }
 //
     BrainConnector * child = this->nursery->Mate(father, foundConnector);
 
     double givenEnergyToChildGoal = child->getCreature()->getMaxEnergy() / 4.f;
 
-    double givenFatherEnergy = father->getCreature()->removeEnergy(givenEnergyToChildGoal / 2.f);
-    double givenMotherEnergy = foundConnector->getCreature()->removeEnergy(givenEnergyToChildGoal / 2.f);
+    double givenFatherEnergy = std::min(father->getCreature()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
+    double givenMotherEnergy = std::min(foundConnector->getCreature()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
 
-    child->getCreature()->setEnergy(givenFatherEnergy + givenMotherEnergy);
-    connectors.emplace_back(child);
+    double actualGivenFatherEnergy = father->getCreature()->removeEnergy(givenFatherEnergy);
+    double actualGivenMotherEnergy = foundConnector->getCreature()->removeEnergy(givenMotherEnergy);
 
-    addedCreatures.emplace_back(child->getCreature());
+    if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
+        std::cout << "Wrong energy given" << std::endl;
+    }
+
+    double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
+
+    if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
+        child->getCreature()->setEnergy(totalGivenEnergy);
+        connectors.emplace_back(child);
+        addedCreatures.emplace_back(child->getCreature());
+
+        return true;
+    }
+
+
+    Point childCoordinate = child->getCreature()->getPosition();
+    Point tileChildPosition = childCoordinate.getTileCoordinates();
+
+    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+
+
+    if (father->getCreature()->getEnergy() <= 0) {
+        toDelete.emplace_back(father->getCreature());
+    }
+    if (foundConnector->getCreature()->getEnergy() <= 0) {
+        toDelete.emplace_back(foundConnector->getCreature());
+    }
+
+//    if (givenMotherEnergy + givenFatherEnergy == 0) {
+//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
+//    } else {
+//        std::cout << "New Child " << std::endl;
+//
+//    }
+
+
+
+
+    return false;
 }
 
 
@@ -336,34 +351,51 @@ void Farm::vegetalisation() {
 
     random_device rd;
     mt19937 mt(rd());
-    uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
-    uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
-
-//    int foodToGenerate = (int(availableEnergy) / 2000) - 1;
-//    float totalEnergyAdded = 0.f;
-//    for (int it = 0; it < foodToGenerate; it++) {
-//        int x = distWidth(mt);
-//        int y = distHeight(mt);
-//
-//        Point point(x, y);
-//
-//
-////        float foodSize = ((rand() % 300) / 100.f) + 2;
-//        float foodSize = 2;
-//
-//        Food * entity = new Food(point, foodSize);
-//        entity->setEnergy(entity->getMaxEnergy());
-//
-//        availableEnergy -= entity->getEnergy();
-//        totalEnergyAdded += entity->getEnergy();
-//
-//
-//        foods.emplace_back(entity);
-//        addedEntity.emplace_back(entity);
-//    }
+    uniform_real_distribution<double> distWidth(0, TILE_SIZE);
+    uniform_real_distribution<double> distHeight(0, TILE_SIZE);
 
 
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
 
+            float tileX = it * TILE_SIZE;
+            float tileY = jt * TILE_SIZE;
+
+            float tileAvailableEnergy = currentTile->getGround();
+
+
+            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
+            float totalEnergyAdded = 0.f;
+
+//            if (tileAvailableEnergy > 1950) {
+//                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
+//            }
+
+            for (int it = 0; it < foodToGenerate; it++) {
+                int x = distWidth(mt);
+                int y = distHeight(mt);
+
+                Point point(tileX + x, tileY + y);
+
+
+                //        float foodSize = ((rand() % 300) / 100.f) + 2;
+                float foodSize = 2;
+
+                Food * entity = new Food(point, foodSize);
+                entity->setEnergy(entity->getMaxEnergy());
+
+                totalEnergyAdded += entity->getEnergy();
+
+
+                foods.emplace_back(entity);
+                addedEntity.emplace_back(entity);
+            }
+
+            currentTile->addGround(-1 * totalEnergyAdded);
+
+        }
+    }
 
 
 
@@ -503,6 +535,8 @@ void Farm::removeEnergyFromFarm(double amount) {
         toDelete.emplace_back(foods.at(jt));
     }
 
+    clearDeletedEntities();
+
     if (totalCollected > amount) {
         availableEnergy += totalCollected - amount;
     }
@@ -565,22 +599,13 @@ void Farm::clearDeletedEntities() {
     std::vector<Food *> newFood;
     for (int it = 0; it < foods.size(); it++) {
 
-        bool found = false;
-        for (int jt = 0; jt < toDelete.size(); jt++) {
-            if (foods.at(it)->getId() == toDelete.at(jt)->getId()) {
-                found = true;
-            }
-        }
-
-        if (!found) {
+        if (foods.at(it)->getEnergy() > 0) {
             newFood.emplace_back(foods.at(it));
         }
     }
 
     foods.clear();
     foods = newFood;
-
-    actions.clear();
 }
 
 std::vector<Entity *> Farm::getAccessibleEntities(Creature * creature) {
@@ -691,6 +716,10 @@ const vector<Entity *> &Farm::getToDelete() const {
 
 void Farm::clearAddedCreatures() {
     this->addedCreatures.clear();
+}
+
+void Farm::clearToDelete() {
+    this->toDelete.clear();
 }
 void Farm::clearAddedEntities() {
     this->addedEntity.clear();

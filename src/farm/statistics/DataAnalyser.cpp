@@ -23,6 +23,7 @@ DataAnalyser::DataAnalyser() {
     totalTime = new DataItem("totalTime", true);
 
     population = new DataItem("population", true);
+    naturalMatings = new DataItem("naturalMatings", true);
 
     totalEnergy = new DataItem("totalEnergy", true);
     availableEnergy = new DataItem("availableEnergy", true);
@@ -141,4 +142,8 @@ DataItem *DataAnalyser::getHeatEnergy() const {
 
 DataItem *DataAnalyser::getGroundEnergy() const {
     return groundEnergy;
+}
+
+DataItem *DataAnalyser::getNaturalMatings() const {
+    return naturalMatings;
 }

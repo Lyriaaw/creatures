@@ -50,12 +50,10 @@ public:
     void sortCreatures();
 
     void brainProcessing();
-    void brainOutput();
     void moveCreatures();
 
-    void handleActions();
     void executeCreaturesActions();
-    void handleMating(BrainConnector * father, int entityId);
+    bool handleMating(BrainConnector * father, int entityId);
 
     void populationControl();
     void vegetalisation();
@@ -65,6 +63,7 @@ public:
     void removeEnergyFromFarm(double amount);
 
     void clearDeletedEntities();
+    void clearToDelete();
     void generateEntityGrid();
     bool isEntityAboutToBeDeleted(int id);
 

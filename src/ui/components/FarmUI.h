@@ -26,11 +26,13 @@ private:
 
     Point hoveredTile;
     sf::Text hoveredTileInfos;
+
+    sf::Font * font;
 public:
 
 public:
     FarmUI(Farm *farm, sf::Font * font);
-    void loadTexts(sf::Font * font);
+    void loadTexts();
     void draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity);
     void loadMap();
     void update();

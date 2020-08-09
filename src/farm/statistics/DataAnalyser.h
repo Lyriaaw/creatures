@@ -32,6 +32,7 @@ private:
     DataItem * totalTime;
 
     DataItem * population;
+    DataItem * naturalMatings;
 
     DataItem * totalEnergy;
     DataItem * availableEnergy;
@@ -92,6 +93,8 @@ public:
     DataItem *getHeatEnergy() const;
 
     DataItem *getGroundEnergy() const;
+
+    DataItem *getNaturalMatings() const;
 };
 
 

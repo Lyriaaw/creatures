@@ -101,7 +101,7 @@ double Entity::addEnergy(double addedEnergy) {
 
 double Entity::removeEnergy(double removedEnergy) {
     double newEnergy = this->energy - removedEnergy;
-    double returned = 0.f;
+    double returned = removedEnergy;
 
     if (newEnergy <= 0) {
         returned = this->energy;

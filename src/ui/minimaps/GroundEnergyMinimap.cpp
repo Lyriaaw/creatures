@@ -15,7 +15,7 @@ std::string GroundEnergyMinimap::getName() {
 }
 
 void GroundEnergyMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
-    float height = values[tileX][tileY] / 5.f;
+    float height = values[tileX][tileY];
 
     RGBColor rectangleColor = RGBColor(0.28f, 1.f, height);
 
@@ -37,7 +37,7 @@ void GroundEnergyMinimap::draw(sf::RenderWindow *window) {
 void GroundEnergyMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            values[it][jt] = farm->getMap()->getTileAt(it, jt)->getGround() / 100;
+            values[it][jt] = farm->getMap()->getTileAt(it, jt)->getGround() / 10000.f;
         }
     }
 }

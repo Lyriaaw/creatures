@@ -15,8 +15,10 @@ private:
     sf::VertexArray energy;
     Creature * creature;
 
+    sf::Text energyLabel;
+
 public:
-    CreatureUI(Creature *entity);
+    CreatureUI(Creature *entity, sf::Font *font);
 
     void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
 };

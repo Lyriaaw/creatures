@@ -4,9 +4,12 @@
 
 #include "Map.h"
 #include "../utils/perlin/PerlinNoise.h"
+#include "../utils/Point.h"
+#include "entities/Food.h"
 
 #include <iostream>
 #include <zconf.h>
+#include <random>
 
 using namespace std;
 
@@ -43,6 +46,7 @@ void Map::generateRandomTerrain() {
 
             Tile * currentTile = new Tile();
             currentTile->setHeight(height);
+            currentTile->setGround(1500.0);
 
             line.emplace_back(currentTile);
         }
@@ -114,7 +118,7 @@ void Map::processClimate() {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = tiles.at(it).at(jt);
 
-            float availableGround = currentTile->getGround() / 50.f;
+            float availableGround = currentTile->getGround() / 500.f;
 
 
             float currentHeight = currentTile->getHeight();
@@ -133,37 +137,44 @@ void Map::processClimate() {
                     // If the other tile is lower than this one, we add some heat to be transfer
                     // the lowest the target tile, the biggest is the added energy
                     double heightDifference = currentHeight - getTileAt(it + x, jt + y)->getHeight();
-                    double transferedHeat = availableHeat + (heightDifference * availableHeat);
 
+                    double transferedHeat = availableHeat + (heightDifference * availableHeat);
                     newHeats[it + x][jt + y] += transferedHeat;
                     newHeats[it][jt] -= transferedHeat;
 
 
 
 
+                    double transferedGround = availableGround + (heightDifference * availableGround);
 
-                    newGround[it + x][jt + y] += availableGround;
-                    newGround[it][jt] -= availableGround;
+                    newGround[it + x][jt + y] += transferedGround;
+                    newGround[it][jt] -= transferedGround;
                 }
             }
 
         }
     }
 
+
+
+
+
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            tiles.at(it).at(jt)->setGround(newGround[it][jt]);
-            tiles.at(it).at(jt)->setHeat(newHeats[it][jt]);
+            Tile * currentTile = getTileAt(it, jt);
+            currentTile->setGround(newGround[it][jt]);
+            currentTile->setHeat(newHeats[it][jt]);
 
-            if (getTileAt(it, jt)->getHeat() <= 0) {
+            if (currentTile->getHeat() <= 0) {
                 continue;
             }
 
             float heatToGroundRatio = 0.05f;
-            float currentTileHeat = getTileAt(it, jt)->getHeat();
+            float currentTileHeat = currentTile->getHeat();
 
-            getTileAt(it, jt)->addHeat(- 1 * currentTileHeat * heatToGroundRatio);
-            getTileAt(it, jt)->addGround(currentTileHeat * heatToGroundRatio);
+            currentTile->addHeat(- 1 * currentTileHeat * heatToGroundRatio);
+            currentTile->addGround(currentTileHeat * heatToGroundRatio);
+
 
         }
     }

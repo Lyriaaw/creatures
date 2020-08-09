@@ -9,11 +9,11 @@
 #include "FoodUI.h"
 #include "../colors/RGBColor.h"
 
-FarmUI::FarmUI(Farm *farm, sf::Font * font): farm(farm), hoveredTile(Point(-1, -1)) {
-    loadTexts(font);
+FarmUI::FarmUI(Farm *farm, sf::Font * font): farm(farm), hoveredTile(Point(-1, -1)), font(font) {
+    loadTexts();
 }
 
-void FarmUI::loadTexts(sf::Font * font) {
+void FarmUI::loadTexts() {
     hoveredTileInfos.setFont(*font);
     hoveredTileInfos.setCharacterSize(0);
 }
@@ -33,7 +33,7 @@ void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
 
 void FarmUI::generateTileInfoText() {
 
-    if (hoveredTile.getX() < 0 || hoveredTile.getX() > TILE_COUNT_WIDTH || hoveredTile.getY() < 0 || hoveredTile.getY() > TILE_COUNT_HEIGHT) {
+    if (hoveredTile.getX() < 0 || hoveredTile.getX() >= TILE_COUNT_WIDTH || hoveredTile.getY() < 0 || hoveredTile.getY() >= TILE_COUNT_HEIGHT) {
         return;
     }
 
@@ -71,16 +71,13 @@ void FarmUI::loadMap() {
 void FarmUI::update() {
     // TODO OPTI Clear to_delete
     clearEntities(farm->getToDelete());
+    farm->clearToDelete();
 
     addEntities(farm->getAddedEntity());
     farm->clearAddedEntities();
 
     addCreatures(farm->getAddedCreatures());
     farm->clearAddedCreatures();
-
-    std::vector<Entity *> toDelete = farm->getToDelete();
-    toDelete.clear();
-
 
 
     generateTileInfoText();
@@ -180,7 +177,6 @@ void FarmUI::clearEntities(std::vector<Entity *> toDelete) {
         }
 
         if (index != -1) {
-            EntityUI * toDeleteEntityUI = entities.at(it);
             entities.erase(entities.begin() + index);
         }
 
@@ -195,7 +191,7 @@ void FarmUI::addEntities(std::vector<Food *> to_add) {
 }
 void FarmUI::addCreatures(std::vector<Creature *> to_add) {
     for (int it = 0; it < to_add.size(); it++) {
-        CreatureUI *entityUi = new CreatureUI(to_add.at(it));
+        CreatureUI *entityUi = new CreatureUI(to_add.at(it), font);
         entities.push_back(entityUi);
     }
 }

@@ -6,9 +6,10 @@
 #include "CreatureUI.h"
 #include "../colors/RGBColor.h"
 
-CreatureUI::CreatureUI(Creature *entity) : EntityUI(entity, 20, sf::Quads), creature(entity)  {
+CreatureUI::CreatureUI(Creature *entity, sf::Font *font) : EntityUI(entity, 20, sf::Quads), creature(entity)  {
     sensors = sf::VertexArray(sf::Lines, entity->getSensorCount() * 2);
     energy = sf::VertexArray(sf::Quads, 8);
+    energyLabel.setFont(*font);
 }
 
 void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) {
@@ -152,6 +153,19 @@ void CreatureUI::draw(sf::RenderWindow *window, Camera *camera, Entity * selecte
 
         window->draw(energy);
 
+
+
+        energyLabel.setCharacterSize(3 * camera->getZoom());
+
+        std::string energyText = std::to_string(creature->getEnergy());
+        energyLabel.setString(energyText);
+
+        double xPosition = screenPoint.getX() - (energyLabel.getLocalBounds().width / 2);
+        double yPosition = screenPoint.getY() - energyDistance - ((5 - energyLabel.getLocalBounds().height) / 2);
+
+        energyLabel.setPosition(xPosition, yPosition);
+        energyLabel.setFillColor(sf::Color(128, 128, 128, 255));
+        window->draw(energyLabel);
     }
 
 
