@@ -12,7 +12,6 @@
 #include "Camera.h"
 #include "EntityUI.h"
 #include "../../farm/entities/Creature.h"
-#include "../../farm/brain/BrainConnector.h"
 #include "CreatureUI.h"
 #include "../../farm/entities/Food.h"
 #include "../../farm/Farm.h"
@@ -33,7 +32,7 @@ public:
 public:
     FarmUI(Farm *farm, sf::Font * font);
     void loadTexts();
-    void draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity);
+    void draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntity);
     void loadMap();
     void update();
     void setPositions(Camera *camera);

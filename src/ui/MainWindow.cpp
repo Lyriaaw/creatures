@@ -248,7 +248,7 @@ void MainWindow::draw() {
 
 Entity * MainWindow::getSelectedEntity() {
     if (selectedCreature != nullptr) {
-        return selectedCreature->getCreature();
+        return selectedCreature->getEntity();
     }
     if (selectedEntity != nullptr) {
         return selectedEntity;
@@ -413,24 +413,24 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
         bool found = false;
         for (int it = 0; it < farm->getConnectors().size(); it++) {
-            BrainConnector * connector = farm->getConnectors().at(it);
+            Life * connector = farm->getConnectors().at(it);
 
-            double deltaX = abs(worldCoordinates.getX() - connector->getCreature()->getPosition().getX());
-            double deltaY = abs(worldCoordinates.getY() - connector->getCreature()->getPosition().getY());
+            double deltaX = abs(worldCoordinates.getX() - connector->getEntity()->getPosition().getX());
+            double deltaY = abs(worldCoordinates.getY() - connector->getEntity()->getPosition().getY());
 
-            if (deltaX < connector->getCreature()->getSize() && deltaY < connector->getCreature()->getSize()) {
+            if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
                 if (selectedCreature != nullptr) {
-                    BrainConnector * newCreature = farm->getNursery()->Mate(selectedCreature, connector);
+                    Life * newCreature = farm->getNursery()->Mate(selectedCreature, connector);
 
-                    farm->addConnector(newCreature);
+                    farm->addLife(newCreature);
 
-                    CreatureUI *entityUi = new CreatureUI(newCreature->getCreature(), font);
+                    CreatureUI *entityUi = new CreatureUI(newCreature->getEntity(), font);
                     farmUi->addCreature(entityUi);
                 }
 
                 selectedCreature = farm->getConnectors().at(it);
 
-                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getCreature()->getId());
+                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getEntity()->getId());
                 std::vector<Neuron *> neurons = selectedCreature->getBrain()->getNeurons();
 
                 if (brainUi != nullptr) {

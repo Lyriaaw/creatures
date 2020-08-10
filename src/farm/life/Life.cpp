@@ -1,0 +1,150 @@
+//
+// Created by Amalric Lombard de Buffières on 8/9/20.
+//
+
+#include "Life.h"
+#include "muscles/externals/Mouth.h"
+#include "muscles/internals/Movement.h"
+
+void Life::processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
+    for (int it = 0; it < sensors.size(); it++) {
+        sensors.at(it)->fetchSensorValue(availableEntities);
+        sensors.at(it)->passValueToNeuron();
+    }
+}
+void Life::processBrain() {
+
+    for (int it = 0; it < brain->getLinksGrid().size(); it++) {
+        std::vector<Link *> linksLine = brain->getLinksGrid().at(it);
+
+        for (int jt = 0; jt < linksLine.size(); jt++) {
+            Link * link = linksLine.at(jt);
+
+            float inputValue = link->getInput()->getValue();
+            float finalValue = inputValue * link->getWeight();
+            link->getOutput()->addValue(finalValue);
+        }
+    }
+}
+std::vector<ActionDTO> Life::executeExternalActions(std::vector<Entity *> availableEntities) {
+    std::vector<ActionDTO> currentCreatureActions;
+    for (int it = 0; it < externalMuscles.size(); it++) {
+        std::vector<ActionDTO> muscleActions = externalMuscles.at(it)->prepareActionDTO(availableEntities);
+
+        currentCreatureActions.insert(currentCreatureActions.begin(), muscleActions.begin(), muscleActions.end());
+    }
+    return currentCreatureActions;
+}
+
+std::vector<Entity *> Life::executeInternalActions() {
+    std::vector<Entity * > entitiesCreated;
+    for (int it = 0; it < internalMuscles.size(); it++) {
+        std::vector<Entity * > muscleEntities = internalMuscles.at(it)->executeActions();
+
+        entitiesCreated.insert(entitiesCreated.begin(), muscleEntities.begin(), muscleEntities.end());
+    }
+    return entitiesCreated;
+}
+
+double Life::giveawayEnergy() {
+    double muscleEnergy = 0.0;
+
+    for (int it = 0; it < externalMuscles.size(); it++) {
+        muscleEnergy += externalMuscles.at(it)->getAndClearEnergyConsumption();
+    }
+
+    double sensorEnergy = sensors.size();
+    double biasEnergy = 10;
+
+    double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
+
+    double currentEntityEnergy = this->entity->getEnergy();
+
+    if (currentEntityEnergy - usedEnergy < 0) {
+        usedEnergy = this->entity->getEnergy();
+    }
+
+    if (usedEnergy < 0) {
+        std::cout << "Returned negative amount of energy: " << usedEnergy << std::endl;
+    }
+
+    this->entity->setEnergy(currentEntityEnergy - usedEnergy);
+
+    return usedEnergy;
+}
+
+void Life::processSelectedChunks(){
+    for (int it = 0; it < sensors.size(); it++) {
+        sensors.at(it)->findSelectedChunks();
+    }
+    for (int it = 0; it < externalMuscles.size(); it++) {
+        externalMuscles.at(it)->findSelectedChunks();
+    }
+
+}
+
+std::vector<Point> Life::getSelectedChunks() {
+    std::vector<Point> selectedChunks;
+
+    for (int it = 0; it < sensors.size(); it++) {
+        std::vector<Point> sensorSelectedChunks = sensors.at(it)->getSelectedChunks();
+
+        for (int jt = 0; jt < sensorSelectedChunks.size(); jt++) {
+            // If the chunk have not already been selected, select it
+            bool found(false);
+            int index = 0;
+            while(!found && index < selectedChunks.size()) {
+                if (selectedChunks.at(index).equals(sensorSelectedChunks.at(jt))) {
+                    found = true;
+                }
+                index++;
+            };
+
+            if (!found) {
+                selectedChunks.emplace_back(sensorSelectedChunks.at(jt));
+            }
+        }
+    }
+
+
+    for (int it = 0; it < externalMuscles.size(); it++) {
+        std::vector<Point> sensorSelectedChunks = externalMuscles.at(it)->getSelectedChunks();
+
+        for (int jt = 0; jt < sensorSelectedChunks.size(); jt++) {
+            // If the chunk have not already been selected, select it
+            bool found(false);
+            int index = 0;
+            while(!found && index < selectedChunks.size()) {
+                if (selectedChunks.at(index).equals(sensorSelectedChunks.at(jt))) {
+                    found = true;
+                }
+                index++;
+            };
+
+            if (!found) {
+                selectedChunks.emplace_back(sensorSelectedChunks.at(jt));
+            }
+        }
+    }
+
+
+
+
+    return selectedChunks;
+}
+
+Entity *Life::getEntity() const {
+    return entity;
+}
+
+Brain *Life::getBrain() const {
+    return brain;
+}
+
+void Life::setEntity(Entity *entity) {
+    Life::entity = entity;
+}
+
+void Life::setBrain(Brain *brain) {
+    Life::brain = brain;
+}

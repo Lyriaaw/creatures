@@ -3,19 +3,24 @@
 //
 
 #include "SpeedEvolution.h"
+#include "../../life/muscles/internals/Movement.h"
 
 SpeedEvolution::SpeedEvolution(): Evolution() {
 
 }
 
-void SpeedEvolution::generateFromRandom(BrainConnector * connector) {
+void SpeedEvolution::generateFromRandom(Life * life) {
 }
 
-void SpeedEvolution::perform(BrainConnector * connector) {
-    OutputNeuron * speed = new SpeedOutputNeuron();
-    speed->setName("Speed");
-    speed->setGenerationNumber(this->generationNumber);
-    connector->getBrain()->addOutputNeuron(speed);
+void SpeedEvolution::perform(Life * life) {
+    InternalMuscle * movement = new Movement(0.0, life->getEntity());
+
+    OutputNeuron * outputNeuron = new OutputNeuron();
+    outputNeuron->setName("Movement");
+    outputNeuron->setGenerationNumber(this->generationNumber);
+    life->getBrain()->addOutputNeuron(outputNeuron);
+
+    movement->addNeuron(outputNeuron);
 }
 
 std::string SpeedEvolution::describe() {

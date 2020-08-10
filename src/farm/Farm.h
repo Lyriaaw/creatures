@@ -14,13 +14,15 @@
 #include "entities/Food.h"
 #include "CreatureNursery.h"
 #include "statistics/DataAnalyser.h"
+#include "life/Life.h"
 
 class Farm {
 private:
-    std::vector<BrainConnector *> sorted;
+    std::vector<Life *> sorted;
 
-    std::vector<BrainConnector *> connectors;
-    std::vector<Food *> foods;
+    std::vector<Life *> lifes;
+    std::vector<Entity *> entities;
+
     Map * map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
@@ -31,9 +33,13 @@ private:
 
     double availableEnergy;
 
-    std::vector<Entity *> toDelete;
-    std::vector<Food *> addedEntity;
-    std::vector<Creature *> addedCreatures;
+
+    std::vector<Life *> lifesAdded;
+    std::vector<Life *> lifesToDelete;
+
+    std::vector<Entity *> entityAdded;
+    std::vector<Entity *> entityToDelete;
+
 
     int tickCount;
 
@@ -53,7 +59,7 @@ public:
     void moveCreatures();
 
     void executeCreaturesActions();
-    bool handleMating(BrainConnector * father, int entityId);
+    bool handleMating(Life * father, int entityId);
 
     void populationControl();
     void vegetalisation();
@@ -62,14 +68,13 @@ public:
 
     void removeEnergyFromFarm(double amount);
 
-    void clearDeletedEntities();
+    void removeDeletedEntities();
     void clearToDelete();
     void generateEntityGrid();
     bool isEntityAboutToBeDeleted(int id);
 
-    Creature * getCreatureFromId(int id);
     Entity * getEntityFromId(int id);
-    BrainConnector * getConnectorFromId(int id);
+    Life * getLifeFromId(int id);
 
     static std::string getHumanReadableEnergy(float givenEnergy) ;
 
@@ -83,24 +88,20 @@ public:
 
     const std::vector<BrainConnector *> &getConnectors() const;
 
-    void addConnector(BrainConnector * connector);
+    void addLife(Life * life);
 
-    std::vector<Entity *> getAccessibleEntities(Creature * creature);
+    std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedChunks);
+    std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedChunks);
 
-    const std::vector<Entity *> &getToDelete() const;
 
-    const std::vector<Food *> &getAddedEntity() const;
 
-    void setAddedEntity(const std::vector<Food *> &addedEntity);
 
-    const std::vector<Creature *> &getAddedCreatures() const;
 
-    void setAddedCreatures(const std::vector<Creature *> &addedCreatures);
 
     void clearAddedCreatures();
     void clearAddedEntities();
 
-    std::vector<BrainConnector *> getScoreSortedCreatures();
+    std::vector<Life *> getScoreSortedCreatures();
 
     const DataAnalyser &getDataAnalyser() const;
 

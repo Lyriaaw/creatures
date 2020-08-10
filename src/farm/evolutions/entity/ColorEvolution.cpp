@@ -8,12 +8,12 @@ ColorEvolution::ColorEvolution(): Evolution() {
 
 }
 
-void ColorEvolution::generateFromRandom(BrainConnector * connector) {
+void ColorEvolution::generateFromRandom(Life * life) {
     this->hue = (rand() % 1000) / 1000.f;
 }
 
-void ColorEvolution::perform(BrainConnector * connector) {
-    connector->getCreature()->setColor(this->hue);
+void ColorEvolution::perform(Life * life) {
+    life->getEntity()->setColor(this->hue);
 }
 
 std::string ColorEvolution::describe() {

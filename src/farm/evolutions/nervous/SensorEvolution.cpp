@@ -5,43 +5,33 @@
 #include <iostream>
 #include "SensorEvolution.h"
 #include "../../brain/neurons/SensorNeuron.h"
+#include "../../life/sensors/bars/BarSensor.h"
+#include "../../life/sensors/bars/DistanceBarSensor.h"
+#include "../../life/sensors/bars/BrightnessBarSensor.h"
 
 SensorEvolution::SensorEvolution(): Evolution() {
 
 }
 
-void SensorEvolution::generateFromRandom(BrainConnector * connector) {
-    sensorLength = (((rand() % 300) / 100.f) + 2) * connector->getCreature()->getSize();
+void SensorEvolution::generateFromRandom(Life * life) {
+    sensorLength = (((rand() % 300) / 100.f) + 2) * life->getEntity()->getSize();
     sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     sensorColor = ((rand() % 999) / 1000.f);
 }
 
-void SensorEvolution::perform(BrainConnector * connector) {
-    int index = connector->getCreature()->addVisionSensorSensor(sensorLength, sensorRotation, sensorColor);
+void SensorEvolution::perform(Life * life) {
+    BarSensor * barSensor = new BrightnessBarSensor(life->getEntity(), 0, sensorLength, sensorColor);
 
-    InputNeuron * distanceNeuron = new DistanceSensorNeuron(index);
-    distanceNeuron->setHueOutline(sensorColor);
-    distanceNeuron->setBrightnessOutline(0.4);
-    distanceNeuron->setName("Distance");
-    distanceNeuron->setGenerationNumber(this->generationNumber);
-    connector->getBrain()->addInputNeuron(distanceNeuron);
-
-    InputNeuron * brightnessNeuron = new BrightnessSensorNeuron(index);
-    brightnessNeuron->setHueOutline(sensorColor);
-    brightnessNeuron->setBrightnessOutline(0.4);
-    brightnessNeuron->setName("Brightness");
-    brightnessNeuron->setGenerationNumber(this->generationNumber + 1);
-    connector->getBrain()->addInputNeuron(brightnessNeuron);
-
-    InputNeuron * sizeNeuron = new SizeSensorNeuron(index);
-    sizeNeuron->setHueOutline(sensorColor);
-    sizeNeuron->setBrightnessOutline(0.4);
-    sizeNeuron->setName("Size");
-    sizeNeuron->setGenerationNumber(this->generationNumber + 2);
-    connector->getBrain()->addInputNeuron(sizeNeuron);
+    InputNeuron * inputNeuron = new InputNeuron();
+    inputNeuron->setHueOutline(sensorColor);
+    inputNeuron->setBrightnessOutline(0.4);
+    inputNeuron->setName("Brightness - WIP");
+    inputNeuron->setGenerationNumber(this->generationNumber);
 
 
+    barSensor->setConnectedNeuron(inputNeuron);
 
+    life->getBrain()->addInputNeuron(inputNeuron);
 
 }
 

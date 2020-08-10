@@ -46,6 +46,7 @@ public:
     int getGenerationNumber() const;
 
     void setGenerationNumber(int generationNumber);
+
 };
 
 

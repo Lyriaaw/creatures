@@ -3,26 +3,30 @@
 //
 
 #include "GenitalsEvolution.h"
+#include "../../life/muscles/externals/Genitals.h"
 
 GenitalsEvolution::GenitalsEvolution(): Evolution() {
 
 }
 
-void GenitalsEvolution::generateFromRandom(BrainConnector * connector) {
+void GenitalsEvolution::generateFromRandom(Life * life) {
     rotation = 1.f;
 }
 
-void GenitalsEvolution::perform(BrainConnector * connector) {
-    connector->getCreature()->setGenitalsRotation(rotation);
+void GenitalsEvolution::perform(Life * life) {
 
-    GenitalsOutputNeuron * genitals = new GenitalsOutputNeuron();
-    genitals->setName("Genitals");
-    genitals->setGenerationNumber(this->generationNumber);
-    connector->getBrain()->addOutputNeuron(genitals);
+    ExternalMuscle * genitals = new Genitals(rotation, life->getEntity());
+
+    OutputNeuron * outputNeuron = new OutputNeuron();
+    outputNeuron->setName("Genitals");
+    outputNeuron->setGenerationNumber(this->generationNumber);
+    life->getBrain()->addOutputNeuron(outputNeuron);
+
+    genitals->addNeuron(outputNeuron);
 }
 
 std::string GenitalsEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Mouth ";
+    return std::to_string(this->generationNumber) + " => Genitals ";
 }
 
 Evolution * GenitalsEvolution::generateWithMate(Evolution * mate) {

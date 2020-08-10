@@ -29,7 +29,7 @@ void BrainConnector::processBrainInputs() {
     }
 
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
-        brain->getInputNeurons().at(it)->fetchInputValue(creature);
+//        brain->getInputNeurons().at(it)->fetchInputValue(creature);
     }
 }
 
@@ -54,7 +54,7 @@ void BrainConnector::processBrain() {
 void BrainConnector::processBrainOutputs() {
 
     for (int it = 0; it < brain->getOutputNeurons().size(); it++) {
-        brain->getOutputNeurons().at(it)->transferOutputValue(creature);
+//        brain->getOutputNeurons().at(it)->transferOutputValue(creature);
     }
 }
 

@@ -4,19 +4,24 @@
 
 #include "EnergySensorEvolution.h"
 #include "../../../brain/neurons/EnergySensorNeuron.h"
+#include "../../../life/sensors/SelfEnergySensor.h"
 
 EnergySensorEvolution::EnergySensorEvolution(): Evolution() {
 
 }
 
-void EnergySensorEvolution::generateFromRandom(BrainConnector * connector) {
+void EnergySensorEvolution::generateFromRandom(Life * life) {
 }
 
-void EnergySensorEvolution::perform(BrainConnector * connector) {
-    InputNeuron * bias = new EnergySensorNeuron();
-    bias->setName("Energy");
-    bias->setGenerationNumber(this->generationNumber);
-    connector->getBrain()->addInputNeuron(bias);
+void EnergySensorEvolution::perform(Life * life) {
+    InputNeuron * inputNeuron = new InputNeuron();
+    inputNeuron->setName("Energy");
+    inputNeuron->setGenerationNumber(this->generationNumber);
+
+    Sensor * energySensor = new SelfEnergySensor(life->getEntity());
+    energySensor->setConnectedNeuron(inputNeuron);
+
+    life->getBrain()->addInputNeuron(inputNeuron);
 }
 
 std::string EnergySensorEvolution::describe() {

@@ -9,3 +9,7 @@ InputNeuron::InputNeuron(): Neuron() {}
 float InputNeuron::getValue() {
     return this->value;
 }
+
+void InputNeuron::setValue(float value) {
+    this->value = value;
+}

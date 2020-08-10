@@ -9,15 +9,16 @@
 #include "entities/Creature.h"
 #include "evolutions/nervous/SensorEvolution.h"
 #include "evolutions/inputs/BiasInputEvolution.h"
-#include "evolutions/muscles/RotationEvolution.h"
+#include "evolutions/musclesEvolutions/RotationEvolution.h"
 #include "evolutions/nervous/LinkEvolution.h"
-#include "evolutions/muscles/SpeedEvolution.h"
+#include "evolutions/musclesEvolutions/SpeedEvolution.h"
 #include "evolutions/EvolutionLibrary.h"
 #include "evolutions/entity/ColorEvolution.h"
 #include "evolutions/entity/SizeEvolution.h"
-#include "evolutions/muscles/MouthEvolution.h"
-#include "evolutions/muscles/GenitalsEvolution.h"
+#include "evolutions/musclesEvolutions/MouthEvolution.h"
+#include "evolutions/musclesEvolutions/GenitalsEvolution.h"
 #include "evolutions/inputs/sensors/EnergySensorEvolution.h"
+#include "life/Life.h"
 
 class CreatureNursery {
 private:
@@ -25,8 +26,8 @@ private:
 public:
     CreatureNursery();
 
-    BrainConnector * generateFromRandom();
-    BrainConnector * Mate(BrainConnector * father, BrainConnector * mother);
+    Life * generateCreatureFromRandom();
+    Life * Mate(Life * father, Life * mother);
 
     const EvolutionLibrary &getEvolutionLibrary() const;
 };

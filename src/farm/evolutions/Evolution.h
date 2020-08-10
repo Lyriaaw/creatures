@@ -8,6 +8,7 @@
 
 #include "../entities/Creature.h"
 #include "../brain/BrainConnector.h"
+#include "../life/Life.h"
 
 class Evolution {
 protected:
@@ -18,9 +19,9 @@ public:
 
     Evolution();
 
-    virtual void generateFromRandom(BrainConnector * connector) = 0;
+    virtual void generateFromRandom(Life * life) = 0;
 
-    virtual void perform(BrainConnector * connector) = 0;
+    virtual void perform(Life * connector) = 0;
 
     virtual std::string describe() = 0;
 

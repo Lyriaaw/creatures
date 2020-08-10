@@ -3,22 +3,26 @@
 //
 
 #include "MouthEvolution.h"
+#include "../../life/muscles/externals/Mouth.h"
+
 MouthEvolution::MouthEvolution(): Evolution() {
 
 }
 
-void MouthEvolution::generateFromRandom(BrainConnector * connector) {
+void MouthEvolution::generateFromRandom(Life * life) {
 //    rotation = ((rand() % 200) / 100.f) - 1.f ;
     rotation = 0;
 }
 
-void MouthEvolution::perform(BrainConnector * connector) {
-    connector->getCreature()->setMouthRotation(rotation);
+void MouthEvolution::perform(Life * life) {
+    ExternalMuscle * mouth = new Mouth(rotation, life->getEntity());
 
-    MouthOutputNeuron * mouth = new MouthOutputNeuron();
-    mouth->setName("Mouth");
-    mouth->setGenerationNumber(this->generationNumber);
-    connector->getBrain()->addOutputNeuron(mouth);
+    OutputNeuron * outputNeuron = new OutputNeuron();
+    outputNeuron->setName("Mouth");
+    outputNeuron->setGenerationNumber(this->generationNumber);
+    life->getBrain()->addOutputNeuron(outputNeuron);
+
+    mouth->addNeuron(outputNeuron);
 }
 
 std::string MouthEvolution::describe() {

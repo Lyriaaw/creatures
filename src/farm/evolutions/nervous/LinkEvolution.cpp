@@ -7,10 +7,10 @@ LinkEvolution::LinkEvolution(): Evolution() {
 
 }
 
-void LinkEvolution::generateFromRandom(BrainConnector * connector) {
+void LinkEvolution::generateFromRandom(Life * life) {
 }
 
-void LinkEvolution::generateFromNeurons(BrainConnector * connector, Neuron * input, Neuron * output) {
+void LinkEvolution::generateFromNeurons(Life * life, Neuron * input, Neuron * output) {
     inputGenerationNumber = input->getGenerationNumber();
     outputGenerationNumber = output->getGenerationNumber();
     weight = ((rand() % 200) / 100.f) - 1.f;
@@ -18,12 +18,12 @@ void LinkEvolution::generateFromNeurons(BrainConnector * connector, Neuron * inp
 
 
 
-void LinkEvolution::perform(BrainConnector * connector) {
+void LinkEvolution::perform(Life * life) {
 
     Neuron * inputNeuron = nullptr;
     Neuron * outputNeuron = nullptr;
 
-    std::vector<Neuron *> connectorNeurons = connector->getBrain()->getNeurons();
+    std::vector<Neuron *> connectorNeurons = life->getBrain()->getNeurons();
 
     for (int it = 0; it < connectorNeurons.size(); it++) {
         Neuron * currentNeuron = connectorNeurons.at(it);
@@ -43,7 +43,7 @@ void LinkEvolution::perform(BrainConnector * connector) {
     }
 
     Link * newLink = new Link(weight, inputNeuron, outputNeuron);
-    connector->getBrain()->addLink(newLink);
+    life->getBrain()->addLink(newLink);
 }
 
 std::string LinkEvolution::describe() {

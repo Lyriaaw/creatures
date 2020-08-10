@@ -63,3 +63,5 @@ int Neuron::getGenerationNumber() const {
 void Neuron::setGenerationNumber(int generationNumber) {
     Neuron::generationNumber = generationNumber;
 }
+
+

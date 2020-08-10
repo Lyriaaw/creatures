@@ -70,14 +70,14 @@ void FarmUI::loadMap() {
 
 void FarmUI::update() {
     // TODO OPTI Clear to_delete
-    clearEntities(farm->getToDelete());
-    farm->clearToDelete();
-
-    addEntities(farm->getAddedEntity());
-    farm->clearAddedEntities();
-
-    addCreatures(farm->getAddedCreatures());
-    farm->clearAddedCreatures();
+//    clearEntities(farm->getToDelete());
+//    farm->clearToDelete();
+//
+//    addEntities(farm->getAddedEntity());
+//    farm->clearAddedEntities();
+//
+//    addCreatures(farm->getAddedCreatures());
+//    farm->clearAddedCreatures();
 
 
     generateTileInfoText();
@@ -179,19 +179,13 @@ void FarmUI::setPositions(Camera *camera) {
     }
 }
 
-void FarmUI::draw(sf::RenderWindow *window, Camera *camera, BrainConnector * selectedEntity) {
-    Creature * selectedCreature = nullptr;
-
+void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntity) {
 
     setPositions(camera);
 
-    if (selectedEntity != nullptr) {
-        selectedCreature = selectedEntity->getCreature();
-    }
-
     window->draw(tilesVertexArray);
     for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->draw(window, camera, selectedCreature);
+        entities.at(it)->draw(window, camera, selectedEntity->getEntity());
     }
 
     window->draw(hoveredTileInfos);

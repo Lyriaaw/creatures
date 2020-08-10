@@ -3,19 +3,24 @@
 //
 
 #include "RotationEvolution.h"
+#include "../../life/muscles/internals/Rotation.h"
 
 RotationEvolution::RotationEvolution(): Evolution() {
 
 }
 
-void RotationEvolution::generateFromRandom(BrainConnector * connector) {
+void RotationEvolution::generateFromRandom(Life * life) {
 }
 
-void RotationEvolution::perform(BrainConnector * connector) {
-    OutputNeuron * rotation = new RotationOutputNeuron();
-    rotation->setName("Rotation");
-    rotation->setGenerationNumber(this->generationNumber);
-    connector->getBrain()->addOutputNeuron(rotation);
+void RotationEvolution::perform(Life * life) {
+    InternalMuscle * rotation = new Rotation(0.0, life->getEntity());
+
+    OutputNeuron * outputNeuron = new OutputNeuron();
+    outputNeuron->setName("Rotation");
+    outputNeuron->setGenerationNumber(this->generationNumber);
+    life->getBrain()->addOutputNeuron(outputNeuron);
+
+    rotation->addNeuron(outputNeuron);
 }
 
 std::string RotationEvolution::describe() {

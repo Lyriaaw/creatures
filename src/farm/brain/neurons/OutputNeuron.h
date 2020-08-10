@@ -15,8 +15,6 @@ public:
 
     float getValue() override;
 
-    virtual void transferOutputValue(Creature * creature) = 0;
-
 };
 
 // #################

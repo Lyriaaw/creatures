@@ -11,8 +11,8 @@
 class SpeedEvolution: public Evolution {
 public:
     SpeedEvolution();
-    void generateFromRandom(BrainConnector * connector) override;
-    void perform(BrainConnector * connector) override;
+    void generateFromRandom(Life * life) override;
+    void perform(Life * life) override;
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
 };

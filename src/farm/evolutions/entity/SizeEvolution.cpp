@@ -8,12 +8,12 @@ SizeEvolution::SizeEvolution(): Evolution() {
 
 }
 
-void SizeEvolution::generateFromRandom(BrainConnector * connector) {
+void SizeEvolution::generateFromRandom(Life * life) {
     this->size = ((rand() % 1000) / 100.f) + 5;
 }
 
-void SizeEvolution::perform(BrainConnector * connector) {
-    connector->getCreature()->setSize(this->size);
+void SizeEvolution::perform(Life * life) {
+    life->getEntity()->setSize(this->size);
 }
 
 std::string SizeEvolution::describe() {

@@ -14,13 +14,13 @@ private:
     float weight;
 public:
     LinkEvolution();
-    void generateFromRandom(BrainConnector * connector) override;
-    void perform(BrainConnector * connector) override;
+    void generateFromRandom(Life * life) override;
+    void perform(Life * life) override;
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(LinkEvolution * mate);
 
-    void generateFromNeurons(BrainConnector * connector, Neuron * input, Neuron * output);
+    void generateFromNeurons(Life * life, Neuron * input, Neuron * output);
 
 };
 

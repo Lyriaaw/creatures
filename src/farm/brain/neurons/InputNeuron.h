@@ -13,9 +13,11 @@ class InputNeuron: public Neuron {
 public:
     InputNeuron();
 
-    virtual void fetchInputValue(Creature * creature) = 0;
-
     float getValue() override ;
+
+    void setValue(float value);
+
+
 };
 
 

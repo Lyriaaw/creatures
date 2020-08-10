@@ -1,0 +1,23 @@
+//
+// Created by Amalric Lombard de Buffières on 8/10/20.
+//
+
+#include "SizeBarSensor.h"
+
+void SizeBarSensor::processSensorValue(float distance, Entity *closestEntity) {
+    float biggestEntity = std::max(this->entity->getSize(), closestEntity->getSize());
+    float smallestEntity = std::min(this->entity->getSize(), closestEntity->getSize());
+
+    float sizeRatio = 1 - (smallestEntity / biggestEntity);
+    if (this->entity->getSize() > closestEntity->getSize()) {
+        sizeRatio *= -1;
+    }
+    value = (0.5f + (sizeRatio / 2.f));
+}
+
+std::string SizeBarSensor::getName() {
+    return "Size bar";
+}
+
+SizeBarSensor::SizeBarSensor(Entity *entity, float rotation, float length) : BarSensor(entity, rotation, length) {}
+

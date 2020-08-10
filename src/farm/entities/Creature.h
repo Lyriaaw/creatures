@@ -7,7 +7,6 @@
 
 
 #include "Entity.h"
-#include "../brain/muscles/Muscle.h"
 #include "../brain/ActionDTO.h"
 
 class Creature: public Entity {
@@ -75,7 +74,6 @@ private:
     float genitalsValue;
 
 
-    std::vector<Muscle *> muscles;
 
     void getSensorValueFromSensorEquation(int sensorIndex, float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
 };
