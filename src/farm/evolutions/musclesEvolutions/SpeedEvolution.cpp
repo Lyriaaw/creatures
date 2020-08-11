@@ -21,6 +21,8 @@ void SpeedEvolution::perform(Life * life) {
     life->getBrain()->addOutputNeuron(outputNeuron);
 
     movement->addNeuron(outputNeuron);
+
+    life->addInternalMuscle(movement);
 }
 
 std::string SpeedEvolution::describe() {

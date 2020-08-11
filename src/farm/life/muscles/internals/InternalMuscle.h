@@ -12,7 +12,7 @@ class InternalMuscle: public Muscle {
 public:
     InternalMuscle(float rotation, Entity *entity);
 
-    virtual std::vector<Entity *> executeActions() = 0;
+    virtual std::vector<Entity *> executeAction() = 0;
 };
 
 

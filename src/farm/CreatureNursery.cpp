@@ -24,11 +24,13 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     int y = distHeight(mt);
 
     Entity * entity = new Entity(Point(x, y));
+    entity->setBrightness(0.5f);
     Brain * brain = new Brain();
 
     Life * life = new Life();
     life->setEntity(entity);
     life->setBrain(brain);
+    life->setEntity(entity);
 
     std::vector<Evolution *> creatureGenome;
 
@@ -58,7 +60,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
 
 
-    int sensorCount = rand() % 4;
+    int sensorCount = rand() % 4 + 1;
     for (int it = 0; it < sensorCount; it++) {
 
         SensorEvolution * sensorEvol = new SensorEvolution();
@@ -112,6 +114,8 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
 
     brain->generateLinkGrid();
+
+    life->connectSensorAndMuscles();
 
     evolutionLibrary.addGenome(life->getEntity()->getId(), creatureGenome);
     return life;
@@ -208,9 +212,6 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     life->setBrain(childBrain);
 
 
-
-
-
     for (int it = 0; it < childGenome.size(); it++) {
         childGenome.at(it)->perform(life);
     }
@@ -218,6 +219,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     life->getBrain()->generateLinkGrid();
     evolutionLibrary.addGenome(life->getEntity()->getId(), childGenome);
 
+    life->connectSensorAndMuscles();
     return life;
 }
 

@@ -61,6 +61,25 @@ void StatisticsScreen::loadGraphs() {
 
 
 
+    Graph * brainTimeGraph = new Graph("Brain times", font);
+    brainTimeGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+
+    brainTimeGraph->addLine(farm->getDataAnalyser().getChunkSelection(), 2, 255, 255, 255);
+
+    brainTimeGraph->addLine(farm->getDataAnalyser().getSensorProcessing(), 2, 0, 0, 0);
+
+    brainTimeGraph->addLine(farm->getDataAnalyser().getBrainProcessing(), 2, 0, 0, 255);
+
+    brainTimeGraph->addLine(farm->getDataAnalyser().getExternalActions(), 2, 128, 255, 128);
+
+    brainTimeGraph->windowResized(windowWidth, windowHeight);
+
+
+
+
+
+
+
     Graph * energyGraph = new Graph("Energies", font);
     energyGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
 
@@ -79,6 +98,7 @@ void StatisticsScreen::loadGraphs() {
     graphs.emplace_back(populationGraph);
     graphs.emplace_back(scoreGraph);
     graphs.emplace_back(timeGraph);
+    graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(energyGraph);
 }
 

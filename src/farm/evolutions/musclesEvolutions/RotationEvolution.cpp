@@ -21,6 +21,8 @@ void RotationEvolution::perform(Life * life) {
     life->getBrain()->addOutputNeuron(outputNeuron);
 
     rotation->addNeuron(outputNeuron);
+
+    life->addInternalMuscle(rotation);
 }
 
 std::string RotationEvolution::describe() {

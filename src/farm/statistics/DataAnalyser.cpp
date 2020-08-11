@@ -38,6 +38,10 @@ DataAnalyser::DataAnalyser() {
     firstQuartileScore = new DataItem("firstQuartileScore", true);
     lastQuartileScore = new DataItem("lastQuartileScore", true);
 
+    chunkSelection = new DataItem("chunkSelection", true);
+    sensorProcessing = new DataItem("sensorProcessing", true);
+    brainProcessing = new DataItem("brainProcessing", true);
+    externalActions = new DataItem("externalActions", true);
 
 }
 
@@ -146,4 +150,20 @@ DataItem *DataAnalyser::getGroundEnergy() const {
 
 DataItem *DataAnalyser::getNaturalMatings() const {
     return naturalMatings;
+}
+
+DataItem *DataAnalyser::getChunkSelection() const {
+    return chunkSelection;
+}
+
+DataItem *DataAnalyser::getSensorProcessing() const {
+    return sensorProcessing;
+}
+
+DataItem *DataAnalyser::getBrainProcessing() const {
+    return brainProcessing;
+}
+
+DataItem *DataAnalyser::getExternalActions() const {
+    return externalActions;
 }

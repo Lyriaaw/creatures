@@ -4,7 +4,7 @@
 
 #include "SizeBarSensor.h"
 
-void SizeBarSensor::processSensorValue(float distance, Entity *closestEntity) {
+void SizeBarSensor::processSensorValue(double distance, Entity *closestEntity) {
     float biggestEntity = std::max(this->entity->getSize(), closestEntity->getSize());
     float smallestEntity = std::min(this->entity->getSize(), closestEntity->getSize());
 
@@ -13,6 +13,8 @@ void SizeBarSensor::processSensorValue(float distance, Entity *closestEntity) {
         sizeRatio *= -1;
     }
     value = (0.5f + (sizeRatio / 2.f));
+
+    std::cout << "Sie sensor" << std::endl;
 }
 
 std::string SizeBarSensor::getName() {

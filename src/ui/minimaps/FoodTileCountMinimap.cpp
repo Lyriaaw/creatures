@@ -41,10 +41,10 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 
-    std::vector<Food *> currentFoods = farm->getFoods();
+    std::vector<Entity *> currentEntities = farm->getEntities();
 
-    for (int it = 0; it < currentFoods.size(); it++) {
-        Point point = currentFoods.at(it)->getPosition();
+    for (int it = 0; it < currentEntities.size(); it++) {
+        Point point = currentEntities.at(it)->getPosition();
         Point tilePosition = point.getTileCoordinates();
 
         values[int(tilePosition.getX())][int(tilePosition.getY())]++;

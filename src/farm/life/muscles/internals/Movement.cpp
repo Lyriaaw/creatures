@@ -4,7 +4,7 @@
 
 #include "Movement.h"
 
-std::vector<Entity *> Movement::executeActions() {
+std::vector<Entity *> Movement::executeAction() {
 
     float actualSpeed = this->neurons.at(0)->getValue() * this->entity->getSize();
 
@@ -25,13 +25,13 @@ std::vector<Entity *> Movement::executeActions() {
     if (nextX < 0) {
         nextX = 0;
     }
-    if (int(nextX) >= FARM_WIDTH) {
+    if (nextX >= FARM_WIDTH) {
         nextX = FARM_WIDTH - 1;
     }
     if (nextY < 0) {
         nextY = 0;
     }
-    if (int(nextY) >= FARM_HEIGHT) {
+    if (nextY >= FARM_HEIGHT) {
         nextY = FARM_HEIGHT - 1;
     }
 
@@ -39,6 +39,9 @@ std::vector<Entity *> Movement::executeActions() {
     currentEntityPosition.setY(nextY);
 
     this->entity->setPosition(currentEntityPosition);
+
+    std::vector<Entity *> empty;
+    return empty;
 }
 
 Movement::Movement(float rotation, Entity *entity) : InternalMuscle(rotation, entity) {

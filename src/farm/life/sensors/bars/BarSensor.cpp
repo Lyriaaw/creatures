@@ -47,7 +47,6 @@ void BarSensor::findSelectedChunks() {
     // Iterating through the chunks under the sensor end and the creature
     for (int x = minChunkX; x <= maxChunkX; x++) {
         for (int y = minChunkY; y <= maxChunkY; y++) {
-
             // If the chunk have not already been selected, select it
             bool found(false);
             int index = 0;
@@ -94,21 +93,28 @@ void BarSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
 }
 
 
-void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities) {
-    float currentDistance(0.f);
+void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, double m, double p, std::vector<Entity *> accessibleEntities) {
+    double currentDistance(FARM_WIDTH);
 
-    Entity *closestEntity;
+    Entity *closestEntity = nullptr;
+
 
     for (int jt = 0; jt < accessibleEntities.size(); jt++) {
         Entity *currentAccessibleEntity = accessibleEntities.at(jt);
 
-        float entitiesDistance = sqrt(
+        if (currentAccessibleEntity->getId() == this->entity->getId()) {
+            continue;
+        }
+
+        double entitiesDistance = sqrt(
                 pow(this->entity->getPosition().getX() - currentAccessibleEntity->getPosition().getX(), 2) +
                 pow(this->entity->getPosition().getY() - currentAccessibleEntity->getPosition().getY(), 2));
 
         if (entitiesDistance > this->length + currentAccessibleEntity->getSize()) {
             continue;
         }
+
+
 
         // Check if the entity is between the two ends of the sensor
         // Add the size of the entity for margin purposes
@@ -137,14 +143,9 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, f
             continue;
         }
 
-
-        float closestX =
-                ((currentAccessibleEntity->getPosition().getX() + m * currentAccessibleEntity->getPosition().getY()) -
-                 (m * p)) / float(pow(m, 2) + 1);
-        float closestY = (m * (currentAccessibleEntity->getPosition().getX() +
-                               m * currentAccessibleEntity->getPosition().getY()) + p) / float(pow(m, 2) + 1);
-        float preciseEntitiesDistance = sqrt(
-                pow(closestX - entity->getPosition().getX(), 2) + pow(closestY - entity->getPosition().getY(), 2));
+        float closestX = ((currentAccessibleEntity->getPosition().getX() + m * currentAccessibleEntity->getPosition().getY()) - (m * p)) / float(pow(m, 2) + 1);
+        float closestY = (m * (currentAccessibleEntity->getPosition().getX() + m * currentAccessibleEntity->getPosition().getY()) + p) / float(pow(m, 2) + 1);
+        float preciseEntitiesDistance = sqrt( pow(closestX - entity->getPosition().getX(), 2) + pow(closestY - entity->getPosition().getY(), 2));
 
 
         float sensorCurrentDistanceValue = preciseEntitiesDistance;
@@ -155,12 +156,22 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, f
         currentDistance = sensorCurrentDistanceValue;
         closestEntity = accessibleEntities.at(jt);
 
-
+        this->processSensorValue(currentDistance, closestEntity);
     }
 
-    this->processSensorValue(currentDistance, closestEntity);
+    if (closestEntity == nullptr) {
+        value = 0.0;
+    }
 }
 
-BarSensor::BarSensor(Entity *entity, float rotation, float length) : Sensor(entity), rotation(rotation),
+BarSensor::BarSensor(Entity *entity, double rotation, double length) : Sensor(entity), rotation(rotation),
                                                                      length(length) {}
+
+double BarSensor::getRotation() const {
+    return rotation;
+}
+
+double BarSensor::getLength() const {
+    return length;
+}
 

@@ -33,3 +33,7 @@ void Sensor::passValueToNeuron() {
 void Sensor::setConnectedNeuron(InputNeuron *connectedNeuron) {
     Sensor::connectedNeuron = connectedNeuron;
 }
+
+void Sensor::setEntity(Entity *entity) {
+    Sensor::entity = entity;
+}

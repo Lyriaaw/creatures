@@ -5,31 +5,117 @@
 #include <iostream>
 #include "FarmUI.h"
 #include "Camera.h"
-#include "CreatureUI.h"
-#include "FoodUI.h"
 #include "../colors/RGBColor.h"
 
 FarmUI::FarmUI(Farm *farm, sf::Font * font): farm(farm), hoveredTile(Point(-1, -1)), font(font) {
     loadTexts();
+    loadFarm();
 }
+
 
 void FarmUI::loadTexts() {
     hoveredTileInfos.setFont(*font);
     hoveredTileInfos.setCharacterSize(0);
 }
 
-void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
-    hoveredTile = worldPosition.getTileCoordinates();
 
-    Point topLeftChunk = Point(hoveredTile.getX() * TILE_SIZE, hoveredTile.getY() * TILE_SIZE);
-    Point screenTopLeft = camera->getScreenCoordinates(topLeftChunk);
-
-
-    hoveredTileInfos.setPosition(screenTopLeft.getX(), screenTopLeft.getY());
-    hoveredTileInfos.setFillColor(sf::Color(100, 0, 0));
-    hoveredTileInfos.setCharacterSize((5 / TILE_PER_CHUNK) * camera->getZoom());
-    generateTileInfoText();
+void FarmUI::loadFarm() {
+    loadMap();
+    loadLifes();
+    loadEntities();
 }
+
+void FarmUI::loadMap() {
+    tilesVertexArray = sf::VertexArray(sf::Quads, TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT * 4);
+}
+
+void FarmUI::loadLifes() {
+    for (int it = 0; it < farm->getLifes().size(); it++) {
+        Life * currentLife = farm->getLifes().at(it);
+
+        LifeUI * ui = new LifeUI(currentLife, font);
+        lifeUIs.emplace_back(ui);
+    }
+}
+
+void FarmUI::loadEntities() {
+    for (int it = 0; it < farm->getEntities().size(); it++) {
+        Entity * currentEntity = farm->getEntities().at(it);
+
+        EntityUI * ui = new EntityUI(currentEntity, font);
+        entityUIs.emplace_back(ui);
+    }
+}
+
+
+// =============
+
+
+void FarmUI::addLife(Life * life) {
+    LifeUI * ui = new LifeUI(life, font);
+    lifeUIs.emplace_back(ui);
+}
+
+void FarmUI::addEntity(Entity * entity) {
+    EntityUI * ui = new EntityUI(entity, font);
+    entityUIs.emplace_back(ui);
+}
+
+void FarmUI::addLifes(std::vector<Life *> addedToFarm) {
+    for (int it = 0; it < addedToFarm.size(); it++) {
+        addLife(addedToFarm.at(it));
+    }
+}
+
+void FarmUI::addEntities(std::vector<Entity *> addedToFarm) {
+    for (int it = 0; it < addedToFarm.size(); it++) {
+        addEntity(addedToFarm.at(it));
+    }
+}
+
+
+void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
+//    for (int it = 0; it < deletedFromFarm.size(); it++) {
+//        Life * lifeToDelete = deletedFromFarm.at(it);
+//
+//        int index = -1;
+//        for (int jt = 0; jt < lifeUIs.size(); jt++) {
+//            LifeUI * currentLife = lifeUIs.at(jt);
+//
+//            if (currentLife->getLife()->getEntity()->getId() == lifeToDelete->getEntity()->getId()) {
+//                index = jt;
+//            }
+//        }
+//
+//        if (index != -1) {
+//            lifeUIs.erase(lifeUIs.begin() + index);
+//        }
+//
+//    }
+}
+
+void FarmUI::clearDeletedEntities(std::vector<Entity *> deletedFromFarm) {
+    for (int it = 0; it < deletedFromFarm.size(); it++) {
+        Entity * entityToDelete = deletedFromFarm.at(it);
+
+        int index = -1;
+        for (int jt = 0; jt < entityUIs.size(); jt++) {
+            EntityUI * currentEntity = entityUIs.at(jt);
+
+            if (currentEntity->getEntity()->getId() == entityToDelete->getId()) {
+                index = jt;
+            }
+        }
+
+        if (index != -1) {
+            entityUIs.erase(entityUIs.begin() + index);
+        }
+    }
+}
+
+
+// =============
+
 
 void FarmUI::generateTileInfoText() {
 
@@ -51,34 +137,22 @@ void FarmUI::generateTileInfoText() {
     hoveredTileInfos.setString(tileInfo);
 }
 
-void FarmUI::loadMap() {
-    tilesVertexArray = sf::VertexArray(sf::Quads, TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT * 4);
 
-//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-//        std::vector<sf::RectangleShape> line;
-//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-//
-//            sf::RectangleShape rectangle = sf::RectangleShape(sf::Vector2f(TILE_SIZE - 2, TILE_SIZE - 2));
-//            rectangle.setPosition((float(it) * TILE_SIZE) + 1, (float(jt) * TILE_SIZE) + 1);
-//
-//
-//            line.emplace_back(rectangle);
-//        }
-//        tiles.emplace_back(line);
-//    }
-}
 
 void FarmUI::update() {
     // TODO OPTI Clear to_delete
-//    clearEntities(farm->getToDelete());
-//    farm->clearToDelete();
-//
-//    addEntities(farm->getAddedEntity());
-//    farm->clearAddedEntities();
-//
-//    addCreatures(farm->getAddedCreatures());
-//    farm->clearAddedCreatures();
 
+    clearDeletedEntities(farm->getEntityToDelete());
+    farm->clearToDeleteEntities();
+
+    clearDeletedLifes(farm->getLifesToDelete());
+    farm->clearToDeleteLifes();
+
+    addLifes(farm->getLifesAdded());
+    farm->clearAddedLifes();
+
+    addEntities(farm->getEntityAdded());
+    farm->clearAddedEntities();
 
     generateTileInfoText();
 }
@@ -180,62 +254,43 @@ void FarmUI::setPositions(Camera *camera) {
 }
 
 void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntity) {
+    Entity * selected = nullptr;
+
+    if (selectedEntity != nullptr) {
+        selected = selectedEntity->getEntity();
+    }
 
     setPositions(camera);
 
     window->draw(tilesVertexArray);
-    for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->draw(window, camera, selectedEntity->getEntity());
+    for (int it = 0; it < entityUIs.size(); it++) {
+        entityUIs.at(it)->draw(window, camera, selected);
     }
+
+    for (int it = 0; it < lifeUIs.size(); it++) {
+        lifeUIs.at(it)->draw(window, camera, selected);
+    }
+
+
 
     window->draw(hoveredTileInfos);
 }
 
-void FarmUI::clearEntities(std::vector<Entity *> toDelete) {
-    for (int it = 0; it < toDelete.size(); it++) {
-        Entity * entityToDelete = toDelete.at(it);
-
-        int index = -1;
-        for (int jt = 0; jt < entities.size(); jt++) {
-            EntityUI * currentEntityUI = entities.at(jt);
-
-            if (currentEntityUI->getEntity()->getId() == entityToDelete->getId()) {
-                index = jt;
-            }
-        }
-
-        if (index != -1) {
-            entities.erase(entities.begin() + index);
-        }
-
-    }
-}
-
-void FarmUI::addEntities(std::vector<Food *> to_add) {
-    for (int it = 0; it < to_add.size(); it++) {
-        FoodUI *entityUi = new FoodUI(to_add.at(it));
-        entities.push_back(entityUi);
-    }
-}
-void FarmUI::addCreatures(std::vector<Creature *> to_add) {
-    for (int it = 0; it < to_add.size(); it++) {
-        CreatureUI *entityUi = new CreatureUI(to_add.at(it), font);
-        entities.push_back(entityUi);
-    }
-}
 
 
 
-void FarmUI::setEntities(const std::vector<EntityUI *> entities) {
-    FarmUI::entities = entities;
-}
 
-void FarmUI::addCreature(CreatureUI * creatureUI) {
-    this->entities.push_back(creatureUI);
-}
+void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
+    hoveredTile = worldPosition.getTileCoordinates();
 
-const std::vector<EntityUI *> &FarmUI::getEntities() const {
-    return entities;
+    Point topLeftChunk = Point(hoveredTile.getX() * TILE_SIZE, hoveredTile.getY() * TILE_SIZE);
+    Point screenTopLeft = camera->getScreenCoordinates(topLeftChunk);
+
+
+    hoveredTileInfos.setPosition(screenTopLeft.getX(), screenTopLeft.getY());
+    hoveredTileInfos.setFillColor(sf::Color(100, 0, 0));
+    hoveredTileInfos.setCharacterSize((5 / TILE_PER_CHUNK) * camera->getZoom());
+    generateTileInfoText();
 }
 
 

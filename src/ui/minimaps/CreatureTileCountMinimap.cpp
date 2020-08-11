@@ -45,14 +45,14 @@ void CreatureTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 
-    std::vector<BrainConnector *> currentConnectors = farm->getConnectors();
+    std::vector<Life *> currentLifes = farm->getLifes();
 
-    for (int it = 0; it < currentConnectors.size(); it++) {
-        Point point = currentConnectors.at(it)->getCreature()->getPosition();
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Point point = currentLifes.at(it)->getEntity()->getPosition();
         Point tilePosition = point.getTileCoordinates();
 
         values[int(tilePosition.getX())][int(tilePosition.getY())]++;
-        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentConnectors.at(it)->getCreature()->getColor();
+        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentLifes.at(it)->getEntity()->getColor();
     }
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {

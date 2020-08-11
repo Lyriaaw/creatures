@@ -3,8 +3,6 @@
 //
 
 #include "MainWindow.h"
-#include "components/CreatureUI.h"
-#include "components/FoodUI.h"
 #include "components/FarmUI.h"
 #include "views/WorldScreen.h"
 #include "views/StatisticsScreen.h"
@@ -60,28 +58,6 @@ void MainWindow::loadFarm() {
     farm->InitFromRandom();
 
     farmUi = new FarmUI(farm, font);
-    farmUi->loadMap();
-
-    std::vector<EntityUI *> entityUis;
-
-    for (int it = 0; it < farm->getFoods().size(); it++) {
-        Food *entity = farm->getFoods().at(it);
-
-        FoodUI *entityUi = new FoodUI(entity);
-        entityUis.push_back(entityUi);
-    }
-
-
-    for (int it = 0; it < farm->getConnectors().size(); it++) {
-        Creature *entity = farm->getConnectors().at(it)->getCreature();
-
-        CreatureUI *entityUi = new CreatureUI(entity, font);
-        entityUis.push_back(entityUi);
-    }
-
-
-
-    farmUi->setEntities(entityUis);
 }
 
 void MainWindow::loadScreens() {
@@ -176,6 +152,10 @@ void MainWindow::runLoop() {
 
     while (running) {
         handleEvents();
+
+
+
+
         updateInformationLabel();
         draw();
 
@@ -223,7 +203,7 @@ void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
     if (mainCamera != nullptr) {
-        farmUi->draw(window, mainCamera, selectedCreature);
+        farmUi->draw(window, mainCamera, selectedLife);
     }
 
     if (brainUi != nullptr) {
@@ -247,8 +227,8 @@ void MainWindow::draw() {
 
 
 Entity * MainWindow::getSelectedEntity() {
-    if (selectedCreature != nullptr) {
-        return selectedCreature->getEntity();
+    if (selectedLife != nullptr) {
+        return selectedLife->getEntity();
     }
     if (selectedEntity != nullptr) {
         return selectedEntity;
@@ -365,13 +345,6 @@ void MainWindow::handleMouseMove(int x, int y) {
     }
 
 
-
-
-    Entity * globalSelectedEntity = getSelectedEntity();
-    if (leftMouseButtonDown && globalSelectedEntity != nullptr) {
-        globalSelectedEntity->setPosition({newMousePosition.getX(), newMousePosition.getY()});
-    }
-
     farmUi->mouseMoved(newMousePosition, mainCamera);
 
 }
@@ -412,31 +385,22 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
 
         bool found = false;
-        for (int it = 0; it < farm->getConnectors().size(); it++) {
-            Life * connector = farm->getConnectors().at(it);
+        for (int it = 0; it < farm->getLifes().size(); it++) {
+            Life * connector = farm->getLifes().at(it);
 
             double deltaX = abs(worldCoordinates.getX() - connector->getEntity()->getPosition().getX());
             double deltaY = abs(worldCoordinates.getY() - connector->getEntity()->getPosition().getY());
 
             if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
-                if (selectedCreature != nullptr) {
-                    Life * newCreature = farm->getNursery()->Mate(selectedCreature, connector);
+                selectedLife = farm->getLifes().at(it);
 
-                    farm->addLife(newCreature);
-
-                    CreatureUI *entityUi = new CreatureUI(newCreature->getEntity(), font);
-                    farmUi->addCreature(entityUi);
-                }
-
-                selectedCreature = farm->getConnectors().at(it);
-
-                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedCreature->getEntity()->getId());
-                std::vector<Neuron *> neurons = selectedCreature->getBrain()->getNeurons();
+                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedLife->getEntity()->getId());
+                std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
 
                 if (brainUi != nullptr) {
                     delete brainUi;
                 }
-                brainUi = new BrainUI(selectedCreature->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
+                brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
 
 
                 selectedEntity = nullptr;
@@ -444,22 +408,22 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
             }
         }
 
-        for (int it = 0; it < farm->getFoods().size(); it++) {
-            Entity * entity = farm->getFoods().at(it);
-
-            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
-            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
-
-            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
-                selectedEntity = entity;
-                selectedCreature = nullptr;
-                found = true;
-            }
-        }
+//        for (int it = 0; it < farm->getFoods().size(); it++) {
+//            Entity * entity = farm->getFoods().at(it);
+//
+//            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
+//            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+//
+//            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+//                selectedEntity = entity;
+//                selectedLife = nullptr;
+//                found = true;
+//            }
+//        }
 
         if (!found) {
             selectedEntity = nullptr;
-            selectedCreature = nullptr;
+            selectedLife = nullptr;
         }
     }
 }
@@ -523,15 +487,15 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             break;
         case Keyboard::Key::C:
             this->selectedEntity = nullptr;
-            this->selectedCreature = nullptr;
+            this->selectedLife = nullptr;
             delete brainUi;
             brainUi = nullptr;
             break;
         case Keyboard::Key::B:
             this->selectedEntity = nullptr;
-            this->selectedCreature = farm->getScoreSortedCreatures().at(0);
+            this->selectedLife = farm->getScoreSortedCreatures().at(0);
             if (mainCamera != nullptr) {
-                this->mainCamera->setCenter(selectedCreature->getCreature()->getPosition());
+                this->mainCamera->setCenter(selectedLife->getEntity()->getPosition());
             }
             delete brainUi;
             brainUi = nullptr;
@@ -556,16 +520,16 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             break;
         case Keyboard::Key::R:
             this->selectedEntity = nullptr;
-            this->selectedCreature = nullptr;
+            this->selectedLife = nullptr;
             delete brainUi;
             brainUi = nullptr;
 
-            int randomCreatureIndex = rand() % farm->getConnectors().size();
-            BrainConnector * creature = farm->getConnectors().at(randomCreatureIndex);
+            int randomCreatureIndex = rand() % farm->getLifes().size();
+            Life * life = farm->getLifes().at(randomCreatureIndex);
 
-            selectedCreature = creature;
+            selectedLife = life;
 
-            brainUi = new BrainUI(selectedCreature->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
+            brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
 
 
 

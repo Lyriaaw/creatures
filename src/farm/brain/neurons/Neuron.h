@@ -21,6 +21,8 @@ protected:
     std::string name;
 
 public:
+    Neuron();
+
     virtual float getValue() = 0;
 
     int getX() const;

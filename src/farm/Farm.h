@@ -66,40 +66,43 @@ public:
     void statistics();
     void aTickHavePassed();
 
-    void removeEnergyFromFarm(double amount);
 
     void removeDeletedEntities();
     void clearToDelete();
     void generateEntityGrid();
-    bool isEntityAboutToBeDeleted(int id);
 
     Entity * getEntityFromId(int id);
     Life * getLifeFromId(int id);
+
+    const std::vector<Life *> &getLifes() const;
+
+    const std::vector<Entity *> &getEntities() const;
 
     static std::string getHumanReadableEnergy(float givenEnergy) ;
 
 
     Map *getMap() const;
 
-    const std::vector<Food *> &getFoods() const;
 
 
     CreatureNursery *getNursery() const;
 
-    const std::vector<BrainConnector *> &getConnectors() const;
 
     void addLife(Life * life);
 
     std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedChunks);
     std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedChunks);
 
+    const std::vector<Life *> &getLifesAdded() const;
+    const std::vector<Entity *> &getEntityAdded() const;
+    const std::vector<Entity *> &getEntityToDelete() const;
+    const std::vector<Life *> &getLifesToDelete() const;
 
 
-
-
-
-    void clearAddedCreatures();
+    void clearAddedLifes();
     void clearAddedEntities();
+    void clearToDeleteLifes();
+    void clearToDeleteEntities();
 
     std::vector<Life *> getScoreSortedCreatures();
 
@@ -108,6 +111,8 @@ public:
     void setDataAnalyser(const DataAnalyser &dataAnalyser);
 
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
+
+
 };
 
 

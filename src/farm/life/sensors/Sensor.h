@@ -36,6 +36,8 @@ public:
 
     void setConnectedNeuron(InputNeuron *connectedNeuron);
 
+    void setEntity(Entity *entity);
+
 };
 
 

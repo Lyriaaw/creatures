@@ -57,6 +57,8 @@ public:
     void setAge(int age);
     void aTickHavePassed();
 
+    void setBrightness(float brightness);
+
 
 protected:
     static int GLOBAL_INDEX;

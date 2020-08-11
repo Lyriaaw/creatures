@@ -18,10 +18,12 @@ void BiasInputEvolution::perform(Life * life) {
     inputNeuron->setName("Bias");
     inputNeuron->setGenerationNumber(this->generationNumber);
 
-    Sensor * energySensor = new BiasSensor(life->getEntity());
-    energySensor->setConnectedNeuron(inputNeuron);
+    Sensor * biasSensor = new BiasSensor(life->getEntity());
+    biasSensor->setConnectedNeuron(inputNeuron);
 
     life->getBrain()->addInputNeuron(inputNeuron);
+
+    life->addSensor(biasSensor);
 }
 
 std::string BiasInputEvolution::describe() {

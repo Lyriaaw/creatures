@@ -13,6 +13,9 @@ void Life::processSensors(std::vector<Entity *> availableEntities, std::vector<T
     }
 }
 void Life::processBrain() {
+    for (int it = 0; it < brain->getLinks().size(); it++) {
+        brain->getLinks().at(it)->getOutput()->clear();
+    }
 
     for (int it = 0; it < brain->getLinksGrid().size(); it++) {
         std::vector<Link *> linksLine = brain->getLinksGrid().at(it);
@@ -39,8 +42,7 @@ std::vector<ActionDTO> Life::executeExternalActions(std::vector<Entity *> availa
 std::vector<Entity *> Life::executeInternalActions() {
     std::vector<Entity * > entitiesCreated;
     for (int it = 0; it < internalMuscles.size(); it++) {
-        std::vector<Entity * > muscleEntities = internalMuscles.at(it)->executeActions();
-
+        std::vector<Entity * > muscleEntities = internalMuscles.at(it)->executeAction();
         entitiesCreated.insert(entitiesCreated.begin(), muscleEntities.begin(), muscleEntities.end());
     }
     return entitiesCreated;
@@ -148,3 +150,40 @@ void Life::setEntity(Entity *entity) {
 void Life::setBrain(Brain *brain) {
     Life::brain = brain;
 }
+
+
+void Life::addSensor(Sensor * sensor) {
+    this->sensors.emplace_back(sensor);
+}
+void Life::addInternalMuscle(InternalMuscle * muscle) {
+    this->internalMuscles.emplace_back(muscle);
+}
+void Life::addExternalMuscle(ExternalMuscle * muscle) {
+    this->externalMuscles.emplace_back(muscle);
+}
+
+void Life::connectSensorAndMuscles() {
+    for (int it = 0; it < internalMuscles.size(); it++) {
+        internalMuscles.at(it)->setEntity(entity);
+    }
+    for (int it = 0; it < externalMuscles.size(); it++) {
+        externalMuscles.at(it)->setEntity(entity);
+    }
+    for (int it = 0; it < sensors.size(); it++) {
+        sensors.at(it)->setEntity(entity);
+    }
+
+}
+
+const std::vector<Sensor *> &Life::getSensors() const {
+    return sensors;
+}
+
+const std::vector<InternalMuscle *> &Life::getInternalMuscles() const {
+    return internalMuscles;
+}
+
+const std::vector<ExternalMuscle *> &Life::getExternalMuscles() const {
+    return externalMuscles;
+}
+

@@ -23,6 +23,8 @@ void GenitalsEvolution::perform(Life * life) {
     life->getBrain()->addOutputNeuron(outputNeuron);
 
     genitals->addNeuron(outputNeuron);
+
+    life->addExternalMuscle(genitals);
 }
 
 std::string GenitalsEvolution::describe() {

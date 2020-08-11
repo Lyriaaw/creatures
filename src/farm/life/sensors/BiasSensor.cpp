@@ -11,7 +11,7 @@ std::string BiasSensor::getName() {
 }
 
 void BiasSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
-    this->connectedNeuron->setValue(1.0);
+    this->value = 1;
 }
 
 void BiasSensor::findSelectedChunks() {

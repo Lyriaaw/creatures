@@ -64,4 +64,6 @@ void Neuron::setGenerationNumber(int generationNumber) {
     Neuron::generationNumber = generationNumber;
 }
 
+Neuron::Neuron(): value(0.0) {}
+
 

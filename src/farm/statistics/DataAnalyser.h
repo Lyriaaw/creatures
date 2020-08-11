@@ -29,6 +29,11 @@ private:
     DataItem * statisticsTime;
     DataItem * brainProcessingTime;
 
+    DataItem * chunkSelection;
+    DataItem * sensorProcessing;
+    DataItem * brainProcessing;
+    DataItem * externalActions;
+
     DataItem * totalTime;
 
     DataItem * population;
@@ -95,6 +100,14 @@ public:
     DataItem *getGroundEnergy() const;
 
     DataItem *getNaturalMatings() const;
+
+    DataItem *getChunkSelection() const;
+
+    DataItem *getSensorProcessing() const;
+
+    DataItem *getBrainProcessing() const;
+
+    DataItem *getExternalActions() const;
 };
 
 

@@ -15,16 +15,16 @@ class EntityUI {
 protected:
     Entity *entity;
 
-    sf::VertexArray vertexArray;
+    sf::Font * font;
+
     sf::Color color;
+    sf::VertexArray vertexArray;
 
 
 public:
-    EntityUI(Entity *entity, int vertexCount, sf::PrimitiveType type);
+    EntityUI(Entity *entity, sf::Font * font);
 
-    ~ EntityUI();
-
-    virtual void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity) = 0;
+    void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
 
     Entity *getEntity() const;
 

@@ -18,59 +18,58 @@ Farm::Farm(){
 
 
 void Farm::InitFromRandom() {
-//    random_device rd;
-//    mt19937 mt(rd());
-//    uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
-//    uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
-//
-//    map = new Map();
-//    map->initRandomMap();
-//
-//
-//    std::vector<std::vector<std::vector<Entity *>>> testEntites;
-//
-//    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-//        std::vector<std::vector<Entity *>> line;
-//        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-//            std::vector<Entity *> currentChunk;
-//            line.push_back(currentChunk);
-//        }
-//        testEntites.emplace_back(line);
-//    }
-//
-//    entityGrid = testEntites;
-//
-//
-//    std::uniform_real_distribution<float> distMovement(-1, 1);
-//    nursery = new CreatureNursery();
-//    for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
-//        BrainConnector * initialCreature = nursery->generateFromRandom();
-//
-//        float creatureEnergy = initialCreature->getCreature()->getMaxEnergy() / 2.0;
-//        initialCreature->getCreature()->setEnergy(creatureEnergy);
-//
-//        connectors.push_back(initialCreature);
-//    }
-//
-//    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
-//        int x = distWidth(mt);
-//        int y = distHeight(mt);
-//
-//        Point point(x, y);
-//
-//
-////        float foodSize = ((rand() % 300) / 100.f) + 2;
-//        float foodSize = 2;
-//
-//        Food * entity = new Food(point, foodSize);
-//        entity->setEnergy(entity->getMaxEnergy());
-//        foods.push_back(entity);
-//    }
-//
-//    availableEnergy = 0.f;
-//    tickCount = 0;
-//
-//    sortCreatures();
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
+    uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
+
+    map = new Map();
+    map->initRandomMap();
+
+
+    std::vector<std::vector<std::vector<Entity *>>> testEntites;
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<std::vector<Entity *>> line;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            std::vector<Entity *> currentChunk;
+            line.push_back(currentChunk);
+        }
+        testEntites.emplace_back(line);
+    }
+
+    entityGrid = testEntites;
+
+    std::uniform_real_distribution<float> distMovement(-1, 1);
+    nursery = new CreatureNursery();
+    for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
+        Life * initialLife = nursery->generateCreatureFromRandom();
+
+        float creatureEnergy = initialLife->getEntity()->getMaxEnergy() / 2.0;
+        initialLife->getEntity()->setEnergy(creatureEnergy);
+
+        lifes.push_back(initialLife);
+    }
+
+    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
+        int x = distWidth(mt);
+        int y = distHeight(mt);
+
+        Point point(x, y);
+
+
+//        float foodSize = ((rand() % 300) / 100.f) + 2;
+        float foodSize = 2;
+
+        Food * entity = new Food(point, foodSize);
+        entity->setEnergy(entity->getMaxEnergy());
+        entities.push_back(entity);
+    }
+
+    availableEnergy = 0.f;
+    tickCount = 0;
+
+    sortCreatures();
 }
 
 
@@ -109,6 +108,7 @@ void Farm::Tick(bool paused) {
             dataAnalyser.getTickTime()->addValue(tickTime);
         }
 
+
         dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
     }
 }
@@ -117,18 +117,60 @@ void Farm::Tick(bool paused) {
 
 void Farm::brainProcessing() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+
+    std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
-        Life * currentLife = lifes.at(it);
+        Life *currentLife = lifes.at(it);
         currentLife->processSelectedChunks();
+    }
+    std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
+    dataAnalyser.getChunkSelection()->addValue(elapsed_timeChunk.count());
+
+
+
+    std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
         std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedChunks());
         currentLife->processSensors(accessibleEntities, accessibleTiles);
+    }
+    std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
+    dataAnalyser.getSensorProcessing()->addValue(elapsed_timeSensor.count());
+
+
+
+
+    std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+
         currentLife->processBrain();
+    }
+    std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
+    dataAnalyser.getBrainProcessing()->addValue(elapsed_timeBrain.count());
+
+
+    std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+
+        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
+
         std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
         actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
-
     }
+    std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
+    dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
+
+
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -554,10 +596,12 @@ void Farm::removeDeletedEntities() {
 
 std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChunks) {
     std::vector<Entity *> accessibleEntities;
+    std::cout << "Selected chunks: " << selectedChunks.size() << std::endl;
     for (int jt = 0; jt < selectedChunks.size(); jt++) {
         Point currentChunk = selectedChunks.at(jt);
 
         std::vector<Entity *> chunkEntities = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+
         accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
     }
     return accessibleEntities;
@@ -654,18 +698,20 @@ void Farm::addLife(Life * life) {
 }
 
 
-void Farm::clearAddedCreatures() {
+void Farm::clearAddedLifes() {
     this->lifesAdded.clear();
 }
 
-void Farm::clearToDelete() {
-    this->lifesToDelete.clear();
-    this->entityToDelete.clear();
-}
 void Farm::clearAddedEntities() {
     this->entityAdded.clear();
 }
+void Farm::clearToDeleteLifes() {
+    this->lifesToDelete.clear();
+}
 
+void Farm::clearToDeleteEntities() {
+    this->entityToDelete.clear();
+}
 
 
 
@@ -713,4 +759,30 @@ const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
 Map *Farm::getMap() const {
     return map;
 }
+
+const vector<Life *> &Farm::getLifes() const {
+    return lifes;
+}
+
+const vector<Entity *> &Farm::getEntities() const {
+    return entities;
+}
+
+const vector<Life *> &Farm::getLifesAdded() const {
+    return lifesAdded;
+}
+
+
+const vector<Life *> &Farm::getLifesToDelete() const {
+    return lifesToDelete;
+}
+
+const vector<Entity *> &Farm::getEntityAdded() const {
+    return entityAdded;
+}
+
+const vector<Entity *> &Farm::getEntityToDelete() const {
+    return entityToDelete;
+}
+
 

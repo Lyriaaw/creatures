@@ -10,17 +10,21 @@
 
 class BarSensor: public Sensor {
 protected:
-    float rotation;
-    float length;
+    double rotation;
+    double length;
 
 public:
-    BarSensor(Entity *entity, float rotation, float length);
+    BarSensor(Entity *entity, double rotation, double length);
 
     void findSelectedChunks() override;
     void fetchSensorValue(std::vector<Entity *> accessibleEntities) override;
-    void getSensorValueFromSensorEquation(float sensorX, float sensorY, float m, float p, std::vector<Entity *> accessibleEntities);
+    void getSensorValueFromSensorEquation(float sensorX, float sensorY, double m, double p, std::vector<Entity *> accessibleEntities);
 
-    virtual void processSensorValue(float distance, Entity * closestEntity) = 0;
+    virtual void processSensorValue(double distance, Entity * closestEntity) = 0;
+
+    double getRotation() const;
+
+    double getLength() const;
 
 };
 

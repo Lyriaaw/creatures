@@ -33,28 +33,34 @@ void Muscle::clearSelectedChunks() {
 }
 
 void Muscle::findSelectedChunks() {
+    this->selectedChunks.clear();
     float muscleRotation = (float(rotation) + entity->getRotation()) * float(M_PI);
 
     float muscleX = (cos(muscleRotation) * entity->getSize()) + entity->getPosition().getX();
     float muscleY = (sin(muscleRotation) * entity->getSize()) + entity->getPosition().getY();
 
     Point musclePoint = Point(muscleX, muscleY);
-    Point tile = musclePoint.getTileCoordinates();
+    Point chunk = musclePoint.getSimpleCoordinates();
 
-    if (tile.getX() < 0)
-        tile.setX(0);
-    if (tile.getY() < 0)
-        tile.setY(0);
-    if (tile.getX() > TILE_COUNT_WIDTH)
-        tile.setX(TILE_COUNT_WIDTH - 1);
-    if (tile.getY() > TILE_COUNT_HEIGHT)
-        tile.setY(TILE_COUNT_HEIGHT - 1);
 
     for (int it = -1; it <= 1; it++) {
         for (int jt = -1; jt <= 1; jt++) {
-            if (it < 0 || it >= TILE_COUNT_WIDTH || jt < 0 || jt >= TILE_COUNT_HEIGHT)
+            if (it < 0 || it >= CHUNK_COUNT_WIDTH || jt < 0 || jt >= CHUNK_COUNT_HEIGHT)
                 continue;
-            selectedChunks.emplace_back(Point(tile.getX() + it, tile.getY() + jt));
+
+            float x = chunk.getX() + it;
+            float y = chunk.getY() + jt;
+
+            if (x < 0)
+                x = 0;
+            if (y < 0)
+                y = 0;
+            if (x >= CHUNK_COUNT_WIDTH)
+                x = CHUNK_COUNT_WIDTH - 1;
+            if (y >= CHUNK_COUNT_HEIGHT)
+                y = CHUNK_COUNT_HEIGHT - 1;
+
+            selectedChunks.emplace_back(Point(x, y));
         }
     }
 
@@ -76,3 +82,6 @@ void Muscle::addNeuron(OutputNeuron * neuron) {
 }
 
 
+void Muscle::setEntity(Entity *entity) {
+    Muscle::entity = entity;
+}

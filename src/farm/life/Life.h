@@ -45,6 +45,18 @@ public:
     void setBrain(Brain *brain);
 
     void setEntity(Entity *entity);
+
+    void addSensor(Sensor * sensor);
+    void addInternalMuscle(InternalMuscle * muscle);
+    void addExternalMuscle(ExternalMuscle * muscle);
+
+    void connectSensorAndMuscles();
+
+    const std::vector<Sensor *> &getSensors() const;
+
+    const std::vector<InternalMuscle *> &getInternalMuscles() const;
+
+    const std::vector<ExternalMuscle *> &getExternalMuscles() const;
 };
 
 

@@ -58,7 +58,7 @@ private:
     bool rightMouseButtonDown;
     bool leftMouseButtonDown;
 
-    Life * selectedCreature = nullptr;
+    Life * selectedLife = nullptr;
     Entity * selectedEntity = nullptr;
 
     BrainUI * brainUi;

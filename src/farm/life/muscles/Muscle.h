@@ -40,6 +40,8 @@ public:
 
     void setNeurons(const std::vector<OutputNeuron *> &neurons);
     void addNeuron(OutputNeuron * neuron);
+
+    void setEntity(Entity *entity);
 };
 
 

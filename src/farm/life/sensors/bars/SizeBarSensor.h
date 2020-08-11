@@ -12,7 +12,7 @@ class SizeBarSensor: public BarSensor {
 public:
     SizeBarSensor(Entity *entity, float rotation, float length);
 
-    void processSensorValue(float distance, Entity *closestEntity) override;
+    void processSensorValue(double distance, Entity *closestEntity) override;
 
     std::string getName() override;
 };

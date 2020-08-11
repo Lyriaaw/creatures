@@ -12,7 +12,7 @@ class Rotation: public InternalMuscle {
 public:
     Rotation(float rotation, Entity *entity);
 
-    std::vector<Entity *> executeActions() override;
+    std::vector<Entity *> executeAction() override;
 };
 
 

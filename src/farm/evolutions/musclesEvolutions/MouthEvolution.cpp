@@ -23,6 +23,8 @@ void MouthEvolution::perform(Life * life) {
     life->getBrain()->addOutputNeuron(outputNeuron);
 
     mouth->addNeuron(outputNeuron);
+
+    life->addExternalMuscle(mouth);
 }
 
 std::string MouthEvolution::describe() {

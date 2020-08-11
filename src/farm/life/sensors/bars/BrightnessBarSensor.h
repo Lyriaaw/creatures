@@ -14,7 +14,7 @@ private:
 public:
     BrightnessBarSensor(Entity *entity, float rotation, float length, float color);
 
-    void processSensorValue(float distance, Entity *closestEntity) override;
+    void processSensorValue(double distance, Entity *closestEntity) override;
 
     float getColor() const;
 

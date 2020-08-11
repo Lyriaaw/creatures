@@ -22,6 +22,8 @@ void EnergySensorEvolution::perform(Life * life) {
     energySensor->setConnectedNeuron(inputNeuron);
 
     life->getBrain()->addInputNeuron(inputNeuron);
+
+    life->addSensor(energySensor);
 }
 
 std::string EnergySensorEvolution::describe() {

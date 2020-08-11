@@ -130,3 +130,7 @@ void Entity::setAge(int age) {
 void Entity::aTickHavePassed(){
     Entity::age++;
 }
+
+void Entity::setBrightness(float brightness) {
+    Entity::brightness = brightness;
+}

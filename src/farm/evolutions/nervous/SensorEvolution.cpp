@@ -20,18 +20,21 @@ void SensorEvolution::generateFromRandom(Life * life) {
 }
 
 void SensorEvolution::perform(Life * life) {
-    BarSensor * barSensor = new BrightnessBarSensor(life->getEntity(), 0, sensorLength, sensorColor);
+    BarSensor * barSensor = new BrightnessBarSensor(life->getEntity(), sensorRotation, sensorLength, sensorColor);
+
 
     InputNeuron * inputNeuron = new InputNeuron();
     inputNeuron->setHueOutline(sensorColor);
     inputNeuron->setBrightnessOutline(0.4);
-    inputNeuron->setName("Brightness - WIP");
+    inputNeuron->setName("Brightness -" + std::to_string(sensorLength));
     inputNeuron->setGenerationNumber(this->generationNumber);
 
 
     barSensor->setConnectedNeuron(inputNeuron);
 
     life->getBrain()->addInputNeuron(inputNeuron);
+
+    life->addSensor(barSensor);
 
 }
 
