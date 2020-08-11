@@ -186,7 +186,7 @@ void Map::processClimate() {
                 continue;
             }
 
-            float heatToGroundRatio = 0.05f;
+            float heatToGroundRatio = 0.01f;
             float currentTileHeat = currentTile->getHeat();
 
             currentTile->addHeat(- 1 * currentTileHeat * heatToGroundRatio);

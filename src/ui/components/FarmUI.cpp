@@ -258,7 +258,10 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
 
     if (selectedEntity != nullptr) {
         selected = selectedEntity->getEntity();
+        camera->setCenter(selected->getPosition());
     }
+
+
 
     setPositions(camera);
 

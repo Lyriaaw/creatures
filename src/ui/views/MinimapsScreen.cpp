@@ -15,21 +15,21 @@ int MinimapsScreen::getId() {
 
 void MinimapsScreen::init() {
     WorldMinimap * worldMinimap = new WorldMinimap();
-    placeMinimap(0, 0, worldMinimap);
+    placeMinimap(8, 0, 0, worldMinimap);
 
     creatureCountMinimap = new CreatureTileCountMinimap();
-    placeMinimap(1, 0, creatureCountMinimap);
+    placeMinimap(8, 1, 0, creatureCountMinimap);
 
 
     foodTileCountMinimap = new FoodTileCountMinimap();
-    placeMinimap(2, 0, foodTileCountMinimap);
+    placeMinimap(8, 2, 0, foodTileCountMinimap);
 
 
     heatMinimap = new HeatEnergyMinimap();
-    placeMinimap(0, 1, heatMinimap);
+    placeMinimap(8, 0, 1, heatMinimap);
 
     groundMinimap = new GroundEnergyMinimap();
-    placeMinimap(1, 1, groundMinimap);
+    placeMinimap(8, 1, 1, groundMinimap);
 
 
 
@@ -38,8 +38,8 @@ void MinimapsScreen::init() {
     background.setFillColor(sf::Color(50, 50, 50, 255));
 }
 
-void MinimapsScreen::placeMinimap(int x, int y, Minimap * minimap) {
-    minimap->move(((x * (TILE_COUNT_WIDTH * 4))) + (x * 10), 70 + ((y * (TILE_COUNT_HEIGHT * 4)) + 10) + (y * 10), 4 * TILE_COUNT_WIDTH, 4 * TILE_COUNT_HEIGHT);
+void MinimapsScreen::placeMinimap(int pixelSize, int x, int y, Minimap * minimap) {
+    minimap->move(((x * (TILE_COUNT_WIDTH * pixelSize))) + (x * 10), 70 + ((y * (TILE_COUNT_HEIGHT * pixelSize)) + 10) + (y * 10), pixelSize * TILE_COUNT_WIDTH, pixelSize * TILE_COUNT_HEIGHT);
     minimaps.emplace_back(minimap);
 }
 

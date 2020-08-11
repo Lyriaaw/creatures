@@ -11,7 +11,7 @@ std::vector<ActionDTO> Genitals::prepareActionDTO(std::vector<Entity *> accessib
         return actions;
     }
 
-    energyConsumption += this->neurons.at(0)->getValue();
+//    energyConsumption += this->neurons.at(0)->getValue();
 
 
     float genitalsTotalRotation = (float(rotation) + entity->getRotation()) * float(M_PI);

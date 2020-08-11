@@ -45,7 +45,7 @@ public:
 
     void drawMinimaps(sf::RenderWindow *window);
 
-    void placeMinimap(int x, int y, Minimap * minimap);
+    void placeMinimap(int pixelSize, int x, int y, Minimap * minimap);
 };
 
 

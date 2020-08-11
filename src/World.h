@@ -7,8 +7,8 @@
 
 //#define CHUNK_SIZE TILE_SIZE * 6
 
-#define TILE_SIZE 15
-#define TILE_PER_CHUNK 2
+#define TILE_SIZE 30
+#define TILE_PER_CHUNK 1
 
 #define CHUNK_SIZE TILE_SIZE * TILE_PER_CHUNK
 
