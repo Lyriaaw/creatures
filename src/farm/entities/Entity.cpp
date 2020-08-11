@@ -45,7 +45,14 @@ void Entity::setPosition(const Point &position) {
 
 
 Point Entity::getSimpleCoordinates() {
-    return {float(int(this->getPosition().getX() / float(CHUNK_SIZE))), float(int(this->getPosition().getY() / float(CHUNK_SIZE)))};
+    Point simpleCoordinates = {float(int(this->getPosition().getX() / float(CHUNK_SIZE))), float(int(this->getPosition().getY() / float(CHUNK_SIZE)))};
+
+    if (simpleCoordinates.getX() < 0 || simpleCoordinates.getX() >= CHUNK_COUNT_WIDTH || simpleCoordinates.getY() < 0 || simpleCoordinates.getY() >= CHUNK_COUNT_HEIGHT) {
+        std::cout << "Error while generating chunk coordinates !" << std::endl;
+        std::cout << "X: " << simpleCoordinates.getX() << " Y: " << simpleCoordinates.getY() << " mapX: " << position.getX() << " mapY: " << position.getY() << std::endl;
+    }
+
+    return simpleCoordinates;
 }
 
 int Entity::getId() const {

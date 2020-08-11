@@ -12,6 +12,11 @@
 class CreatureTileCountMinimap: public Minimap {
 private:
 
+public:
+    CreatureTileCountMinimap();
+
+private:
+
     float averageHues[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
     double values[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 

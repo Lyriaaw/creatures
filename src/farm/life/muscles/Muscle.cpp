@@ -85,3 +85,11 @@ void Muscle::addNeuron(OutputNeuron * neuron) {
 void Muscle::setEntity(Entity *entity) {
     Muscle::entity = entity;
 }
+
+float Muscle::getRotation() const {
+    return rotation;
+}
+
+double Muscle::getValue() {
+    return this->neurons.at(0)->getValue();
+}

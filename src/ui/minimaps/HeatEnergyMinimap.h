@@ -16,6 +16,9 @@ private:
 
 public:
     HeatEnergyMinimap(double pixelSize, double positionX, double positionY);
+
+    HeatEnergyMinimap();
+
     std::string getName() override;
 
     void generateValues(Farm * farm);

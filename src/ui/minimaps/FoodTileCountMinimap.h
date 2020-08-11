@@ -11,6 +11,11 @@
 class FoodTileCountMinimap: public Minimap {
 private:
 
+public:
+    FoodTileCountMinimap();
+
+private:
+
     double values[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
 public:

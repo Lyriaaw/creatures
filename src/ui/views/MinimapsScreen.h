@@ -44,6 +44,8 @@ public:
     void mouseMoved(int x, int y) override;
 
     void drawMinimaps(sf::RenderWindow *window);
+
+    void placeMinimap(int x, int y, Minimap * minimap);
 };
 
 

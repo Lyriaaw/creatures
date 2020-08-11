@@ -204,6 +204,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
     Entity * childEntity = new Entity(childSpawn);
     childEntity->setRotation(((std::rand() % 2000) / 1000.f) - 1.f);
+    childEntity->setBrightness(0.5);
 
     Brain * childBrain = new Brain();
 

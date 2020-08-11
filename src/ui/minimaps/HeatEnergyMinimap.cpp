@@ -6,6 +6,8 @@
 #include "HeatEnergyMinimap.h"
 #include "../colors/RGBColor.h"
 
+HeatEnergyMinimap::HeatEnergyMinimap(): Minimap() {}
+
 HeatEnergyMinimap::HeatEnergyMinimap(double pixelSize, double positionX, double positionY)
         : Minimap(pixelSize, positionX, positionY) {
 

@@ -6,9 +6,7 @@
 #include "../World.h"
 
 
-Point::Point(float x, float y) {
-    this->x = x;
-    this->y = y;
+Point::Point(float x, float y): x(x), y(y) {
 }
 
 

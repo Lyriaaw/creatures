@@ -15,6 +15,9 @@ private:
 
 public:
     GroundEnergyMinimap(double pixelSize, double positionX, double positionY);
+
+    GroundEnergyMinimap();
+
     std::string getName() override;
 
     void generateValues(Farm * farm);

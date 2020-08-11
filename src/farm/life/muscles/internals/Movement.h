@@ -13,6 +13,8 @@ public:
     Movement(float rotation, Entity *entity);
 
     std::vector<Entity *> executeAction() override;
+
+    std::string getName() override;
 };
 
 

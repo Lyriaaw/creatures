@@ -5,6 +5,9 @@
 #include "Minimap.h"
 #include "../colors/RGBColor.h"
 
+Minimap::Minimap(): pixelSize(4) {
+    load();
+}
 
 Minimap::Minimap(double pixelSize, double positionX, double positionY) :pixelSize(pixelSize), positionX(
                                                                                              positionX),
@@ -53,22 +56,22 @@ void Minimap::move(double positionX, double positionY, double width, double heig
             int vertexArrayIndex = (it * TILE_COUNT_HEIGHT) + jt;
 
 
-            vertexArray[vertexArrayIndex + 0].position = sf::Vector2f(
+            vertexArray[(vertexArrayIndex * 4) + 0].position = sf::Vector2f(
                     (float(it) * pixelSize) + positionX,
                     (float(jt) * pixelSize) + positionY);
 
 
-            vertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
+            vertexArray[(vertexArrayIndex * 4) + 1].position = sf::Vector2f(
                     (float(it) * pixelSize) + positionX + pixelSize,
                     (float(jt) * pixelSize) + positionY);
 
 
-            vertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
+            vertexArray[(vertexArrayIndex * 4) + 2].position = sf::Vector2f(
                     (float(it) * pixelSize) + positionX + pixelSize,
                     (float(jt) * pixelSize) + positionY + pixelSize);
 
 
-            vertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
+            vertexArray[(vertexArrayIndex * 4) + 3].position = sf::Vector2f(
                     (float(it) * pixelSize) + positionX,
                     (float(jt) * pixelSize) + positionY + pixelSize);
         }
@@ -79,10 +82,6 @@ void Minimap::move(double positionX, double positionY, double width, double heig
 void Minimap::changeSize(double width, double height) {
     move(positionX, positionY, width, height);
 }
-
-
-
-
 
 
 // World map
@@ -121,6 +120,8 @@ void WorldMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
 void WorldMinimap::draw(sf::RenderWindow *window) {
     window->draw(vertexArray);
 }
+
+WorldMinimap::WorldMinimap(): Minimap(){}
 
 
 

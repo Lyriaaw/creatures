@@ -21,6 +21,7 @@ protected:
 
 public:
 
+    Minimap();
     Minimap(double pixelSize, double positionX, double positionY);
     void load();
 
@@ -31,11 +32,15 @@ public:
     virtual void draw(sf::RenderWindow *window) = 0;
 
     virtual std::string getName() = 0;
+
 };
 
 
 class WorldMinimap: public Minimap {
 public:
+
+    WorldMinimap();
+
     WorldMinimap(double pixelSize, double positionX, double positionY);
     std::string getName() override;
 

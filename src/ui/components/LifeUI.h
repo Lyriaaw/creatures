@@ -18,6 +18,8 @@ private:
     sf::VertexArray barSensors;
     sf::VertexArray energyBar;
 
+    sf::VertexArray muscles;
+
     sf::Color color;
     sf::VertexArray body;
 

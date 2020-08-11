@@ -5,10 +5,14 @@
 #include "GroundEnergyMinimap.h"
 #include "../colors/RGBColor.h"
 
+GroundEnergyMinimap::GroundEnergyMinimap(): Minimap() {}
+
 GroundEnergyMinimap::GroundEnergyMinimap(double pixelSize, double positionX, double positionY)
         : Minimap(pixelSize, positionX, positionY) {
 
 }
+
+
 
 std::string GroundEnergyMinimap::getName() {
     return "Heat";

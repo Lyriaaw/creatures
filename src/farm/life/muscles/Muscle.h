@@ -42,6 +42,12 @@ public:
     void addNeuron(OutputNeuron * neuron);
 
     void setEntity(Entity *entity);
+
+    float getRotation() const;
+
+    virtual std::string getName() = 0;
+
+    double getValue();
 };
 
 

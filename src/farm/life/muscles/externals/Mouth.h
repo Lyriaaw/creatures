@@ -13,6 +13,8 @@ public:
     Mouth(float rotation, Entity *entity);
 
     std::vector<ActionDTO> prepareActionDTO(std::vector<Entity *> accessibleEntities) override;
+
+    std::string getName() override;
 };
 
 

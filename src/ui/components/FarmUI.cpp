@@ -75,23 +75,23 @@ void FarmUI::addEntities(std::vector<Entity *> addedToFarm) {
 
 
 void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
-//    for (int it = 0; it < deletedFromFarm.size(); it++) {
-//        Life * lifeToDelete = deletedFromFarm.at(it);
-//
-//        int index = -1;
-//        for (int jt = 0; jt < lifeUIs.size(); jt++) {
-//            LifeUI * currentLife = lifeUIs.at(jt);
-//
-//            if (currentLife->getLife()->getEntity()->getId() == lifeToDelete->getEntity()->getId()) {
-//                index = jt;
-//            }
-//        }
-//
-//        if (index != -1) {
-//            lifeUIs.erase(lifeUIs.begin() + index);
-//        }
-//
-//    }
+    for (int it = 0; it < deletedFromFarm.size(); it++) {
+        Life * lifeToDelete = deletedFromFarm.at(it);
+
+        int index = -1;
+        for (int jt = 0; jt < lifeUIs.size(); jt++) {
+            LifeUI * currentLife = lifeUIs.at(jt);
+
+            if (currentLife->getLife()->getEntity()->getId() == lifeToDelete->getEntity()->getId()) {
+                index = jt;
+            }
+        }
+
+        if (index != -1) {
+            lifeUIs.erase(lifeUIs.begin() + index);
+        }
+
+    }
 }
 
 void FarmUI::clearDeletedEntities(std::vector<Entity *> deletedFromFarm) {

@@ -61,3 +61,5 @@ void CreatureTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 }
+
+CreatureTileCountMinimap::CreatureTileCountMinimap(): Minimap() {}

@@ -50,3 +50,5 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
         values[int(tilePosition.getX())][int(tilePosition.getY())]++;
     }
 }
+
+FoodTileCountMinimap::FoodTileCountMinimap(): Minimap() {}

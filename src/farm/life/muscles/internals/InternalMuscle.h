@@ -13,6 +13,8 @@ public:
     InternalMuscle(float rotation, Entity *entity);
 
     virtual std::vector<Entity *> executeAction() = 0;
+
+
 };
 
 

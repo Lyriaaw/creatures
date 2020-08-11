@@ -50,3 +50,7 @@ std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleE
 Mouth::Mouth(float rotation, Entity *entity) : ExternalMuscle(rotation, entity) {
 
 }
+
+std::string Mouth::getName() {
+    return "MOUTH";
+}

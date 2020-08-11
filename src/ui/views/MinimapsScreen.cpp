@@ -14,26 +14,33 @@ int MinimapsScreen::getId() {
 
 
 void MinimapsScreen::init() {
-    WorldMinimap * worldMinimap = new WorldMinimap(2, 10, 70);
-    minimaps.emplace_back(worldMinimap);
+    WorldMinimap * worldMinimap = new WorldMinimap();
+    placeMinimap(0, 0, worldMinimap);
 
-    creatureCountMinimap = new CreatureTileCountMinimap(2, 20 + (TILE_COUNT_WIDTH * 1) * 2, 70);
-    minimaps.emplace_back(creatureCountMinimap);
+    creatureCountMinimap = new CreatureTileCountMinimap();
+    placeMinimap(1, 0, creatureCountMinimap);
 
-    foodTileCountMinimap = new FoodTileCountMinimap(2, 30 + (TILE_COUNT_WIDTH * 2) * 2, 70);
-    minimaps.emplace_back(foodTileCountMinimap);
 
-    heatMinimap = new HeatEnergyMinimap(2, 10, 70 + (TILE_COUNT_HEIGHT * 2) + 30);
-    minimaps.emplace_back(heatMinimap);
+    foodTileCountMinimap = new FoodTileCountMinimap();
+    placeMinimap(2, 0, foodTileCountMinimap);
 
-    groundMinimap = new GroundEnergyMinimap(2, 20 + (TILE_COUNT_WIDTH * 1) * 2, 70 + (TILE_COUNT_HEIGHT * 2) + 30);
-    minimaps.emplace_back(groundMinimap);
+
+    heatMinimap = new HeatEnergyMinimap();
+    placeMinimap(0, 1, heatMinimap);
+
+    groundMinimap = new GroundEnergyMinimap();
+    placeMinimap(1, 1, groundMinimap);
 
 
 
     background = sf::RectangleShape(sf::Vector2f(0, 0));
     background.setPosition(0, 0);
-    background.setFillColor(sf::Color(10, 10, 10, 255));
+    background.setFillColor(sf::Color(50, 50, 50, 255));
+}
+
+void MinimapsScreen::placeMinimap(int x, int y, Minimap * minimap) {
+    minimap->move(((x * (TILE_COUNT_WIDTH * 4))) + (x * 10), 70 + ((y * (TILE_COUNT_HEIGHT * 4)) + 10) + (y * 10), 4 * TILE_COUNT_WIDTH, 4 * TILE_COUNT_HEIGHT);
+    minimaps.emplace_back(minimap);
 }
 
 Camera *MinimapsScreen::open() {
@@ -75,6 +82,7 @@ void MinimapsScreen::updateSelectedCreature(BrainConnector *connector) {
 
 void MinimapsScreen::onWindowResize(int width, int height) {
     background.setSize(sf::Vector2f(width, height));
+
 }
 
 void MinimapsScreen::mouseMoved(int x, int y) {

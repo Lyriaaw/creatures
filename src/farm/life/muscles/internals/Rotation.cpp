@@ -14,3 +14,7 @@ std::vector<Entity *> Rotation::executeAction() {
 Rotation::Rotation(float rotation, Entity *entity) : InternalMuscle(rotation, entity) {
 
 }
+
+std::string Rotation::getName() {
+    return "Rotation";
+}

@@ -51,3 +51,7 @@ std::vector<ActionDTO> Genitals::prepareActionDTO(std::vector<Entity *> accessib
 Genitals::Genitals(float rotation, Entity *entity) : ExternalMuscle(rotation, entity) {
 
 }
+
+std::string Genitals::getName() {
+    return "GENITALS";
+}

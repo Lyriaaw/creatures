@@ -191,8 +191,12 @@ void Farm::moveCreatures() {
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
         newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
 
-        double releasedHead = currentLife->giveawayEnergy();
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHead);
+        double releasedHeat = currentLife->giveawayEnergy();
+        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
+
+        if (currentLife->getEntity()->getEnergy() <= 0) {
+            this->lifesToDelete.emplace_back(currentLife);
+        }
 
     }
 
@@ -455,7 +459,7 @@ void Farm::statistics() {
 
     std::vector<Life *> sortedLife = getScoreSortedCreatures();
 //    std::vector<BrainConnector *> sortedConnectors = connectors;
-    int populationSize = lifes.size();
+    int populationSize = sortedLife.size();
 
     dataAnalyser.getPopulation()->addValue(populationSize);
 
@@ -596,7 +600,6 @@ void Farm::removeDeletedEntities() {
 
 std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChunks) {
     std::vector<Entity *> accessibleEntities;
-    std::cout << "Selected chunks: " << selectedChunks.size() << std::endl;
     for (int jt = 0; jt < selectedChunks.size(); jt++) {
         Point currentChunk = selectedChunks.at(jt);
 

@@ -17,8 +17,8 @@ std::vector<Entity *> Movement::executeAction() {
     Point currentEntityPosition = this->entity->getPosition();
 
 
-    float nextX = currentEntityPosition.getX() + (actualSpeed * cos((this->rotation * M_PI)));
-    float nextY = currentEntityPosition.getY() + (actualSpeed * sin((this->rotation * M_PI)));
+    float nextX = currentEntityPosition.getX() + (actualSpeed * cos((this->entity->getRotation() * M_PI)));
+    float nextY = currentEntityPosition.getY() + (actualSpeed * sin((this->entity->getRotation() * M_PI)));
 
 
 
@@ -46,5 +46,9 @@ std::vector<Entity *> Movement::executeAction() {
 
 Movement::Movement(float rotation, Entity *entity) : InternalMuscle(rotation, entity) {
 
+}
+
+std::string Movement::getName() {
+    return "Movement";
 }
 
