@@ -7,8 +7,7 @@
 
 
 #include "entities/Creature.h"
-#include "evolutions/nervous/SensorEvolution.h"
-#include "evolutions/inputs/BiasInputEvolution.h"
+#include "evolutions/sensors/BiasInputEvolution.h"
 #include "evolutions/musclesEvolutions/RotationEvolution.h"
 #include "evolutions/nervous/LinkEvolution.h"
 #include "evolutions/musclesEvolutions/SpeedEvolution.h"
@@ -17,7 +16,6 @@
 #include "evolutions/entity/SizeEvolution.h"
 #include "evolutions/musclesEvolutions/MouthEvolution.h"
 #include "evolutions/musclesEvolutions/GenitalsEvolution.h"
-#include "evolutions/inputs/sensors/EnergySensorEvolution.h"
 #include "life/Life.h"
 
 class CreatureNursery {
@@ -28,6 +26,8 @@ public:
 
     Life * generateCreatureFromRandom();
     Life * Mate(Life * father, Life * mother);
+
+    Life * generateVegetalFromRandom();
 
     const EvolutionLibrary &getEvolutionLibrary() const;
 };

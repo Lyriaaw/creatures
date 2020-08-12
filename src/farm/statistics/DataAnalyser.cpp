@@ -41,6 +41,7 @@ DataAnalyser::DataAnalyser() {
     chunkSelection = new DataItem("chunkSelection", true);
     sensorProcessing = new DataItem("sensorProcessing", true);
     brainProcessing = new DataItem("brainProcessing", true);
+    totalGridGeneration = new DataItem("totalGridGeneration", true);
     externalActions = new DataItem("externalActions", true);
 
 }
@@ -166,4 +167,8 @@ DataItem *DataAnalyser::getBrainProcessing() const {
 
 DataItem *DataAnalyser::getExternalActions() const {
     return externalActions;
+}
+
+DataItem *DataAnalyser::getTotalGridGeneration() const {
+    return totalGridGeneration;
 }

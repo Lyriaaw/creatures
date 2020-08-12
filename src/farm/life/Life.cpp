@@ -8,7 +8,7 @@
 
 void Life::processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
     for (int it = 0; it < sensors.size(); it++) {
-        sensors.at(it)->fetchSensorValue(availableEntities);
+        sensors.at(it)->fetchSensorValue(availableEntities, availableTiles);
         sensors.at(it)->passValueToNeuron();
     }
 }

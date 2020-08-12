@@ -18,7 +18,7 @@ void SizeBarSensor::processSensorValue(double distance, Entity *closestEntity) {
 }
 
 std::string SizeBarSensor::getName() {
-    return "Size bar";
+    return "SIZE_BAR";
 }
 
 SizeBarSensor::SizeBarSensor(Entity *entity, float rotation, float length) : BarSensor(entity, rotation, length) {}

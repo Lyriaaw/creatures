@@ -217,13 +217,20 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 //            window->draw(currentSensorValue);
 //        }
 
-        BrightnessBarSensor * currentSensor = (BrightnessBarSensor *) this->life->getSensors().at(sensorIndex);
-        if (currentSensor->getName() != "BRIGHTNESS_BAR") {
+        BarSensor * currentSensor = (BarSensor *) this->life->getSensors().at(sensorIndex);
+        if (currentSensor->getName() != "BRIGHTNESS_BAR" && currentSensor->getName() != "DISTANCE_BAR" && currentSensor->getName() != "SIZE_BAR") {
             continue;
         }
 
-        RGBColor sensorRGB = RGBColor(currentSensor->getColor(), 1.f, 0.5f);
-        sf::Color sensorColor = sf::Color(sensorRGB.getRed(), sensorRGB.getGreen(), sensorRGB.getBlue(), 128);
+
+        sf::Color sensorColor = sf::Color(55, 55, 55, 255);
+
+        if (currentSensor->getName() == "BRIGHTNESS_BAR") {
+            BrightnessBarSensor * currentSensorBar = (BrightnessBarSensor *) this->life->getSensors().at(sensorIndex);
+            RGBColor sensorRGB = RGBColor(currentSensorBar->getColor(), 1.f, 0.5f);
+            sensorColor = sf::Color(sensorRGB.getRed(), sensorRGB.getGreen(), sensorRGB.getBlue(), 128);
+        }
+
 
 //        float currentSensorLength = this->life->getEntity()->getSize();
         float currentSensorLength = currentSensor->getLength();

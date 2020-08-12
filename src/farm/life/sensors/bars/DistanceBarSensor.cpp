@@ -6,11 +6,10 @@
 
 void DistanceBarSensor::processSensorValue(double distance, Entity *closestEntity) {
     this->value = 1.f - (distance / length);
-    std::cout << "Distance sensor" << std::endl;
 }
 
 std::string DistanceBarSensor::getName() {
-    return "Distance bar";
+    return "DISTANCE_BAR";
 }
 
 DistanceBarSensor::DistanceBarSensor(Entity *entity, float rotation, float length) : BarSensor(entity, rotation,

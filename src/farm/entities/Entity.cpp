@@ -50,6 +50,8 @@ Point Entity::getSimpleCoordinates() {
     if (simpleCoordinates.getX() < 0 || simpleCoordinates.getX() >= CHUNK_COUNT_WIDTH || simpleCoordinates.getY() < 0 || simpleCoordinates.getY() >= CHUNK_COUNT_HEIGHT) {
         std::cout << "Error while generating chunk coordinates !" << std::endl;
         std::cout << "X: " << simpleCoordinates.getX() << " Y: " << simpleCoordinates.getY() << " mapX: " << position.getX() << " mapY: " << position.getY() << std::endl;
+
+        return Point(0,0);
     }
 
     return simpleCoordinates;

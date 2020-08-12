@@ -30,6 +30,7 @@ private:
     DataItem * brainProcessingTime;
 
     DataItem * chunkSelection;
+    DataItem * totalGridGeneration;
     DataItem * sensorProcessing;
     DataItem * brainProcessing;
     DataItem * externalActions;
@@ -108,6 +109,8 @@ public:
     DataItem *getBrainProcessing() const;
 
     DataItem *getExternalActions() const;
+
+    DataItem *getTotalGridGeneration() const;
 };
 
 

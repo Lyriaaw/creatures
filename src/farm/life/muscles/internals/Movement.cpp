@@ -12,7 +12,7 @@ std::vector<Entity *> Movement::executeAction() {
         actualSpeed = -1 * (this->entity->getSize() / 2.f);
     }
 
-    energyConsumption += actualSpeed;
+    energyConsumption += (1/2) * this->entity->getSize() * pow(this->neurons.at(0)->getValue(), 2);
 
     Point currentEntityPosition = this->entity->getPosition();
 

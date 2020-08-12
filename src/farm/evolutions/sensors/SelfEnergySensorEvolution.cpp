@@ -2,18 +2,18 @@
 // Created by Amalric Lombard de Buffières on 8/5/20.
 //
 
-#include "EnergySensorEvolution.h"
-#include "../../../brain/neurons/EnergySensorNeuron.h"
-#include "../../../life/sensors/SelfEnergySensor.h"
+#include "SelfEnergySensorEvolution.h"
+#include "../../brain/neurons/EnergySensorNeuron.h"
+#include "../../life/sensors/SelfEnergySensor.h"
 
-EnergySensorEvolution::EnergySensorEvolution(): Evolution() {
+SelfEnergySensorEvolution::SelfEnergySensorEvolution(): Evolution() {
 
 }
 
-void EnergySensorEvolution::generateFromRandom(Life * life) {
+void SelfEnergySensorEvolution::generateFromRandom(Life * life) {
 }
 
-void EnergySensorEvolution::perform(Life * life) {
+void SelfEnergySensorEvolution::perform(Life * life) {
     InputNeuron * inputNeuron = new InputNeuron();
     inputNeuron->setName("Energy");
     inputNeuron->setGenerationNumber(this->generationNumber);
@@ -26,12 +26,12 @@ void EnergySensorEvolution::perform(Life * life) {
     life->addSensor(energySensor);
 }
 
-std::string EnergySensorEvolution::describe() {
+std::string SelfEnergySensorEvolution::describe() {
     return std::to_string(this->generationNumber) + " => Energy sensor";
 }
 
-Evolution * EnergySensorEvolution::generateWithMate(Evolution * mate) {
-    EnergySensorEvolution * childEvolution = new EnergySensorEvolution();
+Evolution * SelfEnergySensorEvolution::generateWithMate(Evolution * mate) {
+    SelfEnergySensorEvolution * childEvolution = new SelfEnergySensorEvolution();
     childEvolution->setGenerationNumber(getGenerationNumber());
     return childEvolution;
 }

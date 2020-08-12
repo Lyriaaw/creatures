@@ -79,10 +79,10 @@ void Farm::Tick(bool paused) {
 
 
     if (!paused) {
+        vegetalisation();
         brainProcessing();
         executeCreaturesActions();
         moveCreatures();
-        vegetalisation();
         populationControl();
     }
 
@@ -129,46 +129,72 @@ void Farm::brainProcessing() {
     dataAnalyser.getChunkSelection()->addValue(elapsed_timeChunk.count());
 
 
+    double totalEntityGrid = 0.0;
+    double totalSensors = 0.0;
+    double totalBrain = 0.0;
+    double totalActions = 0.0;
 
-    std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
+
+        std::chrono::system_clock::time_point entityGridStart = std::chrono::system_clock::now();
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
         std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedChunks());
+
+        std::chrono::system_clock::time_point entityGridEnd = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time_entity_grid = entityGridEnd - entityGridStart;
+
+        totalEntityGrid += elapsed_time_entity_grid.count();
+
+
+
+
+        std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
+
         currentLife->processSensors(accessibleEntities, accessibleTiles);
-    }
-    std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
-    dataAnalyser.getSensorProcessing()->addValue(elapsed_timeSensor.count());
+
+        std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time_sensorProcessing = sensorProcessingEnd - sensorProcessingStart;
+        totalSensors += elapsed_time_sensorProcessing.count();
 
 
 
 
-    std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
-
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
+        std::chrono::system_clock::time_point processBrainStart = std::chrono::system_clock::now();
 
         currentLife->processBrain();
-    }
-    std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
-    dataAnalyser.getBrainProcessing()->addValue(elapsed_timeBrain.count());
+
+        std::chrono::system_clock::time_point processBrainEnd = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time_process_brain = processBrainEnd - processBrainStart;
+        totalBrain += elapsed_time_process_brain.count();
 
 
-    std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
 
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
+
+        std::chrono::system_clock::time_point actionsStart = std::chrono::system_clock::now();
+
 
         std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
         actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+
+        std::chrono::system_clock::time_point actionsEnd = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time_actions = actionsEnd - actionsStart;
+        totalActions += elapsed_time_actions.count();
+
+
     }
-    std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
-    dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
+
+    std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
+    dataAnalyser.getBrainProcessing()->addValue(totalBrain);
+
+
+    dataAnalyser.getSensorProcessing()->addValue(totalSensors);
+    dataAnalyser.getExternalActions()->addValue(totalActions);
+    dataAnalyser.getTotalGridGeneration()->addValue(totalEntityGrid);
+
 
 
 

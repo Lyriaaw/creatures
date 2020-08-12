@@ -7,6 +7,7 @@
 
 
 #include "../Sensor.h"
+#include "../../../Tile.h"
 
 class BarSensor: public Sensor {
 protected:
@@ -17,7 +18,7 @@ public:
     BarSensor(Entity *entity, double rotation, double length);
 
     void findSelectedChunks() override;
-    void fetchSensorValue(std::vector<Entity *> accessibleEntities) override;
+    void fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) override;
     void getSensorValueFromSensorEquation(float sensorX, float sensorY, double m, double p, std::vector<Entity *> accessibleEntities);
 
     virtual void processSensorValue(double distance, Entity * closestEntity) = 0;

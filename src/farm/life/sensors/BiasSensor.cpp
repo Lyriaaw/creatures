@@ -10,7 +10,7 @@ std::string BiasSensor::getName() {
     return "Bias";
 }
 
-void BiasSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
+void BiasSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) {
     this->value = 1;
 }
 

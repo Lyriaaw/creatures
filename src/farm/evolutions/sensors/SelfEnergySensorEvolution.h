@@ -2,17 +2,17 @@
 // Created by Amalric Lombard de Buffières on 8/5/20.
 //
 
-#ifndef CREATURES_ENERGYSENSOREVOLUTION_H
-#define CREATURES_ENERGYSENSOREVOLUTION_H
+#ifndef CREATURES_SELFENERGYSENSOREVOLUTION_H
+#define CREATURES_SELFENERGYSENSOREVOLUTION_H
 
 
-#include "../../Evolution.h"
+#include "../Evolution.h"
 
-class EnergySensorEvolution: public Evolution {
+class SelfEnergySensorEvolution: public Evolution {
 private:
     float rotation;
 public:
-    EnergySensorEvolution();
+    SelfEnergySensorEvolution();
     void generateFromRandom(Life * life) override;
     void perform(Life * life) override;
     std::string describe() override;
@@ -20,4 +20,4 @@ public:
 };
 
 
-#endif //CREATURES_ENERGYSENSOREVOLUTION_H
+#endif //CREATURES_SELFENERGYSENSOREVOLUTION_H

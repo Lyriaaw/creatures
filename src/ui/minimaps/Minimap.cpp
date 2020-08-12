@@ -5,7 +5,7 @@
 #include "Minimap.h"
 #include "../colors/RGBColor.h"
 
-Minimap::Minimap(): pixelSize(4) {
+Minimap::Minimap(): pixelSize(8) {
     load();
 }
 
