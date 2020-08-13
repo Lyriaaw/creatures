@@ -2,14 +2,16 @@
 // Created by Amalric Lombard de Buffières on 8/12/20.
 //
 
-#ifndef CREATURES_ACCESSIBLEGROUNDENERGY_H
-#define CREATURES_ACCESSIBLEGROUNDENERGY_H
+#ifndef CREATURES_TILEHEATSENSOR_H
+#define CREATURES_TILEHEATSENSOR_H
 
 
 #include "Sensor.h"
 
-class AccessibleGroundEnergy: public Sensor{
+class TileHeatSensor: public Sensor {
 public:
+    TileHeatSensor(Entity *entity);
+
     std::string getName() override;
 
     void fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) override;
@@ -18,4 +20,4 @@ public:
 };
 
 
-#endif //CREATURES_ACCESSIBLEGROUNDENERGY_H
+#endif //CREATURES_TILEHEATSENSOR_H

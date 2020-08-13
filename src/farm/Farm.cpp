@@ -43,7 +43,7 @@ void Farm::InitFromRandom() {
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
-        Life * initialLife = nursery->generateCreatureFromRandom();
+        Life * initialLife = nursery->generateVegetalFromRandom();
 
         float creatureEnergy = initialLife->getEntity()->getMaxEnergy() / 2.0;
         initialLife->getEntity()->setEnergy(creatureEnergy);
@@ -242,11 +242,14 @@ void Farm::executeCreaturesActions() {
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
 
-
         Life * performer = getLifeFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
-        if (subject->getEnergy() <= 0 || performer->getEntity()->getEnergy() <= 0) {
+        if (performer->getEntity()->getEnergy() <= 0) {
+            continue;
+        }
+
+        if (subject != nullptr && subject->getEnergy() <= 0) {
             continue;
         }
 

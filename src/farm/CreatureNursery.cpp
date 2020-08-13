@@ -9,6 +9,9 @@
 #include "evolutions/musclesEvolutions/SpeedEvolution.h"
 #include "evolutions/sensors/SelfEnergySensorEvolution.h"
 #include "evolutions/sensors/BarSensorDistanceEvolution.h"
+#include "evolutions/sensors/AccessibleGroundEnergyEvolution.h"
+#include "evolutions/sensors/TileHeatEvolution.h"
+#include "evolutions/musclesEvolutions/DuplicationMuscleEvolution.h"
 
 using namespace std;
 
@@ -272,48 +275,32 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     energySensorInputEvolution->perform(life);
     creatureGenome.emplace_back(energySensorInputEvolution);
 
+    AccessibleGroundEnergyEvolution * accessibleGroundEnergyEvolution = new AccessibleGroundEnergyEvolution();
+    accessibleGroundEnergyEvolution->setGenerationNumber(5);
+    accessibleGroundEnergyEvolution->perform(life);
+    creatureGenome.emplace_back(accessibleGroundEnergyEvolution);
+
+    TileHeatEvolution * tileHeatEvolution = new TileHeatEvolution();
+    tileHeatEvolution->setGenerationNumber(6);
+    tileHeatEvolution->perform(life);
+    creatureGenome.emplace_back(tileHeatEvolution);
 
 
+    DuplicationMuscleEvolution * duplicationMuscleEvolution = new DuplicationMuscleEvolution();
+    duplicationMuscleEvolution->setGenerationNumber(7);
+    duplicationMuscleEvolution->perform(life);
+    creatureGenome.emplace_back(duplicationMuscleEvolution);
 
-    int sensorCount = rand() % 4 + 1;
-    for (int it = 0; it < sensorCount; it++) {
 
-        BarSensorDistanceEvolution * sensorEvol = new BarSensorDistanceEvolution();
-        sensorEvol->setGenerationNumber((it * 3) + 5);
-        sensorEvol->generateFromRandom(life);
-        sensorEvol->perform(life);
-        creatureGenome.emplace_back(sensorEvol);
-
-    }
-
-    SpeedEvolution * speedEvolution = new SpeedEvolution();
-    speedEvolution->setGenerationNumber(35);
-    speedEvolution->perform(life);
-    creatureGenome.emplace_back(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(36);
+    rotationEvolution->setGenerationNumber(8);
     rotationEvolution->perform(life);
     creatureGenome.emplace_back(rotationEvolution);
 
-    MouthEvolution * mouthEvolution = new MouthEvolution();
-    mouthEvolution->setGenerationNumber(37);
-    mouthEvolution->generateFromRandom(life);
-    mouthEvolution->perform(life);
-    creatureGenome.emplace_back(mouthEvolution);
-
-    GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
-    genitalsEvolution->setGenerationNumber(38);
-    genitalsEvolution->generateFromRandom(life);
-    genitalsEvolution->perform(life);
-    creatureGenome.emplace_back(genitalsEvolution);
 
 
-
-
-
-
-    int generationNumberIndex(39);
+    int generationNumberIndex(9);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
@@ -326,6 +313,13 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 
         }
     }
+
+
+    for (int it = 0; it < creatureGenome.size(); it++) {
+        std::cout << creatureGenome.at(it)->describe() << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
 
 
     brain->generateLinkGrid();
