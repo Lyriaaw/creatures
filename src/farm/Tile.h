@@ -6,13 +6,18 @@
 #define CREATURES_TILE_H
 
 
+#include "../utils/Point.h"
+
 class Tile {
 private:
+    Point position;
     float height;
     float heat;
     float ground;
 
 public:
+    Tile(const Point &position);
+
     float getHeight() const;
 
     void setHeight(float height);
@@ -28,6 +33,8 @@ public:
     void addHeight(float value);
     void addHeat(float value);
     void addGround(float value);
+
+    const Point &getPosition() const;
 };
 
 

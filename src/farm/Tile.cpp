@@ -39,3 +39,9 @@ void Tile::addHeat(float value) {
 void Tile::addHeight(float value) {
     height += value;
 }
+
+Tile::Tile(const Point &position) : position(position), heat(0), ground(0), height(0) {}
+
+const Point &Tile::getPosition() const {
+    return position;
+}

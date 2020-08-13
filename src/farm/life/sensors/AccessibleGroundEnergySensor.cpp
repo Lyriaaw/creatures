@@ -9,16 +9,34 @@ std::string AccessibleGroundEnergySensor::getName() {
 }
 
 void AccessibleGroundEnergySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) {
-    float totalGroundEnergy = 0.0;
+    double totalGroundEnergy = 0.0;
 
-    for (int it = 0; it < availableTiles.size(); it++) {
-        totalGroundEnergy += availableTiles.at(it)->getGround();
+
+    for (int it = 0; it < selectedChunks.size(); it++) {
+
+        for (int jt = 0; jt < availableTiles.size(); jt++) {
+            if (!selectedChunks.at(it).equals(availableTiles.at(jt)->getPosition())) {
+                continue;
+            }
+
+            totalGroundEnergy += availableTiles.at(jt)->getGround();
+        }
     }
 
-    value = totalGroundEnergy;
+    float biggestEntity = std::max(double(this->entity->getMaxEnergy()), totalGroundEnergy);
+    float smallestEntity = std::min(double(this->entity->getMaxEnergy()), totalGroundEnergy);
+
+    float sizeRatio = 1 - (smallestEntity / biggestEntity);
+    if (this->entity->getMaxEnergy() > totalGroundEnergy) {
+        sizeRatio *= -1;
+    }
+    value = (0.5f + (sizeRatio / 2.f));
 }
 
 void AccessibleGroundEnergySensor::findSelectedChunks() {
+    this->selectedChunks.clear();
+
+
     int chunkReach = this->entity->getSize() / 5;
 
     Point entityPoint = this->entity->getPosition();

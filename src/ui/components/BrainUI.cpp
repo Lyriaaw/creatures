@@ -95,6 +95,8 @@ void BrainUI::draw(sf::RenderWindow *window) {
 
         neurons.at(it).setFillColor(sf::Color(currentNeuronValue * 255, currentNeuronValue * 255, currentNeuronValue * 255, 255));
 
+        neuronNames.at(it).setString(currentNeuron->getName() + " (" + std::to_string(currentNeuronValue) + ")");
+
         window->draw(neurons.at(it));
     }
 

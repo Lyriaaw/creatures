@@ -67,7 +67,7 @@ void Muscle::findSelectedChunks() {
 
 }
 
-Muscle::Muscle(float rotation, Entity *entity) : rotation(rotation), entity(entity) {}
+Muscle::Muscle(float rotation, Entity *entity) : rotation(rotation), entity(entity), energyConsumption(0) {}
 
 const std::vector<OutputNeuron *> &Muscle::getNeurons() const {
     return neurons;

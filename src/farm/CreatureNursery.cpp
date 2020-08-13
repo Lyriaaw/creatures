@@ -12,6 +12,8 @@
 #include "evolutions/sensors/AccessibleGroundEnergyEvolution.h"
 #include "evolutions/sensors/TileHeatEvolution.h"
 #include "evolutions/musclesEvolutions/DuplicationMuscleEvolution.h"
+#include "evolutions/musclesEvolutions/CaptureGroundMuscleEvolution.h"
+#include "evolutions/musclesEvolutions/CaptureHeatMuscleEvolution.h"
 
 using namespace std;
 
@@ -291,16 +293,30 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     duplicationMuscleEvolution->perform(life);
     creatureGenome.emplace_back(duplicationMuscleEvolution);
 
+    CaptureHeatMuscleEvolution * captureHeatMuscleEvolution = new CaptureHeatMuscleEvolution();
+    captureHeatMuscleEvolution->setGenerationNumber(8);
+    captureHeatMuscleEvolution->perform(life);
+    creatureGenome.emplace_back(captureHeatMuscleEvolution);
+
+    CaptureGroundMuscleEvolution * captureGroundMuscleEvolution = new CaptureGroundMuscleEvolution();
+    captureGroundMuscleEvolution->setGenerationNumber(9);
+    captureGroundMuscleEvolution->perform(life);
+    creatureGenome.emplace_back(captureGroundMuscleEvolution);
 
 
-    RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(8);
-    rotationEvolution->perform(life);
-    creatureGenome.emplace_back(rotationEvolution);
 
 
 
-    int generationNumberIndex(9);
+
+//
+//    RotationEvolution * rotationEvolution = new RotationEvolution();
+//    rotationEvolution->setGenerationNumber(8);
+//    rotationEvolution->perform(life);
+//    creatureGenome.emplace_back(rotationEvolution);
+
+
+
+    int generationNumberIndex(10);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
@@ -314,12 +330,12 @@ Life * CreatureNursery::generateVegetalFromRandom() {
         }
     }
 
-
-    for (int it = 0; it < creatureGenome.size(); it++) {
-        std::cout << creatureGenome.at(it)->describe() << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;
+//
+//    for (int it = 0; it < creatureGenome.size(); it++) {
+//        std::cout << creatureGenome.at(it)->describe() << std::endl;
+//    }
+//    std::cout << std::endl;
+//    std::cout << std::endl;
 
 
     brain->generateLinkGrid();

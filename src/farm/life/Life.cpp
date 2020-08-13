@@ -57,6 +57,8 @@ double Life::giveawayEnergy() {
 
     double sensorEnergy = sensors.size();
     double biasEnergy = 10;
+//    double sensorEnergy = 0;
+//    double biasEnergy = 0;
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
 

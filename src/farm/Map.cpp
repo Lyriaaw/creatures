@@ -44,7 +44,7 @@ void Map::generateRandomTerrain() {
             }
 
 
-            Tile * currentTile = new Tile();
+            Tile * currentTile = new Tile(Point(it, jt));
             currentTile->setHeight(height);
             currentTile->setGround(1500.0);
 

@@ -15,14 +15,19 @@ private:
 
     std::string type;
 
+    double value;
+
 public:
     ActionDTO(int performerId, int subjectId, const std::string &type);
+    ActionDTO(int performerId, int subjectId, const std::string &type, double value);
 
     int getPerformerId() const;
 
     int getSubjectId() const;
 
     const std::string &getType() const;
+
+    double getValue() const;
 };
 
 

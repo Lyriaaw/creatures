@@ -13,7 +13,7 @@ void TileHeatEvolution::generateFromRandom(Life *life) {
 
 void TileHeatEvolution::perform(Life *life) {
     InputNeuron * inputNeuron = new InputNeuron();
-    inputNeuron->setName("AccessibleGround");
+    inputNeuron->setName("Accessible heat");
     inputNeuron->setGenerationNumber(this->generationNumber);
 
     Sensor * sensor = new TileHeatSensor(life->getEntity());
@@ -25,7 +25,7 @@ void TileHeatEvolution::perform(Life *life) {
 }
 
 std::string TileHeatEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Accessible ground energy evolution";}
+    return std::to_string(this->generationNumber) + " => Accessible heat energy evolution";}
 
 Evolution *TileHeatEvolution::generateWithMate(Evolution *mate) {
     TileHeatEvolution * childEvolution = new TileHeatEvolution();
