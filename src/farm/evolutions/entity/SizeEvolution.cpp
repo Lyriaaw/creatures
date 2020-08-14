@@ -24,7 +24,7 @@ Evolution * SizeEvolution::generateWithMate(Evolution * mate) {
     SizeEvolution * mateColorEvolution(nullptr);
 
     if (mate == nullptr) {
-        std::cout << "NULL POINTER OF FATHER COLOR" << std::endl;
+//        std::cout << "NULL POINTER OF FATHER SIZE" << std::endl;
     } else {
         mateColorEvolution = dynamic_cast<SizeEvolution *>(mate);
         if (mateColorEvolution == nullptr) {

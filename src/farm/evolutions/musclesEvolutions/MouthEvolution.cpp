@@ -35,7 +35,7 @@ Evolution * MouthEvolution::generateWithMate(Evolution * mate) {
     MouthEvolution * mateColorEvolution(nullptr);
 
     if (mate == nullptr) {
-        std::cout << "NULL POINTER OF FATHER COLOR" << std::endl;
+        std::cout << "NULL POINTER OF FATHER MOUTH" << std::endl;
     } else {
         mateColorEvolution = dynamic_cast<MouthEvolution *>(mate);
         if (mateColorEvolution == nullptr) {

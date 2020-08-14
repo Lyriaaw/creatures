@@ -272,6 +272,24 @@ void Farm::executeCreaturesActions() {
 
         }
 
+        if (actionDto.getType() == "DUPLICATE") {
+            bool success = handleDuplication(performer);
+
+            if (success)
+                naturalMatingCount++;
+
+        }
+
+        if (actionDto.getType() == "CAPTURE_GROUND") {
+            handleCaptureGround(performer, actionDto);
+        }
+
+        if (actionDto.getType() == "CAPTURE_HEAT") {
+            handleCaptureHeat(performer, actionDto);
+        }
+
+
+
     }
     removeDeletedEntities();
 
@@ -282,6 +300,139 @@ void Farm::executeCreaturesActions() {
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 }
+
+void Farm::handleCaptureHeat(Life * life, ActionDTO action) {
+
+}
+
+void Farm::handleCaptureGround(Life * life, ActionDTO action) {
+    int chunkReach = life->getEntity()->getSize() / 5;
+
+    double totalGround = 0.0;
+    int ratioSize = (chunkReach * 2) + 1;
+    double ratios[ratioSize * ratioSize];
+    double test[2][2] = {{1, 1}, {1, 1}};
+
+    Point entityPoint = life->getEntity()->getPosition();
+    Point tilePoint = entityPoint.getTileCoordinates();
+
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            totalGround += map->getTileAt(currentTileX, currentTileY)->getGround();
+        }
+    }
+
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            Tile * tile = map->getTileAt(currentTileX, currentTileY);
+            double ratio = tile->getGround() / totalGround;
+            int currentIndex = ((it + chunkReach) * ratioSize) + (jt * chunkReach);
+            ratios[currentIndex] = ratio;
+        }
+    }
+//
+    double totalAimedEnergy = action.getValue() * totalGround;
+
+    double totalCollectedEnergy = 0;
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            int currentIndex = ((it + chunkReach) * ratioSize) + (jt * chunkReach);
+            double currentRatio = ratios[currentIndex] * 0.01;
+            double tileEnergy = map->getTileAt(currentTileX, currentTileY)->getGround();
+            double tileCollectedEnergy = (currentRatio * totalAimedEnergy);
+
+            if (tileEnergy - tileCollectedEnergy < 0) {
+                std::cout << "Error while removing from ground: " << tileEnergy - tileCollectedEnergy << std::endl;
+            }
+
+            totalCollectedEnergy += tileCollectedEnergy;
+            map->getTileAt(currentTileX, currentTileY)->setGround(tileEnergy - tileCollectedEnergy);
+        }
+    }
+
+    double heat = life->getEntity()->addEnergy(totalCollectedEnergy);
+
+    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(heat);
+
+}
+
+
+bool Farm::handleDuplication(Life * life) {
+
+    bool fatherCanReproduce = life->getEntity()->getEnergy() > life->getEntity()->getMaxEnergy() / 2.f;
+
+    if (!fatherCanReproduce) {
+//        std::cout << "Father cannot reproduce" << std::endl;
+        return false;
+    }
+//
+    Life * child = this->nursery->Mate(life, nullptr);
+
+    double givenEnergyToChildGoal = child->getEntity()->getMaxEnergy() / 4.f;
+
+    double givenFatherEnergy = std::min(life->getEntity()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
+
+    double actualGivenFatherEnergy = life->getEntity()->removeEnergy(givenFatherEnergy);
+
+    if (givenFatherEnergy != actualGivenFatherEnergy) {
+        std::cout << "Wrong energy given" << std::endl;
+    }
+
+    double totalGivenEnergy = actualGivenFatherEnergy;
+
+    if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
+        child->getEntity()->setEnergy(totalGivenEnergy);
+        lifes.emplace_back(child);
+        lifesAdded.emplace_back(child);
+
+        return true;
+    }
+
+
+    Point childCoordinate = child->getEntity()->getPosition();
+    Point tileChildPosition = childCoordinate.getTileCoordinates();
+
+    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+
+
+    if (life->getEntity()->getEnergy() <= 0) {
+        lifesToDelete.emplace_back(life);
+    }
+
+//    if (givenMotherEnergy + givenFatherEnergy == 0) {
+//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
+//    } else {
+//        std::cout << "New Child " << std::endl;
+//
+//    }
+
+
+
+
+    return false;
+}
+
+
+
+
 
 bool Farm::handleMating(Life * father, int entityId) {
     Life * foundLife = getLifeFromId(entityId);
@@ -419,6 +570,7 @@ void Farm::vegetalisation() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = map->getTileAt(it, jt);
+
 
             float tileX = it * TILE_SIZE;
             float tileY = jt * TILE_SIZE;

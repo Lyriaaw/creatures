@@ -11,28 +11,28 @@
 class Tile {
 private:
     Point position;
-    float height;
-    float heat;
-    float ground;
+    double height;
+    double heat;
+    double ground;
 
 public:
     Tile(const Point &position);
 
-    float getHeight() const;
+    double getHeight() const;
 
-    void setHeight(float height);
+    void setHeight(double height);
 
-    float getHeat() const;
+    double getHeat() const;
 
-    void setHeat(float heat);
+    void setHeat(double heat);
 
-    float getGround() const;
+    double getGround() const;
 
-    void setGround(float ground);
+    void setGround(double ground);
 
-    void addHeight(float value);
-    void addHeat(float value);
-    void addGround(float value);
+    void addHeight(double value);
+    void addHeat(double value);
+    void addGround(double value);
 
     const Point &getPosition() const;
 };

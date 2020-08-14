@@ -132,7 +132,11 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
     std::vector<Evolution *> fatherGenome = this->getEvolutionLibrary().getGenomeFor(father->getEntity()->getId());
-    std::vector<Evolution *> motherGenome = this->getEvolutionLibrary().getGenomeFor(mother->getEntity()->getId());
+    std::vector<Evolution *> motherGenome;
+
+    if (mother != nullptr) {
+        motherGenome = this->getEvolutionLibrary().getGenomeFor(mother->getEntity()->getId());
+    }
 
     int maxGenerationNumber(0);
 
@@ -185,11 +189,12 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
         }
     }
 
-    float delta = (((rand() % 400) / 100.f) - 2.f) * father->getEntity()->getSize();
+    float delta = (((rand() % 1000) / 100.f) - 2.f) * father->getEntity()->getSize();
+    float randomRotation = ((rand() * 2000) / 1000.f) - 1.0;
 
     Point childSpawn = {
-    father->getEntity()->getPosition().getX() + delta,
-    father->getEntity()->getPosition().getY() + delta,
+    father->getEntity()->getPosition().getX() + cos(randomRotation) * delta,
+    father->getEntity()->getPosition().getY() + sin(randomRotation) * delta,
     };
 
     if (childSpawn.getX() < 0) {

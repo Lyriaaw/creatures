@@ -112,6 +112,10 @@ public:
 
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 
+    void handleCaptureGround(Life * life, ActionDTO action);
+    void handleCaptureHeat(Life * life, ActionDTO action);
+    bool handleDuplication(Life * life);
+
 
 };
 

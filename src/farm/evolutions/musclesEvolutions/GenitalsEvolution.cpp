@@ -35,7 +35,7 @@ Evolution * GenitalsEvolution::generateWithMate(Evolution * mate) {
     GenitalsEvolution * mateColorEvolution(nullptr);
 
     if (mate == nullptr) {
-        std::cout << "NULL POINTER OF FATHER COLOR" << std::endl;
+        std::cout << "NULL POINTER OF FATHER GENITALS" << std::endl;
     } else {
         mateColorEvolution = dynamic_cast<GenitalsEvolution *>(mate);
         if (mateColorEvolution == nullptr) {

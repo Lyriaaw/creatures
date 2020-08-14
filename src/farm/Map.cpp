@@ -179,6 +179,10 @@ void Map::processClimate() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
+
+            if (newGround[it][jt] < 0) {
+                std::cout << "Climate to ground " << newGround[it][jt] << std::endl;
+            }
             currentTile->setGround(newGround[it][jt]);
             currentTile->setHeat(newHeats[it][jt]);
 
@@ -186,7 +190,7 @@ void Map::processClimate() {
                 continue;
             }
 
-            float heatToGroundRatio = 0.01f;
+            float heatToGroundRatio = 0.1f;
             float currentTileHeat = currentTile->getHeat();
 
             currentTile->addHeat(- 1 * currentTileHeat * heatToGroundRatio);

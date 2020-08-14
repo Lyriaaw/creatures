@@ -15,21 +15,21 @@ int MinimapsScreen::getId() {
 
 void MinimapsScreen::init() {
     WorldMinimap * worldMinimap = new WorldMinimap();
-    placeMinimap(8, 0, 0, worldMinimap);
+    placeMinimap(4, 0, 0, worldMinimap);
 
     creatureCountMinimap = new CreatureTileCountMinimap();
-    placeMinimap(8, 1, 0, creatureCountMinimap);
+    placeMinimap(4, 1, 0, creatureCountMinimap);
 
 
     foodTileCountMinimap = new FoodTileCountMinimap();
-    placeMinimap(8, 2, 0, foodTileCountMinimap);
+    placeMinimap(4, 2, 0, foodTileCountMinimap);
 
 
     heatMinimap = new HeatEnergyMinimap();
-    placeMinimap(8, 0, 1, heatMinimap);
+    placeMinimap(4, 0, 1, heatMinimap);
 
     groundMinimap = new GroundEnergyMinimap();
-    placeMinimap(8, 1, 1, groundMinimap);
+    placeMinimap(4, 1, 1, groundMinimap);
 
 
 
