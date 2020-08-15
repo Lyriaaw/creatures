@@ -28,12 +28,9 @@ public:
 
     float getRotation() const;
 
-    float getSpeed() const;
     float getBrightness() const;
 
     void setRotation(float rotation);
-
-    void setSpeed(float speed);
 
     void setPosition(const Point &position);
 
@@ -47,17 +44,15 @@ public:
 
     void setExists(bool exists);
 
-    float getEnergy() const;
-    double setEnergy(double energy);
-    double addEnergy(double addedEnergy);
-    double removeEnergy(double removedEnergy);
-    double getMaxEnergy();
+    double getMass() const;
+    void setMass(double currentMass);
 
     int getAge() const;
     void setAge(int age);
     void aTickHavePassed();
 
     void setBrightness(float brightness);
+    void setSizeFromEnergy();
 
 
 protected:
@@ -66,10 +61,12 @@ protected:
     int id;
 
     Point position;
+
+    double mass;
+
     float size;
 
     float rotation;
-    float speed;
 
     float color;
     float brightness;

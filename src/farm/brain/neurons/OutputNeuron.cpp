@@ -19,11 +19,6 @@ SpeedOutputNeuron::SpeedOutputNeuron(): OutputNeuron() {
 
 }
 
-void SpeedOutputNeuron::transferOutputValue(Creature *creature) {
-    creature->setSpeed(this->getValue());
-}
-
-
 // #################
 
 RotationOutputNeuron::RotationOutputNeuron(): OutputNeuron() {

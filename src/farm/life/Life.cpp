@@ -62,17 +62,17 @@ double Life::giveawayEnergy() {
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
 
-    double currentEntityEnergy = this->entity->getEnergy();
+    double currentEntityEnergy = this->body->getEnergy();
 
     if (currentEntityEnergy - usedEnergy < 0) {
-        usedEnergy = this->entity->getEnergy();
+        usedEnergy = this->body->getEnergy();
     }
 
     if (usedEnergy < 0) {
         std::cout << "Returned negative amount of energy: " << usedEnergy << std::endl;
     }
 
-    this->entity->setEnergy(currentEntityEnergy - usedEnergy);
+    this->body->setEnergy(currentEntityEnergy - usedEnergy);
 
     return usedEnergy;
 }
@@ -137,16 +137,8 @@ std::vector<Point> Life::getSelectedChunks() {
     return selectedChunks;
 }
 
-Entity *Life::getEntity() const {
-    return entity;
-}
-
 Brain *Life::getBrain() const {
     return brain;
-}
-
-void Life::setEntity(Entity *entity) {
-    Life::entity = entity;
 }
 
 void Life::setBrain(Brain *brain) {
@@ -166,13 +158,13 @@ void Life::addExternalMuscle(ExternalMuscle * muscle) {
 
 void Life::connectSensorAndMuscles() {
     for (int it = 0; it < internalMuscles.size(); it++) {
-        internalMuscles.at(it)->setEntity(entity);
+        internalMuscles.at(it)->setEntity(body);
     }
     for (int it = 0; it < externalMuscles.size(); it++) {
-        externalMuscles.at(it)->setEntity(entity);
+        externalMuscles.at(it)->setEntity(body);
     }
     for (int it = 0; it < sensors.size(); it++) {
-        sensors.at(it)->setEntity(entity);
+        sensors.at(it)->setEntity(body);
     }
 
 }
@@ -188,4 +180,32 @@ const std::vector<InternalMuscle *> &Life::getInternalMuscles() const {
 const std::vector<ExternalMuscle *> &Life::getExternalMuscles() const {
     return externalMuscles;
 }
+
+Body *Life::getBody() const {
+    return body;
+}
+
+Body *Life::getEntity() const {
+    return body;
+}
+
+void Life::setEntity(Body * entity) {
+    this->body = entity;
+}
+
+double Life::addEnergy(double addedEnergy) {
+    double remaining = 0.f;
+
+    double newEnergy = this->energy + addedEnergy;
+
+    if (newEnergy > getMaxEnergy()) {
+        remaining = newEnergy - getMaxEnergy();
+        newEnergy = newEnergy - remaining;
+    }
+
+    this->energy = newEnergy;
+
+    return remaining;
+}
+
 

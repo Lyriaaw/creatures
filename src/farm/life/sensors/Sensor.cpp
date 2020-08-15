@@ -12,7 +12,7 @@ void Sensor::setValue(double value) {
     Sensor::value = value;
 }
 
-Sensor::Sensor(Entity * entity) : value(0.0), entity(entity) {}
+Sensor::Sensor(Body * entity) : value(0.0), entity(entity), connectedNeuron(nullptr) {}
 
 void Sensor::clearSelectedChunks() {
     this->selectedChunks.clear();
@@ -34,6 +34,6 @@ void Sensor::setConnectedNeuron(InputNeuron *connectedNeuron) {
     Sensor::connectedNeuron = connectedNeuron;
 }
 
-void Sensor::setEntity(Entity *entity) {
+void Sensor::setEntity(Body *entity) {
     Sensor::entity = entity;
 }

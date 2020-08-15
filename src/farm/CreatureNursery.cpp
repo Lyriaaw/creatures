@@ -5,7 +5,6 @@
 #include <iostream>
 #include "CreatureNursery.h"
 #include "brain/BrainConnector.h"
-#include "brain/neurons/BiasNeuron.h"
 #include "evolutions/musclesEvolutions/SpeedEvolution.h"
 #include "evolutions/sensors/SelfEnergySensorEvolution.h"
 #include "evolutions/sensors/BarSensorDistanceEvolution.h"
@@ -30,7 +29,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     int x = distWidth(mt);
     int y = distHeight(mt);
 
-    Entity * entity = new Entity(Point(x, y));
+    Body * entity = new Body(Point(x, y));
     entity->setBrightness(0.5f);
     Brain * brain = new Brain();
 
@@ -214,7 +213,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
 
 
-    Entity * childEntity = new Entity(childSpawn);
+    Body * childEntity = new Body(childSpawn);
     childEntity->setRotation(((std::rand() % 2000) / 1000.f) - 1.f);
     childEntity->setBrightness(0.5);
 
@@ -247,7 +246,7 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     int x = distWidth(mt);
     int y = distHeight(mt);
 
-    Entity * entity = new Entity(Point(x, y));
+    Body * entity = new Body(Point(x, y));
     entity->setBrightness(0.5f);
     Brain * brain = new Brain();
 

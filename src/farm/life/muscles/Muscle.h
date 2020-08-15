@@ -7,12 +7,13 @@
 
 
 #include "../../brain/neurons/OutputNeuron.h"
+#include "../Body.h"
 
 class Muscle {
 protected:
     std::vector<OutputNeuron *> neurons;
     float rotation;
-    Entity * entity;
+    Body * entity;
 
     double energyConsumption;
 
@@ -41,7 +42,7 @@ public:
     void setNeurons(const std::vector<OutputNeuron *> &neurons);
     void addNeuron(OutputNeuron * neuron);
 
-    void setEntity(Entity *entity);
+    void setEntity(Body *entity);
 
     float getRotation() const;
 

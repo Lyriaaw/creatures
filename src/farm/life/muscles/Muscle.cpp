@@ -82,7 +82,7 @@ void Muscle::addNeuron(OutputNeuron * neuron) {
 }
 
 
-void Muscle::setEntity(Entity *entity) {
+void Muscle::setEntity(Body *entity) {
     Muscle::entity = entity;
 }
 

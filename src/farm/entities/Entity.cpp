@@ -31,9 +31,6 @@ float Entity::getRotation() const {
     return rotation;
 }
 
-float Entity::getSpeed() const {
-    return speed;
-}
 
 float Entity::getBrightness() const {
     return brightness;
@@ -65,9 +62,6 @@ void Entity::setRotation(float rotation) {
     Entity::rotation = rotation;
 }
 
-void Entity::setSpeed(float speed) {
-    Entity::speed = speed;
-}
 
 void Entity::setColor(float color) {
     Entity::color = color;
@@ -85,47 +79,8 @@ void Entity::setExists(bool exists) {
     Entity::exists = exists;
 }
 
-float Entity::getEnergy() const {
-    return energy;
-}
-
-double Entity::setEnergy(double energy) {
-    Entity::energy = energy;
-}
-
-double Entity::addEnergy(double addedEnergy) {
-    double remaining = 0.f;
-
-    double newEnergy = this->energy + addedEnergy;
-
-    if (newEnergy > getMaxEnergy()) {
-        remaining = newEnergy - getMaxEnergy();
-        newEnergy = newEnergy - remaining;
-    }
-
-    this->energy = newEnergy;
-
-    return remaining;
-}
-
-double Entity::removeEnergy(double removedEnergy) {
-    double newEnergy = this->energy - removedEnergy;
-    double returned = removedEnergy;
-
-    if (newEnergy <= 0) {
-        returned = this->energy;
-        this->energy = 0;
-    }
-
-    this->energy = newEnergy;
-
-    return returned;
-}
-
-double Entity::getMaxEnergy() {
-//    double result = this->size * pow(299792458, 2);
-    double result = this->size * 1000;
-    return result;
+void Entity::setSizeFromEnergy() {
+    this->size = energy / 1000.0;
 }
 
 int Entity::getAge() const {
@@ -143,3 +98,13 @@ void Entity::aTickHavePassed(){
 void Entity::setBrightness(float brightness) {
     Entity::brightness = brightness;
 }
+
+
+double Entity::getMass() const {
+    return mass;
+}
+
+void Entity::setMass(double mass) {
+    Entity::mass = mass;
+}
+

@@ -3,7 +3,6 @@
 //
 
 #include "BiasInputEvolution.h"
-#include "../../brain/neurons/BiasNeuron.h"
 #include "../../life/sensors/BiasSensor.h"
 
 BiasInputEvolution::BiasInputEvolution(): Evolution() {

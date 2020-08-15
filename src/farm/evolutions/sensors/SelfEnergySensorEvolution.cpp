@@ -3,7 +3,6 @@
 //
 
 #include "SelfEnergySensorEvolution.h"
-#include "../../brain/neurons/EnergySensorNeuron.h"
 #include "../../life/sensors/SelfEnergySensor.h"
 
 SelfEnergySensorEvolution::SelfEnergySensorEvolution(): Evolution() {

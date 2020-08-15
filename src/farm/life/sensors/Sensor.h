@@ -9,15 +9,16 @@
 #include "../../entities/Entity.h"
 #include "../../brain/neurons/InputNeuron.h"
 #include "../../Tile.h"
+#include "../Body.h"
 
 class Sensor {
 protected:
-    Entity * entity;
+    Body * entity;
     double value;
     InputNeuron * connectedNeuron;
     std::vector<Point> selectedChunks;
 public:
-    Sensor(Entity * entity);
+    Sensor(Body * entity);
 
     double getValue() const;
     void setValue(double value);
@@ -37,7 +38,7 @@ public:
 
     void setConnectedNeuron(InputNeuron *connectedNeuron);
 
-    void setEntity(Entity *entity);
+    void setEntity(Body *entity);
 
 };
 

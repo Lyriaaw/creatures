@@ -45,8 +45,8 @@ void Farm::InitFromRandom() {
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
         Life * initialLife = nursery->generateVegetalFromRandom();
 
-        float creatureEnergy = initialLife->getEntity()->getMaxEnergy() / 2.0;
-        initialLife->getEntity()->setEnergy(creatureEnergy);
+        float creatureEnergy = initialLife->getBody()->getMaximumMass() / 10.0;
+        initialLife->getBody()->setEnergy(creatureEnergy);
 
         lifes.push_back(initialLife);
     }
@@ -62,7 +62,7 @@ void Farm::InitFromRandom() {
         float foodSize = 2;
 
         Food * entity = new Food(point, foodSize);
-        entity->setEnergy(entity->getMaxEnergy());
+        entity->setMass(2000.0);
         entities.push_back(entity);
     }
 
@@ -249,12 +249,12 @@ void Farm::executeCreaturesActions() {
             continue;
         }
 
-        if (subject != nullptr && subject->getEnergy() <= 0) {
+        if (subject != nullptr && subject->getMass() <= 0) {
             continue;
         }
 
         if (actionDto.getType() == "EAT") {
-            double wastedEnergy = performer->getEntity()->addEnergy(subject->getEnergy());
+            double wastedEnergy = performer->addEnergy(subject->getMass());
             subject->setEnergy(0.0);
 
             Point performerPoint = performer->getEntity()->getPosition();
@@ -440,8 +440,8 @@ bool Farm::handleMating(Life * father, int entityId) {
         return false;
     }
 
-    bool fatherCanReproduce = father->getEntity()->getEnergy() > father->getEntity()->getMaxEnergy() / 2.f;
-    bool motherCanReproduce = foundLife->getEntity()->getEnergy() > father->getEntity()->getMaxEnergy() / 2.f;
+    bool fatherCanReproduce = father->getEntity()->getEnergy() > father->getMaximumMass() / 2.f;
+    bool motherCanReproduce = foundLife->getEntity()->getEnergy() > father->getMaximumMass() / 2.f;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
         return false;
@@ -449,13 +449,13 @@ bool Farm::handleMating(Life * father, int entityId) {
 //
     Life * child = this->nursery->Mate(father, foundLife);
 
-    double givenEnergyToChildGoal = child->getEntity()->getMaxEnergy() / 4.f;
+    double givenEnergyToChildGoal = child->getMaximumMass() / 10.f;
 
     double givenFatherEnergy = std::min(father->getEntity()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
     double givenMotherEnergy = std::min(foundLife->getEntity()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
 
-    double actualGivenFatherEnergy = father->getEntity()->removeEnergy(givenFatherEnergy);
-    double actualGivenMotherEnergy = foundLife->getEntity()->removeEnergy(givenMotherEnergy);
+    double actualGivenFatherEnergy = father->removeEnergy(givenFatherEnergy);
+    double actualGivenMotherEnergy = foundLife->removeEnergy(givenMotherEnergy);
 
     if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
         std::cout << "Wrong energy given" << std::endl;
@@ -596,7 +596,7 @@ void Farm::vegetalisation() {
                 float foodSize = 2;
 
                 Food * entity = new Food(point, foodSize);
-                entity->setEnergy(entity->getMaxEnergy());
+                entity->setEnergy(2000.0);
 
                 totalEnergyAdded += entity->getEnergy();
 

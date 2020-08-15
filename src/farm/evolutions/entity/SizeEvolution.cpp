@@ -9,15 +9,17 @@ SizeEvolution::SizeEvolution(): Evolution() {
 }
 
 void SizeEvolution::generateFromRandom(Life * life) {
-    this->size = ((rand() % 1000) / 100.f) + 5;
+    this->maximumMass = (rand() % 10000);
+    this->massTransformationRatio = ((rand() % 1000) / 1000.0);
 }
 
 void SizeEvolution::perform(Life * life) {
-    life->getEntity()->setSize(this->size);
+    life->setMaximumMass(this->maximumMass);
+    life->setMassTransformationRatio(this->massTransformationRatio);
 }
 
 std::string SizeEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Size ";
+    return std::to_string(this->generationNumber) + " => Mass ";
 }
 
 Evolution * SizeEvolution::generateWithMate(Evolution * mate) {
@@ -28,7 +30,7 @@ Evolution * SizeEvolution::generateWithMate(Evolution * mate) {
     } else {
         mateColorEvolution = dynamic_cast<SizeEvolution *>(mate);
         if (mateColorEvolution == nullptr) {
-            std::cout << "UNABLE TO CAST FATHER COLOR EVOLUTION" << std::endl;
+            std::cout << "UNABLE TO CAST FATHER MASS EVOLUTION" << std::endl;
         }
     }
 
@@ -40,23 +42,32 @@ Evolution * SizeEvolution::generateFromCastedMate(SizeEvolution * mate) {
     childSizeEvolution->setGenerationNumber(getGenerationNumber());
 
     if (mate == nullptr) {
-        childSizeEvolution->size = this->size;
+        childSizeEvolution->maximumMass = this->maximumMass;
+        childSizeEvolution->massTransformationRatio = this->massTransformationRatio;
         return childSizeEvolution;
     }
 
     // 3 chances out of 4 to simply select one of the parent's sensor
     if (rand() % MUTATION_RATIO != 0) {
         if (rand() % 2 == 0) {
-            childSizeEvolution->size = this->size;
+            childSizeEvolution->maximumMass = this->maximumMass;
+            childSizeEvolution->massTransformationRatio = this->massTransformationRatio;
         } else {
-            childSizeEvolution->size = mate->size;
+            childSizeEvolution->maximumMass = mate->maximumMass;
+            childSizeEvolution->massTransformationRatio = mate->massTransformationRatio;
         }
 
         return childSizeEvolution;
     }
 
-    float newSize = (this->size + mate->size) / 2.f;
-    childSizeEvolution->size = newSize;
+
+    double newMaximumMass = (this->maximumMass + mate->maximumMass) / 2.f;
+    childSizeEvolution->maximumMass = newMaximumMass;
+
+    double newMassTransformationRatio = (this->massTransformationRatio + mate->massTransformationRatio) / 2.0;
+    childSizeEvolution->massTransformationRatio = newMassTransformationRatio;
+
+
 
     return childSizeEvolution;
 }

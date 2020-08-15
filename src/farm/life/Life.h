@@ -13,10 +13,11 @@
 #include "muscles/externals/ExternalMuscle.h"
 #include "../Tile.h"
 #include "../brain/Brain.h"
+#include "Body.h"
 
 class Life {
 private:
-    Entity * entity;
+    Body * body;
 
     std::vector<Sensor *> sensors;
 
@@ -24,8 +25,10 @@ private:
     std::vector<ExternalMuscle *> externalMuscles;
 
     Brain * brain;
+
 public:
     double giveawayEnergy();
+    double addEnergy(double addedEnergy);
 
     void processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
     void processBrain();
@@ -37,14 +40,14 @@ public:
     std::vector<Entity *> executeInternalActions();
 
 
+    Body *getBody() const;
+    Body *getEntity() const;
 
-
-    Entity *getEntity() const;
     Brain *getBrain() const;
 
     void setBrain(Brain *brain);
 
-    void setEntity(Entity *entity);
+    void setEntity(Body *entity);
 
     void addSensor(Sensor * sensor);
     void addInternalMuscle(InternalMuscle * muscle);
@@ -57,6 +60,7 @@ public:
     const std::vector<InternalMuscle *> &getInternalMuscles() const;
 
     const std::vector<ExternalMuscle *> &getExternalMuscles() const;
+
 };
 
 
