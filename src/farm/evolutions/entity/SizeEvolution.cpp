@@ -9,11 +9,11 @@ SizeEvolution::SizeEvolution(): Evolution() {
 }
 
 void SizeEvolution::generateFromRandom(Life * life) {
-    this->size = ((rand() % 1000) / 100.f) + 5;
+    this->maxMass = (((rand() % 1000) / 100.f) + 5) * 1000.f;
 }
 
 void SizeEvolution::perform(Life * life) {
-    life->getEntity()->setSize(this->size);
+    life->getEnergyManagement()->setMaxMass(this->maxMass);
 }
 
 std::string SizeEvolution::describe() {
@@ -40,23 +40,23 @@ Evolution * SizeEvolution::generateFromCastedMate(SizeEvolution * mate) {
     childSizeEvolution->setGenerationNumber(getGenerationNumber());
 
     if (mate == nullptr) {
-        childSizeEvolution->size = this->size;
+        childSizeEvolution->maxMass = this->maxMass;
         return childSizeEvolution;
     }
 
     // 3 chances out of 4 to simply select one of the parent's sensor
     if (rand() % MUTATION_RATIO != 0) {
         if (rand() % 2 == 0) {
-            childSizeEvolution->size = this->size;
+            childSizeEvolution->maxMass = this->maxMass;
         } else {
-            childSizeEvolution->size = mate->size;
+            childSizeEvolution->maxMass = mate->maxMass;
         }
 
         return childSizeEvolution;
     }
 
-    float newSize = (this->size + mate->size) / 2.f;
-    childSizeEvolution->size = newSize;
+    float newSize = (this->maxMass + mate->maxMass) / 2.f;
+    childSizeEvolution->maxMass = newSize;
 
     return childSizeEvolution;
 }

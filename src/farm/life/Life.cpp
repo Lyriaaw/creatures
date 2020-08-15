@@ -62,17 +62,23 @@ double Life::giveawayEnergy() {
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
 
-    double currentEntityEnergy = this->entity->getEnergy();
+    double currentEntityEnergy = this->energyManagement->getEnergy();
 
     if (currentEntityEnergy - usedEnergy < 0) {
-        usedEnergy = this->entity->getEnergy();
+        usedEnergy = this->energyManagement->getEnergy();
     }
+
 
     if (usedEnergy < 0) {
         std::cout << "Returned negative amount of energy: " << usedEnergy << std::endl;
     }
 
-    this->entity->setEnergy(currentEntityEnergy - usedEnergy);
+    this->energyManagement->setEnergy(currentEntityEnergy - usedEnergy);
+
+    if (this->energyManagement->getEnergy() > 100) {
+        this->entity->setMass(this->entity->getMass() + 1);
+        this->energyManagement->removeEnergy(1);
+    }
 
     return usedEnergy;
 }
@@ -187,5 +193,13 @@ const std::vector<InternalMuscle *> &Life::getInternalMuscles() const {
 
 const std::vector<ExternalMuscle *> &Life::getExternalMuscles() const {
     return externalMuscles;
+}
+
+EnergyManagement *Life::getEnergyManagement() const {
+    return energyManagement;
+}
+
+void Life::setEnergyManagement(EnergyManagement *energyManagement) {
+    Life::energyManagement = energyManagement;
 }
 

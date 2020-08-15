@@ -43,6 +43,7 @@ private:
     DataItem * totalEnergy;
     DataItem * availableEnergy;
     DataItem * foodEnergy;
+    DataItem * creaturesMass;
     DataItem * creaturesEnergy;
 
     DataItem * heatEnergy;
@@ -111,6 +112,8 @@ public:
     DataItem *getExternalActions() const;
 
     DataItem *getTotalGridGeneration() const;
+
+    DataItem *getCreaturesMass() const;
 };
 
 

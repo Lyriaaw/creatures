@@ -31,6 +31,7 @@ DataAnalyser::DataAnalyser() {
     creaturesEnergy = new DataItem("creaturesEnergy", true);
     heatEnergy = new DataItem("heatEnergy", true);
     groundEnergy = new DataItem("groundEnergy", true);
+    creaturesMass = new DataItem("creaturesMass", true);
 
     averageScore = new DataItem("averageScore", true);
     bestScore = new DataItem("bestScore", true);
@@ -171,4 +172,8 @@ DataItem *DataAnalyser::getExternalActions() const {
 
 DataItem *DataAnalyser::getTotalGridGeneration() const {
     return totalGridGeneration;
+}
+
+DataItem *DataAnalyser::getCreaturesMass() const {
+    return creaturesMass;
 }

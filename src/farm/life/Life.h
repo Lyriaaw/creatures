@@ -13,6 +13,7 @@
 #include "muscles/externals/ExternalMuscle.h"
 #include "../Tile.h"
 #include "../brain/Brain.h"
+#include "EnergyManagement.h"
 
 class Life {
 private:
@@ -24,6 +25,8 @@ private:
     std::vector<ExternalMuscle *> externalMuscles;
 
     Brain * brain;
+
+    EnergyManagement * energyManagement;
 public:
     double giveawayEnergy();
 
@@ -57,6 +60,11 @@ public:
     const std::vector<InternalMuscle *> &getInternalMuscles() const;
 
     const std::vector<ExternalMuscle *> &getExternalMuscles() const;
+
+    EnergyManagement *getEnergyManagement() const;
+
+    void setEnergyManagement(EnergyManagement *energyManagement);
+
 };
 
 

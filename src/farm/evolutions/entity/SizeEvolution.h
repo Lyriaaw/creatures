@@ -10,7 +10,7 @@
 
 class SizeEvolution: public Evolution {
 private:
-    float size;
+    float maxMass;
 public:
     SizeEvolution();
     void generateFromRandom(Life * life) override;

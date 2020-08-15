@@ -41,23 +41,18 @@ public:
 
     int getId() const;
 
-    void setSize(float size);
-
     bool isExists() const;
 
-    void setExists(bool exists);
-
-    float getEnergy() const;
-    double setEnergy(double energy);
-    double addEnergy(double addedEnergy);
-    double removeEnergy(double removedEnergy);
-    double getMaxEnergy();
 
     int getAge() const;
     void setAge(int age);
     void aTickHavePassed();
 
     void setBrightness(float brightness);
+
+    float getMass() const;
+
+    void setMass(float mass);
 
 
 protected:
@@ -66,17 +61,13 @@ protected:
     int id;
 
     Point position;
-    float size;
+    float mass;
 
     float rotation;
     float speed;
 
     float color;
     float brightness;
-
-    double energy;
-
-    bool exists;
 
     int age;
 
