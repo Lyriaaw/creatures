@@ -14,16 +14,12 @@ void Sensor::setValue(double value) {
 
 Sensor::Sensor(Entity * entity) : value(0.0), entity(entity) {}
 
-void Sensor::clearSelectedChunks() {
-    this->selectedChunks.clear();
+void Sensor::clearSelectedTiles() {
+    this->selectedTiles.clear();
 }
 
-const std::vector<Point> &Sensor::getSelectedChunks() const {
-    return selectedChunks;
-}
-
-void Sensor::setSelectedChunks(const std::vector<Point> &selectedChunks) {
-    Sensor::selectedChunks = selectedChunks;
+const std::vector<Point> &Sensor::getSelectedTiles() const {
+    return selectedTiles;
 }
 
 void Sensor::passValueToNeuron() {

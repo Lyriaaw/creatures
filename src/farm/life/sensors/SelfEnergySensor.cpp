@@ -12,7 +12,7 @@ void SelfEnergySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities
     this->value = this->energyManagement->getEnergy() / this->entity->getMass();
 }
 
-void SelfEnergySensor::findSelectedChunks() {
+void SelfEnergySensor::findSelectedTiles() {
 }
 
 SelfEnergySensor::SelfEnergySensor(Entity *entity, EnergyManagement * energyManagement) : Sensor(entity), energyManagement(energyManagement) {}

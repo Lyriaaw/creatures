@@ -33,8 +33,8 @@ public:
     void processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
     void processBrain();
 
-    void processSelectedChunks();
-    std::vector<Point> getSelectedChunks();
+    void processSelectedTiles();
+    std::vector<Point> getSelectedTiles();
 
     std::vector<ActionDTO> executeExternalActions(std::vector<Entity *> availableEntities);
     std::vector<Entity *> executeInternalActions();

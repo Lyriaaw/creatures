@@ -4,12 +4,12 @@
 
 #include "BarSensor.h"
 
-void BarSensor::findSelectedChunks() {
+void BarSensor::findSelectedTiles() {
     Point entityPoint = this->entity->getPosition();
-    Point currentSimplePosition = entityPoint.getSimpleCoordinates();
+    Point currentTilePosition = entityPoint.getTileCoordinates();
 
 
-    this->selectedChunks.clear();
+    this->selectedTiles.clear();
 
 
     float currentRotation = (rotation  + this->entity->getRotation()) * float(M_PI);
@@ -19,27 +19,27 @@ void BarSensor::findSelectedChunks() {
 
     Point sensorPosition = {sensorX, sensorY};
 
-    Point sensorSimplePosition = sensorPosition.getSimpleCoordinates();
+    Point sensorTilePosition = sensorPosition.getTileCoordinates();
 
-    int minChunkX = std::min(sensorSimplePosition.getX(), currentSimplePosition.getX()) - 1;
-    int maxChunkX = std::max(sensorSimplePosition.getX(), currentSimplePosition.getX()) + 1;
+    int minChunkX = std::min(sensorTilePosition.getX(), currentTilePosition.getX()) - 1;
+    int maxChunkX = std::max(sensorTilePosition.getX(), currentTilePosition.getX()) + 1;
 
     if (minChunkX < 0) {
         minChunkX = 0;
     }
-    if (maxChunkX >= CHUNK_COUNT_WIDTH) {
-        maxChunkX = CHUNK_COUNT_WIDTH - 1;
+    if (maxChunkX >= TILE_COUNT_WIDTH) {
+        maxChunkX = TILE_COUNT_WIDTH - 1;
     }
 
 
-    int minChunkY = std::min(sensorSimplePosition.getY(), currentSimplePosition.getY()) - 1;
-    int maxChunkY = std::max(sensorSimplePosition.getY(), currentSimplePosition.getY()) + 1;
+    int minChunkY = std::min(sensorTilePosition.getY(), currentTilePosition.getY()) - 1;
+    int maxChunkY = std::max(sensorTilePosition.getY(), currentTilePosition.getY()) + 1;
 
     if (minChunkY < 0) {
         minChunkY = 0;
     }
-    if (maxChunkY >= CHUNK_COUNT_HEIGHT) {
-        maxChunkY = CHUNK_COUNT_HEIGHT - 1;
+    if (maxChunkY >= TILE_COUNT_HEIGHT) {
+        maxChunkY = TILE_COUNT_HEIGHT - 1;
     }
 
 
@@ -50,15 +50,15 @@ void BarSensor::findSelectedChunks() {
             // If the chunk have not already been selected, select it
             bool found(false);
             int index = 0;
-            while(!found && index < selectedChunks.size()) {
-                if (selectedChunks.at(index).equals(Point(x, y))) {
+            while(!found && index < selectedTiles.size()) {
+                if (selectedTiles.at(index).equals(Point(x, y))) {
                     found = true;
                 }
                 index++;
             };
 
             if (!found) {
-                selectedChunks.emplace_back(x, y);
+                selectedTiles.emplace_back(x, y);
             }
         }
     }

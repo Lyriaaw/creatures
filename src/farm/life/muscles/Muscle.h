@@ -16,7 +16,7 @@ protected:
 
     double energyConsumption;
 
-    std::vector<Point> selectedChunks;
+    std::vector<Point> selectedTiles;
 
 
 public:
@@ -27,12 +27,9 @@ public:
 
     double getAndClearEnergyConsumption();
 
-    const std::vector<Point> &getSelectedChunks() const;
-
-    void setSelectedChunks(const std::vector<Point> &selectedChunks);
-
-    void findSelectedChunks();
-    void clearSelectedChunks();
+    const std::vector<Point> &getSelectedTiles() const;
+    void findSelectedTiles();
+    void clearSelectedTiles();
 
     Muscle(float rotation, Entity *entity);
 

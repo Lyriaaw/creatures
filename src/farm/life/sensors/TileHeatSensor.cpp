@@ -10,10 +10,10 @@ std::string TileHeatSensor::getName() {
 void TileHeatSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) {
 
     double tileValue = 0.0;
-    for (int it = 0; it < selectedChunks.size(); it++) {
+    for (int it = 0; it < selectedTiles.size(); it++) {
 
         for (int jt = 0; jt < availableTiles.size(); jt++) {
-            if (!selectedChunks.at(it).equals(availableTiles.at(jt)->getPosition())) {
+            if (!selectedTiles.at(it).equals(availableTiles.at(jt)->getPosition())) {
                 continue;
             }
 
@@ -32,14 +32,14 @@ void TileHeatSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, 
     value = (0.5f + (sizeRatio / 2.f));
 }
 
-void TileHeatSensor::findSelectedChunks() {
-    this->selectedChunks.clear();
+void TileHeatSensor::findSelectedTiles() {
+    this->selectedTiles.clear();
 
     Point entityPoint = this->entity->getPosition();
     Point tilePoint = entityPoint.getTileCoordinates();
 
 
-    selectedChunks.emplace_back(tilePoint);
+    selectedTiles.emplace_back(tilePoint);
 }
 
 TileHeatSensor::TileHeatSensor(Entity *entity) : Sensor(entity) {}

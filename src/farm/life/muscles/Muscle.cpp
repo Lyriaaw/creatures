@@ -20,47 +20,44 @@ void Muscle::setEnergyConsumption(double energyConsumption) {
     Muscle::energyConsumption = energyConsumption;
 }
 
-const std::vector<Point> &Muscle::getSelectedChunks() const {
-    return selectedChunks;
+const std::vector<Point> &Muscle::getSelectedTiles() const {
+    return selectedTiles;
 }
 
-void Muscle::setSelectedChunks(const std::vector<Point> &selectedChunks) {
-    Muscle::selectedChunks = selectedChunks;
+
+void Muscle::clearSelectedTiles() {
+    this->selectedTiles.clear();
 }
 
-void Muscle::clearSelectedChunks() {
-    this->selectedChunks.clear();
-}
-
-void Muscle::findSelectedChunks() {
-    this->selectedChunks.clear();
+void Muscle::findSelectedTiles() {
+    this->selectedTiles.clear();
     float muscleRotation = (float(rotation) + entity->getRotation()) * float(M_PI);
 
     float muscleX = (cos(muscleRotation) * entity->getSize()) + entity->getPosition().getX();
     float muscleY = (sin(muscleRotation) * entity->getSize()) + entity->getPosition().getY();
 
     Point musclePoint = Point(muscleX, muscleY);
-    Point chunk = musclePoint.getSimpleCoordinates();
+    Point tile = musclePoint.getTileCoordinates();
 
 
     for (int it = -1; it <= 1; it++) {
         for (int jt = -1; jt <= 1; jt++) {
-            if (it < 0 || it >= CHUNK_COUNT_WIDTH || jt < 0 || jt >= CHUNK_COUNT_HEIGHT)
+            if (it < 0 || it >= TILE_COUNT_WIDTH || jt < 0 || jt >= TILE_COUNT_HEIGHT)
                 continue;
 
-            float x = chunk.getX() + it;
-            float y = chunk.getY() + jt;
+            float x = tile.getX() + it;
+            float y = tile.getY() + jt;
 
             if (x < 0)
                 x = 0;
             if (y < 0)
                 y = 0;
-            if (x >= CHUNK_COUNT_WIDTH)
-                x = CHUNK_COUNT_WIDTH - 1;
-            if (y >= CHUNK_COUNT_HEIGHT)
-                y = CHUNK_COUNT_HEIGHT - 1;
+            if (x >= TILE_COUNT_WIDTH)
+                x = TILE_COUNT_WIDTH - 1;
+            if (y >= TILE_COUNT_HEIGHT)
+                y = TILE_COUNT_HEIGHT - 1;
 
-            selectedChunks.emplace_back(Point(x, y));
+            selectedTiles.emplace_back(Point(x, y));
         }
     }
 

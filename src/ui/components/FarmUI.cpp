@@ -292,7 +292,7 @@ void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
 
     hoveredTileInfos.setPosition(screenTopLeft.getX(), screenTopLeft.getY());
     hoveredTileInfos.setFillColor(sf::Color(100, 0, 0));
-    hoveredTileInfos.setCharacterSize((5 / TILE_PER_CHUNK) * camera->getZoom());
+    hoveredTileInfos.setCharacterSize((TILE_SIZE / TILE_PER_CHUNK) * camera->getZoom());
     generateTileInfoText();
 }
 

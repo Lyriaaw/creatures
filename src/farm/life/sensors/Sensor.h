@@ -15,7 +15,7 @@ protected:
     Entity * entity;
     double value;
     InputNeuron * connectedNeuron;
-    std::vector<Point> selectedChunks;
+    std::vector<Point> selectedTiles;
 public:
     Sensor(Entity * entity);
 
@@ -26,12 +26,10 @@ public:
 
 
     virtual void fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) = 0;
-    virtual void findSelectedChunks() = 0;
-    void clearSelectedChunks();
+    virtual void findSelectedTiles() = 0;
+    void clearSelectedTiles();
 
-    const std::vector<Point> &getSelectedChunks() const;
-
-    void setSelectedChunks(const std::vector<Point> &selectedChunks);
+    const std::vector<Point> &getSelectedTiles() const;
 
     void passValueToNeuron();
 

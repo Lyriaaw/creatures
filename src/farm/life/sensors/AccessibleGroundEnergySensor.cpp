@@ -12,10 +12,10 @@ void AccessibleGroundEnergySensor::fetchSensorValue(std::vector<Entity *> access
     double totalGroundEnergy = 0.0;
 
 
-    for (int it = 0; it < selectedChunks.size(); it++) {
+    for (int it = 0; it < selectedTiles.size(); it++) {
 
         for (int jt = 0; jt < availableTiles.size(); jt++) {
-            if (!selectedChunks.at(it).equals(availableTiles.at(jt)->getPosition())) {
+            if (!selectedTiles.at(it).equals(availableTiles.at(jt)->getPosition())) {
                 continue;
             }
 
@@ -33,8 +33,8 @@ void AccessibleGroundEnergySensor::fetchSensorValue(std::vector<Entity *> access
     value = (0.5f + (sizeRatio / 2.f));
 }
 
-void AccessibleGroundEnergySensor::findSelectedChunks() {
-    this->selectedChunks.clear();
+void AccessibleGroundEnergySensor::findSelectedTiles() {
+    this->selectedTiles.clear();
 
 
     int chunkReach = this->entity->getSize() / 5;
@@ -59,7 +59,7 @@ void AccessibleGroundEnergySensor::findSelectedChunks() {
             if (currentTileY >= TILE_COUNT_HEIGHT)
                 currentTileY = TILE_COUNT_HEIGHT - 1;
 
-            selectedChunks.emplace_back(Point(currentTileX, currentTileY));
+            selectedTiles.emplace_back(Point(currentTileX, currentTileY));
 
         }
     }

@@ -14,5 +14,5 @@ void BiasSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std:
     this->value = 1;
 }
 
-void BiasSensor::findSelectedChunks() {
+void BiasSensor::findSelectedTiles() {
 }

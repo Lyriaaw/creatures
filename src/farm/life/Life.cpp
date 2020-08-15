@@ -80,56 +80,56 @@ double Life::giveawayEnergy() {
     return usedEnergy;
 }
 
-void Life::processSelectedChunks(){
+void Life::processSelectedTiles(){
     for (int it = 0; it < sensors.size(); it++) {
-        sensors.at(it)->findSelectedChunks();
+        sensors.at(it)->findSelectedTiles();
     }
     for (int it = 0; it < externalMuscles.size(); it++) {
-        externalMuscles.at(it)->findSelectedChunks();
+        externalMuscles.at(it)->findSelectedTiles();
     }
 
 }
 
-std::vector<Point> Life::getSelectedChunks() {
-    std::vector<Point> selectedChunks;
+std::vector<Point> Life::getSelectedTiles() {
+    std::vector<Point> selectedTiles;
 
     for (int it = 0; it < sensors.size(); it++) {
-        std::vector<Point> sensorSelectedChunks = sensors.at(it)->getSelectedChunks();
+        std::vector<Point> sensorSelectedTiles = sensors.at(it)->getSelectedTiles();
 
-        for (int jt = 0; jt < sensorSelectedChunks.size(); jt++) {
+        for (int jt = 0; jt < sensorSelectedTiles.size(); jt++) {
             // If the chunk have not already been selected, select it
             bool found(false);
             int index = 0;
-            while(!found && index < selectedChunks.size()) {
-                if (selectedChunks.at(index).equals(sensorSelectedChunks.at(jt))) {
+            while(!found && index < selectedTiles.size()) {
+                if (selectedTiles.at(index).equals(sensorSelectedTiles.at(jt))) {
                     found = true;
                 }
                 index++;
             };
 
             if (!found) {
-                selectedChunks.emplace_back(sensorSelectedChunks.at(jt));
+                selectedTiles.emplace_back(sensorSelectedTiles.at(jt));
             }
         }
     }
 
 
     for (int it = 0; it < externalMuscles.size(); it++) {
-        std::vector<Point> sensorSelectedChunks = externalMuscles.at(it)->getSelectedChunks();
+        std::vector<Point> sensorSelectedTiles = externalMuscles.at(it)->getSelectedTiles();
 
-        for (int jt = 0; jt < sensorSelectedChunks.size(); jt++) {
+        for (int jt = 0; jt < sensorSelectedTiles.size(); jt++) {
             // If the chunk have not already been selected, select it
             bool found(false);
             int index = 0;
-            while(!found && index < selectedChunks.size()) {
-                if (selectedChunks.at(index).equals(sensorSelectedChunks.at(jt))) {
+            while(!found && index < selectedTiles.size()) {
+                if (selectedTiles.at(index).equals(sensorSelectedTiles.at(jt))) {
                     found = true;
                 }
                 index++;
             };
 
             if (!found) {
-                selectedChunks.emplace_back(sensorSelectedChunks.at(jt));
+                selectedTiles.emplace_back(sensorSelectedTiles.at(jt));
             }
         }
     }
@@ -137,7 +137,7 @@ std::vector<Point> Life::getSelectedChunks() {
 
 
 
-    return selectedChunks;
+    return selectedTiles;
 }
 
 Entity *Life::getEntity() const {

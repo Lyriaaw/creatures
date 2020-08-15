@@ -29,9 +29,9 @@ void Farm::InitFromRandom() {
 
     std::vector<std::vector<std::vector<Entity *>>> testEntites;
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         std::vector<std::vector<Entity *>> line;
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             std::vector<Entity *> currentChunk;
             line.push_back(currentChunk);
         }
@@ -120,7 +120,7 @@ void Farm::brainProcessing() {
     std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
-        currentLife->processSelectedChunks();
+        currentLife->processSelectedTiles();
     }
     std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
@@ -138,8 +138,8 @@ void Farm::brainProcessing() {
 
         std::chrono::system_clock::time_point entityGridStart = std::chrono::system_clock::now();
 
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
-        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedChunks());
+        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedTiles());
+        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedTiles());
 
         std::chrono::system_clock::time_point entityGridEnd = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time_entity_grid = entityGridEnd - entityGridStart;
@@ -772,20 +772,23 @@ void Farm::statistics() {
 void Farm::generateEntityGrid() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             entityGrid.at(it).at(jt).clear();
         }
     }
 
     for (int it = 0; it < lifes.size(); it++) {
-        Point simpleCoordinates = lifes.at(it)->getEntity()->getSimpleCoordinates();
-        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(lifes.at(it)->getEntity());
+        Point position = lifes.at(it)->getEntity()->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+
+        entityGrid.at(tileCoordinate.getX()).at(tileCoordinate.getY()).push_back(lifes.at(it)->getEntity());
     }
 
     for (int it = 0; it < entities.size(); it++) {
-        Point simpleCoordinates = entities.at(it)->getSimpleCoordinates();
-        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(entities.at(it));
+        Point position = entities.at(it)->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+        entityGrid.at(tileCoordinate.getX()).at(tileCoordinate.getY()).push_back(entities.at(it));
     }
 
 
@@ -880,12 +883,12 @@ void Farm::removeDeletedEntities() {
 
 }
 
-std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChunks) {
+std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedTiles) {
     std::vector<Entity *> accessibleEntities;
-    for (int jt = 0; jt < selectedChunks.size(); jt++) {
-        Point currentChunk = selectedChunks.at(jt);
+    for (int jt = 0; jt < selectedTiles.size(); jt++) {
+        Point currentTiles = selectedTiles.at(jt);
 
-        std::vector<Entity *> chunkEntities = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+        std::vector<Entity *> chunkEntities = entityGrid.at(currentTiles.getX()).at(currentTiles.getY());
 
         accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
     }
