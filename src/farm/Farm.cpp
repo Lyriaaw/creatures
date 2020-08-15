@@ -239,6 +239,12 @@ void Farm::moveCreatures() {
 void Farm::executeCreaturesActions() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    int captureGroundActions = 0;
+    int captureHeatActions = 0;
+    int duplicateActions = 0;
+    int mateActions = 0;
+    int eatActions = 0;
+
     int naturalMatingCount = 0;
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
@@ -259,34 +265,49 @@ void Farm::executeCreaturesActions() {
             performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
 
+            Life * foundLife = getLifeFromId(actionDto.getSubjectId());
+            if (foundLife != nullptr) {
+                Point performerPosition = performer->getEntity()->getPosition();
+                Point tilePosition = performerPosition.getTileCoordinates();
+
+                map->getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
+            }
+
             Point performerPoint = performer->getEntity()->getPosition();
             Point tilePoint = performerPoint.getTileCoordinates();
 
             entityToDelete.emplace_back(subject);
+            eatActions++;
         }
 
         if (actionDto.getType() == "MATE") {
             bool success = handleMating(performer, subject->getId());
 
-            if (success)
+            if (success) {
                 naturalMatingCount++;
+                mateActions++;
+            }
 
         }
 
         if (actionDto.getType() == "DUPLICATE") {
             bool success = handleDuplication(performer);
 
-            if (success)
+            if (success) {
                 naturalMatingCount++;
+                duplicateActions++;
+            }
 
         }
 
         if (actionDto.getType() == "CAPTURE_GROUND") {
             handleCaptureGround(performer, actionDto);
+            captureGroundActions++;
         }
 
         if (actionDto.getType() == "CAPTURE_HEAT") {
             handleCaptureHeat(performer, actionDto);
+            captureHeatActions++;
         }
 
 
@@ -296,6 +317,17 @@ void Farm::executeCreaturesActions() {
 
     actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
+
+    int totalActions = captureGroundActions + captureHeatActions + duplicateActions + mateActions + eatActions;
+
+    dataAnalyser.getTotalActions()->addValue(totalActions);
+    dataAnalyser.getCaptureGroundActions()->addValue(captureGroundActions);
+    dataAnalyser.getCaptureHeatActions()->addValue(captureHeatActions);
+    dataAnalyser.getDuplicateActions()->addValue(duplicateActions);
+    dataAnalyser.getMateActions()->addValue(mateActions);
+    dataAnalyser.getEatActions()->addValue(eatActions);
+
+
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;

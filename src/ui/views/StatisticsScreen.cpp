@@ -71,12 +71,6 @@ void StatisticsScreen::loadGraphs() {
     brainTimeGraph->addLine(farm->getDataAnalyser().getBrainProcessing(), 2, 0, 255, 0);
     brainTimeGraph->addLine(farm->getDataAnalyser().getExternalActions(), 2, 255, 255, 128);
 
-
-
-
-
-
-
     brainTimeGraph->windowResized(windowWidth, windowHeight);
 
 
@@ -101,11 +95,30 @@ void StatisticsScreen::loadGraphs() {
     energyGraph->windowResized(windowWidth, windowHeight);
 
 
+    Graph * actionsGraph = new Graph("Actions", font);
+    actionsGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+
+    actionsGraph->addLine(farm->getDataAnalyser().getTotalActions(), 1, 0, 0, 0);
+    actionsGraph->addLine(farm->getDataAnalyser().getCaptureGroundActions(), 1, 0, 255, 0);
+    actionsGraph->addLine(farm->getDataAnalyser().getCaptureHeatActions(), 1, 255, 0, 0);
+    actionsGraph->addLine(farm->getDataAnalyser().getDuplicateActions(), 1, 0, 0, 255);
+    actionsGraph->addLine(farm->getDataAnalyser().getMateActions(), 1, 255, 105, 180);
+
+    actionsGraph->addLine(farm->getDataAnalyser().getEatActions(), 1, 255, 255, 255);
+
+
+    actionsGraph->windowResized(windowWidth, windowHeight);
+
+
+
+
+
     graphs.emplace_back(populationGraph);
     graphs.emplace_back(scoreGraph);
     graphs.emplace_back(timeGraph);
     graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(energyGraph);
+    graphs.emplace_back(actionsGraph);
 }
 
 void StatisticsScreen::loadButtons(sf::Font *font) {

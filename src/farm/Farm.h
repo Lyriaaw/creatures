@@ -21,6 +21,10 @@ private:
     std::vector<Life *> sorted;
 
     std::vector<Life *> lifes;
+
+    std::vector<Life *> creatures;
+    std::vector<Life *> vegetals;
+
     std::vector<Entity *> entities;
 
     Map * map;

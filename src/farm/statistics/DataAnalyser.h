@@ -50,6 +50,16 @@ private:
     DataItem * groundEnergy;
 
 
+    DataItem * totalActions;
+    DataItem * captureGroundActions;
+    DataItem * captureHeatActions;
+    DataItem * duplicateActions;
+    DataItem * mateActions;
+    DataItem * eatActions;
+public:
+    DataItem *getEatActions() const;
+
+
 public:
     DataAnalyser();
 
@@ -114,6 +124,16 @@ public:
     DataItem *getTotalGridGeneration() const;
 
     DataItem *getCreaturesMass() const;
+
+    DataItem *getTotalActions() const;
+
+    DataItem *getCaptureGroundActions() const;
+
+    DataItem *getCaptureHeatActions() const;
+
+    DataItem *getDuplicateActions() const;
+
+    DataItem *getMateActions() const;
 };
 
 

@@ -45,6 +45,14 @@ DataAnalyser::DataAnalyser() {
     totalGridGeneration = new DataItem("totalGridGeneration", true);
     externalActions = new DataItem("externalActions", true);
 
+
+    totalActions = new DataItem("totalActions", true);
+    captureGroundActions = new DataItem("captureGroundActions", true);
+    captureHeatActions = new DataItem("captureHeatActions", true);
+    duplicateActions = new DataItem("duplicateActions", true);
+    mateActions = new DataItem("mateActions", true);
+    eatActions = new DataItem("eatActions", true);
+
 }
 
 
@@ -176,4 +184,28 @@ DataItem *DataAnalyser::getTotalGridGeneration() const {
 
 DataItem *DataAnalyser::getCreaturesMass() const {
     return creaturesMass;
+}
+
+DataItem *DataAnalyser::getTotalActions() const {
+    return totalActions;
+}
+
+DataItem *DataAnalyser::getCaptureGroundActions() const {
+    return captureGroundActions;
+}
+
+DataItem *DataAnalyser::getCaptureHeatActions() const {
+    return captureHeatActions;
+}
+
+DataItem *DataAnalyser::getDuplicateActions() const {
+    return duplicateActions;
+}
+
+DataItem *DataAnalyser::getMateActions() const {
+    return mateActions;
+}
+
+DataItem *DataAnalyser::getEatActions() const {
+    return eatActions;
 }
