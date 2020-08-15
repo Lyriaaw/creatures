@@ -174,7 +174,7 @@ sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
     }
 
     if (camera->getMapMode() == 1) {
-        float heat = map->getTileAt(x, y)->getHeat() / 100.f;
+        float heat = map->getTileAt(x, y)->getHeat() / 1000.f;
         RGBColor rectangleColor = RGBColor(0.f, 1.f, heat);
 
         if (heat > 1.f) {
@@ -213,10 +213,10 @@ void FarmUI::setPositions(Camera *camera, Life * selectedEntity) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Point chunkPoint = Point(it, jt);
-            Point chunkTopLeft = Point((it * TILE_SIZE) - (5 * TILE_SIZE), (jt * TILE_SIZE) - (5 * TILE_SIZE));
-            Point chunkTopRight = Point((it * TILE_SIZE) - (5 * TILE_SIZE), (jt * TILE_SIZE) + (5 * TILE_SIZE));
-            Point chunkBottomRight = Point((it * TILE_SIZE) + (5 * TILE_SIZE), (jt * TILE_SIZE) + (5 * TILE_SIZE));
-            Point chunkBottomLeft = Point((it * TILE_SIZE) + (5 * TILE_SIZE), (jt * TILE_SIZE) - (5 * TILE_SIZE));
+            Point chunkTopLeft = Point((it * TILE_SIZE), (jt * TILE_SIZE));
+            Point chunkBottomRight = Point((it * TILE_SIZE) + TILE_SIZE, (jt * TILE_SIZE) + TILE_SIZE);
+            Point chunkTopRight = Point((it * TILE_SIZE) + TILE_SIZE, jt * TILE_SIZE);
+            Point chunkBottomLeft = Point((it * TILE_SIZE), (jt * TILE_SIZE) + TILE_SIZE);
 
 
             if (!camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkTopLeft)) &&
@@ -233,46 +233,56 @@ void FarmUI::setPositions(Camera *camera, Life * selectedEntity) {
                 continue;
             }
 
-            int gridRatio = 0;
+            int topLeftRatio = 0;
+            int rightRatio = 0;
+            int bottomRatio = 0;
 
             if (camera->isShowGrid()) {
-                gridRatio = 1;
+                topLeftRatio = 1;
+
+                if (it % TILE_PER_CHUNK == TILE_PER_CHUNK - 1) {
+                    rightRatio = 1;
+                }
+                if (jt % TILE_PER_CHUNK == TILE_PER_CHUNK - 1) {
+                    bottomRatio = 1;
+                }
+
             }
 
             int vertexArrayIndex = ((it * TILE_COUNT_HEIGHT) + jt) * 4;
             Point point = camera->getScreenCoordinates({float(it) * TILE_SIZE, float(jt) * TILE_SIZE});
             tilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(
-                    point.getX(),
-                    point.getY());
+                    point.getX() + topLeftRatio,
+                    point.getY() + topLeftRatio);
 
 
             tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
-                    point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio,
-                    point.getY());
+                    point.getX() + (TILE_SIZE * camera->getZoom()) - rightRatio,
+                    point.getY() + topLeftRatio);
 
 
             tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
-                    point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio,
-                    point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio);
+                    point.getX() + (TILE_SIZE * camera->getZoom()) - rightRatio,
+                    point.getY() + (TILE_SIZE * camera->getZoom()) - bottomRatio);
 
 
             tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
-                    point.getX(),
-                    point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio);
+                    point.getX() + topLeftRatio,
+                    point.getY() + (TILE_SIZE * camera->getZoom()) - bottomRatio);
 
 
 
 
 
             sf::Color tileColor = getColorForTile(it, jt, camera, map);
-            if (selectedEntity != nullptr) {
-                for (int kt = 0; kt < selectedEntity->getSelectedTiles().size(); kt++) {
-                    if (selectedEntity->getSelectedTiles().at(kt).equals(Point(it, jt))) {
-                        tileColor = sf::Color(55, 55, 55, 255);
-                        kt = selectedEntity->getSelectedTiles().size();
-                    }
-                }
-            }
+//            if (selectedEntity != nullptr) {
+//                for (int kt = 0; kt < selectedEntity->getSelectedTiles().size(); kt++) {
+//                    if (selectedEntity->getSelectedTiles().at(kt).equals(Point(it, jt))) {
+//                        tileColor = sf::Color(55, 55, 55, 255);
+//                        kt = selectedEntity->getSelectedTiles().size();
+//                    }
+//                }
+//            }
 
             tilesVertexArray[vertexArrayIndex + 0].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 1].color = tileColor;
