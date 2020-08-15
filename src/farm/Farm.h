@@ -15,9 +15,15 @@
 #include "CreatureNursery.h"
 #include "statistics/DataAnalyser.h"
 #include "life/Life.h"
+#include "Chunk.h"
 
 class Farm {
 private:
+    std::vector<std::vector<Chunk *>> chunks;
+
+
+
+
     std::vector<Life *> sorted;
 
     std::vector<Life *> lifes;
@@ -124,7 +130,11 @@ public:
     void handleCaptureHeat(Life * life, ActionDTO action);
     bool handleDuplication(Life * life);
 
+    Chunk * getChunkAt(int chunkX, int chunkY);
 
+    void generateRandomTerrain(int seed);
+
+    Tile *getTileAt(int tileX, int tileY);
 };
 
 

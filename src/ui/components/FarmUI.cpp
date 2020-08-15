@@ -157,10 +157,10 @@ void FarmUI::update() {
     generateTileInfoText();
 }
 
-sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
+sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera) {
 
     if (camera->getMapMode() == 0) {
-        float height = map->getTileAt(x, y)->getHeight();
+        float height = farm->getTileAt(x, y)->getHeight();
         RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
         if (height < -0.05f) {
             rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
@@ -174,7 +174,7 @@ sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
     }
 
     if (camera->getMapMode() == 1) {
-        float heat = map->getTileAt(x, y)->getHeat() / 1000.f;
+        float heat = farm->getTileAt(x, y)->getHeat() / 1000.f;
         RGBColor rectangleColor = RGBColor(0.f, 1.f, heat);
 
         if (heat > 1.f) {
@@ -186,7 +186,7 @@ sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
     }
 
     if (camera->getMapMode() == 2) {
-        float ground = map->getTileAt(x, y)->getGround();
+        float ground = farm->getTileAt(x, y)->getGround();
 
         RGBColor rectangleColor = RGBColor(0.28f, 1.f, ground / 10000.f);
         sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
@@ -208,7 +208,7 @@ void FarmUI::setPositions(Camera *camera, Life * selectedEntity) {
     }
 
 
-    Map *map = farm->getMap();
+//    Map *map = farm->getMap();
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
@@ -274,7 +274,7 @@ void FarmUI::setPositions(Camera *camera, Life * selectedEntity) {
 
 
 
-            sf::Color tileColor = getColorForTile(it, jt, camera, map);
+            sf::Color tileColor = getColorForTile(it, jt, camera);
 //            if (selectedEntity != nullptr) {
 //                for (int kt = 0; kt < selectedEntity->getSelectedTiles().size(); kt++) {
 //                    if (selectedEntity->getSelectedTiles().at(kt).equals(Point(it, jt))) {

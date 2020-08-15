@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include "../utils/perlin/PerlinNoise.h"
 
 
 using namespace std;
@@ -16,15 +17,81 @@ Farm::Farm(){
     tickEnd = std::chrono::system_clock::now();
 }
 
+void Farm::generateRandomTerrain(int seed) {
+
+    cout << "Map generated with seed " << seed << endl;
+    cout << "Chunks: " << CHUNK_COUNT_WIDTH << " x " << CHUNK_COUNT_HEIGHT << endl;
+    cout << "Tiles: " << TILE_COUNT_WIDTH << " x " << TILE_COUNT_HEIGHT << endl;
+    cout << "Size: " << FARM_WIDTH << " x " << FARM_HEIGHT << endl;
+    cout << "Tiles per chunks: " << TILE_PER_CHUNK << endl;
+
+    float min = 11111110.f;
+    float max = 0.f;
+    PerlinNoise perlin(seed);
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            float xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * 2.5;
+            float yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * 2.5;
+
+            float height = perlin.noise(xComponent, yComponent, 0.8);
+
+            if (height < min) {
+                min = height;
+            }
+            if (height > max) {
+                max = height;
+            }
+        }
+    }
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<Chunk *> chunkLine;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = new Chunk(Point(it, jt));
+            chunk->generateRandomChunk(seed, min, max);
+
+            chunkLine.emplace_back(chunk);
+        }
+        chunks.emplace_back(chunkLine);
+    }
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+
+            Chunk * chunk = chunks.at(it).at(jt);
+
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    if (it + x < 0 || it + x >= CHUNK_COUNT_WIDTH ||jt + y < 0 || jt + y >= CHUNK_COUNT_HEIGHT) {
+                        continue;
+                    }
+
+                    Chunk * neighbour = chunks.at(it + x).at(jt + y);
+                    chunk->setNeighbour(x, y, neighbour);
+                }
+            }
+
+        }
+    }
+}
+
+
+
 
 void Farm::InitFromRandom() {
+    float seed = rand() % 1000000;
+
+    generateRandomTerrain(seed);
+
+
+
     random_device rd;
     mt19937 mt(rd());
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
     map = new Map();
-    map->initRandomMap();
+    map->initRandomMap(seed);
 
 
     std::vector<std::vector<std::vector<Entity *>>> testEntites;
@@ -1082,3 +1149,27 @@ const vector<Life *> &Farm::getVegetals() const {
 }
 
 
+
+Chunk * Farm::getChunkAt(int chunkX, int chunkY) {
+    if (chunkX < 0 || chunkX >= TILE_COUNT_WIDTH || chunkY < 0 || chunkY >= TILE_COUNT_HEIGHT) {
+        std::cout << "ERROR, REQUESTED WRONG CHUNK => X: " << chunkX << " Y: " << chunkY << std::endl;
+        return chunks.at(0).at(0);
+    }
+
+
+
+
+    return chunks.at(chunkX).at(chunkY);
+}
+
+
+Tile * Farm::getTileAt(int tileX, int tileY) {
+    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
+        std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
+        return getChunkAt(0, 0)->getTileAt(0, 0);
+    }
+
+    Point chunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
+
+    return getChunkAt(chunkPosition.getX(), chunkPosition.getY())->getTileAt(tileX, tileY);
+}

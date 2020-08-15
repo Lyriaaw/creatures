@@ -15,8 +15,7 @@ using namespace std;
 
 std::mutex mapMutex;
 
-void Map::generateRandomTerrain() {
-    float seed = rand() % 1000000;
+void Map::generateRandomTerrain(int seed) {
     PerlinNoise perlin(seed);
 
     cout << "Map generated with seed " << seed << endl;
@@ -82,9 +81,9 @@ void Map::generateRandomTerrain() {
 }
 
 
-void Map::initRandomMap() {
+void Map::initRandomMap(int seed) {
 
-    generateRandomTerrain();
+    generateRandomTerrain(seed);
 }
 
 void Map::prepareTiles() {

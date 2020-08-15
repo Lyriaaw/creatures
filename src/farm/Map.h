@@ -24,8 +24,8 @@ public:
 
     Map();
 
-    void initRandomMap();
-    void generateRandomTerrain();
+    void initRandomMap(int seed);
+    void generateRandomTerrain(int seed);
     void processClimate();
     void processGroundChanges();
     void prepareTiles();
