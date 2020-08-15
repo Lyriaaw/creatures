@@ -42,7 +42,7 @@ public:
 
     void draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntity);
     void update();
-    void setPositions(Camera *camera);
+    void setPositions(Camera *camera, Life * selectedEntity);
     sf::Color getColorForTile(int x, int y, Camera * camera, Map *map);
 
 

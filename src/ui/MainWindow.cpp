@@ -123,7 +123,7 @@ void MainWindow::start() {
     loadUI();
 
 
-    farmUi->setPositions(mainCamera);
+    farmUi->setPositions(mainCamera, nullptr);
 
     running = true;
     std::thread farmThread = runFarmLoop();

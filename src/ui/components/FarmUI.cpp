@@ -200,17 +200,38 @@ sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
 
 }
 
-void FarmUI::setPositions(Camera *camera) {
+void FarmUI::setPositions(Camera *camera, Life * selectedEntity) {
 //     std::cout << "Setting positions " << camera->getZoom() << std::endl;
 
     if (camera == nullptr) {
         return;
     }
 
+
     Map *map = farm->getMap();
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Point chunkPoint = Point(it, jt);
+            Point chunkTopLeft = Point((it * TILE_SIZE) - (5 * TILE_SIZE), (jt * TILE_SIZE) - (5 * TILE_SIZE));
+            Point chunkTopRight = Point((it * TILE_SIZE) - (5 * TILE_SIZE), (jt * TILE_SIZE) + (5 * TILE_SIZE));
+            Point chunkBottomRight = Point((it * TILE_SIZE) + (5 * TILE_SIZE), (jt * TILE_SIZE) + (5 * TILE_SIZE));
+            Point chunkBottomLeft = Point((it * TILE_SIZE) + (5 * TILE_SIZE), (jt * TILE_SIZE) - (5 * TILE_SIZE));
+
+
+            if (!camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkTopLeft)) &&
+                    !camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkBottomRight)) &&
+                    !camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkTopRight)) &&
+                    !camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkBottomLeft))
+                    ) {
+                int vertexArrayIndex = ((it * TILE_COUNT_HEIGHT) + jt) * 4;
+
+                tilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(-10, -10);
+                tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(-10, -10);
+                tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(-10, -10);
+                tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(-10, -10);
+                continue;
+            }
 
             int gridRatio = 0;
 
@@ -242,11 +263,22 @@ void FarmUI::setPositions(Camera *camera) {
 
 
 
+
             sf::Color tileColor = getColorForTile(it, jt, camera, map);
+            if (selectedEntity != nullptr) {
+                for (int kt = 0; kt < selectedEntity->getSelectedTiles().size(); kt++) {
+                    if (selectedEntity->getSelectedTiles().at(kt).equals(Point(it, jt))) {
+                        tileColor = sf::Color(55, 55, 55, 255);
+                        kt = selectedEntity->getSelectedTiles().size();
+                    }
+                }
+            }
+
             tilesVertexArray[vertexArrayIndex + 0].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 1].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 2].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 3].color = tileColor;
+
 
 
         }
@@ -263,7 +295,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
 
 
 
-    setPositions(camera);
+    setPositions(camera, selectedEntity);
 
     window->draw(tilesVertexArray);
     for (int it = 0; it < entityUIs.size(); it++) {

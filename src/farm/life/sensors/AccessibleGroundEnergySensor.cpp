@@ -36,8 +36,8 @@ void AccessibleGroundEnergySensor::fetchSensorValue(std::vector<Entity *> access
 void AccessibleGroundEnergySensor::findSelectedTiles() {
     this->selectedTiles.clear();
 
-
-    int chunkReach = this->entity->getSize() / 5;
+    int chunkReach = entity->getSize() / 5.0;
+    chunkReach = std::max(double(chunkReach), 1.0);
 
     Point entityPoint = this->entity->getPosition();
     Point tilePoint = entityPoint.getTileCoordinates();
