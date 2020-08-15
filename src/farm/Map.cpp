@@ -135,7 +135,7 @@ void Map::processClimate() {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = tiles.at(it).at(jt);
 
-            float availableGround = currentTile->getGround() / 1000.f;
+            float availableGround = currentTile->getGround() / 100.f;
 
 
             float currentHeight = currentTile->getHeight();

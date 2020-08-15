@@ -102,6 +102,10 @@ public:
     const std::vector<Entity *> &getEntityToDelete() const;
     const std::vector<Life *> &getLifesToDelete() const;
 
+    const std::vector<Life *> &getCreatures() const;
+
+    const std::vector<Life *> &getVegetals() const;
+
 
     void clearAddedLifes();
     void clearAddedEntities();

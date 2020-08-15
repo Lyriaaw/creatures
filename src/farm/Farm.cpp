@@ -414,7 +414,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
 
 bool Farm::handleDuplication(Life * life) {
 
-    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 4.f;
+    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
 
     if (!fatherCanReproduce) {
 //        std::cout << "Father cannot reproduce" << std::endl;
@@ -440,6 +440,8 @@ bool Farm::handleDuplication(Life * life) {
         child->setMass(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
+
+        vegetals.emplace_back(child);
 
         return true;
     }
@@ -506,6 +508,8 @@ bool Farm::handleMating(Life * father, int entityId) {
         child->setMass(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
+
+        creatures.emplace_back(child);
 
         return true;
     }
@@ -843,14 +847,14 @@ void Farm::removeDeletedEntities() {
         }
 
         if (!found) {
-            newLifes.emplace_back(lifes.at(it));
+            newCreatures.emplace_back(creatures.at(it));
         }
     }
 
     creatures = newCreatures;
 
     std::vector<Life *> newVegetals;
-    for (int it = 0; it < creatures.size(); it++) {
+    for (int it = 0; it < vegetals.size(); it++) {
 
         bool found = false;
         int foundIndex = -1;
@@ -862,7 +866,7 @@ void Farm::removeDeletedEntities() {
         }
 
         if (!found) {
-            newVegetals.emplace_back(lifes.at(it));
+            newVegetals.emplace_back(vegetals.at(it));
         }
     }
 
@@ -1064,6 +1068,14 @@ const vector<Entity *> &Farm::getEntityAdded() const {
 
 const vector<Entity *> &Farm::getEntityToDelete() const {
     return entityToDelete;
+}
+
+const vector<Life *> &Farm::getCreatures() const {
+    return creatures;
+}
+
+const vector<Life *> &Farm::getVegetals() const {
+    return vegetals;
 }
 
 
