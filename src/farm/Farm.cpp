@@ -43,6 +43,17 @@ void Farm::InitFromRandom() {
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
+        Life * initialLife = nursery->generateCreatureFromRandom();
+
+        float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
+        initialLife->getEnergyManagement()->setEnergy(creatureEnergy);
+        initialLife->setMass(creatureEnergy);
+
+        lifes.push_back(initialLife);
+        creatures.push_back(initialLife);
+    }
+
+    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
         Life * initialLife = nursery->generateVegetalFromRandom();
 
         float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
@@ -50,22 +61,8 @@ void Farm::InitFromRandom() {
         initialLife->setMass(creatureEnergy);
 
         lifes.push_back(initialLife);
+        vegetals.push_back(initialLife);
     }
-
-//    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
-//        int x = distWidth(mt);
-//        int y = distHeight(mt);
-//
-//        Point point(x, y);
-//
-//
-////        float foodSize = ((rand() % 300) / 100.f) + 2;
-//        float foodSize = 2;
-//
-//        Food * entity = new Food(point, foodSize);
-//        entity->setMass(2000.0);
-//        entities.push_back(entity);
-//    }
 
     availableEnergy = 0.f;
     tickCount = 0;
@@ -831,6 +828,52 @@ void Farm::removeDeletedEntities() {
 
     entities.clear();
     entities = newEntities;
+
+
+    std::vector<Life *> newCreatures;
+    for (int it = 0; it < creatures.size(); it++) {
+
+        bool found = false;
+        int foundIndex = -1;
+        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
+            if (creatures.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
+                found = true;
+                foundIndex = jt;
+            }
+        }
+
+        if (!found) {
+            newLifes.emplace_back(lifes.at(it));
+        }
+    }
+
+    creatures = newCreatures;
+
+    std::vector<Life *> newVegetals;
+    for (int it = 0; it < creatures.size(); it++) {
+
+        bool found = false;
+        int foundIndex = -1;
+        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
+            if (vegetals.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
+                found = true;
+                foundIndex = jt;
+            }
+        }
+
+        if (!found) {
+            newVegetals.emplace_back(lifes.at(it));
+        }
+    }
+
+    vegetals = newVegetals;
+
+
+
+
+
+
+
 }
 
 std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChunks) {

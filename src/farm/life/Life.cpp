@@ -61,8 +61,8 @@ double Life::giveawayEnergy() {
 //    double sensorEnergy = 0;
 //    double biasEnergy = 0;
 
-//    double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
-    double usedEnergy = 0;
+    double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
+//    double usedEnergy = 0;
 
     double currentEntityEnergy = this->energyManagement->getEnergy();
 

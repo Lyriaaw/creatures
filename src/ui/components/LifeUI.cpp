@@ -142,7 +142,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 //    window->draw(vertexArray);
 //
 //
-    if (false) {
+    if (selectedEntity != nullptr && selectedEntity->getId() == this->life->getEntity()->getId()) {
         int index = 0;
 
         float energyDistance = (this->life->getEntity()->getSize() + 10) * camera->getZoom();
