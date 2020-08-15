@@ -164,8 +164,8 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, d
     }
 }
 
-BarSensor::BarSensor(Entity *entity, double rotation, double length) : Sensor(entity), rotation(rotation),
-                                                                     length(length) {}
+BarSensor::BarSensor(Entity *entity, double rotation, double lengthRatio) : Sensor(entity), rotation(rotation),
+                                                                            lengthRatio(lengthRatio) {}
 
 double BarSensor::getRotation() const {
     return rotation;
@@ -173,5 +173,17 @@ double BarSensor::getRotation() const {
 
 double BarSensor::getLength() const {
     return length;
+}
+
+double BarSensor::getLengthRatio() const {
+    return lengthRatio;
+}
+
+void BarSensor::setLength(double length) {
+    BarSensor::length = length;
+}
+
+void BarSensor::setLengthRatio(double lengthRatio) {
+    BarSensor::lengthRatio = lengthRatio;
 }
 

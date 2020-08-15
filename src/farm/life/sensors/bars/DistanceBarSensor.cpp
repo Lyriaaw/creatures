@@ -12,5 +12,5 @@ std::string DistanceBarSensor::getName() {
     return "DISTANCE_BAR";
 }
 
-DistanceBarSensor::DistanceBarSensor(Entity *entity, float rotation, float length) : BarSensor(entity, rotation,
-                                                                                               length) {}
+DistanceBarSensor::DistanceBarSensor(Entity *entity, float rotation, float lengthRatio) : BarSensor(entity, rotation,
+                                                                                                    lengthRatio) {}

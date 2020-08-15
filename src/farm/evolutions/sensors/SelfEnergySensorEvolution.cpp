@@ -3,7 +3,6 @@
 //
 
 #include "SelfEnergySensorEvolution.h"
-#include "../../brain/neurons/EnergySensorNeuron.h"
 #include "../../life/sensors/SelfEnergySensor.h"
 
 SelfEnergySensorEvolution::SelfEnergySensorEvolution(): Evolution() {
@@ -18,7 +17,7 @@ void SelfEnergySensorEvolution::perform(Life * life) {
     inputNeuron->setName("Energy");
     inputNeuron->setGenerationNumber(this->generationNumber);
 
-    Sensor * energySensor = new SelfEnergySensor(life->getEntity());
+    Sensor * energySensor = new SelfEnergySensor(life->getEntity(), life->getEnergyManagement());
     energySensor->setConnectedNeuron(inputNeuron);
 
     life->getBrain()->addInputNeuron(inputNeuron);

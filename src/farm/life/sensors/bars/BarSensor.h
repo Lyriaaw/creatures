@@ -14,6 +14,8 @@ protected:
     double rotation;
     double length;
 
+    double lengthRatio;
+
 public:
     BarSensor(Entity *entity, double rotation, double length);
 
@@ -26,6 +28,12 @@ public:
     double getRotation() const;
 
     double getLength() const;
+
+    double getLengthRatio() const;
+
+    void setLength(double length);
+
+    void setLengthRatio(double lengthRatio);
 
 };
 

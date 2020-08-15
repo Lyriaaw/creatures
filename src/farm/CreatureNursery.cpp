@@ -34,10 +34,14 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     entity->setBrightness(0.5f);
     Brain * brain = new Brain();
 
+
     Life * life = new Life();
     life->setEntity(entity);
     life->setBrain(brain);
-    life->setEntity(entity);
+
+    EnergyManagement * energyManagement = new EnergyManagement();
+    life->setEnergyManagement(energyManagement);
+    energyManagement->setBody(entity);
 
     std::vector<Evolution *> creatureGenome;
 
@@ -189,7 +193,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
         }
     }
 
-    float delta = (((rand() % 1000) / 100.f) - 2.f) * father->getEntity()->getSize();
+    float delta = (((rand() % 5000) / 100.f) - 2.f) * (father->getEnergyManagement()->getMaxMass() / 1000.0);
     float randomRotation = ((rand() * 2000) / 1000.f) - 1.0;
 
     Point childSpawn = {
@@ -224,6 +228,10 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     life->setEntity(childEntity);
     life->setBrain(childBrain);
 
+    EnergyManagement * energyManagement = new EnergyManagement();
+    life->setEnergyManagement(energyManagement);
+    energyManagement->setBody(childEntity);
+
 
     for (int it = 0; it < childGenome.size(); it++) {
         childGenome.at(it)->perform(life);
@@ -254,7 +262,10 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     Life * life = new Life();
     life->setEntity(entity);
     life->setBrain(brain);
-    life->setEntity(entity);
+
+    EnergyManagement * energyManagement = new EnergyManagement();
+    life->setEnergyManagement(energyManagement);
+    energyManagement->setBody(entity);
 
     std::vector<Evolution *> creatureGenome;
 
@@ -298,10 +309,10 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     duplicationMuscleEvolution->perform(life);
     creatureGenome.emplace_back(duplicationMuscleEvolution);
 
-    CaptureHeatMuscleEvolution * captureHeatMuscleEvolution = new CaptureHeatMuscleEvolution();
-    captureHeatMuscleEvolution->setGenerationNumber(8);
-    captureHeatMuscleEvolution->perform(life);
-    creatureGenome.emplace_back(captureHeatMuscleEvolution);
+//    CaptureHeatMuscleEvolution * captureHeatMuscleEvolution = new CaptureHeatMuscleEvolution();
+//    captureHeatMuscleEvolution->setGenerationNumber(8);
+//    captureHeatMuscleEvolution->perform(life);
+//    creatureGenome.emplace_back(captureHeatMuscleEvolution);
 
     CaptureGroundMuscleEvolution * captureGroundMuscleEvolution = new CaptureGroundMuscleEvolution();
     captureGroundMuscleEvolution->setGenerationNumber(9);

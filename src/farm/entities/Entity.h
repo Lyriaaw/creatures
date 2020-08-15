@@ -50,9 +50,9 @@ public:
 
     void setBrightness(float brightness);
 
-    float getMass() const;
+    double getMass() const;
 
-    void setMass(float mass);
+    void setMass(double mass);
 
 
 protected:

@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), age(0) {
+Entity::Entity(Point position): position(position), age(0), rotation(0.0), speed(0.0) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
 }
@@ -23,7 +23,8 @@ const Point &Entity::getPosition() const {
 }
 
 float Entity::getSize() const {
-    return mass / 1000.f;
+    double value = mass / 1000.f;
+    return value;
 }
 
 float Entity::getRotation() const {
@@ -95,11 +96,11 @@ void Entity::setBrightness(float brightness) {
     Entity::brightness = brightness;
 }
 
-float Entity::getMass() const {
+double Entity::getMass() const {
     return mass;
 }
 
-void Entity::setMass(float mass) {
+void Entity::setMass(double mass) {
     Entity::mass = mass;
 }
 

@@ -22,11 +22,11 @@ void TileHeatSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, 
     }
 
 
-    float biggestEntity = std::max(this->entity->getMaxEnergy(), tileValue);
-    float smallestEntity = std::min(this->entity->getMaxEnergy(), tileValue);
+    float biggestEntity = std::max(this->entity->getMass(), tileValue);
+    float smallestEntity = std::min(this->entity->getMass(), tileValue);
 
     float sizeRatio = 1 - (smallestEntity / biggestEntity);
-    if (this->entity->getMaxEnergy() > tileValue) {
+    if (this->entity->getMass() > tileValue) {
         sizeRatio *= -1;
     }
     value = (0.5f + (sizeRatio / 2.f));

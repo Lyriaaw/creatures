@@ -142,7 +142,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 //    window->draw(vertexArray);
 //
 //
-    if (true) {
+    if (false) {
         int index = 0;
 
         float energyDistance = (this->life->getEntity()->getSize() + 10) * camera->getZoom();
@@ -160,7 +160,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 
         index++;
 
-        float energyRatio = (life->getEntity()->getEnergy() / life->getEntity()->getMaxEnergy()) * energyDistance;
+        float energyRatio = (life->getEnergyManagement()->getEnergy() / life->getEntity()->getMass()) * energyDistance;
 
         energyBar[(index * 4) + 0].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + 1);
         energyBar[(index * 4) + 0].color =  sf::Color(255, 255, 255, 255);
@@ -180,7 +180,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 
         energyLabel.setCharacterSize(3 * camera->getZoom());
 
-        std::string energyText = std::to_string(life->getEntity()->getEnergy());
+        std::string energyText = std::to_string(life->getEnergyManagement()->getEnergy());
         energyLabel.setString(energyText);
 
         double xPosition = screenPoint.getX() - (energyLabel.getLocalBounds().width / 2);

@@ -4,13 +4,14 @@
 
 #include "EnergyManagement.h"
 
+EnergyManagement::EnergyManagement(): maxMass(0.0), energy(0.0) {}
 
 double EnergyManagement::getEnergy() const {
     return energy;
 }
 
 double EnergyManagement::setEnergy(double energy) {
-    EnergyManagement::energy = energy;
+    this->energy = energy;
 }
 
 double EnergyManagement::addEnergy(double addedEnergy) {
@@ -51,9 +52,17 @@ void EnergyManagement::setMaxMass(double maxMass) {
 }
 
 double EnergyManagement::getMaxEnergy() {
-    return this->maxMass;
+    return this->body->getMass();
 }
 
 bool EnergyManagement::isAlive() {
     return this->body->isExists() && this->energy >= 0;
+}
+
+Entity *EnergyManagement::getBody() const {
+    return body;
+}
+
+void EnergyManagement::setBody(Entity *body) {
+    EnergyManagement::body = body;
 }

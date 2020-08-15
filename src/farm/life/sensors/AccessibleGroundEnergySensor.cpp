@@ -23,11 +23,11 @@ void AccessibleGroundEnergySensor::fetchSensorValue(std::vector<Entity *> access
         }
     }
 
-    float biggestEntity = std::max(double(this->entity->getMaxEnergy()), totalGroundEnergy);
-    float smallestEntity = std::min(double(this->entity->getMaxEnergy()), totalGroundEnergy);
+    float biggestEntity = std::max(double(this->entity->getMass()), totalGroundEnergy);
+    float smallestEntity = std::min(double(this->entity->getMass()), totalGroundEnergy);
 
     float sizeRatio = 1 - (smallestEntity / biggestEntity);
-    if (this->entity->getMaxEnergy() > totalGroundEnergy) {
+    if (this->entity->getMass() > totalGroundEnergy) {
         sizeRatio *= -1;
     }
     value = (0.5f + (sizeRatio / 2.f));

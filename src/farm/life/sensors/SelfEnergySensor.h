@@ -7,10 +7,13 @@
 
 
 #include "Sensor.h"
+#include "../EnergyManagement.h"
 
 class SelfEnergySensor: public Sensor {
+private:
+    EnergyManagement * energyManagement;
 public:
-    SelfEnergySensor(Entity *entity);
+    SelfEnergySensor(Entity *entity, EnergyManagement * energyManagement);
 
     std::string getName() override;
 

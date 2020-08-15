@@ -65,6 +65,9 @@ public:
 
     void setEnergyManagement(EnergyManagement *energyManagement);
 
+    void setMass(double newMass);
+    double addEnergy(double energy);
+
 };
 
 

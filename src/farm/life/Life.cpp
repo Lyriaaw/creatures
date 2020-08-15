@@ -5,6 +5,7 @@
 #include "Life.h"
 #include "muscles/externals/Mouth.h"
 #include "muscles/internals/Movement.h"
+#include "sensors/bars/BarSensor.h"
 
 void Life::processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
     for (int it = 0; it < sensors.size(); it++) {
@@ -60,7 +61,8 @@ double Life::giveawayEnergy() {
 //    double sensorEnergy = 0;
 //    double biasEnergy = 0;
 
-    double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
+//    double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
+    double usedEnergy = 0;
 
     double currentEntityEnergy = this->energyManagement->getEnergy();
 
@@ -74,11 +76,6 @@ double Life::giveawayEnergy() {
     }
 
     this->energyManagement->setEnergy(currentEntityEnergy - usedEnergy);
-
-    if (this->energyManagement->getEnergy() > 100) {
-        this->entity->setMass(this->entity->getMass() + 1);
-        this->energyManagement->removeEnergy(1);
-    }
 
     return usedEnergy;
 }
@@ -201,5 +198,52 @@ EnergyManagement *Life::getEnergyManagement() const {
 
 void Life::setEnergyManagement(EnergyManagement *energyManagement) {
     Life::energyManagement = energyManagement;
+}
+
+void Life::setMass(double newMass) {
+    this->entity->setMass(newMass);
+
+    for (int it = 0; it < sensors.size(); it++) {
+        BarSensor * barSensor = dynamic_cast<BarSensor *>(sensors.at(it));
+
+        if (barSensor == nullptr) {
+            continue;
+        }
+
+        float entitySize = this->entity->getSize();
+
+        barSensor->setLength(entitySize * barSensor->getLengthRatio());
+    }
+
+}
+
+double Life::addEnergy(double energy) {
+    double massRatio = 1 - (entity->getMass() / energyManagement->getMaxMass());
+
+
+    if (massRatio < 0) {
+        std::cout << "Error: negative massTransformationRatio: " << massRatio << std::endl;
+    }
+
+    double wastedEnergy = energyManagement->addEnergy(energy);
+
+
+
+
+
+    double convertedToMass = wastedEnergy * massRatio;
+
+
+    if (convertedToMass < 0) {
+        std::cout << "Error: Negative mass added " << convertedToMass << std::endl;
+    }
+
+    this->entity->setMass(entity->getMass() + convertedToMass);
+
+    if (wastedEnergy - convertedToMass < 0) {
+        std::cout << "Error wasted energy : " << wastedEnergy - convertedToMass << std::endl;
+    }
+
+    return wastedEnergy - convertedToMass;
 }
 

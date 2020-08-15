@@ -43,28 +43,29 @@ void Farm::InitFromRandom() {
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
-        Life * initialLife = nursery->generateCreatureFromRandom();
+        Life * initialLife = nursery->generateVegetalFromRandom();
 
-        float creatureEnergy = initialLife->getEnergyManagement()->getMaxEnergy() / 2.0;
+        float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
         initialLife->getEnergyManagement()->setEnergy(creatureEnergy);
+        initialLife->setMass(creatureEnergy);
 
         lifes.push_back(initialLife);
     }
 
-    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
-        int x = distWidth(mt);
-        int y = distHeight(mt);
-
-        Point point(x, y);
-
-
-//        float foodSize = ((rand() % 300) / 100.f) + 2;
-        float foodSize = 2;
-
-        Food * entity = new Food(point, foodSize);
-        entity->setMass(2000.0);
-        entities.push_back(entity);
-    }
+//    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
+//        int x = distWidth(mt);
+//        int y = distHeight(mt);
+//
+//        Point point(x, y);
+//
+//
+////        float foodSize = ((rand() % 300) / 100.f) + 2;
+//        float foodSize = 2;
+//
+//        Food * entity = new Food(point, foodSize);
+//        entity->setMass(2000.0);
+//        entities.push_back(entity);
+//    }
 
     availableEnergy = 0.f;
     tickCount = 0;
@@ -242,10 +243,11 @@ void Farm::executeCreaturesActions() {
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
 
+
         Life * performer = getLifeFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
-        if (performer->getEnergyManagement()->isAlive()) {
+        if (!performer->getEnergyManagement()->isAlive()) {
             continue;
         }
 
@@ -254,13 +256,12 @@ void Farm::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
-            double wastedEnergy = performer->getEnergyManagement()->addEnergy(subject->getMass());
+            performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
 
             Point performerPoint = performer->getEntity()->getPosition();
             Point tilePoint = performerPoint.getTileCoordinates();
 
-            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
             entityToDelete.emplace_back(subject);
         }
 
@@ -306,7 +307,10 @@ void Farm::handleCaptureHeat(Life * life, ActionDTO action) {
 }
 
 void Farm::handleCaptureGround(Life * life, ActionDTO action) {
-    int chunkReach = life->getEntity()->getSize() / 5;
+    int chunkReach = life->getEntity()->getSize() / 5.0;
+
+    chunkReach = std::max(double(chunkReach), 1.0);
+
 
     double totalGround = 0.0;
     int ratioSize = (chunkReach * 2) + 1;
@@ -338,7 +342,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
 
             Tile * tile = map->getTileAt(currentTileX, currentTileY);
             double ratio = tile->getGround() / totalGround;
-            int currentIndex = ((it + chunkReach) * ratioSize) + (jt * chunkReach);
+            int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
             ratios[currentIndex] = ratio;
         }
     }
@@ -354,7 +358,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
             if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
                 continue;
 
-            int currentIndex = ((it + chunkReach) * ratioSize) + (jt * chunkReach);
+            int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
             double currentRatio = ratios[currentIndex] * 0.01;
             double tileEnergy = map->getTileAt(currentTileX, currentTileY)->getGround();
             double tileCollectedEnergy = (currentRatio * totalAimedEnergy);
@@ -368,16 +372,20 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
         }
     }
 
-    double heat = life->getEnergyManagement()->addEnergy(totalCollectedEnergy);
+//    if (totalCollectedEnergy == 0) {
+//    }
+    double wastedEnergy = life->addEnergy(totalCollectedEnergy);
 
-    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(heat);
+
+    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
+
 
 }
 
 
 bool Farm::handleDuplication(Life * life) {
 
-    bool fatherCanReproduce = life->getEnergyManagement()->getEnergy() > life->getEntity()->getMass() / 10.f;
+    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 4.f;
 
     if (!fatherCanReproduce) {
 //        std::cout << "Father cannot reproduce" << std::endl;
@@ -400,7 +408,7 @@ bool Farm::handleDuplication(Life * life) {
 
     if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
         child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
-        child->getEntity()->setMass(totalGivenEnergy / 2.0);
+        child->setMass(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
 
@@ -466,7 +474,7 @@ bool Farm::handleMating(Life * father, int entityId) {
 
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
-        child->getEntity()->setMass(totalGivenEnergy / 2.0);
+        child->setMass(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
 
@@ -534,7 +542,7 @@ void Farm::populationControl() {
 
         Life * child = this->nursery->Mate(father, mother);
         child->getEnergyManagement()->setEnergy(child->getEnergyManagement()->getMaxMass() / 4.f);
-        child->getEntity()->setMass(child->getEnergyManagement()->getMaxMass() / 4.f);
+        child->setMass(child->getEnergyManagement()->getMaxMass() / 4.f);
         Entity * childCreature = child->getEntity();
 
 //        float childSpawnX = distWidth(mt);
@@ -564,56 +572,56 @@ void Farm::vegetalisation() {
 
     map->processClimate();
 
-    random_device rd;
-    mt19937 mt(rd());
-    uniform_real_distribution<double> distWidth(0, TILE_SIZE);
-    uniform_real_distribution<double> distHeight(0, TILE_SIZE);
-
-
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            Tile * currentTile = map->getTileAt(it, jt);
-
-
-            float tileX = it * TILE_SIZE;
-            float tileY = jt * TILE_SIZE;
-
-            float tileAvailableEnergy = currentTile->getGround();
-
-
-            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
-            float totalEnergyAdded = 0.f;
-
-//            if (tileAvailableEnergy > 1950) {
-//                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
+//    random_device rd;
+//    mt19937 mt(rd());
+//    uniform_real_distribution<double> distWidth(0, TILE_SIZE);
+//    uniform_real_distribution<double> distHeight(0, TILE_SIZE);
+//
+//
+//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+//            Tile * currentTile = map->getTileAt(it, jt);
+//
+//
+//            float tileX = it * TILE_SIZE;
+//            float tileY = jt * TILE_SIZE;
+//
+//            float tileAvailableEnergy = currentTile->getGround();
+//
+//
+//            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
+//            float totalEnergyAdded = 0.f;
+//
+////            if (tileAvailableEnergy > 1950) {
+////                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
+////            }
+//
+//            for (int it = 0; it < foodToGenerate; it++) {
+//                int x = distWidth(mt);
+//                int y = distHeight(mt);
+//
+//                Point point(tileX + x, tileY + y);
+//
+//
+//                //        float foodSize = ((rand() % 300) / 100.f) + 2;
+//                float foodSize = 2;
+//
+//                Food * entity = new Food(point, foodSize);
+//                entity->setMass(2000.0);
+//
+//                totalEnergyAdded += entity->getMass();
+//
+//
+//                entities.emplace_back(entity);
+//                entityAdded.emplace_back(entity);
 //            }
-
-            for (int it = 0; it < foodToGenerate; it++) {
-                int x = distWidth(mt);
-                int y = distHeight(mt);
-
-                Point point(tileX + x, tileY + y);
-
-
-                //        float foodSize = ((rand() % 300) / 100.f) + 2;
-                float foodSize = 2;
-
-                Food * entity = new Food(point, foodSize);
-                entity->setMass(2000.0);
-
-                totalEnergyAdded += entity->getMass();
-
-
-                entities.emplace_back(entity);
-                entityAdded.emplace_back(entity);
-            }
-
-            currentTile->addGround(-1 * totalEnergyAdded);
-
-        }
-    }
-
-
+//
+//            currentTile->addGround(-1 * totalEnergyAdded);
+//
+//        }
+//    }
+//
+//
 
 
 
@@ -759,13 +767,21 @@ void Farm::removeDeletedEntities() {
     for (int it = 0; it < lifes.size(); it++) {
 
         bool found = false;
+        int foundIndex = -1;
         for (int jt = 0; jt < lifesToDelete.size(); jt++) {
             if (lifes.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
                 found = true;
+                foundIndex = jt;
             }
         }
 
-        if (!found) {
+        if (found) {
+            Life * currentLife = lifes.at(it);
+            Point currentLifePosition = currentLife->getEntity()->getPosition();
+            Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
+
+            map->getTileAt(currentLifeTilePosition.getX(), currentLifeTilePosition.getY())->addGround(currentLife->getEntity()->getMass());
+        } else {
             newLifes.emplace_back(lifes.at(it));
         }
     }

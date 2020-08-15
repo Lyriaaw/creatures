@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include "BarSensorDistanceEvolution.h"
-#include "../../brain/neurons/SensorNeuron.h"
 #include "../../life/sensors/bars/BarSensor.h"
 #include "../../life/sensors/bars/DistanceBarSensor.h"
 #include "../../life/sensors/bars/BrightnessBarSensor.h"
@@ -14,7 +13,7 @@ BarSensorDistanceEvolution::BarSensorDistanceEvolution(): Evolution() {
 }
 
 void BarSensorDistanceEvolution::generateFromRandom(Life * life) {
-    sensorLength = (((rand() % 300) / 100.f) + 2) * life->getEntity()->getSize();
+    sensorLength = (((rand() % 300) / 100.f) + 2);
     sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     sensorColor = ((rand() % 999) / 1000.f);
 }

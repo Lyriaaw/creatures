@@ -17,6 +17,9 @@ private:
     double energy;
 
 public:
+
+    EnergyManagement();
+
     double getEnergy() const;
     double setEnergy(double energy);
     double addEnergy(double addedEnergy);
@@ -28,6 +31,10 @@ public:
     void setMaxMass(double maxMass);
 
     bool isAlive();
+
+    Entity *getBody() const;
+
+    void setBody(Entity *body);
 
 
 };
