@@ -30,8 +30,9 @@ void FarmUI::loadMap() {
 }
 
 void FarmUI::loadLifes() {
-    for (int it = 0; it < farm->getLifes().size(); it++) {
-        Life * currentLife = farm->getLifes().at(it);
+    std::vector<Life *> initialLifes = farm->fetchLifes();
+    for (int it = 0; it < initialLifes.size(); it++) {
+        Life * currentLife = initialLifes.at(it);
 
         LifeUI * ui = new LifeUI(currentLife, font);
         lifeUIs.emplace_back(ui);
@@ -142,17 +143,20 @@ void FarmUI::generateTileInfoText() {
 void FarmUI::update() {
     // TODO OPTI Clear to_delete
 
-    clearDeletedEntities(farm->getEntityToDelete());
-    farm->clearToDeleteEntities();
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            clearDeletedEntities(farm->getChunkAt(it, jt)->getEntityToDelete());
+            farm->getChunkAt(it, jt)->clearToDeleteEntities();
+            clearDeletedLifes(farm->getChunkAt(it, jt)->getLifesToDelete());
+            farm->getChunkAt(it, jt)->clearToDeleteLifes();
+            addLifes(farm->getChunkAt(it, jt)->getLifesAdded());
+            farm->getChunkAt(it, jt)->clearAddedLifes();
+            addEntities(farm->getChunkAt(it, jt)->getEntityAdded());
+            farm->getChunkAt(it, jt)->clearAddedEntities();
 
-    clearDeletedLifes(farm->getLifesToDelete());
-    farm->clearToDeleteLifes();
+        }
+    }
 
-    addLifes(farm->getLifesAdded());
-    farm->clearAddedLifes();
-
-    addEntities(farm->getEntityAdded());
-    farm->clearAddedEntities();
 
     generateTileInfoText();
 }

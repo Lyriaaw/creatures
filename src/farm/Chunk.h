@@ -122,6 +122,20 @@ public:
     const std::vector<Life *> &getVegetals() const;
 
     void setVegetals(const std::vector<Life *> &vegetals);
+
+    void removeDeletedEntities();
+
+    void moveCreatures();
+
+    void clearAddedLifes();
+
+    void clearAddedEntities();
+
+    void clearToDeleteLifes();
+
+    void clearToDeleteEntities();
+
+    void addLife(Life *life);
 };
 
 

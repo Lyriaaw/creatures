@@ -153,11 +153,6 @@ void Farm::InitFromRandom() {
 
     generateRandomTerrain(seed);
 
-}
-
-
-void Farm::Tick(bool paused) {
-
     generateEntityGrid();
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
@@ -168,6 +163,13 @@ void Farm::Tick(bool paused) {
 
         }
     }
+
+}
+
+
+void Farm::Tick(bool paused) {
+
+
 
 
 
@@ -180,7 +182,6 @@ void Farm::Tick(bool paused) {
 
 
      if (!paused) {
-        moveCreatures();
         populationControl();
     }
 
@@ -212,11 +213,6 @@ void Farm::Tick(bool paused) {
 }
 
 void Farm::handleBigThread() {
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            getChunkAt(it, jt)->generateEntityGrid();
-        }
-    }
 
     std::thread chunkThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
 
@@ -226,8 +222,10 @@ void Farm::handleBigThread() {
 
             auto f = [](Chunk * chunk) {
                 chunk->processClimate();
+                chunk->generateEntityGrid();
                 chunk->brainProcessing();
                 chunk->executeCreaturesActions();
+                chunk->moveCreatures();
             };
 
             int index = (it * CHUNK_COUNT_HEIGHT) + jt;
@@ -378,7 +376,6 @@ void Farm::executeCreaturesActions() {
     findVegetals();
     findCreatures();
 
-    removeDeletedEntities();
 
     actions.clear();
 //    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
@@ -507,25 +504,26 @@ void Farm::aTickHavePassed() {
 void Farm::statistics() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    std::vector<Life *> currentLifes = fetchLifes();
 
     std::vector<Life *> sortedLife = getScoreSortedCreatures();
 //    std::vector<BrainConnector *> sortedConnectors = connectors;
-    int populationSize = sortedLife.size();
+    int populationSize = currentLifes.size();
 
     dataAnalyser.getPopulation()->addValue(populationSize);
 
     double totalPopulationScore = 0.0;
     for (int it = 0; it < populationSize; it++) {
-        totalPopulationScore += sortedLife.at(it)->getEntity()->getAge();
+        totalPopulationScore += currentLifes.at(it)->getEntity()->getAge();
     }
 
     double averagePopulationAge = totalPopulationScore / double(populationSize);
 
-    double maxScore = sortedLife.at(0)->getEntity()->getAge();
+    double maxScore = currentLifes.at(0)->getEntity()->getAge();
 
-    double firstQuartileScore = sortedLife.at(populationSize / 4)->getEntity()->getAge();
-    double median = sortedLife.at(populationSize / 2)->getEntity()->getAge();
-    double lastQuartileScore = sortedLife.at((3 * populationSize) / 4)->getEntity()->getAge();
+    double firstQuartileScore = currentLifes.at(populationSize / 4)->getEntity()->getAge();
+    double median = currentLifes.at(populationSize / 2)->getEntity()->getAge();
+    double lastQuartileScore = currentLifes.at((3 * populationSize) / 4)->getEntity()->getAge();
 
 
     dataAnalyser.getAverageScore()->addValue(averagePopulationAge);
@@ -541,16 +539,17 @@ void Farm::statistics() {
     double totalCreaturesMass = 0.f;
     double totalFoodsMass = 0.f;
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Life * currentLife = lifes.at(it);
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Life * currentLife = currentLifes.at(it);
         totalCreaturesEnergy += currentLife->getEnergyManagement()->getEnergy();
         totalCreaturesMass += currentLife->getEntity()->getMass();
     }
 
-    for (int it = 0; it < entities.size(); it++) {
-        Entity * entity = entities.at(it);
-        totalFoodsMass += entity->getMass();
-    }
+//    for (int it = 0; it < entities.size(); it++) {
+//        Entity * entity = entities.at(it);
+//        totalFoodsMass += entity->getMass();
+//    }
 
 
     double totalHeat = 0.0;
@@ -568,7 +567,7 @@ void Farm::statistics() {
 
     int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
 
-//    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << " Ground: " << totalGround - dataAnalyser.getGroundEnergy()->getLastValue() << " Lost: " << lastLostEnergy << std::endl;
+    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
 
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
@@ -1012,4 +1011,19 @@ std::vector<Life *> Farm::fetchCreatures() {
     }
 
     return foundCreatures;
+}
+
+std::vector<Life *> Farm::fetchLifes() {
+    std::vector<Life *> foundLifes;
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            std::vector<Life *> chunkCreatures = chunk->getLifes();
+
+            foundLifes.insert(foundLifes.begin(), chunkCreatures.begin(), chunkCreatures.end());
+        }
+    }
+
+    return foundLifes;
 }

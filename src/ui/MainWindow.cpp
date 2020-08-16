@@ -343,7 +343,11 @@ void MainWindow::handleMouseMove(int x, int y) {
 
         Point newCenter = {mainCamera->getCenter().getX() + deltaX, mainCamera->getCenter().getY() + deltaY};
 
-        this->mainCamera->setCenter(newCenter);
+        if (selectedLife != nullptr && mainCamera != nullptr) {
+            this->selectedLife->getEntity()->setPosition(newCenter);
+        } else {
+            this->mainCamera->setCenter(newCenter);
+        }
     }
 
 

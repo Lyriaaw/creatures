@@ -141,6 +141,8 @@ public:
 
 
     void handleBigThread();
+
+    std::vector<Life *> fetchLifes();
 };
 
 
