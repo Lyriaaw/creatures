@@ -160,6 +160,16 @@ void Farm::Tick(bool paused) {
 
     generateEntityGrid();
 
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+
+            getChunkAt(it, jt)->setLifes(chunkLifeGrid.at(it).at(jt));
+            getChunkAt(it, jt)->setEntities(chunkEntityGrid.at(it).at(jt));
+
+        }
+    }
+
+
 
     if (!paused) {
         vegetalisation();
@@ -213,101 +223,44 @@ void Farm::Tick(bool paused) {
 
 void Farm::brainProcessing() {
 
-    actionsGrid.clear();
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        std::vector<std::vector<ActionDTO>> actionsLine;
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            std::vector<ActionDTO> actionsCase;
-            actionsLine.push_back(actionsCase);
-        }
-        actionsGrid.emplace_back(actionsLine);
-    }
-
 
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 
-    std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-        currentLife->processSelectedTiles();
-    }
-    std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
-    dataAnalyser.getChunkSelection()->addValue(elapsed_timeChunk.count());
 
-
-    double totalEntityGrid = 0.0;
-    double totalSensors = 0.0;
-    double totalBrain = 0.0;
-    double totalActions = 0.0;
-
-    std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-
-        std::chrono::system_clock::time_point entityGridStart = std::chrono::system_clock::now();
-
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedTiles());
-        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedTiles());
-
-        std::chrono::system_clock::time_point entityGridEnd = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time_entity_grid = entityGridEnd - entityGridStart;
-
-        totalEntityGrid += elapsed_time_entity_grid.count();
-
-
-
-
-        std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
-
-        currentLife->processSensors(accessibleEntities, accessibleTiles);
-
-        std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time_sensorProcessing = sensorProcessingEnd - sensorProcessingStart;
-        totalSensors += elapsed_time_sensorProcessing.count();
-
-
-
-
-        std::chrono::system_clock::time_point processBrainStart = std::chrono::system_clock::now();
-
-        currentLife->processBrain();
-
-        std::chrono::system_clock::time_point processBrainEnd = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time_process_brain = processBrainEnd - processBrainStart;
-        totalBrain += elapsed_time_process_brain.count();
-
-
-
-
-        std::chrono::system_clock::time_point actionsStart = std::chrono::system_clock::now();
-
-
-        std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
-
-        Point currentLifePosition = currentLife->getEntity()->getPosition();
-        Point chunkPosition = currentLifePosition.getSimpleCoordinates();
-        std::vector<ActionDTO> * currentActionCase = &actionsGrid.at(chunkPosition.getX()).at(chunkPosition.getY());
-        currentActionCase->insert(currentActionCase->end(), currentCreatureActions.begin(), currentCreatureActions.end());
-
-        std::chrono::system_clock::time_point actionsEnd = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time_actions = actionsEnd - actionsStart;
-        totalActions += elapsed_time_actions.count();
-
-
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            getChunkAt(it, jt)->generateEntityGrid();
+        }
     }
 
-    std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
-    dataAnalyser.getBrainProcessing()->addValue(totalBrain);
+    std::thread brainThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
 
 
-    dataAnalyser.getSensorProcessing()->addValue(totalSensors);
-    dataAnalyser.getExternalActions()->addValue(totalActions);
-    dataAnalyser.getTotalGridGeneration()->addValue(totalEntityGrid);
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
 
+            auto f = [](Chunk * chunk) {
+                chunk->brainProcessing();
+            };
+
+            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+
+            brainThreads[index] = std::thread(f, chunks.at(it).at(jt));
+
+        }
+    }
+
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+
+            brainThreads[index].join();
+        }
+    }
 
 
 
@@ -351,15 +304,6 @@ void Farm::moveCreatures() {
 void Farm::executeCreaturesActions() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-
-            getChunkAt(it, jt)->setLifes(chunkLifeGrid.at(it).at(jt));
-            getChunkAt(it, jt)->setEntities(chunkEntityGrid.at(it).at(jt));
-            getChunkAt(it, jt)->setActions(actionsGrid.at(it).at(jt));
-
-        }
-    }
 
     std::thread actionThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
 
@@ -407,6 +351,9 @@ void Farm::executeCreaturesActions() {
         }
     }
 
+    findVegetals();
+    findCreatures();
+
     removeDeletedEntities();
 
     actions.clear();
@@ -428,215 +375,7 @@ void Farm::executeCreaturesActions() {
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 }
 
-void Farm::handleCaptureHeat(Life * life, ActionDTO action) {
 
-}
-
-void Farm::handleCaptureGround(Life * life, ActionDTO action) {
-    int chunkReach = life->getEntity()->getSize() / 5.0;
-
-    chunkReach = std::max(double(chunkReach), 1.0);
-
-
-    double totalGround = 0.0;
-    int ratioSize = (chunkReach * 2) + 1;
-    double ratios[ratioSize * ratioSize];
-    double test[2][2] = {{1, 1}, {1, 1}};
-
-    Point entityPoint = life->getEntity()->getPosition();
-    Point tilePoint = entityPoint.getTileCoordinates();
-
-    for (int it = -chunkReach; it <= chunkReach; it++) {
-        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
-            int currentTileX = tilePoint.getX() + it;
-            int currentTileY = tilePoint.getY() + jt;
-
-            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
-                continue;
-
-            totalGround += getTileAt(currentTileX, currentTileY)->getGround();
-        }
-    }
-
-    for (int it = -chunkReach; it <= chunkReach; it++) {
-        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
-            int currentTileX = tilePoint.getX() + it;
-            int currentTileY = tilePoint.getY() + jt;
-
-            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
-                continue;
-
-            Tile * tile = getTileAt(currentTileX, currentTileY);
-            double ratio = tile->getGround() / totalGround;
-            int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
-            ratios[currentIndex] = ratio;
-        }
-    }
-//
-    double totalAimedEnergy = action.getValue() * totalGround;
-
-    double totalCollectedEnergy = 0;
-    for (int it = -chunkReach; it <= chunkReach; it++) {
-        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
-            int currentTileX = tilePoint.getX() + it;
-            int currentTileY = tilePoint.getY() + jt;
-
-            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
-                continue;
-
-            int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
-            double currentRatio = ratios[currentIndex] * 0.01;
-            double tileEnergy = getTileAt(currentTileX, currentTileY)->getGround();
-            double tileCollectedEnergy = (currentRatio * totalAimedEnergy);
-
-            if (tileEnergy - tileCollectedEnergy < 0) {
-                std::cout << "Error while removing from ground: " << tileEnergy - tileCollectedEnergy << std::endl;
-            }
-
-            totalCollectedEnergy += tileCollectedEnergy;
-            getTileAt(currentTileX, currentTileY)->setGround(tileEnergy - tileCollectedEnergy);
-        }
-    }
-
-//    if (totalCollectedEnergy == 0) {
-//    }
-    double wastedEnergy = life->addEnergy(totalCollectedEnergy);
-
-
-    getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
-
-
-}
-
-
-bool Farm::handleDuplication(Life * life) {
-
-    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
-
-    if (!fatherCanReproduce) {
-//        std::cout << "Father cannot reproduce" << std::endl;
-        return false;
-    }
-//
-    Life * child = this->nursery->Mate(life, nullptr);
-
-    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.f;
-
-    double givenFatherEnergy = std::min(life->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal);
-
-    double actualGivenFatherEnergy = life->getEnergyManagement()->removeEnergy(givenFatherEnergy);
-
-    if (givenFatherEnergy != actualGivenFatherEnergy) {
-        std::cout << "Wrong energy given" << std::endl;
-    }
-
-    double totalGivenEnergy = actualGivenFatherEnergy;
-
-    if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
-        child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
-        child->setMass(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
-        lifesAdded.emplace_back(child);
-
-        vegetals.emplace_back(child);
-
-        return true;
-    }
-
-
-    Point childCoordinate = child->getEntity()->getPosition();
-    Point tileChildPosition = childCoordinate.getTileCoordinates();
-
-    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
-
-
-    if (life->getEnergyManagement()->getEnergy() <= 0) {
-        lifesToDelete.emplace_back(life);
-    }
-
-//    if (givenMotherEnergy + givenFatherEnergy == 0) {
-//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
-//    } else {
-//        std::cout << "New Child " << std::endl;
-//
-//    }
-
-
-
-
-    return false;
-}
-
-
-
-
-
-bool Farm::handleMating(Life * father, int entityId) {
-    Life * foundLife = getLifeFromId(entityId);
-    if (foundLife == nullptr) {
-        return false;
-    }
-
-    bool fatherCanReproduce = father->getEnergyManagement()->getEnergy() > father->getEntity()->getMass() / 2.f;
-    bool motherCanReproduce = foundLife->getEnergyManagement()->getEnergy() > father->getEntity()->getMass() / 2.f;
-
-    if (!fatherCanReproduce || !motherCanReproduce) {
-        return false;
-    }
-//
-    Life * child = this->nursery->Mate(father, foundLife);
-
-    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.0;
-
-    double givenFatherEnergy = std::min(father->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal / 2.0);
-    double givenMotherEnergy = std::min(foundLife->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal / 2.0);
-
-    double actualGivenFatherEnergy = father->getEnergyManagement()->removeEnergy(givenFatherEnergy);
-    double actualGivenMotherEnergy = foundLife->getEnergyManagement()->removeEnergy(givenMotherEnergy);
-
-    if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
-        std::cout << "Wrong energy given" << std::endl;
-    }
-
-    double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
-
-    if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
-        child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
-        child->setMass(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
-        lifesAdded.emplace_back(child);
-
-        creatures.emplace_back(child);
-
-        return true;
-    }
-
-
-    Point childCoordinate = child->getEntity()->getPosition();
-    Point tileChildPosition = childCoordinate.getTileCoordinates();
-
-    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
-
-
-    if (father->getEnergyManagement()->getEnergy() <= 0) {
-        lifesToDelete.emplace_back(father);
-    }
-    if (foundLife->getEnergyManagement()->getEnergy() <= 0) {
-        lifesToDelete.emplace_back(foundLife);
-    }
-
-//    if (givenMotherEnergy + givenFatherEnergy == 0) {
-//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
-//    } else {
-//        std::cout << "New Child " << std::endl;
-//
-//    }
-
-
-
-
-    return false;
-}
 
 
 
@@ -1164,6 +903,29 @@ const vector<Life *> &Farm::getVegetals() const {
     return vegetals;
 }
 
+void Farm::findVegetals(){
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            std::vector<Life *> chunkVegetals = chunk->getVegetals();
+
+            vegetals.insert(vegetals.begin(), chunkVegetals.begin(), chunkVegetals.end());
+        }
+    }
+}
+void Farm::findCreatures(){
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            std::vector<Life *> chunkCreatures = chunk->getCreatures();
+
+            creatures.insert(creatures.begin(), chunkCreatures.begin(), chunkCreatures.end());
+        }
+    }
+}
+
 
 
 Chunk * Farm::getChunkAt(int chunkX, int chunkY) {
@@ -1196,4 +958,34 @@ void Farm::setLifes(const vector<Life *> &lifes) {
 
 void Farm::setEntities(const vector<Entity *> &entities) {
     Farm::entities = entities;
+}
+
+std::vector<Life *> Farm::fetchVegetals() {
+    std::vector<Life *> foundVegetals;
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            std::vector<Life *> chunkVegetals = chunk->getVegetals();
+
+            foundVegetals.insert(foundVegetals.begin(), chunkVegetals.begin(), chunkVegetals.end());
+        }
+    }
+
+    return foundVegetals;
+}
+
+std::vector<Life *> Farm::fetchCreatures() {
+    std::vector<Life *> foundCreatures;
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            std::vector<Life *> chunkCreatures = chunk->getCreatures();
+
+            foundCreatures.insert(foundCreatures.begin(), chunkCreatures.begin(), chunkCreatures.end());
+        }
+    }
+
+    return foundCreatures;
 }

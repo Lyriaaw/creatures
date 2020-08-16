@@ -106,6 +106,22 @@ public:
     const std::vector<Entity *> &getEntityToDelete() const;
 
     void setEntityToDelete(const std::vector<Entity *> &entityToDelete);
+
+    void brainProcessing();
+
+    std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedTiles);
+
+    std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedTiles);
+
+    void generateEntityGrid();
+
+    const std::vector<Life *> &getCreatures() const;
+
+    void setCreatures(const std::vector<Life *> &creatures);
+
+    const std::vector<Life *> &getVegetals() const;
+
+    void setVegetals(const std::vector<Life *> &vegetals);
 };
 
 

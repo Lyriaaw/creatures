@@ -43,7 +43,7 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 
-    std::vector<Life *> currentLifes = farm->getVegetals();
+    std::vector<Life *> currentLifes = farm->fetchVegetals();
 
     for (int it = 0; it < currentLifes.size(); it++) {
         Point point = currentLifes.at(it)->getEntity()->getPosition();

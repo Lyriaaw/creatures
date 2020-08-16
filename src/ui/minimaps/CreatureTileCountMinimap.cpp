@@ -45,7 +45,7 @@ void CreatureTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 
-    std::vector<Life *> currentLifes = farm->getCreatures();
+    std::vector<Life *> currentLifes = farm->fetchCreatures();
 
     for (int it = 0; it < currentLifes.size(); it++) {
         Point point = currentLifes.at(it)->getEntity()->getPosition();

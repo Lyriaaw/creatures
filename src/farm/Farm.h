@@ -70,7 +70,6 @@ public:
     void moveCreatures();
 
     void executeCreaturesActions();
-    bool handleMating(Life * father, int entityId);
 
     void populationControl();
     void vegetalisation();
@@ -79,7 +78,6 @@ public:
 
 
     void removeDeletedEntities();
-    void clearToDelete();
     void generateEntityGrid();
 
     Entity * getEntityFromId(int id);
@@ -124,9 +122,6 @@ public:
 
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 
-    void handleCaptureGround(Life * life, ActionDTO action);
-    void handleCaptureHeat(Life * life, ActionDTO action);
-    bool handleDuplication(Life * life);
 
     Chunk * getChunkAt(int chunkX, int chunkY);
 
@@ -137,6 +132,14 @@ public:
     void setLifes(const std::vector<Life *> &lifes);
 
     void setEntities(const std::vector<Entity *> &entities);
+
+    void findCreatures();
+    void findVegetals();
+
+    std::vector<Life *> fetchCreatures();
+    std::vector<Life *> fetchVegetals();
+
+
 };
 
 

@@ -8,6 +8,15 @@
 
 Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chunkPosition), nursery(nursery), step("init") {
     generateNeighbours();
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        std::vector<std::vector<Entity *>> entityLine;
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            std::vector<Entity *> entityCase;
+            entityLine.push_back(entityCase);
+        }
+        entityGrid.emplace_back(entityLine);
+    }
 }
 
 void Chunk::generateNeighbours() {
@@ -786,4 +795,105 @@ const std::vector<Entity *> &Chunk::getEntityToDelete() const {
 
 void Chunk::setEntityToDelete(const std::vector<Entity *> &entityToDelete) {
     Chunk::entityToDelete = entityToDelete;
+}
+
+
+void Chunk::brainProcessing() {
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+        currentLife->processSelectedTiles();
+    }
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+
+
+        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedTiles());
+        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedTiles());
+
+        currentLife->processSensors(accessibleEntities, accessibleTiles);
+
+
+        currentLife->processBrain();
+
+        std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
+        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+
+    }
+}
+
+std::vector<Entity *> Chunk::getAccessibleEntities(std::vector<Point> selectedTiles) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    std::vector<Entity *> accessibleEntities;
+    for (int jt = 0; jt < selectedTiles.size(); jt++) {
+        Point currentTiles = selectedTiles.at(jt);
+
+        std::vector<Entity *> chunkEntities = getRelativeEntities(currentTiles.getX() - deltaX, currentTiles.getY() - deltaY);
+
+        accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
+    }
+    return accessibleEntities;
+
+}
+std::vector<Tile *> Chunk::getAccessibleTiles(std::vector<Point> selectedTiles) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    std::vector<Tile *> accessibleTiles;
+    for (int jt = 0; jt < selectedTiles.size(); jt++) {
+        Point currentTilePoint = selectedTiles.at(jt);
+
+        Tile * currentTile = getRelativeTile(currentTilePoint.getX() - deltaX, currentTilePoint.getY() - deltaY, false);
+
+        accessibleTiles.emplace_back(currentTile);
+    }
+    return accessibleTiles;
+
+}
+
+void Chunk::generateEntityGrid() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            entityGrid.at(it).at(jt).clear();
+        }
+    }
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Point position = lifes.at(it)->getEntity()->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+        Point chunkCoordinates = position.getSimpleCoordinates();
+
+        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(lifes.at(it)->getEntity());
+    }
+
+    for (int it = 0; it < entities.size(); it++) {
+        Point position = entities.at(it)->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+        Point chunkCoordinates = position.getSimpleCoordinates();
+
+        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(entities.at(it));
+    }
+}
+
+const std::vector<Life *> &Chunk::getCreatures() const {
+    return creatures;
+}
+
+void Chunk::setCreatures(const std::vector<Life *> &creatures) {
+    Chunk::creatures = creatures;
+}
+
+const std::vector<Life *> &Chunk::getVegetals() const {
+    return vegetals;
+}
+
+void Chunk::setVegetals(const std::vector<Life *> &vegetals) {
+    Chunk::vegetals = vegetals;
 }
