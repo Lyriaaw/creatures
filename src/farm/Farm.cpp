@@ -172,15 +172,7 @@ void Farm::Tick(bool paused) {
 
 
     if (!paused) {
-        vegetalisation();
-        brainProcessing();
-    }
-
-
-
-
-    if (!paused) {
-        executeCreaturesActions();
+        handleBigThread();
     }
 
 
@@ -219,54 +211,86 @@ void Farm::Tick(bool paused) {
     }
 }
 
-
-
-void Farm::brainProcessing() {
-
-
-
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-
-
+void Farm::handleBigThread() {
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
             getChunkAt(it, jt)->generateEntityGrid();
         }
     }
 
-    std::thread brainThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
-
+    std::thread chunkThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
             Chunk * chunk = getChunkAt(it, jt);
 
             auto f = [](Chunk * chunk) {
+                chunk->processClimate();
                 chunk->brainProcessing();
+                chunk->executeCreaturesActions();
             };
 
             int index = (it * CHUNK_COUNT_HEIGHT) + jt;
 
-            brainThreads[index] = std::thread(f, chunks.at(it).at(jt));
+            chunkThreads[index] = std::thread(f, chunks.at(it).at(jt));
 
         }
     }
-
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
             int index = (it * CHUNK_COUNT_HEIGHT) + jt;
 
-            brainThreads[index].join();
+            chunkThreads[index].join();
         }
     }
 
+}
 
 
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
+
+
+void Farm::brainProcessing() {
+
+//
+//
+//    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+//
+//
+//
+//
+//
+//
+//
+//    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+//        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+//            Chunk * chunk = getChunkAt(it, jt);
+//
+//            auto f = [](Chunk * chunk) {
+//                chunk->brainProcessing();
+//            };
+//
+//            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+//
+//            brainThreads[index] = std::thread(f, chunks.at(it).at(jt));
+//
+//        }
+//    }
+//
+//
+//    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+//        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+//            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+//
+//            brainThreads[index].join();
+//        }
+//    }
+//
+//
+//
+//    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_time = end - start;
+//    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
 }
 
 

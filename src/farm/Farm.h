@@ -140,6 +140,7 @@ public:
     std::vector<Life *> fetchVegetals();
 
 
+    void handleBigThread();
 };
 
 
