@@ -29,7 +29,15 @@ void Tile::setGround(double ground) {
     if (ground < 0) {
         std::cout << "Setting ground to " << ground << std::endl;
     }
-    Tile::ground = ground;
+    std::lock_guard<std::mutex> guard(add_ground_mutex);
+    this->ground = ground;
+}
+void Tile::removeGround(double removedGround) {
+    if (ground < 0) {
+        std::cout << "Setting ground to " << ground << std::endl;
+    }
+    std::lock_guard<std::mutex> guard(add_ground_mutex);
+    this->ground -= removedGround;
 }
 
 void Tile::addGround(double value) {

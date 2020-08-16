@@ -13,7 +13,7 @@
 
 using namespace std;
 
-Farm::Farm(){
+Farm::Farm(): lastLostEnergy(0.0){
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 }
@@ -48,7 +48,7 @@ void Farm::generateRandomTerrain(int seed) {
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         std::vector<Chunk *> chunkLine;
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = new Chunk(Point(it, jt));
+            Chunk * chunk = new Chunk(Point(it, jt), nursery);
             chunk->generateRandomChunk(seed, min, max);
 
             chunkLine.emplace_back(chunk);
@@ -82,7 +82,6 @@ void Farm::generateRandomTerrain(int seed) {
 void Farm::InitFromRandom() {
     float seed = rand() % 1000000;
 
-    generateRandomTerrain(seed);
 
 
 
@@ -107,6 +106,20 @@ void Farm::InitFromRandom() {
     }
 
     entityGrid = testEntites;
+
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<std::vector<Entity *>> chunkEntityLine;
+        std::vector<std::vector<Life *>> chunkLifeLine;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            std::vector<Entity *> chunkEntityCase;
+            std::vector<Life *> chunkLifeCase;
+            chunkEntityLine.push_back(chunkEntityCase);
+            chunkLifeLine.push_back(chunkLifeCase);
+        }
+        chunkEntityGrid.emplace_back(chunkEntityLine);
+        chunkLifeGrid.emplace_back(chunkLifeLine);
+    }
 
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
@@ -136,6 +149,10 @@ void Farm::InitFromRandom() {
     tickCount = 0;
 
     sortCreatures();
+
+
+    generateRandomTerrain(seed);
+
 }
 
 
@@ -147,7 +164,20 @@ void Farm::Tick(bool paused) {
     if (!paused) {
         vegetalisation();
         brainProcessing();
+    }
+
+
+
+
+    if (!paused) {
         executeCreaturesActions();
+    }
+
+
+
+
+
+     if (!paused) {
         moveCreatures();
         populationControl();
     }
@@ -182,6 +212,19 @@ void Farm::Tick(bool paused) {
 
 
 void Farm::brainProcessing() {
+
+    actionsGrid.clear();
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        std::vector<std::vector<ActionDTO>> actionsLine;
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            std::vector<ActionDTO> actionsCase;
+            actionsLine.push_back(actionsCase);
+        }
+        actionsGrid.emplace_back(actionsLine);
+    }
+
+
+
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 
@@ -243,7 +286,11 @@ void Farm::brainProcessing() {
 
 
         std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
-        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+
+        Point currentLifePosition = currentLife->getEntity()->getPosition();
+        Point chunkPosition = currentLifePosition.getSimpleCoordinates();
+        std::vector<ActionDTO> * currentActionCase = &actionsGrid.at(chunkPosition.getX()).at(chunkPosition.getY());
+        currentActionCase->insert(currentActionCase->end(), currentCreatureActions.begin(), currentCreatureActions.end());
 
         std::chrono::system_clock::time_point actionsEnd = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time_actions = actionsEnd - actionsStart;
@@ -304,93 +351,51 @@ void Farm::moveCreatures() {
 void Farm::executeCreaturesActions() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    int captureGroundActions = 0;
-    int captureHeatActions = 0;
-    int duplicateActions = 0;
-    int mateActions = 0;
-    int eatActions = 0;
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
 
-    int naturalMatingCount = 0;
-    for (int it = 0; it < actions.size(); it++) {
-        ActionDTO actionDto = actions.at(it);
-
-
-        Life * performer = getLifeFromId(actionDto.getPerformerId());
-        Entity * subject = getEntityFromId(actionDto.getSubjectId());
-
-        if (!performer->getEnergyManagement()->isAlive()) {
-            continue;
-        }
-
-        if (subject != nullptr && subject->isExists()) {
-            continue;
-        }
-
-        if (actionDto.getType() == "EAT") {
-            performer->addEnergy(subject->getMass());
-            subject->setMass(0.0);
-
-            Life * foundLife = getLifeFromId(actionDto.getSubjectId());
-            if (foundLife != nullptr) {
-                Point performerPosition = performer->getEntity()->getPosition();
-                Point tilePosition = performerPosition.getTileCoordinates();
-
-                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
-            }
-
-            Point performerPoint = performer->getEntity()->getPosition();
-            Point tilePoint = performerPoint.getTileCoordinates();
-
-            entityToDelete.emplace_back(subject);
-            eatActions++;
-        }
-
-        if (actionDto.getType() == "MATE") {
-            bool success = handleMating(performer, subject->getId());
-
-            if (success) {
-                naturalMatingCount++;
-                mateActions++;
-            }
+            getChunkAt(it, jt)->setLifes(chunkLifeGrid.at(it).at(jt));
+            getChunkAt(it, jt)->setEntities(chunkEntityGrid.at(it).at(jt));
+            getChunkAt(it, jt)->setActions(actionsGrid.at(it).at(jt));
 
         }
-
-        if (actionDto.getType() == "DUPLICATE") {
-            bool success = handleDuplication(performer);
-
-            if (success) {
-                naturalMatingCount++;
-                duplicateActions++;
-            }
-
-        }
-
-        if (actionDto.getType() == "CAPTURE_GROUND") {
-            handleCaptureGround(performer, actionDto);
-            captureGroundActions++;
-        }
-
-        if (actionDto.getType() == "CAPTURE_HEAT") {
-            handleCaptureHeat(performer, actionDto);
-            captureHeatActions++;
-        }
-
-
-
     }
+
+    double totalLostEnergy(0.0);
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            totalLostEnergy += getChunkAt(it, jt)->executeCreaturesActions();
+
+            std::vector<Life *> currentLifesAdded;
+            std::vector<Life *> currentLifesToDelete;
+
+            std::vector<Entity *> currentEntityAdded;
+            std::vector<Entity *> currentEntityToDelete;
+
+            lifesAdded.insert(lifesAdded.end(), currentLifesAdded.begin(), currentLifesAdded.end());
+            lifesToDelete.insert(lifesToDelete.end(), currentLifesToDelete.begin(), currentLifesToDelete.end());
+            entityAdded.insert(entityAdded.end(), currentEntityAdded.begin(), currentEntityAdded.end());
+            entityToDelete.insert(entityToDelete.end(), currentEntityToDelete.begin(), currentEntityToDelete.end());
+
+        }
+    }
+
+    lastLostEnergy = totalLostEnergy;
+
+
     removeDeletedEntities();
 
     actions.clear();
-    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
+//    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 
-    int totalActions = captureGroundActions + captureHeatActions + duplicateActions + mateActions + eatActions;
-
-    dataAnalyser.getTotalActions()->addValue(totalActions);
-    dataAnalyser.getCaptureGroundActions()->addValue(captureGroundActions);
-    dataAnalyser.getCaptureHeatActions()->addValue(captureHeatActions);
-    dataAnalyser.getDuplicateActions()->addValue(duplicateActions);
-    dataAnalyser.getMateActions()->addValue(mateActions);
-    dataAnalyser.getEatActions()->addValue(eatActions);
+//    int totalActions = captureGroundActions + captureHeatActions + duplicateActions + mateActions + eatActions;
+//
+//    dataAnalyser.getTotalActions()->addValue(totalActions);
+//    dataAnalyser.getCaptureGroundActions()->addValue(captureGroundActions);
+//    dataAnalyser.getCaptureHeatActions()->addValue(captureHeatActions);
+//    dataAnalyser.getDuplicateActions()->addValue(duplicateActions);
+//    dataAnalyser.getMateActions()->addValue(mateActions);
+//    dataAnalyser.getEatActions()->addValue(eatActions);
 
 
 
@@ -776,6 +781,8 @@ void Farm::statistics() {
 
     int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
 
+    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << " Lost: " << lastLostEnergy << std::endl;
+
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsMass);
@@ -817,17 +824,33 @@ void Farm::generateEntityGrid() {
         }
     }
 
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            chunkLifeGrid.at(it).at(jt).clear();
+            chunkEntityGrid.at(it).at(jt).clear();
+        }
+    }
+
+
+
     for (int it = 0; it < lifes.size(); it++) {
         Point position = lifes.at(it)->getEntity()->getPosition();
         Point tileCoordinate = position.getTileCoordinates();
+        Point chunkCoordinates = position.getSimpleCoordinates();
 
         entityGrid.at(tileCoordinate.getX()).at(tileCoordinate.getY()).push_back(lifes.at(it)->getEntity());
+        chunkLifeGrid.at(chunkCoordinates.getX()).at(chunkCoordinates.getY()).push_back(lifes.at(it));
     }
 
     for (int it = 0; it < entities.size(); it++) {
         Point position = entities.at(it)->getPosition();
         Point tileCoordinate = position.getTileCoordinates();
+        Point chunkCoordinates = position.getSimpleCoordinates();
+
         entityGrid.at(tileCoordinate.getX()).at(tileCoordinate.getY()).push_back(entities.at(it));
+        chunkEntityGrid.at(chunkCoordinates.getX()).at(chunkCoordinates.getY()).push_back(entities.at(it));
+
     }
 
 
@@ -1140,4 +1163,12 @@ Tile * Farm::getTileAt(int tileX, int tileY) {
     Point chunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
 
     return getChunkAt(chunkPosition.getX(), chunkPosition.getY())->getTileAt(tileX, tileY);
+}
+
+void Farm::setLifes(const vector<Life *> &lifes) {
+    Farm::lifes = lifes;
+}
+
+void Farm::setEntities(const vector<Entity *> &entities) {
+    Farm::entities = entities;
 }

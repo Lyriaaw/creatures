@@ -22,6 +22,8 @@ private:
     std::vector<std::vector<Chunk *>> chunks;
 
 
+    double lastLostEnergy;
+
 
 
     std::vector<Life *> sorted;
@@ -36,6 +38,9 @@ private:
 //    Map * map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
+    std::vector<std::vector<std::vector<Life *>>> chunkLifeGrid;
+    std::vector<std::vector<std::vector<Entity *>>> chunkEntityGrid;
+    std::vector<std::vector<std::vector<ActionDTO>>> actionsGrid;
 
     CreatureNursery * nursery;
 
@@ -132,6 +137,10 @@ public:
     void generateRandomTerrain(int seed);
 
     Tile *getTileAt(int tileX, int tileY);
+
+    void setLifes(const std::vector<Life *> &lifes);
+
+    void setEntities(const std::vector<Entity *> &entities);
 };
 
 

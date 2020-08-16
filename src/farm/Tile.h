@@ -52,6 +52,8 @@ public:
     double getAddedHeat() const;
 
     double getAddedGround() const;
+
+    void removeGround(double ground);
 };
 
 

@@ -6,7 +6,7 @@
 #include "Chunk.h"
 #include "../utils/perlin/PerlinNoise.h"
 
-Chunk::Chunk(Point chunkPosition): chunkPosition(chunkPosition), step("init") {
+Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chunkPosition), nursery(nursery), step("init") {
     generateNeighbours();
 }
 
@@ -132,7 +132,7 @@ void Chunk::processClimate() {
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
-            Tile * currentTile = getRelativeTile(it, jt);
+            Tile * currentTile = getRelativeTile(it, jt, false);
             currentTile->processAddedGround();
             currentTile->processAddedHeat();
 
@@ -173,7 +173,7 @@ void Chunk::processClimate() {
                         continue;
                     }
 
-                    Tile * relativeTile = getRelativeTile(it + x, jt + y);
+                    Tile * relativeTile = getRelativeTile(it + x, jt + y, false);
 //
 //                    if (relativeTile->getPosition().equals(currentTile->getPosition())) {
 //                        continue;
@@ -211,7 +211,7 @@ void Chunk::processClimate() {
 
 //    for (int it = 0; it < TILE_PER_CHUNK; it++) {
 //        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
-//            Tile * currentTile = getRelativeTile(it, jt);
+//            Tile * currentTile = getRelativeTile(it, jt, false);
 //            currentTile->setGround(newGround[it][jt]);
 //            currentTile->setHeat(newHeats[it][jt]);
 //            currentTile->processAddedGround();
@@ -224,7 +224,7 @@ void Chunk::processClimate() {
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
-            Tile * currentTile = getRelativeTile(it, jt);
+            Tile * currentTile = getRelativeTile(it, jt, false);
 
             if (newGround[it][jt] < 0) {
                 std::cout << "Climate to ground " << newGround[it][jt] << std::endl;
@@ -253,7 +253,60 @@ void Chunk::processClimate() {
 
 }
 
-Tile * Chunk::getRelativeTile(int tileX, int tileY) {
+Tile * Chunk::getRelativeTile(int tileX, int tileY, bool debug) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+//    if (debug) {
+//        std::cout << "Requested tile X: " << tileX + deltaX << " Y: " << tileY + deltaY;
+//    }
+
+    if (tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK) {
+        int ratioX = 0;
+        if (tileX < 0)
+            ratioX = -1;
+        if (tileX >= TILE_PER_CHUNK)
+            ratioX = 1;
+
+        int ratioY = 0;
+        if (tileY < 0)
+            ratioY = -1;
+        if (tileY >= TILE_PER_CHUNK)
+            ratioY = 1;
+
+
+
+        int requestedX = deltaX + tileX;
+        int requestedY = deltaY + tileY;
+
+        Tile * foundTile = neighbours.at(ratioX + 1).at(ratioY + 1)->getTileAt(requestedX, requestedY);
+
+//        if (debug) {
+//            std::cout << " => X: " << foundTile->getPosition().getX() << " Y: " << foundTile->getPosition().getY() << std::endl;
+//        }
+
+
+        return foundTile;
+    }
+
+    Tile * tile = tiles.at(tileX).at(tileY);
+
+//    if (debug) {
+//        std::cout << " => X: " << tile->getPosition().getX() << " Y: " << tile->getPosition().getY() << std::endl;
+//    }
+    return tile;
+}
+
+const std::string &Chunk::getStep() const {
+    return step;
+}
+
+const Point &Chunk::getChunkPosition() const {
+    return chunkPosition;
+}
+
+
+std::vector<Entity *> Chunk::getRelativeEntities(int tileX, int tileY) {
 
     if (tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK) {
         int ratioX = 0;
@@ -274,23 +327,455 @@ Tile * Chunk::getRelativeTile(int tileX, int tileY) {
         int requestedX = deltaX + tileX;
         int requestedY = deltaY + tileY;
 
-        Tile * foundTile = neighbours.at(ratioX + 1).at(ratioY + 1)->getTileAt(requestedX, requestedY);
-
-        return foundTile;
+        return neighbours.at(ratioX + 1).at(ratioY + 1)->getEntitiesAt(requestedX, requestedY);
     }
 
-    Tile * tile = tiles.at(tileX).at(tileY);
-    return tile;
+
+    return entityGrid.at(tileX).at(tileY);
 }
 
-const std::string &Chunk::getStep() const {
-    return step;
+std::vector<Entity *> Chunk::getEntitiesAt(int tileX, int tileY) {
+    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
+        std::cout << "ERROR, REQUESTED WRONG ENTITIES => X: " << tileX << " Y: " << tileY << std::endl;
+        return entityGrid.at(0).at(0);
+    }
+
+    Point requestedChunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
+
+    if (!requestedChunkPosition.equals(chunkPosition)) {
+        std::cout << "ERROR, REQUESTED ENTITIES IN WRONG CHUNK: X: " << tileX << " Y: " << tileY << " | ";
+        std::cout << "CURRENT CHUNK => X: " << chunkPosition.getX() << " Y: " << chunkPosition.getY() << std::endl;
+        return entityGrid.at(0).at(0);
+    }
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    return entityGrid.at(tileX - deltaX).at(tileY - deltaY);
 }
 
-const Point &Chunk::getChunkPosition() const {
-    return chunkPosition;
+const std::vector<ActionDTO> &Chunk::getActions() const {
+    return actions;
+}
+
+void Chunk::setActions(const std::vector<ActionDTO> &actions) {
+    Chunk::actions = actions;
 }
 
 
 
+
+
+double Chunk::executeCreaturesActions() {
+
+    double lostEnergy(0.0);
+
+    int captureGroundActions = 0;
+    int captureHeatActions = 0;
+    int duplicateActions = 0;
+    int mateActions = 0;
+    int eatActions = 0;
+
+    int naturalMatingCount = 0;
+    for (int it = 0; it < actions.size(); it++) {
+        ActionDTO actionDto = actions.at(it);
+
+
+        Life * performer = getLifeFromId(actionDto.getPerformerId(), true);
+        Entity * subject = getEntityFromId(actionDto.getSubjectId(), true);
+
+        if (!performer->getEnergyManagement()->isAlive()) {
+            continue;
+        }
+
+        if (actionDto.getSubjectId() != 0 && (subject == nullptr || (subject != nullptr && !subject->isExists()))) {
+            continue;
+        }
+
+        if (actionDto.getType() == "EAT") {
+            performer->addEnergy(subject->getMass());
+            subject->setMass(0.0);
+
+            Life * foundLife = getLifeFromId(actionDto.getSubjectId(), true);
+            if (foundLife != nullptr) {
+                Point performerPosition = performer->getEntity()->getPosition();
+                Point tilePosition = performerPosition.getTileCoordinates();
+
+                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
+            }
+
+            Point performerPoint = performer->getEntity()->getPosition();
+            Point tilePoint = performerPoint.getTileCoordinates();
+
+            entityToDelete.emplace_back(subject);
+            eatActions++;
+        }
+
+        if (actionDto.getType() == "MATE") {
+            bool success = handleMating(performer, subject->getId());
+
+            if (success) {
+                naturalMatingCount++;
+                mateActions++;
+            }
+
+        }
+
+        if (actionDto.getType() == "DUPLICATE") {
+            bool success = handleDuplication(performer);
+
+            if (success) {
+                naturalMatingCount++;
+                duplicateActions++;
+            }
+
+        }
+
+        if (actionDto.getType() == "CAPTURE_GROUND") {
+            lostEnergy += handleCaptureGround(performer, actionDto);
+            captureGroundActions++;
+
+        }
+
+        if (actionDto.getType() == "CAPTURE_HEAT") {
+            handleCaptureHeat(performer, actionDto);
+            captureHeatActions++;
+        }
+
+
+
+    }
+
+    actions.clear();
+
+    return lostEnergy;
+}
+
+void Chunk::handleCaptureHeat(Life * life, ActionDTO action) {
+
+}
+
+double Chunk::handleCaptureGround(Life * life, ActionDTO action) {
+    int chunkReach = life->getEntity()->getSize() / 5.0;
+
+    chunkReach = std::max(double(chunkReach), 1.0);
+
+
+    double totalGround = 0.0;
+    int ratioSize = (chunkReach * 2) + 1;
+    double ratios[ratioSize * ratioSize];
+
+    Point entityPoint = life->getEntity()->getPosition();
+    Point tilePoint = entityPoint.getTileCoordinates();
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            Tile * currentTile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, true);
+
+            totalGround += currentTile->getGround();
+        }
+    }
+
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            Tile * tile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, false);
+            double ratio = tile->getGround() / totalGround;
+            int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
+            ratios[currentIndex] = ratio;
+        }
+    }
+////
+    double totalAimedEnergy = action.getValue() * totalGround;
+//
+    double totalCollectedEnergy = 0;
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
+
+            double currentRatio = ratios[currentIndex] * 0.01;
+            Tile * tile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, false);
+
+            double tileEnergy = tile->getGround();
+            double tileCollectedEnergy = (currentRatio * totalAimedEnergy);
+
+            if (tileEnergy - tileCollectedEnergy < 0) {
+                std::cout << "Error while removing from ground: " << tileEnergy - tileCollectedEnergy << std::endl;
+            }
+
+            totalCollectedEnergy += tileCollectedEnergy;
+            tile->removeGround(tileCollectedEnergy);
+        }
+    }
+
+    double totalGroundAfter = 0.0;
+    for (int it = -chunkReach; it <= chunkReach; it++) {
+        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
+            int currentTileX = tilePoint.getX() + it;
+            int currentTileY = tilePoint.getY() + jt;
+
+            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
+                continue;
+
+            Tile * currentTile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, false);
+
+            totalGroundAfter += currentTile->getGround();
+        }
+    }
+
+//    if (totalCollectedEnergy == 0) {
+//    }
+
+    double lifeEnergyBefore = life->getEnergyManagement()->getEnergy() + life->getEntity()->getMass();
+
+    double wastedEnergy = life->addEnergy(totalCollectedEnergy);
+
+    double lifeEnergyAfter = life->getEnergyManagement()->getEnergy() + life->getEntity()->getMass();
+
+//    std::cout << "Entity: " << (lifeEnergyBefore - lifeEnergyAfter) + (totalCollectedEnergy - wastedEnergy) << std::endl;
+
+    if (abs(totalGroundAfter - (totalGround - totalCollectedEnergy)) > 1) {
+        std::cout << "Aim: " << totalAimedEnergy << " TotalCollected: " << totalCollectedEnergy << " Before: " << totalGround << " After: " << totalGroundAfter << " Result: " << totalGround - totalCollectedEnergy << " Difference: " << totalGroundAfter - (totalGround - totalCollectedEnergy) << std::endl;
+    }
+
+
+    getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
+    getTileAt(tilePoint.getX(), tilePoint.getY())->processAddedHeat();
+
+    return ((lifeEnergyBefore - lifeEnergyAfter) + (totalCollectedEnergy - wastedEnergy)) + ((totalGround - totalGroundAfter) - totalCollectedEnergy);
+}
+
+
+bool Chunk::handleDuplication(Life * life) {
+
+    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
+
+    if (!fatherCanReproduce) {
+//        std::cout << "Father cannot reproduce" << std::endl;
+        return false;
+    }
+//
+    Life * child = this->nursery->Mate(life, nullptr);
+
+    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.f;
+
+    double givenFatherEnergy = std::min(life->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal);
+
+    double actualGivenFatherEnergy = life->getEnergyManagement()->removeEnergy(givenFatherEnergy);
+
+    if (givenFatherEnergy != actualGivenFatherEnergy) {
+        std::cout << "Wrong energy given" << std::endl;
+    }
+
+    double totalGivenEnergy = actualGivenFatherEnergy;
+
+    if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
+        child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
+        child->setMass(totalGivenEnergy / 2.0);
+        lifes.emplace_back(child);
+        lifesAdded.emplace_back(child);
+
+        vegetals.emplace_back(child);
+
+        return true;
+    }
+
+
+    Point childCoordinate = child->getEntity()->getPosition();
+    Point tileChildPosition = childCoordinate.getTileCoordinates();
+
+    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+
+
+    if (life->getEnergyManagement()->getEnergy() <= 0) {
+        lifesToDelete.emplace_back(life);
+    }
+
+//    if (givenMotherEnergy + givenFatherEnergy == 0) {
+//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
+//    } else {
+//        std::cout << "New Child " << std::endl;
+//
+//    }
+
+
+
+
+    return false;
+}
+
+
+
+
+
+bool Chunk::handleMating(Life * father, int entityId) {
+    Life * foundLife = getLifeFromId(entityId, true);
+    if (foundLife == nullptr) {
+        return false;
+    }
+
+    bool fatherCanReproduce = father->getEnergyManagement()->getEnergy() > father->getEntity()->getMass() / 2.f;
+    bool motherCanReproduce = foundLife->getEnergyManagement()->getEnergy() > father->getEntity()->getMass() / 2.f;
+
+    if (!fatherCanReproduce || !motherCanReproduce) {
+        return false;
+    }
+//
+    Life * child = this->nursery->Mate(father, foundLife);
+
+    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.0;
+
+    double givenFatherEnergy = std::min(father->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal / 2.0);
+    double givenMotherEnergy = std::min(foundLife->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal / 2.0);
+
+    double actualGivenFatherEnergy = father->getEnergyManagement()->removeEnergy(givenFatherEnergy);
+    double actualGivenMotherEnergy = foundLife->getEnergyManagement()->removeEnergy(givenMotherEnergy);
+
+    if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
+        std::cout << "Wrong energy given" << std::endl;
+    }
+
+    double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
+
+    if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
+        child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
+        child->setMass(totalGivenEnergy / 2.0);
+        lifes.emplace_back(child);
+        lifesAdded.emplace_back(child);
+
+        creatures.emplace_back(child);
+
+        return true;
+    }
+
+
+    Point childCoordinate = child->getEntity()->getPosition();
+    Point tileChildPosition = childCoordinate.getTileCoordinates();
+
+    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+
+
+    if (father->getEnergyManagement()->getEnergy() <= 0) {
+        lifesToDelete.emplace_back(father);
+    }
+    if (foundLife->getEnergyManagement()->getEnergy() <= 0) {
+        lifesToDelete.emplace_back(foundLife);
+    }
+
+//    if (givenMotherEnergy + givenFatherEnergy == 0) {
+//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
+//    } else {
+//        std::cout << "New Child " << std::endl;
+//
+//    }
+
+
+
+
+    return false;
+}
+
+Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
+    for (int it = 0; it < this->lifes.size(); it++) {
+        if (this->lifes.at(it)->getEntity()->getId() == id) {
+            return this->lifes.at(it);
+        }
+    }
+
+    if (!askNeighbours)
+        return nullptr;
+
+    Life * found = nullptr;
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            Life * neighbourResponse = neighbour->getLifeFromId(id, false);
+
+            if (neighbourResponse != nullptr) {
+                found = neighbourResponse;
+            }
+
+        }
+    }
+
+
+
+    return found;
+}
+
+Entity * Chunk::getEntityFromId(int id, bool askNeighbours) {
+    for (int it = 0; it < this->entities.size(); it++) {
+        if (this->entities.at(it)->getId() == id) {
+            return this->entities.at(it);
+        }
+    }
+
+    if (!askNeighbours)
+        return nullptr;
+
+    Entity * found = nullptr;
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            Entity * neighbourResponse = neighbour->getEntityFromId(id, false);
+
+            if (neighbourResponse != nullptr) {
+                found = neighbourResponse;
+            }
+
+        }
+    }
+
+
+
+    return found;
+}
+
+const std::vector<Life *> &Chunk::getLifes() const {
+    return lifes;
+}
+
+void Chunk::setLifes(const std::vector<Life *> &lifes) {
+    Chunk::lifes = lifes;
+}
+
+const std::vector<Entity *> &Chunk::getEntities() const {
+    return entities;
+}
+
+void Chunk::setEntities(const std::vector<Entity *> &entities) {
+    Chunk::entities = entities;
+}
 

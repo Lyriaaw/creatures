@@ -24,6 +24,10 @@ std::vector<ActionDTO> Genitals::prepareActionDTO(std::vector<Entity *> accessib
     float smallestDistance = FARM_WIDTH;
 
     for (int it = 0; it < accessibleEntities.size(); it++) {
+        if (accessibleEntities.at(it)->getId() == this->entity->getId()) {
+            continue;
+        }
+
         float distanceX = abs(accessibleEntities.at(it)->getPosition().getX() - genitalsX);
         float distanceY = abs(accessibleEntities.at(it)->getPosition().getY() - genitalsY);
 

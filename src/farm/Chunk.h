@@ -8,6 +8,7 @@
 
 #include <vector>
 #include "life/Life.h"
+#include "CreatureNursery.h"
 
 
 class Chunk {
@@ -31,9 +32,17 @@ private:
 
     std::string step;
 
+    CreatureNursery * nursery;
+
+    std::vector<Life *> lifesAdded;
+    std::vector<Life *> lifesToDelete;
+
+    std::vector<Entity *> entityAdded;
+    std::vector<Entity *> entityToDelete;
+
 public:
 
-    Chunk(Point chunkPosition);
+    Chunk(Point chunkPosition, CreatureNursery * nursery);
 
     void generateRandomChunk(int seed, float min, float max);
 
@@ -45,13 +54,42 @@ public:
 
     void processClimate();
 
-    Tile *getRelativeTile(int tileX, int tileY);
+    Tile *getRelativeTile(int tileX, int tileY, bool debug);
 
     const std::string &getStep() const;
 
     void waitForNeighbours(std::vector<std::string> requestedSteps);
 
     const Point &getChunkPosition() const;
+
+    std::vector<Entity *> getRelativeEntities(int tileX, int tileY);
+    std::vector<Entity *> getEntitiesAt(int tileX, int tileY);
+
+    const std::vector<ActionDTO> &getActions() const;
+
+    void setActions(const std::vector<ActionDTO> &actions);
+
+    double executeCreaturesActions();
+
+    void handleCaptureHeat(Life *life, ActionDTO action);
+
+    double handleCaptureGround(Life *life, ActionDTO action);
+
+    bool handleDuplication(Life *life);
+
+    bool handleMating(Life *father, int entityId);
+
+    Life *getLifeFromId(int id, bool askNeighbours);
+
+    Entity *getEntityFromId(int id, bool askNeighbours);
+
+    const std::vector<Life *> &getLifes() const;
+
+    void setLifes(const std::vector<Life *> &lifes);
+
+    const std::vector<Entity *> &getEntities() const;
+
+    void setEntities(const std::vector<Entity *> &entities);
 };
 
 
