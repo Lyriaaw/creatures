@@ -69,11 +69,11 @@ public:
 
     void setActions(const std::vector<ActionDTO> &actions);
 
-    double executeCreaturesActions();
+    void executeCreaturesActions();
 
     void handleCaptureHeat(Life *life, ActionDTO action);
 
-    double handleCaptureGround(Life *life, ActionDTO action);
+    void handleCaptureGround(Life *life, ActionDTO action);
 
     bool handleDuplication(Life *life);
 
@@ -90,6 +90,22 @@ public:
     const std::vector<Entity *> &getEntities() const;
 
     void setEntities(const std::vector<Entity *> &entities);
+
+    const std::vector<Life *> &getLifesAdded() const;
+
+    void setLifesAdded(const std::vector<Life *> &lifesAdded);
+
+    const std::vector<Life *> &getLifesToDelete() const;
+
+    void setLifesToDelete(const std::vector<Life *> &lifesToDelete);
+
+    const std::vector<Entity *> &getEntityAdded() const;
+
+    void setEntityAdded(const std::vector<Entity *> &entityAdded);
+
+    const std::vector<Entity *> &getEntityToDelete() const;
+
+    void setEntityToDelete(const std::vector<Entity *> &entityToDelete);
 };
 
 

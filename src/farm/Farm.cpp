@@ -364,16 +364,19 @@ void Farm::executeCreaturesActions() {
     double totalLostEnergy(0.0);
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            totalLostEnergy += getChunkAt(it, jt)->executeCreaturesActions();
+            Chunk * chunk = getChunkAt(it, jt);
+            chunk->executeCreaturesActions();
 
-            std::vector<Life *> currentLifesAdded;
-            std::vector<Life *> currentLifesToDelete;
+            std::vector<Life *> currentLifesAdded = chunk->getLifesAdded();
+            std::vector<Life *> currentLifesToDelete = chunk->getLifesToDelete();
 
-            std::vector<Entity *> currentEntityAdded;
-            std::vector<Entity *> currentEntityToDelete;
+            std::vector<Entity *> currentEntityAdded = chunk->getEntityAdded();
+            std::vector<Entity *> currentEntityToDelete = chunk->getEntityToDelete();
 
+            lifes.insert(lifes.end(), currentLifesAdded.begin(), currentLifesAdded.end());
             lifesAdded.insert(lifesAdded.end(), currentLifesAdded.begin(), currentLifesAdded.end());
             lifesToDelete.insert(lifesToDelete.end(), currentLifesToDelete.begin(), currentLifesToDelete.end());
+            entities.insert(entities.end(), currentEntityAdded.begin(), currentEntityAdded.end());
             entityAdded.insert(entityAdded.end(), currentEntityAdded.begin(), currentEntityAdded.end());
             entityToDelete.insert(entityToDelete.end(), currentEntityToDelete.begin(), currentEntityToDelete.end());
 
@@ -781,7 +784,7 @@ void Farm::statistics() {
 
     int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
 
-    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << " Lost: " << lastLostEnergy << std::endl;
+    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << " Ground: " << totalGround - dataAnalyser.getGroundEnergy()->getLastValue() << " Lost: " << lastLostEnergy << std::endl;
 
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
@@ -879,6 +882,7 @@ void Farm::removeDeletedEntities() {
             Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
 
             getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addGround(currentLife->getEntity()->getMass());
+            getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addHeat(currentLife->getEnergyManagement()->getEnergy());
         } else {
             newLifes.emplace_back(lifes.at(it));
         }

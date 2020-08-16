@@ -32,12 +32,14 @@ void Tile::setGround(double ground) {
     std::lock_guard<std::mutex> guard(add_ground_mutex);
     this->ground = ground;
 }
-void Tile::removeGround(double removedGround) {
-    if (ground < 0) {
-        std::cout << "Setting ground to " << ground << std::endl;
+double Tile::removeGround(double removedGround) {
+    if (ground - removedGround < 0) {
+        std::cout << "Error removing ground : " << ground << " - " << removedGround << std::endl;
     }
     std::lock_guard<std::mutex> guard(add_ground_mutex);
     this->ground -= removedGround;
+
+    return removedGround;
 }
 
 void Tile::addGround(double value) {
@@ -51,13 +53,13 @@ void Tile::addHeat(double value) {
 }
 
 void Tile::processAddedHeat() {
-    ground += addedGround;
-    addedGround = 0;
+    heat += addedHeat;
+    addedHeat = 0;
 }
 
 void Tile::processAddedGround() {
-    heat += addedHeat;
-    addedHeat = 0;
+    ground += addedGround;
+    addedGround = 0;
 }
 
 

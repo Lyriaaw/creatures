@@ -53,7 +53,7 @@ public:
 
     double getAddedGround() const;
 
-    void removeGround(double ground);
+    double removeGround(double ground);
 };
 
 

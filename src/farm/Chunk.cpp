@@ -366,9 +366,11 @@ void Chunk::setActions(const std::vector<ActionDTO> &actions) {
 
 
 
-double Chunk::executeCreaturesActions() {
-
-    double lostEnergy(0.0);
+void Chunk::executeCreaturesActions() {
+    this->lifesToDelete.clear();
+    this->entityToDelete.clear();
+    this->lifesAdded.clear();
+    this->entityAdded.clear();
 
     int captureGroundActions = 0;
     int captureHeatActions = 0;
@@ -432,7 +434,7 @@ double Chunk::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "CAPTURE_GROUND") {
-            lostEnergy += handleCaptureGround(performer, actionDto);
+            handleCaptureGround(performer, actionDto);
             captureGroundActions++;
 
         }
@@ -447,15 +449,13 @@ double Chunk::executeCreaturesActions() {
     }
 
     actions.clear();
-
-    return lostEnergy;
 }
 
 void Chunk::handleCaptureHeat(Life * life, ActionDTO action) {
 
 }
 
-double Chunk::handleCaptureGround(Life * life, ActionDTO action) {
+void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
     int chunkReach = life->getEntity()->getSize() / 5.0;
 
     chunkReach = std::max(double(chunkReach), 1.0);
@@ -523,8 +523,7 @@ double Chunk::handleCaptureGround(Life * life, ActionDTO action) {
                 std::cout << "Error while removing from ground: " << tileEnergy - tileCollectedEnergy << std::endl;
             }
 
-            totalCollectedEnergy += tileCollectedEnergy;
-            tile->removeGround(tileCollectedEnergy);
+            totalCollectedEnergy += tile->removeGround(tileCollectedEnergy);
         }
     }
 
@@ -543,26 +542,11 @@ double Chunk::handleCaptureGround(Life * life, ActionDTO action) {
         }
     }
 
-//    if (totalCollectedEnergy == 0) {
-//    }
-
-    double lifeEnergyBefore = life->getEnergyManagement()->getEnergy() + life->getEntity()->getMass();
-
     double wastedEnergy = life->addEnergy(totalCollectedEnergy);
 
-    double lifeEnergyAfter = life->getEnergyManagement()->getEnergy() + life->getEntity()->getMass();
+    getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
+    getTileAt(tilePoint.getX(), tilePoint.getY())->processAddedGround();
 
-//    std::cout << "Entity: " << (lifeEnergyBefore - lifeEnergyAfter) + (totalCollectedEnergy - wastedEnergy) << std::endl;
-
-    if (abs(totalGroundAfter - (totalGround - totalCollectedEnergy)) > 1) {
-        std::cout << "Aim: " << totalAimedEnergy << " TotalCollected: " << totalCollectedEnergy << " Before: " << totalGround << " After: " << totalGroundAfter << " Result: " << totalGround - totalCollectedEnergy << " Difference: " << totalGroundAfter - (totalGround - totalCollectedEnergy) << std::endl;
-    }
-
-
-    getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
-    getTileAt(tilePoint.getX(), tilePoint.getY())->processAddedHeat();
-
-    return ((lifeEnergyBefore - lifeEnergyAfter) + (totalCollectedEnergy - wastedEnergy)) + ((totalGround - totalGroundAfter) - totalCollectedEnergy);
 }
 
 
@@ -604,7 +588,10 @@ bool Chunk::handleDuplication(Life * life) {
     Point childCoordinate = child->getEntity()->getPosition();
     Point tileChildPosition = childCoordinate.getTileCoordinates();
 
-    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    getRelativeTile(tileChildPosition.getX() - deltaX, tileChildPosition.getY() - deltaY, false)->addGround(totalGivenEnergy);
 
 
     if (life->getEnergyManagement()->getEnergy() <= 0) {
@@ -779,3 +766,34 @@ void Chunk::setEntities(const std::vector<Entity *> &entities) {
     Chunk::entities = entities;
 }
 
+const std::vector<Life *> &Chunk::getLifesAdded() const {
+    return lifesAdded;
+}
+
+void Chunk::setLifesAdded(const std::vector<Life *> &lifesAdded) {
+    Chunk::lifesAdded = lifesAdded;
+}
+
+const std::vector<Life *> &Chunk::getLifesToDelete() const {
+    return lifesToDelete;
+}
+
+void Chunk::setLifesToDelete(const std::vector<Life *> &lifesToDelete) {
+    Chunk::lifesToDelete = lifesToDelete;
+}
+
+const std::vector<Entity *> &Chunk::getEntityAdded() const {
+    return entityAdded;
+}
+
+void Chunk::setEntityAdded(const std::vector<Entity *> &entityAdded) {
+    Chunk::entityAdded = entityAdded;
+}
+
+const std::vector<Entity *> &Chunk::getEntityToDelete() const {
+    return entityToDelete;
+}
+
+void Chunk::setEntityToDelete(const std::vector<Entity *> &entityToDelete) {
+    Chunk::entityToDelete = entityToDelete;
+}
