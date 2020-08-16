@@ -41,7 +41,7 @@ void GroundEnergyMinimap::draw(sf::RenderWindow *window) {
 void GroundEnergyMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            values[it][jt] = farm->getMap()->getTileAt(it, jt)->getGround() / 10000.f;
+            values[it][jt] = farm->getTileAt(it, jt)->getGround() / 10000.f;
         }
     }
 }

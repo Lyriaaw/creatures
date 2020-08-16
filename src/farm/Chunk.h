@@ -40,6 +40,10 @@ public:
     void generateNeighbours();
 
     void setNeighbour(int it, int jt, Chunk *neighbour);
+
+    void processClimate();
+
+    Tile *getRelativeTile(int tileX, int tileY);
 };
 
 

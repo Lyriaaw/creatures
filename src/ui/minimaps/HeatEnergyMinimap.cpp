@@ -44,7 +44,7 @@ void HeatEnergyMinimap::draw(sf::RenderWindow *window) {
 void HeatEnergyMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            values[it][jt] = farm->getMap()->getTileAt(it, jt)->getHeat() / 1000.f;
+            values[it][jt] = farm->getTileAt(it, jt)->getHeat() / 1000.f;
         }
     }
 }

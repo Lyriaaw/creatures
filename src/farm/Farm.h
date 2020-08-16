@@ -33,7 +33,7 @@ private:
 
     std::vector<Entity *> entities;
 
-    Map * map;
+//    Map * map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
 
@@ -89,9 +89,6 @@ public:
     const std::vector<Entity *> &getEntities() const;
 
     static std::string getHumanReadableEnergy(float givenEnergy) ;
-
-
-    Map *getMap() const;
 
 
 

@@ -33,18 +33,30 @@ void Tile::setGround(double ground) {
 }
 
 void Tile::addGround(double value) {
-    ground += value;
+    addedGround += value;
 }
 
 void Tile::addHeat(double value) {
-    heat += value;
+    addedHeat += value;
 }
+
+void Tile::processAddedHeat() {
+    ground += addedGround;
+    addedGround = 0;
+}
+
+void Tile::processAddedGround() {
+    heat += addedHeat;
+    addedHeat = 0;
+}
+
+
 
 void Tile::addHeight(double value) {
     height += value;
 }
 
-Tile::Tile(const Point &position) : position(position), heat(0.0), ground(0.0), height(0.0) {}
+Tile::Tile(const Point &position) : position(position), heat(0.0), ground(0.0), height(0.0), addedHeat(0.0), addedGround(0.0) {}
 
 const Point &Tile::getPosition() const {
     return position;

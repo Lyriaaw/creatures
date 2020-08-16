@@ -15,6 +15,9 @@ private:
     double heat;
     double ground;
 
+    double addedHeat;
+    double addedGround;
+
 public:
     Tile(const Point &position);
 
@@ -35,6 +38,10 @@ public:
     void addGround(double value);
 
     const Point &getPosition() const;
+
+    void processAddedGround();
+
+    void processAddedHeat();
 };
 
 

@@ -90,8 +90,8 @@ void Farm::InitFromRandom() {
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
-    map = new Map();
-    map->initRandomMap(seed);
+//    map = new Map();
+//    map->initRandomMap(seed);
 
 
     std::vector<std::vector<std::vector<Entity *>>> testEntites;
@@ -283,7 +283,7 @@ void Farm::moveCreatures() {
         newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
 
         double releasedHeat = currentLife->giveawayEnergy();
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
+        getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
         if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
             this->lifesToDelete.emplace_back(currentLife);
@@ -334,7 +334,7 @@ void Farm::executeCreaturesActions() {
                 Point performerPosition = performer->getEntity()->getPosition();
                 Point tilePosition = performerPosition.getTileCoordinates();
 
-                map->getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
+                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
             }
 
             Point performerPoint = performer->getEntity()->getPosition();
@@ -424,7 +424,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
             if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
                 continue;
 
-            totalGround += map->getTileAt(currentTileX, currentTileY)->getGround();
+            totalGround += getTileAt(currentTileX, currentTileY)->getGround();
         }
     }
 
@@ -436,7 +436,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
             if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
                 continue;
 
-            Tile * tile = map->getTileAt(currentTileX, currentTileY);
+            Tile * tile = getTileAt(currentTileX, currentTileY);
             double ratio = tile->getGround() / totalGround;
             int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
             ratios[currentIndex] = ratio;
@@ -456,7 +456,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
 
             int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
             double currentRatio = ratios[currentIndex] * 0.01;
-            double tileEnergy = map->getTileAt(currentTileX, currentTileY)->getGround();
+            double tileEnergy = getTileAt(currentTileX, currentTileY)->getGround();
             double tileCollectedEnergy = (currentRatio * totalAimedEnergy);
 
             if (tileEnergy - tileCollectedEnergy < 0) {
@@ -464,7 +464,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
             }
 
             totalCollectedEnergy += tileCollectedEnergy;
-            map->getTileAt(currentTileX, currentTileY)->setGround(tileEnergy - tileCollectedEnergy);
+            getTileAt(currentTileX, currentTileY)->setGround(tileEnergy - tileCollectedEnergy);
         }
     }
 
@@ -473,7 +473,7 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
     double wastedEnergy = life->addEnergy(totalCollectedEnergy);
 
 
-    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
+    getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
 
 
 }
@@ -517,7 +517,7 @@ bool Farm::handleDuplication(Life * life) {
     Point childCoordinate = child->getEntity()->getPosition();
     Point tileChildPosition = childCoordinate.getTileCoordinates();
 
-    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
 
     if (life->getEnergyManagement()->getEnergy() <= 0) {
@@ -585,7 +585,7 @@ bool Farm::handleMating(Life * father, int entityId) {
     Point childCoordinate = child->getEntity()->getPosition();
     Point tileChildPosition = childCoordinate.getTileCoordinates();
 
-    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+    getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
 
     if (father->getEnergyManagement()->getEnergy() <= 0) {
@@ -658,7 +658,8 @@ void Farm::populationControl() {
         lifesAdded.emplace_back(child);
     }
 
-    map->removeEnergyFromGround(totalEnergyRemoved);
+    // TODO
+//    map->removeEnergyFromGround(totalEnergyRemoved);
 
 
 
@@ -670,7 +671,11 @@ void Farm::populationControl() {
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    map->processClimate();
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            chunks.at(it).at(jt)->processClimate();
+        }
+    }
 
 //    random_device rd;
 //    mt19937 mt(rd());
@@ -798,8 +803,8 @@ void Farm::statistics() {
     double totalGround = 0.0;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            totalHeat += map->getTileAt(it, jt)->getHeat();
-            totalGround += map->getTileAt(it, jt)->getGround();
+            totalHeat += getTileAt(it, jt)->getHeat();
+            totalGround += getTileAt(it, jt)->getGround();
         }
     }
 
@@ -883,7 +888,7 @@ void Farm::removeDeletedEntities() {
             Point currentLifePosition = currentLife->getEntity()->getPosition();
             Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
 
-            map->getTileAt(currentLifeTilePosition.getX(), currentLifeTilePosition.getY())->addGround(currentLife->getEntity()->getMass());
+            getTileAt(currentLifeTilePosition.getX(), currentLifeTilePosition.getY())->addGround(currentLife->getEntity()->getMass());
         } else {
             newLifes.emplace_back(lifes.at(it));
         }
@@ -967,7 +972,7 @@ std::vector<Tile *> Farm::getAccessibleTiles(std::vector<Point> selectedChunks) 
     for (int jt = 0; jt < selectedChunks.size(); jt++) {
         Point currentTilePoint = selectedChunks.at(jt);
 
-        Tile * currentTile = map->getTileAt(currentTilePoint.getX(), currentTilePoint.getY());
+        Tile * currentTile = getTileAt(currentTilePoint.getX(), currentTilePoint.getY());
 
         accessibleTiles.emplace_back(currentTile);
     }
@@ -1109,10 +1114,6 @@ void Farm::setDataAnalyser(const DataAnalyser &dataAnalyser) {
 
 const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
     return entityGrid;
-}
-
-Map *Farm::getMap() const {
-    return map;
 }
 
 const vector<Life *> &Farm::getLifes() const {

@@ -79,3 +79,132 @@ Tile * Chunk::getTileAt(int tileX, int tileY) {
 void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
     neighbours.at(it + 1).at(jt + 1) = neighbour;
 }
+
+
+void Chunk::processClimate() {
+    float newGround[TILE_PER_CHUNK][TILE_PER_CHUNK];
+    float newHeats[TILE_PER_CHUNK][TILE_PER_CHUNK];
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * currentTile = getRelativeTile(it, jt);
+            currentTile->processAddedGround();
+            currentTile->processAddedHeat();
+
+            newGround[it][jt] = currentTile->getGround();
+            newHeats[it][jt] = currentTile->getHeat();
+        }
+    }
+
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * currentTile = tiles.at(it).at(jt);
+
+            double availableGround = currentTile->getGround() / 100.0;
+
+
+            float currentHeight = currentTile->getHeight();
+            double availableHeat = currentTile->getHeat() / 10.0;
+
+            if (availableGround == 0 && availableHeat == 0) {
+                continue;
+            }
+
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    int totalX = it + x + deltaX;
+                    int totalY = jt + y + deltaY;
+                    if (it + x + deltaX < 0 || it + x + deltaX >= TILE_COUNT_WIDTH ||jt + y + deltaY < 0 || jt + y + deltaY >= TILE_COUNT_HEIGHT) {
+                        continue;
+                    }
+
+                    Tile * relativeTile = getRelativeTile(it + x, jt + y);
+
+                    // If the other tile is lower than this one, we add some heat to be transfer
+                    // the lowest the target tile, the biggest is the added energy
+                    double heightDifference = (currentHeight - getRelativeTile(it + x, jt + y)->getHeight()) / 5.f;
+
+                    double transferedHeat = availableHeat + (heightDifference * availableHeat);
+                    relativeTile->addHeat(transferedHeat);
+                    newHeats[it][jt] -= transferedHeat;
+
+
+
+
+                    double transferedGround = availableGround + (heightDifference * availableGround);
+                    relativeTile->addGround(transferedGround);
+                    newGround[it][jt] -= transferedGround;
+                }
+            }
+
+        }
+    }
+
+
+
+
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * currentTile = getRelativeTile(it, jt);
+
+            if (newGround[it][jt] < 0) {
+                std::cout << "Climate to ground " << newGround[it][jt] << std::endl;
+            }
+            currentTile->setGround(newGround[it][jt]);
+            currentTile->setHeat(newHeats[it][jt]);
+
+            currentTile->processAddedHeat();
+            currentTile->processAddedGround();
+
+            if (currentTile->getHeat() <= 0) {
+                continue;
+            }
+
+            float heatToGroundRatio = 0.01f;
+            float currentTileHeat = currentTile->getHeat();
+
+            currentTile->setHeat(currentTile->getHeat() - (currentTileHeat * heatToGroundRatio));
+            currentTile->addGround(currentTileHeat * heatToGroundRatio);
+
+            currentTile->processAddedGround();
+        }
+    }
+
+}
+
+Tile * Chunk::getRelativeTile(int tileX, int tileY) {
+
+    if (tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK) {
+        int ratioX = 0;
+        if (tileX < 0)
+            ratioX = -1;
+        if (tileX >= TILE_PER_CHUNK)
+            ratioX = 1;
+
+        int ratioY = 0;
+        if (tileY < 0)
+            ratioY = -1;
+        if (tileY >= TILE_PER_CHUNK)
+            ratioY = 1;
+
+        int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+        int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+        int requestedX = deltaX + tileX;
+        int requestedY = deltaY + tileY;
+
+        return neighbours.at(ratioX + 1).at(ratioY + 1)->getTileAt(requestedX, requestedY);
+    }
+
+    Tile * tile = tiles.at(tileX).at(tileY);
+    return tile;
+}
+
+
+
+
