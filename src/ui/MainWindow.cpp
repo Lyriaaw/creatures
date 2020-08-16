@@ -126,10 +126,10 @@ void MainWindow::start() {
     farmUi->setPositions(mainCamera, nullptr);
 
     running = true;
-//    std::thread farmThread = runFarmLoop();
+    std::thread farmThread = runFarmLoop();
 
     runLoop();
-//    farmThread.join();
+    farmThread.join();
 }
 
 
@@ -152,10 +152,10 @@ void MainWindow::runLoop() {
 
     while (running) {
         handleEvents();
-
-        farm->Tick(paused);
-
-        farmUi->update();
+//
+//        farm->Tick(paused);
+//
+//        farmUi->update();
 
 
         updateInformationLabel();

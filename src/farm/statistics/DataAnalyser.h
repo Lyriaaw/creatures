@@ -45,6 +45,7 @@ private:
     DataItem * foodEnergy;
     DataItem * creaturesMass;
     DataItem * creaturesEnergy;
+    DataItem * energyToAdd;
 
     DataItem * heatEnergy;
     DataItem * groundEnergy;
@@ -134,6 +135,8 @@ public:
     DataItem *getDuplicateActions() const;
 
     DataItem *getMateActions() const;
+
+    DataItem *getEnergyToAdd() const;
 };
 
 

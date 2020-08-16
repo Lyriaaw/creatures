@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <thread>
 #include "../utils/perlin/PerlinNoise.h"
 
 
@@ -671,63 +672,24 @@ void Farm::populationControl() {
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    std::thread climateThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
+
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            chunks.at(it).at(jt)->processClimate();
+            auto f = [](Chunk * chunk) {
+                chunk->processClimate();
+            };
+
+            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+
+            climateThreads[index] = std::thread(f, chunks.at(it).at(jt));
         }
     }
 
-//    random_device rd;
-//    mt19937 mt(rd());
-//    uniform_real_distribution<double> distWidth(0, TILE_SIZE);
-//    uniform_real_distribution<double> distHeight(0, TILE_SIZE);
-//
-//
-//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-//            Tile * currentTile = map->getTileAt(it, jt);
-//
-//
-//            float tileX = it * TILE_SIZE;
-//            float tileY = jt * TILE_SIZE;
-//
-//            float tileAvailableEnergy = currentTile->getGround();
-//
-//
-//            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
-//            float totalEnergyAdded = 0.f;
-//
-////            if (tileAvailableEnergy > 1950) {
-////                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
-////            }
-//
-//            for (int it = 0; it < foodToGenerate; it++) {
-//                int x = distWidth(mt);
-//                int y = distHeight(mt);
-//
-//                Point point(tileX + x, tileY + y);
-//
-//
-//                //        float foodSize = ((rand() % 300) / 100.f) + 2;
-//                float foodSize = 2;
-//
-//                Food * entity = new Food(point, foodSize);
-//                entity->setMass(2000.0);
-//
-//                totalEnergyAdded += entity->getMass();
-//
-//
-//                entities.emplace_back(entity);
-//                entityAdded.emplace_back(entity);
-//            }
-//
-//            currentTile->addGround(-1 * totalEnergyAdded);
-//
-//        }
-//    }
-//
-//
 
+    for (int it = 0; it < CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT; it++) {
+        climateThreads[it].join();
+    }
 
 
 
@@ -801,15 +763,19 @@ void Farm::statistics() {
 
     double totalHeat = 0.0;
     double totalGround = 0.0;
+    double totalToAdd = 0.0;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             totalHeat += getTileAt(it, jt)->getHeat();
             totalGround += getTileAt(it, jt)->getGround();
+            totalToAdd += getTileAt(it, jt)->getAddedHeat();
+            totalToAdd += getTileAt(it, jt)->getAddedGround();
         }
     }
 
 
-    int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround;
+    int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
+
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsMass);
@@ -817,6 +783,7 @@ void Farm::statistics() {
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
+    dataAnalyser.getEnergyToAdd()->addValue(totalToAdd);
 
 
 
@@ -888,7 +855,7 @@ void Farm::removeDeletedEntities() {
             Point currentLifePosition = currentLife->getEntity()->getPosition();
             Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
 
-            getTileAt(currentLifeTilePosition.getX(), currentLifeTilePosition.getY())->addGround(currentLife->getEntity()->getMass());
+            getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addGround(currentLife->getEntity()->getMass());
         } else {
             newLifes.emplace_back(lifes.at(it));
         }

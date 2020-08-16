@@ -90,6 +90,7 @@ void StatisticsScreen::loadGraphs() {
     energyGraph->addLine(farm->getDataAnalyser().getHeatEnergy(), 1, 255, 0, 0);
     energyGraph->addLine(farm->getDataAnalyser().getGroundEnergy(), 1, 0, 255, 0);
     energyGraph->addLine(farm->getDataAnalyser().getCreaturesMass(), 1, 255, 255, 0);
+    energyGraph->addLine(farm->getDataAnalyser().getEnergyToAdd(), 1, 255, 0, 255);
 
 
     energyGraph->windowResized(windowWidth, windowHeight);

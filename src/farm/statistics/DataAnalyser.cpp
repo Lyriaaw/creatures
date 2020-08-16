@@ -32,6 +32,7 @@ DataAnalyser::DataAnalyser() {
     heatEnergy = new DataItem("heatEnergy", true);
     groundEnergy = new DataItem("groundEnergy", true);
     creaturesMass = new DataItem("creaturesMass", true);
+    energyToAdd = new DataItem("energyToAdd", true);
 
     averageScore = new DataItem("averageScore", true);
     bestScore = new DataItem("bestScore", true);
@@ -208,4 +209,8 @@ DataItem *DataAnalyser::getMateActions() const {
 
 DataItem *DataAnalyser::getEatActions() const {
     return eatActions;
+}
+
+DataItem *DataAnalyser::getEnergyToAdd() const {
+    return energyToAdd;
 }

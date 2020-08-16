@@ -7,6 +7,7 @@
 
 
 #include "../utils/Point.h"
+#include <shared_mutex>
 
 class Tile {
 private:
@@ -17,6 +18,11 @@ private:
 
     double addedHeat;
     double addedGround;
+
+    std::mutex add_heat_mutex;
+    std::mutex add_ground_mutex;
+
+
 
 public:
     Tile(const Point &position);
@@ -42,6 +48,10 @@ public:
     void processAddedGround();
 
     void processAddedHeat();
+
+    double getAddedHeat() const;
+
+    double getAddedGround() const;
 };
 
 

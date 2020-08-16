@@ -29,6 +29,8 @@ private:
     std::vector<std::vector<Tile *>> tiles;
     std::vector<std::vector<Chunk *>> neighbours;
 
+    std::string step;
+
 public:
 
     Chunk(Point chunkPosition);
@@ -44,6 +46,12 @@ public:
     void processClimate();
 
     Tile *getRelativeTile(int tileX, int tileY);
+
+    const std::string &getStep() const;
+
+    void waitForNeighbours(std::vector<std::string> requestedSteps);
+
+    const Point &getChunkPosition() const;
 };
 
 

@@ -33,10 +33,12 @@ void Tile::setGround(double ground) {
 }
 
 void Tile::addGround(double value) {
+    std::lock_guard<std::mutex> guard(add_ground_mutex);
     addedGround += value;
 }
 
 void Tile::addHeat(double value) {
+    std::lock_guard<std::mutex> guard(add_heat_mutex);
     addedHeat += value;
 }
 
@@ -60,4 +62,12 @@ Tile::Tile(const Point &position) : position(position), heat(0.0), ground(0.0), 
 
 const Point &Tile::getPosition() const {
     return position;
+}
+
+double Tile::getAddedHeat() const {
+    return addedHeat;
+}
+
+double Tile::getAddedGround() const {
+    return addedGround;
 }

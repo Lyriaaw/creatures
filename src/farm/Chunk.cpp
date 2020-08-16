@@ -2,10 +2,11 @@
 // Created by Amalric Lombard de Buffières on 8/15/20.
 //
 
+#include <zconf.h>
 #include "Chunk.h"
 #include "../utils/perlin/PerlinNoise.h"
 
-Chunk::Chunk(Point chunkPosition): chunkPosition(chunkPosition) {
+Chunk::Chunk(Point chunkPosition): chunkPosition(chunkPosition), step("init") {
     generateNeighbours();
 }
 
@@ -41,7 +42,7 @@ void Chunk::generateRandomChunk(int seed, float min, float max) {
             height *= ratio;
             height *= height * height;
 
-            Tile * currentTile = new Tile(Point(it, jt));
+            Tile * currentTile = new Tile(Point(it + deltaX, jt + deltaY));
             currentTile->setHeight(height);
             currentTile->setGround(1500.0);
 
@@ -81,9 +82,53 @@ void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
 }
 
 
+void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
+
+    bool allNeighboursReady(true);
+
+    do {
+        allNeighboursReady = true;
+
+        for (int it = 0; it < 3; it++) {
+            for (int jt = 0; jt < 3; jt++) {
+
+                Chunk * neighbour = neighbours.at(it).at(jt);
+
+                if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                    continue;
+
+                bool found(false);
+                for (int kt = 0; kt < requestedSteps.size(); kt++) {
+                    if (neighbour->getStep() == requestedSteps.at(kt)) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    allNeighboursReady = false;
+                }
+
+            }
+        }
+
+        if (!allNeighboursReady) {
+            usleep(100);
+        }
+
+    }while (!allNeighboursReady);
+}
+
 void Chunk::processClimate() {
-    float newGround[TILE_PER_CHUNK][TILE_PER_CHUNK];
-    float newHeats[TILE_PER_CHUNK][TILE_PER_CHUNK];
+
+
+    double newGround[TILE_PER_CHUNK][TILE_PER_CHUNK];
+    double newHeats[TILE_PER_CHUNK][TILE_PER_CHUNK];
+
+    this->step = "CLIMATE_START";
+    std::vector<std::string> steps;
+    steps.emplace_back("CLIMATE_READY");
+    steps.emplace_back("CLIMATE_START");
+    waitForNeighbours(steps);
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
@@ -96,18 +141,24 @@ void Chunk::processClimate() {
         }
     }
 
-
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    this->step = "CLIMATE_READY";
+    steps.clear();
+    steps.emplace_back("CLIMATE_READY");
+    steps.emplace_back("CLIMATE_SPREAD");
+    waitForNeighbours(steps);
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
             Tile * currentTile = tiles.at(it).at(jt);
+//            std::cout << "Processing climate on tile X: " << currentTile->getPosition().getX() << " Y: " << currentTile->getPosition().getY() << std::endl;
 
             double availableGround = currentTile->getGround() / 100.0;
 
 
-            float currentHeight = currentTile->getHeight();
+            double currentHeight = currentTile->getHeight();
             double availableHeat = currentTile->getHeat() / 10.0;
 
             if (availableGround == 0 && availableHeat == 0) {
@@ -123,10 +174,15 @@ void Chunk::processClimate() {
                     }
 
                     Tile * relativeTile = getRelativeTile(it + x, jt + y);
+//
+//                    if (relativeTile->getPosition().equals(currentTile->getPosition())) {
+//                        continue;
+//                    }
+
 
                     // If the other tile is lower than this one, we add some heat to be transfer
                     // the lowest the target tile, the biggest is the added energy
-                    double heightDifference = (currentHeight - getRelativeTile(it + x, jt + y)->getHeight()) / 5.f;
+                    double heightDifference = (currentHeight - relativeTile->getHeight()) / 5.f;
 
                     double transferedHeat = availableHeat + (heightDifference * availableHeat);
                     relativeTile->addHeat(transferedHeat);
@@ -144,6 +200,24 @@ void Chunk::processClimate() {
         }
     }
 
+
+
+    this->step = "CLIMATE_SPREAD";
+    steps.clear();
+    steps.emplace_back("CLIMATE_SPREAD");
+    steps.emplace_back("CLIMATE_FINISHED");
+    waitForNeighbours(steps);
+
+
+//    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+//        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+//            Tile * currentTile = getRelativeTile(it, jt);
+//            currentTile->setGround(newGround[it][jt]);
+//            currentTile->setHeat(newHeats[it][jt]);
+//            currentTile->processAddedGround();
+//            currentTile->processAddedHeat();
+//        }
+//    }
 
 
 
@@ -175,6 +249,8 @@ void Chunk::processClimate() {
         }
     }
 
+    this->step = "CLIMATE_FINISHED";
+
 }
 
 Tile * Chunk::getRelativeTile(int tileX, int tileY) {
@@ -198,11 +274,21 @@ Tile * Chunk::getRelativeTile(int tileX, int tileY) {
         int requestedX = deltaX + tileX;
         int requestedY = deltaY + tileY;
 
-        return neighbours.at(ratioX + 1).at(ratioY + 1)->getTileAt(requestedX, requestedY);
+        Tile * foundTile = neighbours.at(ratioX + 1).at(ratioY + 1)->getTileAt(requestedX, requestedY);
+
+        return foundTile;
     }
 
     Tile * tile = tiles.at(tileX).at(tileY);
     return tile;
+}
+
+const std::string &Chunk::getStep() const {
+    return step;
+}
+
+const Point &Chunk::getChunkPosition() const {
+    return chunkPosition;
 }
 
 
