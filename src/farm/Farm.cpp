@@ -221,8 +221,9 @@ void Farm::handleBigThread() {
             Chunk * chunk = getChunkAt(it, jt);
 
             auto f = [](Chunk * chunk) {
-                chunk->processClimate();
                 chunk->generateEntityGrid();
+                chunk->handleEnergyGiveaway();
+                chunk->processClimate();
                 chunk->brainProcessing();
                 chunk->executeCreaturesActions();
                 chunk->moveCreatures();

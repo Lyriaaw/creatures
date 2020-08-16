@@ -19,113 +19,73 @@ Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chun
     }
 }
 
-void Chunk::generateNeighbours() {
-    for (int it = -1; it <= 1; it++) {
-        std::vector<Chunk *> neighbourgsLine;
-        for (int jt = -1; jt <= 1; jt++) {
-            neighbourgsLine.emplace_back(nullptr);
-        }
-        neighbours.emplace_back(neighbourgsLine);
-    }
-}
 
-void Chunk::generateRandomChunk(int seed, float min, float max) {
-    PerlinNoise perlin(seed);
+void Chunk::generateEntityGrid() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    float removed = ((max - min) / 2.f) + min;
-    float ratio = (1.f / (max - min)) * 2.f;
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "ENTITY_GRID";
+    steps.emplace_back("ENTITY_GRID");
+    steps.emplace_back("ENERGY_GIVEAWAY");
+    waitForNeighbours(steps);
+
+    processImportedAndExportedLifes();
 
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
-        std::vector<Tile *> line;
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
-
-            float xComponent = (float(it + deltaX) / float(TILE_COUNT_WIDTH)) * 2.5;
-            float yComponent = (float(jt + deltaY) / float(TILE_COUNT_HEIGHT)) * 2.5;
-
-            float height = perlin.noise(xComponent, yComponent, 0.8);
-
-            height -= removed;
-            height *= ratio;
-            height *= height * height;
-
-            Tile * currentTile = new Tile(Point(it + deltaX, jt + deltaY));
-            currentTile->setHeight(height);
-            currentTile->setGround(1500.0);
-
-            line.emplace_back(currentTile);
-
-            currentTile->setHeight(height);
-
+            entityGrid.at(it).at(jt).clear();
         }
-        tiles.emplace_back(line);
+    }
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Point position = lifes.at(it)->getEntity()->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+        Point chunkCoordinates = position.getSimpleCoordinates();
+
+        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(lifes.at(it)->getEntity());
+    }
+
+    for (int it = 0; it < entities.size(); it++) {
+        Point position = entities.at(it)->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+        Point chunkCoordinates = position.getSimpleCoordinates();
+
+        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(entities.at(it));
     }
 }
 
-Tile * Chunk::getTileAt(int tileX, int tileY) {
-    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
-        std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
-        return tiles.at(0).at(0);
-    }
+void Chunk::handleEnergyGiveaway() {
 
-    Point requestedChunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
+    std::vector<std::string> steps;
+    steps.clear();
 
-    if (!requestedChunkPosition.equals(chunkPosition)) {
-        std::cout << "ERROR, REQUESTED TILE IN WRONG CHUNK: X: " << tileX << " Y: " << tileY << " | ";
-        std::cout << " CHUNK: X: " << tileX / TILE_PER_CHUNK << " Y: " << tileY / TILE_PER_CHUNK << " | ";
-        std::cout << "CURRENT CHUNK => X: " << chunkPosition.getX() << " Y: " << chunkPosition.getY() << std::endl;
-        return tiles.at(0).at(0);
-    }
-
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
-
-    Tile * tile = tiles.at(tileX - deltaX).at(tileY - deltaY);
-
-    return tile;
-}
-
-void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
-    neighbours.at(it + 1).at(jt + 1) = neighbour;
-}
+    this->step = "ENERGY_GIVEAWAY";
+    steps.emplace_back("ENERGY_GIVEAWAY");
+    steps.emplace_back("CLIMATE_START");
+    waitForNeighbours(steps);
 
 
-void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+        Point entityPoint = currentLife->getEntity()->getPosition();
+        Point tilePoint = entityPoint.getTileCoordinates();
 
-    bool allNeighboursReady(true);
+        double releasedHeat = currentLife->giveawayEnergy();
+        getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
-    do {
-        allNeighboursReady = true;
-
-        for (int it = 0; it < 3; it++) {
-            for (int jt = 0; jt < 3; jt++) {
-
-                Chunk * neighbour = neighbours.at(it).at(jt);
-
-                if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
-                    continue;
-
-                bool found(false);
-                for (int kt = 0; kt < requestedSteps.size(); kt++) {
-                    if (neighbour->getStep() == requestedSteps.at(kt)) {
-                        found = true;
-                    }
-                }
-
-                if (!found) {
-                    allNeighboursReady = false;
-                }
-
-            }
+        if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
+            this->lifesToDelete.emplace_back(currentLife);
         }
 
-        if (!allNeighboursReady) {
-            usleep(100);
-        }
+    }
 
-    }while (!allNeighboursReady);
+    removeDeletedEntities();
+
 }
 
 void Chunk::processClimate() {
@@ -262,6 +222,273 @@ void Chunk::processClimate() {
 
 }
 
+void Chunk::brainProcessing() {
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "BRAIN_PROCESSING";
+    steps.emplace_back("BRAIN_PROCESSING");
+    steps.emplace_back("EXECUTE_ACTIONS");
+    waitForNeighbours(steps);
+
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+        currentLife->processSelectedTiles();
+    }
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+
+
+        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedTiles());
+        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedTiles());
+
+        currentLife->processSensors(accessibleEntities, accessibleTiles);
+
+
+        currentLife->processBrain();
+
+        std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
+        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+
+    }
+}
+
+void Chunk::executeCreaturesActions() {
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "EXECUTE_ACTIONS";
+    steps.emplace_back("EXECUTE_ACTIONS");
+    steps.emplace_back("MOVE_CREATURES");
+    waitForNeighbours(steps);
+
+
+    int captureGroundActions = 0;
+    int captureHeatActions = 0;
+    int duplicateActions = 0;
+    int mateActions = 0;
+    int eatActions = 0;
+
+    int naturalMatingCount = 0;
+    for (int it = 0; it < actions.size(); it++) {
+        ActionDTO actionDto = actions.at(it);
+
+
+        Life * performer = getLifeFromId(actionDto.getPerformerId(), true);
+        Entity * subject = getEntityFromId(actionDto.getSubjectId(), true);
+
+        if (!performer->getEnergyManagement()->isAlive()) {
+            continue;
+        }
+
+        if (actionDto.getSubjectId() != 0 && (subject == nullptr || (subject != nullptr && !subject->isExists()))) {
+            continue;
+        }
+
+        if (actionDto.getType() == "EAT") {
+            performer->addEnergy(subject->getMass());
+            subject->setMass(0.0);
+
+            Life * foundLife = getLifeFromId(actionDto.getSubjectId(), true);
+            if (foundLife != nullptr) {
+                Point performerPosition = performer->getEntity()->getPosition();
+                Point tilePosition = performerPosition.getTileCoordinates();
+
+                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
+            }
+
+            Point performerPoint = performer->getEntity()->getPosition();
+            Point tilePoint = performerPoint.getTileCoordinates();
+
+            entityToDelete.emplace_back(subject);
+            eatActions++;
+        }
+
+        if (actionDto.getType() == "MATE") {
+            bool success = handleMating(performer, subject->getId());
+
+            if (success) {
+                naturalMatingCount++;
+                mateActions++;
+            }
+
+        }
+
+        if (actionDto.getType() == "DUPLICATE") {
+            bool success = handleDuplication(performer);
+
+            if (success) {
+                naturalMatingCount++;
+                duplicateActions++;
+            }
+
+        }
+
+        if (actionDto.getType() == "CAPTURE_GROUND") {
+            handleCaptureGround(performer, actionDto);
+            captureGroundActions++;
+
+        }
+
+        if (actionDto.getType() == "CAPTURE_HEAT") {
+            handleCaptureHeat(performer, actionDto);
+            captureHeatActions++;
+        }
+
+    }
+
+    removeDeletedEntities();
+
+
+
+    actions.clear();
+}
+
+void Chunk::moveCreatures() {
+
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "MOVE_CREATURES";
+    steps.emplace_back("MOVE_CREATURES");
+    waitForNeighbours(steps);
+
+
+    std::vector<Life *> exportedLifes;
+    for (int it = 0; it < lifes.size(); it++) {
+        Life *currentLife = lifes.at(it);
+        Point entityPoint = currentLife->getEntity()->getPosition();
+        Point tilePoint = entityPoint.getTileCoordinates();
+
+        std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
+//        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
+
+        checkForLifeTransfer(currentLife);
+    }
+
+
+
+
+
+    removeDeletedEntities();
+
+}
+
+
+
+void Chunk::generateNeighbours() {
+    for (int it = -1; it <= 1; it++) {
+        std::vector<Chunk *> neighbourgsLine;
+        for (int jt = -1; jt <= 1; jt++) {
+            neighbourgsLine.emplace_back(nullptr);
+        }
+        neighbours.emplace_back(neighbourgsLine);
+    }
+}
+
+void Chunk::generateRandomChunk(int seed, float min, float max) {
+    PerlinNoise perlin(seed);
+
+    float removed = ((max - min) / 2.f) + min;
+    float ratio = (1.f / (max - min)) * 2.f;
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        std::vector<Tile *> line;
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+
+            float xComponent = (float(it + deltaX) / float(TILE_COUNT_WIDTH)) * 2.5;
+            float yComponent = (float(jt + deltaY) / float(TILE_COUNT_HEIGHT)) * 2.5;
+
+            float height = perlin.noise(xComponent, yComponent, 0.8);
+
+            height -= removed;
+            height *= ratio;
+            height *= height * height;
+
+            Tile * currentTile = new Tile(Point(it + deltaX, jt + deltaY));
+            currentTile->setHeight(height);
+            currentTile->setGround(1500.0);
+
+            line.emplace_back(currentTile);
+
+            currentTile->setHeight(height);
+
+        }
+        tiles.emplace_back(line);
+    }
+}
+
+Tile * Chunk::getTileAt(int tileX, int tileY) {
+    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
+        std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
+        return tiles.at(0).at(0);
+    }
+
+    Point requestedChunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
+
+    if (!requestedChunkPosition.equals(chunkPosition)) {
+        std::cout << "ERROR, REQUESTED TILE IN WRONG CHUNK: X: " << tileX << " Y: " << tileY << " | ";
+        std::cout << " CHUNK: X: " << tileX / TILE_PER_CHUNK << " Y: " << tileY / TILE_PER_CHUNK << " | ";
+        std::cout << "CURRENT CHUNK => X: " << chunkPosition.getX() << " Y: " << chunkPosition.getY() << std::endl;
+        return tiles.at(0).at(0);
+    }
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    Tile * tile = tiles.at(tileX - deltaX).at(tileY - deltaY);
+
+    return tile;
+}
+
+void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
+    neighbours.at(it + 1).at(jt + 1) = neighbour;
+}
+
+
+void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
+
+    bool allNeighboursReady(true);
+
+    do {
+        allNeighboursReady = true;
+
+        for (int it = 0; it < 3; it++) {
+            for (int jt = 0; jt < 3; jt++) {
+
+                Chunk * neighbour = neighbours.at(it).at(jt);
+
+                if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                    continue;
+
+                bool found(false);
+                for (int kt = 0; kt < requestedSteps.size(); kt++) {
+                    if (neighbour->getStep() == requestedSteps.at(kt)) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    allNeighboursReady = false;
+                }
+
+            }
+        }
+
+        if (!allNeighboursReady) {
+            usleep(100);
+        }
+
+    }while (!allNeighboursReady);
+}
+
+
+
 Tile * Chunk::getRelativeTile(int tileX, int tileY, bool debug) {
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
@@ -372,135 +599,10 @@ void Chunk::setActions(const std::vector<ActionDTO> &actions) {
 }
 
 
-void Chunk::brainProcessing() {
-    std::vector<std::string> steps;
-    steps.clear();
-
-    this->step = "BRAIN_PROCESSING";
-    steps.emplace_back("BRAIN_PROCESSING");
-    steps.emplace_back("EXECUTE_ACTIONS");
-    waitForNeighbours(steps);
-
-
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-        currentLife->processSelectedTiles();
-    }
-
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-
-
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedTiles());
-        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedTiles());
-
-        currentLife->processSensors(accessibleEntities, accessibleTiles);
-
-
-        currentLife->processBrain();
-
-        std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
-        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
-
-    }
-}
 
 
 
-void Chunk::executeCreaturesActions() {
-    std::vector<std::string> steps;
-    steps.clear();
 
-    this->step = "EXECUTE_ACTIONS";
-    steps.emplace_back("EXECUTE_ACTIONS");
-    steps.emplace_back("MOVE_CREATURES");
-    waitForNeighbours(steps);
-
-    this->lifesToDelete.clear();
-    this->entityToDelete.clear();
-    this->lifesAdded.clear();
-    this->entityAdded.clear();
-
-    int captureGroundActions = 0;
-    int captureHeatActions = 0;
-    int duplicateActions = 0;
-    int mateActions = 0;
-    int eatActions = 0;
-
-    int naturalMatingCount = 0;
-    for (int it = 0; it < actions.size(); it++) {
-        ActionDTO actionDto = actions.at(it);
-
-
-        Life * performer = getLifeFromId(actionDto.getPerformerId(), true);
-        Entity * subject = getEntityFromId(actionDto.getSubjectId(), true);
-
-        if (!performer->getEnergyManagement()->isAlive()) {
-            continue;
-        }
-
-        if (actionDto.getSubjectId() != 0 && (subject == nullptr || (subject != nullptr && !subject->isExists()))) {
-            continue;
-        }
-
-        if (actionDto.getType() == "EAT") {
-            performer->addEnergy(subject->getMass());
-            subject->setMass(0.0);
-
-            Life * foundLife = getLifeFromId(actionDto.getSubjectId(), true);
-            if (foundLife != nullptr) {
-                Point performerPosition = performer->getEntity()->getPosition();
-                Point tilePosition = performerPosition.getTileCoordinates();
-
-                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
-            }
-
-            Point performerPoint = performer->getEntity()->getPosition();
-            Point tilePoint = performerPoint.getTileCoordinates();
-
-            entityToDelete.emplace_back(subject);
-            eatActions++;
-        }
-
-        if (actionDto.getType() == "MATE") {
-            bool success = handleMating(performer, subject->getId());
-
-            if (success) {
-                naturalMatingCount++;
-                mateActions++;
-            }
-
-        }
-
-        if (actionDto.getType() == "DUPLICATE") {
-            bool success = handleDuplication(performer);
-
-            if (success) {
-                naturalMatingCount++;
-                duplicateActions++;
-            }
-
-        }
-
-        if (actionDto.getType() == "CAPTURE_GROUND") {
-            handleCaptureGround(performer, actionDto);
-            captureGroundActions++;
-
-        }
-
-        if (actionDto.getType() == "CAPTURE_HEAT") {
-            handleCaptureHeat(performer, actionDto);
-            captureHeatActions++;
-        }
-
-    }
-
-    removeDeletedEntities();
-
-
-
-    actions.clear();
-}
 
 
 void Chunk::removeDeletedEntities() {
@@ -582,35 +684,45 @@ void Chunk::removeDeletedEntities() {
     vegetals = newVegetals;
 }
 
-void Chunk::moveCreatures() {
-
-    std::vector<std::string> steps;
-    steps.clear();
-
-    this->step = "MOVE_CREATURES";
-    steps.emplace_back("MOVE_CREATURES");
-    waitForNeighbours(steps);
 
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-//        Point entityPoint = currentLife->getEntity()->getPosition();
-//        Point tilePoint = entityPoint.getTileCoordinates();
-//
-//        std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
-//
-//        double releasedHeat = currentLife->giveawayEnergy();
-//        getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
+void Chunk::checkForLifeTransfer(Life * life) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
-        if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
-            this->lifesToDelete.emplace_back(currentLife);
-        }
+    Point lifeSpawnPoint = life->getEntity()->getPosition();
+    Point tileLifeSpawnPoint = lifeSpawnPoint.getTileCoordinates();
 
+    int tileX = tileLifeSpawnPoint.getX() - deltaX;
+    int tileY = tileLifeSpawnPoint.getY() - deltaY;
+
+    if (!(tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK)) {
+        return;
     }
 
-    removeDeletedEntities();
+    int ratioX = 0;
+    if (tileX < 0)
+        ratioX = -1;
+    if (tileX >= TILE_PER_CHUNK)
+        ratioX = 1;
 
+    int ratioY = 0;
+    if (tileY < 0)
+        ratioY = -1;
+    if (tileY >= TILE_PER_CHUNK)
+        ratioY = 1;
+
+    int requestedX = deltaX + tileX;
+    int requestedY = deltaY + tileY;
+
+    neighbours.at(ratioX + 1).at(ratioY + 1)->transferLife(life);
+    exportedLifes.emplace_back(life);
 }
+
+void Chunk::transferLife(Life * life) {
+    importedLifes.emplace_back(life);
+}
+
 
 
 void Chunk::handleCaptureHeat(Life * life, ActionDTO action) {
@@ -1014,34 +1126,36 @@ std::vector<Tile *> Chunk::getAccessibleTiles(std::vector<Point> selectedTiles) 
 
 }
 
-void Chunk::generateEntityGrid() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+void Chunk::processImportedAndExportedLifes() {
+    std::vector<Life *> newLifes;
+    for (int it = 0; it < lifes.size(); it++) {
 
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+        bool found = false;
+        int foundIndex = -1;
+        for (int jt = 0; jt < exportedLifes.size(); jt++) {
+            if (lifes.at(it)->getEntity()->getId() == exportedLifes.at(jt)->getEntity()->getId()) {
+                found = true;
+                foundIndex = jt;
+            }
+        }
 
-    for (int it = 0; it < TILE_PER_CHUNK; it++) {
-        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
-            entityGrid.at(it).at(jt).clear();
+        if (!found) {
+            newLifes.emplace_back(lifes.at(it));
         }
     }
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Point position = lifes.at(it)->getEntity()->getPosition();
-        Point tileCoordinate = position.getTileCoordinates();
-        Point chunkCoordinates = position.getSimpleCoordinates();
+    lifes.clear();
+    lifes = newLifes;
 
-        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(lifes.at(it)->getEntity());
-    }
 
-    for (int it = 0; it < entities.size(); it++) {
-        Point position = entities.at(it)->getPosition();
-        Point tileCoordinate = position.getTileCoordinates();
-        Point chunkCoordinates = position.getSimpleCoordinates();
+    lifes.insert(lifes.end(), importedLifes.begin(), importedLifes.end());
 
-        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(entities.at(it));
-    }
+    importedLifes.clear();
+    exportedLifes.clear();
+
 }
+
+
 
 const std::vector<Life *> &Chunk::getCreatures() const {
     return creatures;

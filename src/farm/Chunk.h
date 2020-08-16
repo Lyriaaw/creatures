@@ -34,6 +34,9 @@ private:
 
     CreatureNursery * nursery;
 
+    std::vector<Life *> importedLifes;
+    std::vector<Life *> exportedLifes;
+
     std::vector<Life *> lifesAdded;
     std::vector<Life *> lifesToDelete;
 
@@ -136,6 +139,14 @@ public:
     void clearToDeleteEntities();
 
     void addLife(Life *life);
+
+    void handleEnergyGiveaway();
+
+    void transferLife(Life *life);
+
+    void checkForLifeTransfer(Life *life);
+
+    void processImportedAndExportedLifes();
 };
 
 
