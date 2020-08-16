@@ -18,7 +18,7 @@
 using namespace std;
 
 
-CreatureNursery::CreatureNursery(): evolutionLibrary(EvolutionLibrary()){
+CreatureNursery::CreatureNursery(): evolutionLibrary(new EvolutionLibrary()){
 }
 
 Life * CreatureNursery::generateCreatureFromRandom() {
@@ -128,18 +128,18 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
     life->connectSensorAndMuscles();
 
-    evolutionLibrary.addGenome(life->getEntity()->getId(), creatureGenome);
+    evolutionLibrary->addGenome(life->getEntity()->getId(), creatureGenome);
     return life;
 }
 
 
 Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
-    std::vector<Evolution *> fatherGenome = this->getEvolutionLibrary().getGenomeFor(father->getEntity()->getId());
+    std::vector<Evolution *> fatherGenome = this->getEvolutionLibrary()->getGenomeFor(father->getEntity()->getId());
     std::vector<Evolution *> motherGenome;
 
     if (mother != nullptr) {
-        motherGenome = this->getEvolutionLibrary().getGenomeFor(mother->getEntity()->getId());
+        motherGenome = this->getEvolutionLibrary()->getGenomeFor(mother->getEntity()->getId());
     }
 
     int maxGenerationNumber(0);
@@ -238,7 +238,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     }
 
     life->getBrain()->generateLinkGrid();
-    evolutionLibrary.addGenome(life->getEntity()->getId(), childGenome);
+    evolutionLibrary->addGenome(life->getEntity()->getId(), childGenome);
 
     life->connectSensorAndMuscles();
     return life;
@@ -358,12 +358,15 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 
     life->connectSensorAndMuscles();
 
-    evolutionLibrary.addGenome(life->getEntity()->getId(), creatureGenome);
+    evolutionLibrary->addGenome(life->getEntity()->getId(), creatureGenome);
     return life;
 }
 
 
+void CreatureNursery::setEvolutionLibrary(EvolutionLibrary *evolutionLibrary) {
+    CreatureNursery::evolutionLibrary = evolutionLibrary;
+}
 
-const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {
+EvolutionLibrary *CreatureNursery::getEvolutionLibrary() const {
     return evolutionLibrary;
 }

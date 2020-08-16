@@ -481,6 +481,8 @@ void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
 
             Tile * currentTile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, true);
 
+            currentTile->lockGroundMutex();
+
             totalGround += currentTile->getGround();
         }
     }
@@ -523,24 +525,12 @@ void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
                 std::cout << "Error while removing from ground: " << tileEnergy - tileCollectedEnergy << std::endl;
             }
 
-            totalCollectedEnergy += tile->removeGround(tileCollectedEnergy);
+            totalCollectedEnergy += tile->lockOwnerRemoveGround(tileCollectedEnergy);
+            tile->unlockGroundMutex();
         }
     }
 
-    double totalGroundAfter = 0.0;
-    for (int it = -chunkReach; it <= chunkReach; it++) {
-        for (int jt = -chunkReach; jt <= chunkReach; jt++) {
-            int currentTileX = tilePoint.getX() + it;
-            int currentTileY = tilePoint.getY() + jt;
 
-            if (currentTileX < 0 || currentTileX >= TILE_COUNT_WIDTH || currentTileY < 0 || currentTileY >= TILE_COUNT_HEIGHT)
-                continue;
-
-            Tile * currentTile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, false);
-
-            totalGroundAfter += currentTile->getGround();
-        }
-    }
 
     double wastedEnergy = life->addEnergy(totalCollectedEnergy);
 

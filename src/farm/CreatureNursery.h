@@ -20,7 +20,7 @@
 
 class CreatureNursery {
 private:
-    EvolutionLibrary evolutionLibrary;
+    EvolutionLibrary * evolutionLibrary;
 public:
     CreatureNursery();
 
@@ -29,7 +29,9 @@ public:
 
     Life * generateVegetalFromRandom();
 
-    const EvolutionLibrary &getEvolutionLibrary() const;
+    EvolutionLibrary *getEvolutionLibrary() const;
+
+    void setEvolutionLibrary(EvolutionLibrary *evolutionLibrary);
 };
 
 

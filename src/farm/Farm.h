@@ -22,10 +22,6 @@ private:
     std::vector<std::vector<Chunk *>> chunks;
 
 
-    double lastLostEnergy;
-
-
-
     std::vector<Life *> sorted;
 
     std::vector<Life *> lifes;

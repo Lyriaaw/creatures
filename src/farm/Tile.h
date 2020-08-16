@@ -54,6 +54,12 @@ public:
     double getAddedGround() const;
 
     double removeGround(double ground);
+
+    void unlockGroundMutex();
+
+    void lockGroundMutex();
+
+    double lockOwnerRemoveGround(double removedGround);
 };
 
 

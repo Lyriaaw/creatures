@@ -7,6 +7,8 @@
 
 
 void EvolutionLibrary::addGenome(int creatureIndex, std::vector<Evolution *> genome) {
+    std::lock_guard<std::mutex> guard(genome_mutex);
+
     creatureIndexes.emplace_back(creatureIndex);
     genomes.emplace_back(genome);
 }

@@ -396,7 +396,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
             if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
                 selectedLife = farm->getLifes().at(it);
 
-                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedLife->getEntity()->getId());
+                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary()->getGenomeFor(selectedLife->getEntity()->getId());
                 std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
 
                 if (brainUi != nullptr) {

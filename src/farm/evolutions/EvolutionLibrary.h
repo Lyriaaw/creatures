@@ -15,6 +15,9 @@ public:
 private:
     std::vector<int> creatureIndexes;
     std::vector<std::vector<Evolution *>> genomes;
+
+    std::mutex genome_mutex;
+
 };
 
 

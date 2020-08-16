@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <zconf.h>
 #include "Tile.h"
 
 double Tile::getHeight() const {
@@ -39,6 +40,13 @@ double Tile::removeGround(double removedGround) {
     std::lock_guard<std::mutex> guard(add_ground_mutex);
     this->ground -= removedGround;
 
+    return removedGround;
+}
+double Tile::lockOwnerRemoveGround(double removedGround) {
+    if (ground - removedGround < 0) {
+        std::cout << "Error removing ground : " << ground << " - " << removedGround << std::endl;
+    }
+    this->ground -= removedGround;
     return removedGround;
 }
 
@@ -81,3 +89,14 @@ double Tile::getAddedHeat() const {
 double Tile::getAddedGround() const {
     return addedGround;
 }
+
+void Tile::lockGroundMutex() {
+    while (!add_ground_mutex.try_lock()) {
+        usleep(10);
+    }
+}
+
+void Tile::unlockGroundMutex() {
+    add_ground_mutex.unlock();
+}
+

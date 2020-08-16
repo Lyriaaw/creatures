@@ -13,7 +13,7 @@
 
 using namespace std;
 
-Farm::Farm(): lastLostEnergy(0.0){
+Farm::Farm(){
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 }
@@ -361,11 +361,36 @@ void Farm::executeCreaturesActions() {
         }
     }
 
-    double totalLostEnergy(0.0);
+    std::thread actionThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
+
+
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
             Chunk * chunk = getChunkAt(it, jt);
-            chunk->executeCreaturesActions();
+
+            auto f = [](Chunk * chunk) {
+                chunk->executeCreaturesActions();
+            };
+
+            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+
+            actionThreads[index] = std::thread(f, chunks.at(it).at(jt));
+
+
+
+
+        }
+    }
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
+
+            actionThreads[index].join();
+
+
 
             std::vector<Life *> currentLifesAdded = chunk->getLifesAdded();
             std::vector<Life *> currentLifesToDelete = chunk->getLifesToDelete();
@@ -379,12 +404,8 @@ void Farm::executeCreaturesActions() {
             entities.insert(entities.end(), currentEntityAdded.begin(), currentEntityAdded.end());
             entityAdded.insert(entityAdded.end(), currentEntityAdded.begin(), currentEntityAdded.end());
             entityToDelete.insert(entityToDelete.end(), currentEntityToDelete.begin(), currentEntityToDelete.end());
-
         }
     }
-
-    lastLostEnergy = totalLostEnergy;
-
 
     removeDeletedEntities();
 
@@ -784,7 +805,7 @@ void Farm::statistics() {
 
     int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
 
-    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << " Ground: " << totalGround - dataAnalyser.getGroundEnergy()->getLastValue() << " Lost: " << lastLostEnergy << std::endl;
+//    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << " Ground: " << totalGround - dataAnalyser.getGroundEnergy()->getLastValue() << " Lost: " << lastLostEnergy << std::endl;
 
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
