@@ -290,6 +290,17 @@ void Chunk::executeCreaturesActions() {
         Life * performer = getLifeFromId(actionDto.getPerformerId(), true);
         Entity * subject = getEntityFromId(actionDto.getSubjectId(), true);
 
+        if (actionDto.getSubjectId() != 0 && subject == nullptr) {
+            Life * subjectLife = getLifeFromId(actionDto.getSubjectId(), true);
+            if (subjectLife == nullptr) {
+                std::cout << "ERROR: Subject not found in entities nor in lifes" << std::endl;
+                continue;
+            }
+
+            subject = subjectLife->getEntity();
+        }
+
+
         if (!performer->getEnergyManagement()->isAlive()) {
             continue;
         }
@@ -299,7 +310,6 @@ void Chunk::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
-            std::cout << "EATING" << std::endl;
             performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
 
@@ -352,10 +362,17 @@ void Chunk::executeCreaturesActions() {
     }
 
     removeDeletedEntities();
-
-
-
     actions.clear();
+
+    int totalActions = captureGroundActions + captureHeatActions + duplicateActions + mateActions + eatActions;
+
+    dataAnalyser->getTotalActions()->addRawToTick(tick, totalActions);
+    dataAnalyser->getCaptureGroundActions()->addRawToTick(tick, captureGroundActions);
+    dataAnalyser->getCaptureHeatActions()->addRawToTick(tick, captureHeatActions);
+    dataAnalyser->getDuplicateActions()->addRawToTick(tick, duplicateActions);
+    dataAnalyser->getMateActions()->addRawToTick(tick, mateActions);
+    dataAnalyser->getEatActions()->addRawToTick(tick, eatActions);
+
 }
 
 void Chunk::moveCreatures() {
@@ -1148,7 +1165,7 @@ void Chunk::handleCaptureHeat(Life * life, ActionDTO action) {
 void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
     int chunkReach = life->getEntity()->getSize() / 5.0;
 
-    chunkReach = std::max(double(chunkReach), 1.0);
+//    chunkReach = std::max(double(chunkReach), 1.0);
 
 
     double totalGround = 0.0;
@@ -1290,6 +1307,10 @@ bool Chunk::handleDuplication(Life * life) {
 bool Chunk::handleMating(Life * father, int entityId) {
     Life * foundLife = getLifeFromId(entityId, true);
     if (foundLife == nullptr) {
+        return false;
+    }
+
+    if (father->getType() != "ANIMAL" || foundLife->getType() != "ANIMAL") {
         return false;
     }
 

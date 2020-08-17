@@ -56,12 +56,34 @@ void DataItem::addRawToTick(int tick, double addedValue) {
 
     if (values.size() == tick) {
         values.emplace_back(addedValue);
+
+        if (addedValue > max) {
+            max = addedValue;
+        }
+
+        if (addedValue < min) {
+            min = addedValue;
+        }
+
+
+
         return;
     }
 
 
     double currentValue = values.at(tick);
     values[tick] = currentValue + addedValue;
+
+
+    if (currentValue + addedValue > max) {
+        max = currentValue + addedValue;
+    }
+
+    if (currentValue + addedValue < min) {
+        min = currentValue + addedValue;
+    }
+
+
 }
 void DataItem::setRawToTick(int tick, double newValue) {
     std::lock_guard<std::mutex> guard(data_mutex);
@@ -104,6 +126,10 @@ double DataItem::getAveragedLastValue() {
 
 
 double DataItem::getValueForTick(int tick) {
+    if (values.empty()) {
+        return 0;
+    }
+
     if (values.size() - 1 < tick) {
         tick = values.size() - 1;
     }
