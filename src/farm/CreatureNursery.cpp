@@ -35,7 +35,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     Brain * brain = new Brain();
 
 
-    Life * life = new Life();
+    Life * life = new Life("ANIMAL");
     life->setEntity(entity);
     life->setBrain(brain);
 
@@ -224,7 +224,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
     Brain * childBrain = new Brain();
 
-    Life * life = new Life();
+    Life * life = new Life(father->getType());
     life->setEntity(childEntity);
     life->setBrain(childBrain);
 
@@ -259,7 +259,7 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     entity->setBrightness(0.5f);
     Brain * brain = new Brain();
 
-    Life * life = new Life();
+    Life * life = new Life("VEGETAL");
     life->setEntity(entity);
     life->setBrain(brain);
 

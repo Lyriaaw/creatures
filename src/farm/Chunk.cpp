@@ -76,7 +76,12 @@ void Chunk::handleEnergyGiveaway() {
         Point tilePoint = entityPoint.getTileCoordinates();
 
         double releasedHeat = currentLife->giveawayEnergy();
-        getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
+
+        if (currentLife->getType() == "ANIMAL") {
+            getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
+        } else {
+            getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(releasedHeat);
+        }
 
         if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
             this->lifesToDelete.emplace_back(currentLife);
@@ -288,6 +293,7 @@ void Chunk::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
+            std::cout << "EATING" << std::endl;
             performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
 
@@ -643,45 +649,6 @@ void Chunk::removeDeletedEntities() {
 
     entities.clear();
     entities = newEntities;
-
-
-    std::vector<Life *> newCreatures;
-    for (int it = 0; it < creatures.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (creatures.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (!found) {
-            newCreatures.emplace_back(creatures.at(it));
-        }
-    }
-
-    creatures = newCreatures;
-
-    std::vector<Life *> newVegetals;
-    for (int it = 0; it < vegetals.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (vegetals.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (!found) {
-            newVegetals.emplace_back(vegetals.at(it));
-        }
-    }
-
-    vegetals = newVegetals;
 }
 
 
@@ -808,8 +775,8 @@ void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
 
     double wastedEnergy = life->addEnergy(totalCollectedEnergy);
 
-    getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(wastedEnergy);
-    getTileAt(tilePoint.getX(), tilePoint.getY())->processAddedHeat();
+    getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
+    getTileAt(tilePoint.getX(), tilePoint.getY())->processAddedGround();
 
 }
 
@@ -905,7 +872,6 @@ void Chunk::addLife(Life * life) {
 
     lifes.emplace_back(life);
     lifesAdded.emplace_back(life);
-    vegetals.emplace_back(life);
 }
 
 
@@ -943,8 +909,6 @@ bool Chunk::handleMating(Life * father, int entityId) {
         child->setMass(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
-
-        creatures.emplace_back(child);
 
         return true;
     }
@@ -1153,24 +1117,6 @@ void Chunk::processImportedAndExportedLifes() {
     importedLifes.clear();
     exportedLifes.clear();
 
-}
-
-
-
-const std::vector<Life *> &Chunk::getCreatures() const {
-    return creatures;
-}
-
-void Chunk::setCreatures(const std::vector<Life *> &creatures) {
-    Chunk::creatures = creatures;
-}
-
-const std::vector<Life *> &Chunk::getVegetals() const {
-    return vegetals;
-}
-
-void Chunk::setVegetals(const std::vector<Life *> &vegetals) {
-    Chunk::vegetals = vegetals;
 }
 
 void Chunk::clearAddedLifes() {

@@ -27,7 +27,11 @@ private:
     Brain * brain;
 
     EnergyManagement * energyManagement;
+
+    std::string type;
 public:
+    Life(const std::string &type);
+
     double giveawayEnergy();
 
     void processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
@@ -67,6 +71,8 @@ public:
 
     void setMass(double newMass);
     double addEnergy(double energy);
+
+    const std::string &getType() const;
 
 };
 

@@ -131,7 +131,6 @@ void Farm::InitFromRandom() {
         initialLife->setMass(creatureEnergy);
 
         lifes.push_back(initialLife);
-        creatures.push_back(initialLife);
     }
 
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
@@ -142,7 +141,6 @@ void Farm::InitFromRandom() {
         initialLife->setMass(creatureEnergy);
 
         lifes.push_back(initialLife);
-        vegetals.push_back(initialLife);
     }
 
     availableEnergy = 0.f;
@@ -373,9 +371,6 @@ void Farm::executeCreaturesActions() {
             entityToDelete.insert(entityToDelete.end(), currentEntityToDelete.begin(), currentEntityToDelete.end());
         }
     }
-
-    findVegetals();
-    findCreatures();
 
 
     actions.clear();
@@ -687,50 +682,6 @@ void Farm::removeDeletedEntities() {
     entities = newEntities;
 
 
-    std::vector<Life *> newCreatures;
-    for (int it = 0; it < creatures.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (creatures.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (!found) {
-            newCreatures.emplace_back(creatures.at(it));
-        }
-    }
-
-    creatures = newCreatures;
-
-    std::vector<Life *> newVegetals;
-    for (int it = 0; it < vegetals.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (vegetals.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (!found) {
-            newVegetals.emplace_back(vegetals.at(it));
-        }
-    }
-
-    vegetals = newVegetals;
-
-
-
-
-
-
-
 }
 
 std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedTiles) {
@@ -919,36 +870,7 @@ const vector<Entity *> &Farm::getEntityToDelete() const {
     return entityToDelete;
 }
 
-const vector<Life *> &Farm::getCreatures() const {
-    return creatures;
-}
 
-const vector<Life *> &Farm::getVegetals() const {
-    return vegetals;
-}
-
-void Farm::findVegetals(){
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
-
-            std::vector<Life *> chunkVegetals = chunk->getVegetals();
-
-            vegetals.insert(vegetals.begin(), chunkVegetals.begin(), chunkVegetals.end());
-        }
-    }
-}
-void Farm::findCreatures(){
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
-
-            std::vector<Life *> chunkCreatures = chunk->getCreatures();
-
-            creatures.insert(creatures.begin(), chunkCreatures.begin(), chunkCreatures.end());
-        }
-    }
-}
 
 
 
@@ -982,36 +904,6 @@ void Farm::setLifes(const vector<Life *> &lifes) {
 
 void Farm::setEntities(const vector<Entity *> &entities) {
     Farm::entities = entities;
-}
-
-std::vector<Life *> Farm::fetchVegetals() {
-    std::vector<Life *> foundVegetals;
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
-
-            std::vector<Life *> chunkVegetals = chunk->getVegetals();
-
-            foundVegetals.insert(foundVegetals.begin(), chunkVegetals.begin(), chunkVegetals.end());
-        }
-    }
-
-    return foundVegetals;
-}
-
-std::vector<Life *> Farm::fetchCreatures() {
-    std::vector<Life *> foundCreatures;
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
-
-            std::vector<Life *> chunkCreatures = chunk->getCreatures();
-
-            foundCreatures.insert(foundCreatures.begin(), chunkCreatures.begin(), chunkCreatures.end());
-        }
-    }
-
-    return foundCreatures;
 }
 
 std::vector<Life *> Farm::fetchLifes() {

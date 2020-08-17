@@ -247,3 +247,9 @@ double Life::addEnergy(double energy) {
     return wastedEnergy - convertedToMass;
 }
 
+const std::string &Life::getType() const {
+    return type;
+}
+
+Life::Life(const std::string &type) : type(type) {}
+

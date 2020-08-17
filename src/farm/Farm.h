@@ -25,10 +25,6 @@ private:
     std::vector<Life *> sorted;
 
     std::vector<Life *> lifes;
-
-    std::vector<Life *> creatures;
-    std::vector<Life *> vegetals;
-
     std::vector<Entity *> entities;
 
 //    Map * map;
@@ -104,9 +100,6 @@ public:
     const std::vector<Entity *> &getEntityToDelete() const;
     const std::vector<Life *> &getLifesToDelete() const;
 
-    const std::vector<Life *> &getCreatures() const;
-
-    const std::vector<Life *> &getVegetals() const;
 
 
     void clearAddedLifes();
@@ -133,11 +126,7 @@ public:
 
     void setEntities(const std::vector<Entity *> &entities);
 
-    void findCreatures();
-    void findVegetals();
 
-    std::vector<Life *> fetchCreatures();
-    std::vector<Life *> fetchVegetals();
 
 
     void handleBigThread();

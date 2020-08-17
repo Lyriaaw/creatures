@@ -45,14 +45,15 @@ void CreatureTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 
-    std::vector<Life *> currentLifes = farm->fetchCreatures();
+    std::vector<Life *> currentLifes = farm->fetchLifes();
 
     for (int it = 0; it < currentLifes.size(); it++) {
-        Point point = currentLifes.at(it)->getEntity()->getPosition();
-        Point tilePosition = point.getTileCoordinates();
-
-        values[int(tilePosition.getX())][int(tilePosition.getY())]++;
-        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentLifes.at(it)->getEntity()->getColor();
+        if (currentLifes.at(it)->getType() == "ANIMAL") {
+            Point point = currentLifes.at(it)->getEntity()->getPosition();
+            Point tilePosition = point.getTileCoordinates();
+            values[int(tilePosition.getX())][int(tilePosition.getY())]++;
+            averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentLifes.at(it)->getEntity()->getColor();
+        }
     }
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {

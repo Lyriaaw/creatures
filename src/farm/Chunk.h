@@ -17,10 +17,6 @@ private:
 
 
     std::vector<Life *> lifes;
-
-    std::vector<Life *> creatures;
-    std::vector<Life *> vegetals;
-
     std::vector<Entity *> entities;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
@@ -117,14 +113,6 @@ public:
     std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedTiles);
 
     void generateEntityGrid();
-
-    const std::vector<Life *> &getCreatures() const;
-
-    void setCreatures(const std::vector<Life *> &creatures);
-
-    const std::vector<Life *> &getVegetals() const;
-
-    void setVegetals(const std::vector<Life *> &vegetals);
 
     void removeDeletedEntities();
 
