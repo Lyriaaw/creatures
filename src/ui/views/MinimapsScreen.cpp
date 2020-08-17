@@ -32,7 +32,7 @@ void MinimapsScreen::init() {
     placeMinimap(4, 1, 1, groundMinimap);
 
 
-    chunkStepMinimap = new ChunkStepMinimap();
+    chunkStepMinimap = new ChunkStepMinimap(font);
     placeMinimap(4, 2, 1, chunkStepMinimap);
 
 

@@ -2,10 +2,62 @@
 // Created by Amalric Lombard de Buffières on 8/17/20.
 //
 
+
+int TMP_WINDOW_WIDTH = 2560;
+int TMP_WINDOW_HEIGHT = 1440;
+
+
 #include "ChunkStepMinimap.h"
 
 
-ChunkStepMinimap::ChunkStepMinimap() {
+ChunkStepMinimap::ChunkStepMinimap(sf::Font * font) {
+
+    steps.emplace_back("READY_TO_START");
+    colors.emplace_back(sf::Color(255, 255, 255, 255));
+
+    steps.emplace_back("ENTITY_GRID");
+    colors.emplace_back(sf::Color(55, 0, 0, 255));
+
+    steps.emplace_back("ENERGY_GIVEAWAY");
+    colors.emplace_back(sf::Color(255, 0, 0, 255));
+
+    steps.emplace_back("CLIMATE_START");
+    colors.emplace_back(sf::Color(0, 0, 55, 255));
+
+    steps.emplace_back("CLIMATE_READY");
+    colors.emplace_back(sf::Color(0, 0, 100, 255));
+
+    steps.emplace_back("CLIMATE_SPREAD");
+    colors.emplace_back(sf::Color(0, 0, 200, 255));
+
+    steps.emplace_back("BRAIN_PROCESSING");
+    colors.emplace_back(sf::Color(0, 0, 0, 255));
+
+    steps.emplace_back("EXECUTE_ACTIONS");
+    colors.emplace_back(sf::Color(55, 0, 55, 255));
+
+    steps.emplace_back("MOVE_CREATURES");
+    colors.emplace_back(sf::Color(100, 100, 100, 255));
+
+    steps.emplace_back("STATISTICS");
+    colors.emplace_back(sf::Color(0, 100, 0, 255));
+
+    steps.emplace_back("TICK_PASS");
+    colors.emplace_back(sf::Color(0, 200, 0, 255));
+
+
+
+
+    for (int it = 0; it < steps.size(); it++) {
+        sf::Text text;
+        text.setFont(*font);
+        text.setCharacterSize(15);
+        text.setString(steps.at(it));
+        text.setFillColor(colors.at(it));
+        text.setPosition(TMP_WINDOW_WIDTH - text.getGlobalBounds().width - 10, 0.1 * TMP_WINDOW_HEIGHT + (it * 20));
+        legends.emplace_back(text);
+    }
+
 }
 
 void ChunkStepMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
@@ -16,37 +68,12 @@ void ChunkStepMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
 
     sf::Color pixelColor = sf::Color(0, 0, 0, 255);
 
-    if (currentChunkStep == "READY_TO_START") {
-        pixelColor = sf::Color(255, 255, 255, 255);
-    }
-    if (currentChunkStep == "ENTITY_GRID") {
-        pixelColor = sf::Color(55, 55, 55, 255);
-    }
-    if (currentChunkStep == "ENERGY_GIVEAWAY") {
-        pixelColor = sf::Color(255, 0, 0, 255);
-    }
-    if (currentChunkStep == "CLIMATE_START") {
-        pixelColor = sf::Color(0, 55, 0, 255);
-    }
-    if (currentChunkStep == "CLIMATE_READY") {
-        pixelColor = sf::Color(0, 100, 0, 255);
-    }
-    if (currentChunkStep == "CLIMATE_SPREAD") {
-        pixelColor = sf::Color(55, 100, 0, 255);
-    }
-    if (currentChunkStep == "BRAIN_PROCESSING") {
-        pixelColor = sf::Color(0, 0, 55, 255);
-    }
-    if (currentChunkStep == "EXECUTE_ACTIONS") {
-        pixelColor = sf::Color(0, 0, 100, 255);
-    }
-    if (currentChunkStep == "MOVE_CREATURES") {
-        pixelColor = sf::Color(100, 0, 100, 255);
-    }
-    if (currentChunkStep == "STATISTICS") {
-        pixelColor = sf::Color(0, 0, 255, 255);
-    }
 
+    for (int it = 0; it < steps.size(); it++) {
+        if (steps.at(it) == currentChunkStep) {
+            pixelColor = colors.at(it);
+        }
+    }
 
 
 
@@ -61,8 +88,16 @@ void ChunkStepMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
 
 
 void ChunkStepMinimap::draw(sf::RenderWindow *window) {
+
+    for (int it = 0; it < steps.size(); it++) {
+        window->draw(legends.at(it));
+    }
+
     window->draw(vertexArray);
 }
+
+
+
 
 
 

@@ -29,6 +29,8 @@ private:
     EnergyManagement * energyManagement;
 
     std::string type;
+
+    int lastCaptureGroundage;
 public:
     Life(const std::string &type);
 

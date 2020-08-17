@@ -83,7 +83,7 @@ public:
 
     // In and Out
     void removeDeletedEntities();
-    void checkForLifeTransfer(Life *life);
+    bool checkForLifeTransfer(Life *life);
     void transferLife(Life *life);
     void addLife(Life *life);
     void processImportedAndExportedLifes();

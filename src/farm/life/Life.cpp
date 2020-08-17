@@ -35,7 +35,24 @@ std::vector<ActionDTO> Life::executeExternalActions(std::vector<Entity *> availa
     for (int it = 0; it < externalMuscles.size(); it++) {
         std::vector<ActionDTO> muscleActions = externalMuscles.at(it)->prepareActionDTO(availableEntities);
 
-        currentCreatureActions.insert(currentCreatureActions.begin(), muscleActions.begin(), muscleActions.end());
+        if (muscleActions.size() > 1) {
+            std::cout << muscleActions.size() << " action for muscle " << externalMuscles.at(it)->getName() << std::endl;
+        }
+
+        bool accepted = true;
+        for (int jt = 0; jt < muscleActions.size(); jt++) {
+            if (muscleActions.at(jt).getType() == "CAPTURE_GROUND") {
+                if (entity->getAge() - lastCaptureGroundage < 10) {
+                    accepted = false;
+                } else {
+                    lastCaptureGroundage = entity->getAge();
+                }
+            }
+        }
+
+        if (accepted) {
+            currentCreatureActions.insert(currentCreatureActions.begin(), muscleActions.begin(), muscleActions.end());
+        }
     }
     return currentCreatureActions;
 }
@@ -251,5 +268,5 @@ const std::string &Life::getType() const {
     return type;
 }
 
-Life::Life(const std::string &type) : type(type) {}
+Life::Life(const std::string &type) : type(type), lastCaptureGroundage(0) {}
 

@@ -53,7 +53,9 @@ void Chunk::generateEntityGrid() {
         Point tileCoordinate = position.getTileCoordinates();
         Point chunkCoordinates = position.getSimpleCoordinates();
 
-        entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(lifes.at(it)->getEntity());
+        if (!checkForLifeTransfer(lifes.at(it))) {
+            entityGrid.at(tileCoordinate.getX() - deltaX).at(tileCoordinate.getY() - deltaY).push_back(lifes.at(it)->getEntity());
+        }
     }
 
     for (int it = 0; it < entities.size(); it++) {
@@ -544,7 +546,6 @@ void Chunk::aTickHavePassed() {
 
 
 }
-
 
 void Chunk::populationControl() {
 
@@ -1048,7 +1049,7 @@ void Chunk::removeDeletedEntities() {
     entities = newEntities;
 }
 
-void Chunk::checkForLifeTransfer(Life * life) {
+bool Chunk::checkForLifeTransfer(Life * life) {
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
@@ -1059,7 +1060,7 @@ void Chunk::checkForLifeTransfer(Life * life) {
     int tileY = tileLifeSpawnPoint.getY() - deltaY;
 
     if (!(tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK)) {
-        return;
+        return false;
     }
 
     int ratioX = 0;
@@ -1079,6 +1080,7 @@ void Chunk::checkForLifeTransfer(Life * life) {
 
     neighbours.at(ratioX + 1).at(ratioY + 1)->transferLife(life);
     exportedLifes.emplace_back(life);
+    return true;
 }
 
 void Chunk::transferLife(Life * life) {
@@ -1222,7 +1224,7 @@ void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
 
             int currentIndex = ((it + chunkReach) * ratioSize) + (jt + chunkReach);
 
-            double currentRatio = ratios[currentIndex] * 0.01;
+            double currentRatio = ratios[currentIndex] * 0.1;
             Tile * tile = getRelativeTile(currentTileX - deltaX, currentTileY - deltaY, false);
 
             double tileEnergy = tile->getGround();

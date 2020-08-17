@@ -11,8 +11,14 @@
 class ChunkStepMinimap: public Minimap {
 private:
     double values[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
+
+    std::vector<std::string> steps;
+    std::vector<sf::Color> colors;
+
+    std::vector<sf::Text> legends;
+
 public:
-    ChunkStepMinimap();
+    ChunkStepMinimap(sf::Font * font);
 
     void setPixelColor(int tileX, int tileY, Farm *farm) override;
 
