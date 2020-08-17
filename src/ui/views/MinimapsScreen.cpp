@@ -32,6 +32,12 @@ void MinimapsScreen::init() {
     placeMinimap(4, 1, 1, groundMinimap);
 
 
+    chunkStepMinimap = new ChunkStepMinimap();
+    placeMinimap(4, 2, 1, chunkStepMinimap);
+
+
+
+
 
     background = sf::RectangleShape(sf::Vector2f(0, 0));
     background.setPosition(0, 0);
