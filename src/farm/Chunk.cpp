@@ -598,8 +598,12 @@ void Chunk::populationControl() {
 //
 //        childCreature->setPosition(childCreaturePosition);
 
-        totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyManagement()->getEnergy();
+        double removedEnergy = child->getEntity()->getMass() + child->getEnergyManagement()->getEnergy();
 
+        std::vector<Point> *empty = new std::vector<Point>();
+        Point entityPoint = childCreature->getPosition();
+        Point entityChunkPoint = entityPoint.getSimpleCoordinates();
+        removeEnergy(entityChunkPoint, removedEnergy, empty);
 
         addLife(child);
     }
@@ -610,6 +614,77 @@ void Chunk::populationControl() {
 
 
 }
+
+
+void Chunk::removeEnergy(Point targetChunk, double energyToRemove, std::vector<Point> *visitedPoints) {
+    for (int it = 0; it < visitedPoints->size(); it++) {
+        if (chunkPosition.equals(visitedPoints->at(it))) {
+            return;
+        }
+    }
+
+    visitedPoints->emplace_back(chunkPosition);
+
+
+    if (chunkPosition.equals(targetChunk)) {
+
+        double totalGround = 0.0;
+
+        for (int it = 0; it < TILE_PER_CHUNK; it++) {
+            for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+                Tile * currentTile = getRelativeTile(it, jt, false);
+                currentTile->lockGroundMutex();
+
+                totalGround += currentTile->getGround();
+            }
+        }
+
+
+        if (energyToRemove > totalGround) {
+            for (int it = 0; it < TILE_PER_CHUNK; it++) {
+                for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+                    Tile * currentTile = getRelativeTile(it, jt, false);
+                    currentTile->unlockGroundMutex();
+                }
+            }
+
+            return;
+        }
+
+
+        double removedEnergy = 0.0;
+        for (int it = 0; it < TILE_PER_CHUNK; it++) {
+            for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+                Tile * tile = getRelativeTile(it, jt, false);
+                double ratio = tile->getGround() / totalGround;
+
+                tile->lockOwnerRemoveGround(ratio * energyToRemove);
+                tile->unlockGroundMutex();
+                removedEnergy += ratio * energyToRemove;
+            }
+        }
+
+        return;
+    }
+
+
+
+    visitedPoints->emplace_back(chunkPosition);
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            neighbour->removeEnergy(targetChunk, energyToRemove, visitedPoints);
+        }
+    }
+
+}
+
 
 
 

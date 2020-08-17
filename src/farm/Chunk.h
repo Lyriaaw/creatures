@@ -79,6 +79,7 @@ public:
     void setNeighbour(int it, int jt, Chunk *neighbour);
     void waitForNeighbours(std::vector<std::string> requestedSteps);
     void getNeighboursReady(std::vector<Point> *visitedPoints);
+    void removeEnergy(Point targetChunk, double energyToRemove, std::vector<Point> *visitedPoints);
 
 
     // In and Out
