@@ -6,7 +6,7 @@
 #include "Chunk.h"
 #include "../utils/perlin/PerlinNoise.h"
 
-Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chunkPosition), nursery(nursery), step("init"), tick(0) {
+Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery, DataAnalyser * dataAnalyser): chunkPosition(chunkPosition), nursery(nursery), step("init"), tick(0), dataAnalyser(dataAnalyser) {
     generateNeighbours();
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
@@ -365,7 +365,7 @@ void Chunk::moveCreatures() {
 
     this->step = "MOVE_CREATURES";
     steps.emplace_back("MOVE_CREATURES");
-    steps.emplace_back("MOVED_CREATURES");
+    steps.emplace_back("TICK_PASS");
     waitForNeighbours(steps);
 
 
@@ -387,10 +387,19 @@ void Chunk::moveCreatures() {
 
     removeDeletedEntities();
 
-    this->step = "MOVED_CREATURES";
 }
 
 void Chunk::aTickHavePassed() {
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "TICK_PASS";
+    steps.emplace_back("TICK_PASS");
+    steps.emplace_back("READY_TO_START");
+    steps.emplace_back("STATISTICS");
+    waitForNeighbours(steps);
+
+
     for (int it = 0; it < lifes.size(); it++) {
         lifes.at(it)->getEntity()->aTickHavePassed();
     }
@@ -398,8 +407,133 @@ void Chunk::aTickHavePassed() {
         entities.at(it)->aTickHavePassed();
     }
     tick++;
+
+    this->step = "READY_TO_START";
+
+
 }
 
+void Chunk::statistics() {
+
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "STATISTICS";
+    steps.emplace_back("STATISTICS");
+    steps.emplace_back("READY_TO_START");
+    waitForNeighbours(steps);
+
+    if (!chunkPosition.equals(Point(0, 0))) {
+        return;
+    }
+
+
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    std::vector<Point> *empty = new std::vector<Point>();
+    std::vector<Life *> currentLifes = getAllLifes(empty);
+
+    empty = new std::vector<Point>();
+    std::vector<Tile *> currentTiles = getAllTiles(empty);
+
+
+
+//    std::vector<Life *> sortedLife = getScoreSortedCreatures();
+//    std::vector<BrainConnector *> sortedConnectors = connectors;
+    int populationSize = currentLifes.size();
+
+    dataAnalyser->getPopulation()->addValue(populationSize);
+
+    double totalPopulationScore = 0.0;
+    for (int it = 0; it < populationSize; it++) {
+        totalPopulationScore += currentLifes.at(it)->getEntity()->getAge();
+    }
+
+    double averagePopulationAge = totalPopulationScore / double(populationSize);
+
+    double maxScore = currentLifes.at(0)->getEntity()->getAge();
+
+    double firstQuartileScore = currentLifes.at(populationSize / 4)->getEntity()->getAge();
+    double median = currentLifes.at(populationSize / 2)->getEntity()->getAge();
+    double lastQuartileScore = currentLifes.at((3 * populationSize) / 4)->getEntity()->getAge();
+
+
+    dataAnalyser->getAverageScore()->addValue(averagePopulationAge);
+    dataAnalyser->getBestScore()->addValue(maxScore);
+    dataAnalyser->getFirstQuartileScore()->addValue(firstQuartileScore);
+    dataAnalyser->getMedianScore()->addValue(median);
+    dataAnalyser->getLastQuartileScore()->addValue(lastQuartileScore);
+
+
+
+
+    double totalCreaturesEnergy = 0.f;
+    double totalCreaturesMass = 0.f;
+    double totalFoodsMass = 0.f;
+
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Life * currentLife = currentLifes.at(it);
+        totalCreaturesEnergy += currentLife->getEnergyManagement()->getEnergy();
+        totalCreaturesMass += currentLife->getEntity()->getMass();
+    }
+
+//    for (int it = 0; it < entities.size(); it++) {
+//        Entity * entity = entities.at(it);
+//        totalFoodsMass += entity->getMass();
+//    }
+
+
+    double totalHeat = 0.0;
+    double totalGround = 0.0;
+    double totalToAdd = 0.0;
+
+    for (int it = 0; it < currentTiles.size(); it++) {
+        totalHeat += currentTiles.at(it)->getHeat();
+        totalGround += currentTiles.at(it)->getGround();
+        totalToAdd += currentTiles.at(it)->getAddedHeat();
+        totalToAdd += currentTiles.at(it)->getAddedGround();
+    }
+
+
+    int totalEnergy = totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
+
+//    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser->getTotalEnergy()->getLastValue() << std::endl;
+
+    dataAnalyser->getTotalEnergy()->addValue(totalEnergy);
+    dataAnalyser->getFoodEnergy()->addValue(totalFoodsMass);
+    dataAnalyser->getCreaturesMass()->addValue(totalCreaturesMass);
+    dataAnalyser->getCreaturesEnergy()->addValue(totalCreaturesEnergy);
+    dataAnalyser->getHeatEnergy()->addValue(totalHeat);
+    dataAnalyser->getGroundEnergy()->addValue(totalGround);
+    dataAnalyser->getEnergyToAdd()->addValue(totalToAdd);
+
+
+
+
+    double totalTime = 0.0;
+    totalTime += dataAnalyser->getEntityGridTime()->getLastValue();
+    totalTime += dataAnalyser->getBrainProcessingTime()->getLastValue();
+    totalTime += dataAnalyser->getBrainOutputsTime()->getLastValue();
+    totalTime += dataAnalyser->getPrepareActionsTime()->getLastValue();
+    totalTime += dataAnalyser->getExecuteActionsTime()->getLastValue();
+    totalTime += dataAnalyser->getMoveCreaturesTime()->getLastValue();
+    totalTime += dataAnalyser->getPopulationControlTime()->getLastValue();
+    totalTime += dataAnalyser->getVegetalisationTime()->getLastValue();
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    double statisticsTime = elapsed_time.count();
+
+    dataAnalyser->getStatisticsTime()->addValue(statisticsTime);
+    totalTime += statisticsTime;
+
+    dataAnalyser->getTotalTime()->addValue(totalTime);
+
+    empty = new std::vector<Point>();
+    getNeighboursReady(empty);
+    this->step = "READY_TO_START";
+}
 
 
 
@@ -619,6 +753,74 @@ std::vector<Tile *> Chunk::getAccessibleTiles(std::vector<Point> selectedTiles) 
 
 }
 
+std::vector<Tile *> Chunk::getAllTiles(std::vector<Point> *visitedPoints) {
+    std::vector<Tile *> foundTiles;
+
+    for (int it = 0; it < visitedPoints->size(); it++) {
+        if (chunkPosition.equals(visitedPoints->at(it))) {
+            return foundTiles;
+        }
+    }
+    visitedPoints->emplace_back(chunkPosition);
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            std::vector<Tile *>  neighbourResponse = neighbour->getAllTiles(visitedPoints);
+            if (neighbourResponse.size() > 0) {
+                foundTiles.insert(foundTiles.end(), neighbourResponse.begin(), neighbourResponse.end());
+            }
+        }
+    }
+
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            foundTiles.emplace_back(tiles.at(it).at(jt));
+        }
+    }
+
+    return foundTiles;
+}
+
+std::vector<Life *> Chunk::getAllLifes(std::vector<Point> *visitedPoints) {
+    std::vector<Life *> foundLifes;
+
+
+    for (int it = 0; it < visitedPoints->size(); it++) {
+        if (chunkPosition.equals(visitedPoints->at(it))) {
+            return foundLifes;
+        }
+    }
+    visitedPoints->emplace_back(chunkPosition);
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            std::vector<Life *>  neighbourResponse = neighbour->getAllLifes(visitedPoints);
+            if (neighbourResponse.size() > 0) {
+                foundLifes.insert(foundLifes.end(), neighbourResponse.begin(), neighbourResponse.end());
+            }
+        }
+    }
+
+    for (int it = 0; it < lifes.size(); it++) {
+        foundLifes.emplace_back(lifes.at(it));
+    }
+
+    return foundLifes;
+}
+
 
 
 
@@ -702,10 +904,34 @@ void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
         }
 
         if (!allNeighboursReady) {
-            usleep(100);
+            usleep(500);
         }
 
     }while (!allNeighboursReady);
+}
+
+void Chunk::getNeighboursReady(std::vector<Point> *visitedPoints) {
+
+    for (int it = 0; it < visitedPoints->size(); it++) {
+        if (chunkPosition.equals(visitedPoints->at(it))) {
+            return;
+        }
+    }
+    visitedPoints->emplace_back(chunkPosition);
+
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            neighbour->getNeighboursReady(visitedPoints);
+        }
+    }
+
+    this->step = "READY_TO_START";
 }
 
 

@@ -50,13 +50,14 @@ private:
 
     int tickCount;
 
-    DataAnalyser dataAnalyser;
+    DataAnalyser * dataAnalyser;
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
 
 
 public:
     Farm();
+
     void InitFromRandom();
     void Tick(bool paused);
 
@@ -83,8 +84,7 @@ public:
 
     std::vector<Life *> getScoreSortedCreatures();
 
-    const DataAnalyser &getDataAnalyser() const;
-
+    DataAnalyser *getDataAnalyser() const;
 
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 
@@ -96,11 +96,13 @@ public:
     Tile *getTileAt(int tileX, int tileY);
 
 
-    void handleBigThread();
+    void handleBigThread(bool *paused, bool *running);
 
     std::vector<Life *> fetchLifes();
 
     void waitForChunkReadyForStatistics();
+
+    void setDataAnalyser(DataAnalyser *dataAnalyser);
 };
 
 

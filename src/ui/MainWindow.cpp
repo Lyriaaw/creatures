@@ -85,7 +85,7 @@ void MainWindow::loadScreens() {
 }
 
 void MainWindow::loadUI() {
-    topButtonBackground = sf::RectangleShape(sf::Vector2f(FARM_WIDTH, 50));
+    topButtonBackground = sf::RectangleShape(sf::Vector2f(WINDOW_WIDTH, 50));
     topButtonBackground.setPosition(0, 0);
 
     sf::Color backgroundColor = sf::Color(25, 25, 25, 255);
@@ -127,9 +127,11 @@ void MainWindow::start() {
 
     running = true;
     std::thread farmThread = runFarmLoop();
+    std::thread chunksThread = runChunksLoop();
 
     runLoop();
     farmThread.join();
+    chunksThread.join();
 }
 
 
@@ -137,8 +139,7 @@ void MainWindow::start() {
 std::thread MainWindow::runFarmLoop() {
     auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
         while (*running) {
-            threadedFarm->Tick(*paused);
-
+//            threadedFarm->Tick(*paused);
             threadedFarmUI->update();
         }
     };
@@ -146,6 +147,15 @@ std::thread MainWindow::runFarmLoop() {
     std::thread farmThread(f, farm, farmUi, &running, &paused);
 
     return farmThread;
+}
+std::thread MainWindow::runChunksLoop() {
+    auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
+        threadedFarm->handleBigThread(paused, running);
+    };
+
+    std::thread chunksThread(f, farm, farmUi, &running, &paused);
+
+    return chunksThread;
 }
 
 void MainWindow::runLoop() {
@@ -177,7 +187,7 @@ void MainWindow::updateInformationLabel() {
     std::stringstream speedStream;
     speedStream << std::fixed << std::setprecision(2);
 
-    speedStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getLastValue();
+    speedStream << "TPS: " << farm->getDataAnalyser()->getTickPerSecond()->getLastValue();
     speedStream << std::endl;
 
     speedStream << "FPS: " << fps;
@@ -188,10 +198,10 @@ void MainWindow::updateInformationLabel() {
 
 
     std::stringstream informationStream;
-    informationStream << "Tick: " << farm->getDataAnalyser().getPopulation()->getCount();
+    informationStream << "Tick: " << farm->getDataAnalyser()->getPopulation()->getCount();
     informationStream << std::endl;
 
-    informationStream << "Creatures: " << farm->getDataAnalyser().getPopulation()->getLastValue();
+    informationStream << "Creatures: " << farm->getDataAnalyser()->getPopulation()->getLastValue();
     informationStream << std::endl;
 
     generalInformationLabel.setString(informationStream.str());

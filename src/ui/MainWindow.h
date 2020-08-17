@@ -91,6 +91,8 @@ private:
     Entity * getSelectedEntity();
 
     void updateInformationLabel();
+
+    std::thread runChunksLoop();
 };
 
 

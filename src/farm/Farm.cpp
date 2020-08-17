@@ -17,6 +17,7 @@ using namespace std;
 Farm::Farm(){
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
+    dataAnalyser = new DataAnalyser();
 }
 
 void Farm::generateRandomTerrain(int seed) {
@@ -49,7 +50,7 @@ void Farm::generateRandomTerrain(int seed) {
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         std::vector<Chunk *> chunkLine;
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = new Chunk(Point(it, jt), nursery);
+            Chunk * chunk = new Chunk(Point(it, jt), nursery, dataAnalyser);
             chunk->generateRandomChunk(seed, min, max);
 
             chunkLine.emplace_back(chunk);
@@ -171,14 +172,6 @@ void Farm::Tick(bool paused) {
 
 
 
-    if (!paused) {
-        handleBigThread();
-    }
-
-
-
-
-
      if (!paused) {
         populationControl();
     }
@@ -199,36 +192,46 @@ void Farm::Tick(bool paused) {
     if (!paused) {
         double tickTime = elapsed_time.count();
         if (tickCount == 1) {
-            dataAnalyser.getTickTime()->addValue(0);
+            dataAnalyser->getTickTime()->addValue(0);
         } else {
-            dataAnalyser.getTickTime()->addValue(tickTime);
+            dataAnalyser->getTickTime()->addValue(tickTime);
         }
 
 
-        dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
+        dataAnalyser->getTickPerSecond()->addValue(1.0 / tickTime);
     }
 }
 
-void Farm::handleBigThread() {
+void Farm::handleBigThread(bool *paused, bool *running) {
 
     std::thread chunkThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
 
-            auto f = [](Chunk * chunk) {
-                chunk->generateEntityGrid();
-                chunk->handleEnergyGiveaway();
-                chunk->processClimate();
-                chunk->brainProcessing();
-                chunk->executeCreaturesActions();
-                chunk->moveCreatures();
-                chunk->aTickHavePassed();
+            auto f = [](Chunk * chunk, bool *running, bool *paused) {
+                while(*running) {
+                    chunk->generateEntityGrid();
+
+                    if (!*paused) {
+                        chunk->handleEnergyGiveaway();
+                        chunk->processClimate();
+                    }
+
+                    chunk->brainProcessing();
+
+                    if (!*paused) {
+                        chunk->executeCreaturesActions();
+                        chunk->moveCreatures();
+                        chunk->aTickHavePassed();
+//                        chunk->statistics();
+                    }
+                }
             };
 
             int index = (it * CHUNK_COUNT_HEIGHT) + jt;
 
-            chunkThreads[index] = std::thread(f, chunks.at(it).at(jt));
+            chunkThreads[index] = std::thread(f, chunks.at(it).at(jt), running, paused);
 
         }
     }
@@ -255,7 +258,7 @@ void Farm::populationControl() {
     if (this->lifes.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time = end - start;
-        dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
+        dataAnalyser->getPopulationControlTime()->addValue(elapsed_time.count());
         return;
     }
 
@@ -304,7 +307,7 @@ void Farm::populationControl() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
+    dataAnalyser->getPopulationControlTime()->addValue(elapsed_time.count());
 }
 
 
@@ -322,7 +325,6 @@ void Farm::waitForChunkReadyForStatistics() {
     bool allNeighboursReady(true);
 
     std::vector<std::string> steps;
-    steps.emplace_back("MOVED_CREATURES");
 
     do {
         allNeighboursReady = true;
@@ -346,15 +348,14 @@ void Farm::waitForChunkReadyForStatistics() {
             }
         }
 
-        if (!allNeighboursReady) {
-            usleep(100);
-        }
+//        if (!allNeighboursReady) {
+//            usleep(10);
+//        }
 
     }while (!allNeighboursReady);
 }
 
 void Farm::statistics() {
-    waitForChunkReadyForStatistics();
 
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -365,7 +366,7 @@ void Farm::statistics() {
 //    std::vector<BrainConnector *> sortedConnectors = connectors;
     int populationSize = currentLifes.size();
 
-    dataAnalyser.getPopulation()->addValue(populationSize);
+    dataAnalyser->getPopulation()->addValue(populationSize);
 
     double totalPopulationScore = 0.0;
     for (int it = 0; it < populationSize; it++) {
@@ -381,11 +382,11 @@ void Farm::statistics() {
     double lastQuartileScore = currentLifes.at((3 * populationSize) / 4)->getEntity()->getAge();
 
 
-    dataAnalyser.getAverageScore()->addValue(averagePopulationAge);
-    dataAnalyser.getBestScore()->addValue(maxScore);
-    dataAnalyser.getFirstQuartileScore()->addValue(firstQuartileScore);
-    dataAnalyser.getMedianScore()->addValue(median);
-    dataAnalyser.getLastQuartileScore()->addValue(lastQuartileScore);
+    dataAnalyser->getAverageScore()->addValue(averagePopulationAge);
+    dataAnalyser->getBestScore()->addValue(maxScore);
+    dataAnalyser->getFirstQuartileScore()->addValue(firstQuartileScore);
+    dataAnalyser->getMedianScore()->addValue(median);
+    dataAnalyser->getLastQuartileScore()->addValue(lastQuartileScore);
 
 
 
@@ -422,38 +423,38 @@ void Farm::statistics() {
 
     int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
 
-//    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
+//    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser->getTotalEnergy()->getLastValue() << std::endl;
 
-    dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
-    dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
-    dataAnalyser.getFoodEnergy()->addValue(totalFoodsMass);
-    dataAnalyser.getCreaturesMass()->addValue(totalCreaturesMass);
-    dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
-    dataAnalyser.getHeatEnergy()->addValue(totalHeat);
-    dataAnalyser.getGroundEnergy()->addValue(totalGround);
-    dataAnalyser.getEnergyToAdd()->addValue(totalToAdd);
+    dataAnalyser->getTotalEnergy()->addValue(totalEnergy);
+    dataAnalyser->getAvailableEnergy()->addValue(availableEnergy);
+    dataAnalyser->getFoodEnergy()->addValue(totalFoodsMass);
+    dataAnalyser->getCreaturesMass()->addValue(totalCreaturesMass);
+    dataAnalyser->getCreaturesEnergy()->addValue(totalCreaturesEnergy);
+    dataAnalyser->getHeatEnergy()->addValue(totalHeat);
+    dataAnalyser->getGroundEnergy()->addValue(totalGround);
+    dataAnalyser->getEnergyToAdd()->addValue(totalToAdd);
 
 
 
 
     double totalTime = 0.0;
-    totalTime += dataAnalyser.getEntityGridTime()->getLastValue();
-    totalTime += dataAnalyser.getBrainProcessingTime()->getLastValue();
-    totalTime += dataAnalyser.getBrainOutputsTime()->getLastValue();
-    totalTime += dataAnalyser.getPrepareActionsTime()->getLastValue();
-    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
-    totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
-    totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
-    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
+    totalTime += dataAnalyser->getEntityGridTime()->getLastValue();
+    totalTime += dataAnalyser->getBrainProcessingTime()->getLastValue();
+    totalTime += dataAnalyser->getBrainOutputsTime()->getLastValue();
+    totalTime += dataAnalyser->getPrepareActionsTime()->getLastValue();
+    totalTime += dataAnalyser->getExecuteActionsTime()->getLastValue();
+    totalTime += dataAnalyser->getMoveCreaturesTime()->getLastValue();
+    totalTime += dataAnalyser->getPopulationControlTime()->getLastValue();
+    totalTime += dataAnalyser->getVegetalisationTime()->getLastValue();
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     double statisticsTime = elapsed_time.count();
 
-    dataAnalyser.getStatisticsTime()->addValue(statisticsTime);
+    dataAnalyser->getStatisticsTime()->addValue(statisticsTime);
     totalTime += statisticsTime;
 
-    dataAnalyser.getTotalTime()->addValue(totalTime);
+    dataAnalyser->getTotalTime()->addValue(totalTime);
 
 
 
@@ -509,7 +510,7 @@ void Farm::generateEntityGrid() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getEntityGridTime()->addValue(elapsed_time.count());
+    dataAnalyser->getEntityGridTime()->addValue(elapsed_time.count());
 }
 
 
@@ -561,9 +562,8 @@ CreatureNursery *Farm::getNursery() const {
 }
 
 
-
-const DataAnalyser &Farm::getDataAnalyser() const {
-    return dataAnalyser;
+void Farm::setDataAnalyser(DataAnalyser *dataAnalyser) {
+    Farm::dataAnalyser = dataAnalyser;
 }
 
 const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
@@ -619,4 +619,8 @@ std::vector<Life *> Farm::fetchLifes() {
     }
 
     return foundLifes;
+}
+
+DataAnalyser *Farm::getDataAnalyser() const {
+    return dataAnalyser;
 }

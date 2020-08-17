@@ -16,36 +16,37 @@ void ChunkStepMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
 
     sf::Color pixelColor = sf::Color(0, 0, 0, 255);
 
-    if ("READY_TO_START") {
+    if (currentChunkStep == "READY_TO_START") {
         pixelColor = sf::Color(255, 255, 255, 255);
     }
-    if ("ENTITY_GRID") {
+    if (currentChunkStep == "ENTITY_GRID") {
         pixelColor = sf::Color(55, 55, 55, 255);
     }
-    if ("ENERGY_GIVEAWAY") {
+    if (currentChunkStep == "ENERGY_GIVEAWAY") {
         pixelColor = sf::Color(255, 0, 0, 255);
     }
-    if ("CLIMATE_START") {
+    if (currentChunkStep == "CLIMATE_START") {
         pixelColor = sf::Color(0, 55, 0, 255);
     }
-    if ("CLIMATE_READY") {
+    if (currentChunkStep == "CLIMATE_READY") {
         pixelColor = sf::Color(0, 100, 0, 255);
     }
-    if ("CLIMATE_SPREAD") {
+    if (currentChunkStep == "CLIMATE_SPREAD") {
         pixelColor = sf::Color(55, 100, 0, 255);
     }
-    if ("BRAIN_PROCESSING") {
+    if (currentChunkStep == "BRAIN_PROCESSING") {
         pixelColor = sf::Color(0, 0, 55, 255);
     }
-    if ("EXECUTE_ACTIONS") {
+    if (currentChunkStep == "EXECUTE_ACTIONS") {
         pixelColor = sf::Color(0, 0, 100, 255);
     }
-    if ("MOVE_CREATURES") {
+    if (currentChunkStep == "MOVE_CREATURES") {
         pixelColor = sf::Color(100, 0, 100, 255);
     }
-    if ("MOVED_CREATURES") {
-        pixelColor = sf::Color(255, 0, 0, 255);
+    if (currentChunkStep == "STATISTICS") {
+        pixelColor = sf::Color(0, 0, 255, 255);
     }
+
 
 
 

@@ -9,6 +9,7 @@
 #include <vector>
 #include "life/Life.h"
 #include "CreatureNursery.h"
+#include "statistics/DataAnalyser.h"
 
 
 class Chunk {
@@ -40,9 +41,11 @@ private:
     std::vector<Entity *> entityAdded;
     std::vector<Entity *> entityToDelete;
 
+    DataAnalyser * dataAnalyser;
+
 public:
 
-    Chunk(Point chunkPosition, CreatureNursery * nursery);
+    Chunk(Point chunkPosition, CreatureNursery * nursery, DataAnalyser * dataAnalyser);
 
     // Main loop
     void generateEntityGrid();
@@ -63,7 +66,8 @@ public:
     Entity *getEntityFromId(int id, bool askNeighbours);
     std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedTiles);
     std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedTiles);
-
+    std::vector<Tile *> getAllTiles(std::vector<Point> *visitedPoints);
+    std::vector<Life *> getAllLifes(std::vector<Point> *visitedPoints);
 
 
 
@@ -72,6 +76,7 @@ public:
     void generateNeighbours();
     void setNeighbour(int it, int jt, Chunk *neighbour);
     void waitForNeighbours(std::vector<std::string> requestedSteps);
+    void getNeighboursReady(std::vector<Point> *visitedPoints);
 
 
     // In and Out
@@ -134,6 +139,9 @@ public:
     void setStep(const std::string &step);
 
 
+
+
+    void statistics();
 };
 
 
