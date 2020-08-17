@@ -43,44 +43,67 @@ public:
 
     Chunk(Point chunkPosition, CreatureNursery * nursery);
 
-    void generateRandomChunk(int seed, float min, float max);
-
-    Tile *getTileAt(int tileX, int tileY);
-
-    void generateNeighbours();
-
-    void setNeighbour(int it, int jt, Chunk *neighbour);
-
+    // Main loop
+    void generateEntityGrid();
+    void handleEnergyGiveaway();
     void processClimate();
+    void brainProcessing();
+    void executeCreaturesActions();
+    void moveCreatures();
 
+
+    // Find entities and lifes
     Tile *getRelativeTile(int tileX, int tileY, bool debug);
-
-    const std::string &getStep() const;
-
-    void waitForNeighbours(std::vector<std::string> requestedSteps);
-
-    const Point &getChunkPosition() const;
-
+    Tile *getTileAt(int tileX, int tileY);
     std::vector<Entity *> getRelativeEntities(int tileX, int tileY);
     std::vector<Entity *> getEntitiesAt(int tileX, int tileY);
+    Life *getLifeFromId(int id, bool askNeighbours);
+    Entity *getEntityFromId(int id, bool askNeighbours);
+    std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedTiles);
+    std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedTiles);
+
+
+
+
+    // The neighbourhood
+    void generateRandomChunk(int seed, float min, float max);
+    void generateNeighbours();
+    void setNeighbour(int it, int jt, Chunk *neighbour);
+    void waitForNeighbours(std::vector<std::string> requestedSteps);
+
+
+    // In and Out
+    void removeDeletedEntities();
+    void checkForLifeTransfer(Life *life);
+    void transferLife(Life *life);
+    void addLife(Life *life);
+    void processImportedAndExportedLifes();
+
+
+    // The actions
+    void handleCaptureHeat(Life *life, ActionDTO action);
+    void handleCaptureGround(Life *life, ActionDTO action);
+    bool handleDuplication(Life *life);
+    bool handleMating(Life *father, int entityId);
+
+
+    // For the UI
+    void clearAddedLifes();
+    void clearAddedEntities();
+    void clearToDeleteLifes();
+    void clearToDeleteEntities();
+
+
+
+
+    // Java hell
+    const std::string &getStep() const;
+
+    const Point &getChunkPosition() const;
 
     const std::vector<ActionDTO> &getActions() const;
 
     void setActions(const std::vector<ActionDTO> &actions);
-
-    void executeCreaturesActions();
-
-    void handleCaptureHeat(Life *life, ActionDTO action);
-
-    void handleCaptureGround(Life *life, ActionDTO action);
-
-    bool handleDuplication(Life *life);
-
-    bool handleMating(Life *father, int entityId);
-
-    Life *getLifeFromId(int id, bool askNeighbours);
-
-    Entity *getEntityFromId(int id, bool askNeighbours);
 
     const std::vector<Life *> &getLifes() const;
 
@@ -106,35 +129,14 @@ public:
 
     void setEntityToDelete(const std::vector<Entity *> &entityToDelete);
 
-    void brainProcessing();
 
-    std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedTiles);
 
-    std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedTiles);
 
-    void generateEntityGrid();
 
-    void removeDeletedEntities();
 
-    void moveCreatures();
 
-    void clearAddedLifes();
 
-    void clearAddedEntities();
 
-    void clearToDeleteLifes();
-
-    void clearToDeleteEntities();
-
-    void addLife(Life *life);
-
-    void handleEnergyGiveaway();
-
-    void transferLife(Life *life);
-
-    void checkForLifeTransfer(Life *life);
-
-    void processImportedAndExportedLifes();
 };
 
 

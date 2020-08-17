@@ -62,56 +62,29 @@ public:
 
     void sortCreatures();
 
-    void brainProcessing();
-    void moveCreatures();
-
-    void executeCreaturesActions();
 
     void populationControl();
-    void vegetalisation();
     void statistics();
     void aTickHavePassed();
 
 
-    void removeDeletedEntities();
     void generateEntityGrid();
 
-    Entity * getEntityFromId(int id);
-    Life * getLifeFromId(int id);
 
     const std::vector<Life *> &getLifes() const;
 
     const std::vector<Entity *> &getEntities() const;
 
-    static std::string getHumanReadableEnergy(float givenEnergy) ;
 
 
 
     CreatureNursery *getNursery() const;
 
 
-    void addLife(Life * life);
-
-    std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedChunks);
-    std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedChunks);
-
-    const std::vector<Life *> &getLifesAdded() const;
-    const std::vector<Entity *> &getEntityAdded() const;
-    const std::vector<Entity *> &getEntityToDelete() const;
-    const std::vector<Life *> &getLifesToDelete() const;
-
-
-
-    void clearAddedLifes();
-    void clearAddedEntities();
-    void clearToDeleteLifes();
-    void clearToDeleteEntities();
-
     std::vector<Life *> getScoreSortedCreatures();
 
     const DataAnalyser &getDataAnalyser() const;
 
-    void setDataAnalyser(const DataAnalyser &dataAnalyser);
 
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 
@@ -121,12 +94,6 @@ public:
     void generateRandomTerrain(int seed);
 
     Tile *getTileAt(int tileX, int tileY);
-
-    void setLifes(const std::vector<Life *> &lifes);
-
-    void setEntities(const std::vector<Entity *> &entities);
-
-
 
 
     void handleBigThread();

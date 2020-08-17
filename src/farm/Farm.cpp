@@ -216,7 +216,6 @@ void Farm::handleBigThread() {
 
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
 
             auto f = [](Chunk * chunk) {
                 chunk->generateEntityGrid();
@@ -245,152 +244,6 @@ void Farm::handleBigThread() {
 }
 
 
-
-
-void Farm::brainProcessing() {
-
-//
-//
-//    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-//
-//
-//
-//
-//
-//
-//
-//    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-//        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-//            Chunk * chunk = getChunkAt(it, jt);
-//
-//            auto f = [](Chunk * chunk) {
-//                chunk->brainProcessing();
-//            };
-//
-//            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
-//
-//            brainThreads[index] = std::thread(f, chunks.at(it).at(jt));
-//
-//        }
-//    }
-//
-//
-//    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-//        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-//            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
-//
-//            brainThreads[index].join();
-//        }
-//    }
-//
-//
-//
-//    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-//    std::chrono::duration<double> elapsed_time = end - start;
-//    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
-}
-
-
-void Farm::moveCreatures() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-    std::vector<Entity* > newEntities;
-
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-        Point entityPoint = currentLife->getEntity()->getPosition();
-        Point tilePoint = entityPoint.getTileCoordinates();
-
-        std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
-        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
-
-        double releasedHeat = currentLife->giveawayEnergy();
-        getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
-
-        if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
-            this->lifesToDelete.emplace_back(currentLife);
-        }
-
-    }
-
-    removeDeletedEntities();
-
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getMoveCreaturesTime()->addValue(elapsed_time.count());
-}
-
-
-
-void Farm::executeCreaturesActions() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-
-    std::thread actionThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
-
-
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
-
-            auto f = [](Chunk * chunk) {
-                chunk->executeCreaturesActions();
-            };
-
-            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
-
-            actionThreads[index] = std::thread(f, chunks.at(it).at(jt));
-
-
-
-
-        }
-    }
-
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            Chunk * chunk = getChunkAt(it, jt);
-
-            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
-
-            actionThreads[index].join();
-
-
-
-            std::vector<Life *> currentLifesAdded = chunk->getLifesAdded();
-            std::vector<Life *> currentLifesToDelete = chunk->getLifesToDelete();
-
-            std::vector<Entity *> currentEntityAdded = chunk->getEntityAdded();
-            std::vector<Entity *> currentEntityToDelete = chunk->getEntityToDelete();
-
-            lifes.insert(lifes.end(), currentLifesAdded.begin(), currentLifesAdded.end());
-            lifesAdded.insert(lifesAdded.end(), currentLifesAdded.begin(), currentLifesAdded.end());
-            lifesToDelete.insert(lifesToDelete.end(), currentLifesToDelete.begin(), currentLifesToDelete.end());
-            entities.insert(entities.end(), currentEntityAdded.begin(), currentEntityAdded.end());
-            entityAdded.insert(entityAdded.end(), currentEntityAdded.begin(), currentEntityAdded.end());
-            entityToDelete.insert(entityToDelete.end(), currentEntityToDelete.begin(), currentEntityToDelete.end());
-        }
-    }
-
-
-    actions.clear();
-//    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
-
-//    int totalActions = captureGroundActions + captureHeatActions + duplicateActions + mateActions + eatActions;
-//
-//    dataAnalyser.getTotalActions()->addValue(totalActions);
-//    dataAnalyser.getCaptureGroundActions()->addValue(captureGroundActions);
-//    dataAnalyser.getCaptureHeatActions()->addValue(captureHeatActions);
-//    dataAnalyser.getDuplicateActions()->addValue(duplicateActions);
-//    dataAnalyser.getMateActions()->addValue(mateActions);
-//    dataAnalyser.getEatActions()->addValue(eatActions);
-
-
-
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
-}
 
 
 
@@ -454,36 +307,6 @@ void Farm::populationControl() {
     dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
 }
 
-void Farm::vegetalisation() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-    std::thread climateThreads[CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT];
-
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
-            auto f = [](Chunk * chunk) {
-                chunk->processClimate();
-            };
-
-            int index = (it * CHUNK_COUNT_HEIGHT) + jt;
-
-            climateThreads[index] = std::thread(f, chunks.at(it).at(jt));
-        }
-    }
-
-
-    for (int it = 0; it < CHUNK_COUNT_WIDTH * CHUNK_COUNT_HEIGHT; it++) {
-        climateThreads[it].join();
-    }
-
-
-
-
-
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
-}
 
 void Farm::aTickHavePassed() {
     for (int it = 0; it < lifes.size(); it++) {
@@ -642,76 +465,12 @@ void Farm::generateEntityGrid() {
     dataAnalyser.getEntityGridTime()->addValue(elapsed_time.count());
 }
 
-void Farm::removeDeletedEntities() {
-    std::vector<Life *> newLifes;
-    for (int it = 0; it < lifes.size(); it++) {
 
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (lifes.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (found) {
-            Life * currentLife = lifes.at(it);
-            Point currentLifePosition = currentLife->getEntity()->getPosition();
-            Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
-
-            getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addGround(currentLife->getEntity()->getMass());
-            getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addHeat(currentLife->getEnergyManagement()->getEnergy());
-        } else {
-            newLifes.emplace_back(lifes.at(it));
-        }
-    }
-
-    lifes.clear();
-    lifes = newLifes;
-
-    std::vector<Entity *> newEntities;
-    for (int it = 0; it < entities.size(); it++) {
-
-        if (entities.at(it)->getMass() > 0) {
-            newEntities.emplace_back(entities.at(it));
-        }
-    }
-
-    entities.clear();
-    entities = newEntities;
-
-
-}
-
-std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedTiles) {
-    std::vector<Entity *> accessibleEntities;
-    for (int jt = 0; jt < selectedTiles.size(); jt++) {
-        Point currentTiles = selectedTiles.at(jt);
-
-        std::vector<Entity *> chunkEntities = entityGrid.at(currentTiles.getX()).at(currentTiles.getY());
-
-        accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
-    }
-    return accessibleEntities;
-
-}
-std::vector<Tile *> Farm::getAccessibleTiles(std::vector<Point> selectedChunks) {
-    std::vector<Tile *> accessibleTiles;
-    for (int jt = 0; jt < selectedChunks.size(); jt++) {
-        Point currentTilePoint = selectedChunks.at(jt);
-
-        Tile * currentTile = getTileAt(currentTilePoint.getX(), currentTilePoint.getY());
-
-        accessibleTiles.emplace_back(currentTile);
-    }
-    return accessibleTiles;
-
-}
 
 std::vector<Life *> Farm::getScoreSortedCreatures() {
     return sorted;
 }
+
 void Farm::sortCreatures() {
     std::vector<Life *> sortResult;
 
@@ -741,33 +500,6 @@ void Farm::sortCreatures() {
 
 
 
-Life * Farm::getLifeFromId(int id) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it);
-        }
-    }
-
-    return nullptr;
-}
-
-Entity * Farm::getEntityFromId(int id) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it)->getEntity();
-        }
-    }
-
-    for (int it = 0; it < this->entities.size(); it++) {
-        if (this->entities.at(it)->getId() == id) {
-            return this->entities.at(it);
-        }
-    }
-
-
-    return nullptr;
-}
-
 
 
 
@@ -782,63 +514,9 @@ CreatureNursery *Farm::getNursery() const {
 }
 
 
-void Farm::addLife(Life * life) {
-    this->lifes.push_back(life);
-}
-
-
-void Farm::clearAddedLifes() {
-    this->lifesAdded.clear();
-}
-
-void Farm::clearAddedEntities() {
-    this->entityAdded.clear();
-}
-void Farm::clearToDeleteLifes() {
-    this->lifesToDelete.clear();
-}
-
-void Farm::clearToDeleteEntities() {
-    this->entityToDelete.clear();
-}
-
-
-
-std::string Farm::getHumanReadableEnergy(float givenEnergy) {
-    std::stringstream givenEnergyStream;
-
-
-    if (givenEnergy > 1000000000.f) {
-        givenEnergyStream << std::fixed << std::setprecision(2) << givenEnergy / 1000000000.f;
-        givenEnergyStream << " GA";
-        return givenEnergyStream.str();
-    }
-
-    if (givenEnergy > 1000000.f) {
-        givenEnergyStream << std::fixed << std::setprecision(2) << givenEnergy / 1000000.f;
-        givenEnergyStream << " mA";
-        return givenEnergyStream.str();
-    }
-
-    if (givenEnergy > 1000.f) {
-        givenEnergyStream << std::fixed << std::setprecision(2) << givenEnergy / 1000.f;
-        givenEnergyStream << " kA";
-        return givenEnergyStream.str();
-    }
-
-
-    givenEnergyStream << givenEnergy;
-    givenEnergyStream << " A";
-
-    return givenEnergyStream.str();
-}
 
 const DataAnalyser &Farm::getDataAnalyser() const {
     return dataAnalyser;
-}
-
-void Farm::setDataAnalyser(const DataAnalyser &dataAnalyser) {
-    Farm::dataAnalyser = dataAnalyser;
 }
 
 const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
@@ -852,24 +530,6 @@ const vector<Life *> &Farm::getLifes() const {
 const vector<Entity *> &Farm::getEntities() const {
     return entities;
 }
-
-const vector<Life *> &Farm::getLifesAdded() const {
-    return lifesAdded;
-}
-
-
-const vector<Life *> &Farm::getLifesToDelete() const {
-    return lifesToDelete;
-}
-
-const vector<Entity *> &Farm::getEntityAdded() const {
-    return entityAdded;
-}
-
-const vector<Entity *> &Farm::getEntityToDelete() const {
-    return entityToDelete;
-}
-
 
 
 
@@ -898,13 +558,6 @@ Tile * Farm::getTileAt(int tileX, int tileY) {
     return getChunkAt(chunkPosition.getX(), chunkPosition.getY())->getTileAt(tileX, tileY);
 }
 
-void Farm::setLifes(const vector<Life *> &lifes) {
-    Farm::lifes = lifes;
-}
-
-void Farm::setEntities(const vector<Entity *> &entities) {
-    Farm::entities = entities;
-}
 
 std::vector<Life *> Farm::fetchLifes() {
     std::vector<Life *> foundLifes;

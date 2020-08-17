@@ -19,7 +19,7 @@ Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chun
     }
 }
 
-
+// Main loop
 void Chunk::generateEntityGrid() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
@@ -384,117 +384,7 @@ void Chunk::moveCreatures() {
 
 
 
-void Chunk::generateNeighbours() {
-    for (int it = -1; it <= 1; it++) {
-        std::vector<Chunk *> neighbourgsLine;
-        for (int jt = -1; jt <= 1; jt++) {
-            neighbourgsLine.emplace_back(nullptr);
-        }
-        neighbours.emplace_back(neighbourgsLine);
-    }
-}
-
-void Chunk::generateRandomChunk(int seed, float min, float max) {
-    PerlinNoise perlin(seed);
-
-    float removed = ((max - min) / 2.f) + min;
-    float ratio = (1.f / (max - min)) * 2.f;
-
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
-
-    for (int it = 0; it < TILE_PER_CHUNK; it++) {
-        std::vector<Tile *> line;
-        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
-
-            float xComponent = (float(it + deltaX) / float(TILE_COUNT_WIDTH)) * 2.5;
-            float yComponent = (float(jt + deltaY) / float(TILE_COUNT_HEIGHT)) * 2.5;
-
-            float height = perlin.noise(xComponent, yComponent, 0.8);
-
-            height -= removed;
-            height *= ratio;
-            height *= height * height;
-
-            Tile * currentTile = new Tile(Point(it + deltaX, jt + deltaY));
-            currentTile->setHeight(height);
-            currentTile->setGround(1500.0);
-
-            line.emplace_back(currentTile);
-
-            currentTile->setHeight(height);
-
-        }
-        tiles.emplace_back(line);
-    }
-}
-
-Tile * Chunk::getTileAt(int tileX, int tileY) {
-    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
-        std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
-        return tiles.at(0).at(0);
-    }
-
-    Point requestedChunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
-
-    if (!requestedChunkPosition.equals(chunkPosition)) {
-        std::cout << "ERROR, REQUESTED TILE IN WRONG CHUNK: X: " << tileX << " Y: " << tileY << " | ";
-        std::cout << " CHUNK: X: " << tileX / TILE_PER_CHUNK << " Y: " << tileY / TILE_PER_CHUNK << " | ";
-        std::cout << "CURRENT CHUNK => X: " << chunkPosition.getX() << " Y: " << chunkPosition.getY() << std::endl;
-        return tiles.at(0).at(0);
-    }
-
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
-
-    Tile * tile = tiles.at(tileX - deltaX).at(tileY - deltaY);
-
-    return tile;
-}
-
-void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
-    neighbours.at(it + 1).at(jt + 1) = neighbour;
-}
-
-
-void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
-
-    bool allNeighboursReady(true);
-
-    do {
-        allNeighboursReady = true;
-
-        for (int it = 0; it < 3; it++) {
-            for (int jt = 0; jt < 3; jt++) {
-
-                Chunk * neighbour = neighbours.at(it).at(jt);
-
-                if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
-                    continue;
-
-                bool found(false);
-                for (int kt = 0; kt < requestedSteps.size(); kt++) {
-                    if (neighbour->getStep() == requestedSteps.at(kt)) {
-                        found = true;
-                    }
-                }
-
-                if (!found) {
-                    allNeighboursReady = false;
-                }
-
-            }
-        }
-
-        if (!allNeighboursReady) {
-            usleep(100);
-        }
-
-    }while (!allNeighboursReady);
-}
-
-
-
+// Find entities and lifes
 Tile * Chunk::getRelativeTile(int tileX, int tileY, bool debug) {
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
@@ -539,14 +429,28 @@ Tile * Chunk::getRelativeTile(int tileX, int tileY, bool debug) {
     return tile;
 }
 
-const std::string &Chunk::getStep() const {
-    return step;
-}
+Tile * Chunk::getTileAt(int tileX, int tileY) {
+    if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
+        std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
+        return tiles.at(0).at(0);
+    }
 
-const Point &Chunk::getChunkPosition() const {
-    return chunkPosition;
-}
+    Point requestedChunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
 
+    if (!requestedChunkPosition.equals(chunkPosition)) {
+        std::cout << "ERROR, REQUESTED TILE IN WRONG CHUNK: X: " << tileX << " Y: " << tileY << " | ";
+        std::cout << " CHUNK: X: " << tileX / TILE_PER_CHUNK << " Y: " << tileY / TILE_PER_CHUNK << " | ";
+        std::cout << "CURRENT CHUNK => X: " << chunkPosition.getX() << " Y: " << chunkPosition.getY() << std::endl;
+        return tiles.at(0).at(0);
+    }
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    Tile * tile = tiles.at(tileX - deltaX).at(tileY - deltaY);
+
+    return tile;
+}
 
 std::vector<Entity *> Chunk::getRelativeEntities(int tileX, int tileY) {
 
@@ -596,21 +500,198 @@ std::vector<Entity *> Chunk::getEntitiesAt(int tileX, int tileY) {
     return entityGrid.at(tileX - deltaX).at(tileY - deltaY);
 }
 
-const std::vector<ActionDTO> &Chunk::getActions() const {
-    return actions;
+Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
+    for (int it = 0; it < this->lifes.size(); it++) {
+        if (this->lifes.at(it)->getEntity()->getId() == id) {
+            return this->lifes.at(it);
+        }
+    }
+
+    if (!askNeighbours)
+        return nullptr;
+
+    Life * found = nullptr;
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            Life * neighbourResponse = neighbour->getLifeFromId(id, false);
+
+            if (neighbourResponse != nullptr) {
+                found = neighbourResponse;
+            }
+
+        }
+    }
+
+
+
+    return found;
 }
 
-void Chunk::setActions(const std::vector<ActionDTO> &actions) {
-    Chunk::actions = actions;
+Entity * Chunk::getEntityFromId(int id, bool askNeighbours) {
+    for (int it = 0; it < this->entities.size(); it++) {
+        if (this->entities.at(it)->getId() == id) {
+            return this->entities.at(it);
+        }
+    }
+
+    if (!askNeighbours)
+        return nullptr;
+
+    Entity * found = nullptr;
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            Entity * neighbourResponse = neighbour->getEntityFromId(id, false);
+
+            if (neighbourResponse != nullptr) {
+                found = neighbourResponse;
+            }
+
+        }
+    }
+
+
+
+    return found;
+}
+
+std::vector<Entity *> Chunk::getAccessibleEntities(std::vector<Point> selectedTiles) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    std::vector<Entity *> accessibleEntities;
+    for (int jt = 0; jt < selectedTiles.size(); jt++) {
+        Point currentTiles = selectedTiles.at(jt);
+
+        std::vector<Entity *> chunkEntities = getRelativeEntities(currentTiles.getX() - deltaX, currentTiles.getY() - deltaY);
+
+        accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
+    }
+    return accessibleEntities;
+
+}
+
+std::vector<Tile *> Chunk::getAccessibleTiles(std::vector<Point> selectedTiles) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    std::vector<Tile *> accessibleTiles;
+    for (int jt = 0; jt < selectedTiles.size(); jt++) {
+        Point currentTilePoint = selectedTiles.at(jt);
+
+        Tile * currentTile = getRelativeTile(currentTilePoint.getX() - deltaX, currentTilePoint.getY() - deltaY, false);
+
+        accessibleTiles.emplace_back(currentTile);
+    }
+    return accessibleTiles;
+
 }
 
 
 
 
+// The neighbourhood
+void Chunk::generateNeighbours() {
+    for (int it = -1; it <= 1; it++) {
+        std::vector<Chunk *> neighbourgsLine;
+        for (int jt = -1; jt <= 1; jt++) {
+            neighbourgsLine.emplace_back(nullptr);
+        }
+        neighbours.emplace_back(neighbourgsLine);
+    }
+}
+
+void Chunk::generateRandomChunk(int seed, float min, float max) {
+    PerlinNoise perlin(seed);
+
+    float removed = ((max - min) / 2.f) + min;
+    float ratio = (1.f / (max - min)) * 2.f;
+
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        std::vector<Tile *> line;
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+
+            float xComponent = (float(it + deltaX) / float(TILE_COUNT_WIDTH)) * 2.5;
+            float yComponent = (float(jt + deltaY) / float(TILE_COUNT_HEIGHT)) * 2.5;
+
+            float height = perlin.noise(xComponent, yComponent, 0.8);
+
+            height -= removed;
+            height *= ratio;
+            height *= height * height;
+
+            Tile * currentTile = new Tile(Point(it + deltaX, jt + deltaY));
+            currentTile->setHeight(height);
+            currentTile->setGround(1500.0);
+
+            line.emplace_back(currentTile);
+
+            currentTile->setHeight(height);
+
+        }
+        tiles.emplace_back(line);
+    }
+}
+
+void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
+    neighbours.at(it + 1).at(jt + 1) = neighbour;
+}
+
+void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
+
+    bool allNeighboursReady(true);
+
+    do {
+        allNeighboursReady = true;
+
+        for (int it = 0; it < 3; it++) {
+            for (int jt = 0; jt < 3; jt++) {
+
+                Chunk * neighbour = neighbours.at(it).at(jt);
+
+                if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                    continue;
+
+                bool found(false);
+                for (int kt = 0; kt < requestedSteps.size(); kt++) {
+                    if (neighbour->getStep() == requestedSteps.at(kt)) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    allNeighboursReady = false;
+                }
+
+            }
+        }
+
+        if (!allNeighboursReady) {
+            usleep(100);
+        }
+
+    }while (!allNeighboursReady);
+}
 
 
 
-
+// In and Out
 void Chunk::removeDeletedEntities() {
     std::vector<Life *> newLifes;
     for (int it = 0; it < lifes.size(); it++) {
@@ -651,8 +732,6 @@ void Chunk::removeDeletedEntities() {
     entities = newEntities;
 }
 
-
-
 void Chunk::checkForLifeTransfer(Life * life) {
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
@@ -690,8 +769,74 @@ void Chunk::transferLife(Life * life) {
     importedLifes.emplace_back(life);
 }
 
+void Chunk::addLife(Life * life) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+    Point lifeSpawnPoint = life->getEntity()->getPosition();
+    Point tileLifeSpawnPoint = lifeSpawnPoint.getTileCoordinates();
+
+    int tileX = tileLifeSpawnPoint.getX() - deltaX;
+    int tileY = tileLifeSpawnPoint.getY() - deltaY;
+
+    if (tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK) {
+        int ratioX = 0;
+        if (tileX < 0)
+            ratioX = -1;
+        if (tileX >= TILE_PER_CHUNK)
+            ratioX = 1;
+
+        int ratioY = 0;
+        if (tileY < 0)
+            ratioY = -1;
+        if (tileY >= TILE_PER_CHUNK)
+            ratioY = 1;
+
+        int requestedX = deltaX + tileX;
+        int requestedY = deltaY + tileY;
+
+        neighbours.at(ratioX + 1).at(ratioY + 1)->addLife(life);
+        return;
+    }
 
 
+
+    lifes.emplace_back(life);
+    lifesAdded.emplace_back(life);
+}
+
+void Chunk::processImportedAndExportedLifes() {
+    std::vector<Life *> newLifes;
+    for (int it = 0; it < lifes.size(); it++) {
+
+        bool found = false;
+        int foundIndex = -1;
+        for (int jt = 0; jt < exportedLifes.size(); jt++) {
+            if (lifes.at(it)->getEntity()->getId() == exportedLifes.at(jt)->getEntity()->getId()) {
+                found = true;
+                foundIndex = jt;
+            }
+        }
+
+        if (!found) {
+            newLifes.emplace_back(lifes.at(it));
+        }
+    }
+
+    lifes.clear();
+    lifes = newLifes;
+
+
+    lifes.insert(lifes.end(), importedLifes.begin(), importedLifes.end());
+
+    importedLifes.clear();
+    exportedLifes.clear();
+
+}
+
+
+
+// The actions
 void Chunk::handleCaptureHeat(Life * life, ActionDTO action) {
 
 }
@@ -780,7 +925,6 @@ void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
 
 }
 
-
 bool Chunk::handleDuplication(Life * life) {
 
     bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
@@ -837,43 +981,6 @@ bool Chunk::handleDuplication(Life * life) {
 
     return false;
 }
-
-void Chunk::addLife(Life * life) {
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
-
-    Point lifeSpawnPoint = life->getEntity()->getPosition();
-    Point tileLifeSpawnPoint = lifeSpawnPoint.getTileCoordinates();
-
-    int tileX = tileLifeSpawnPoint.getX() - deltaX;
-    int tileY = tileLifeSpawnPoint.getY() - deltaY;
-
-    if (tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK) {
-        int ratioX = 0;
-        if (tileX < 0)
-            ratioX = -1;
-        if (tileX >= TILE_PER_CHUNK)
-            ratioX = 1;
-
-        int ratioY = 0;
-        if (tileY < 0)
-            ratioY = -1;
-        if (tileY >= TILE_PER_CHUNK)
-            ratioY = 1;
-
-        int requestedX = deltaX + tileX;
-        int requestedY = deltaY + tileY;
-
-        neighbours.at(ratioX + 1).at(ratioY + 1)->addLife(life);
-        return;
-    }
-
-
-
-    lifes.emplace_back(life);
-    lifesAdded.emplace_back(life);
-}
-
 
 bool Chunk::handleMating(Life * father, int entityId) {
     Life * foundLife = getLifeFromId(entityId, true);
@@ -940,73 +1047,52 @@ bool Chunk::handleMating(Life * father, int entityId) {
     return false;
 }
 
-Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it);
-        }
-    }
 
-    if (!askNeighbours)
-        return nullptr;
-
-    Life * found = nullptr;
-
-    for (int it = 0; it < 3; it++) {
-        for (int jt = 0; jt < 3; jt++) {
-
-            Chunk * neighbour = neighbours.at(it).at(jt);
-
-            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
-                continue;
-
-            Life * neighbourResponse = neighbour->getLifeFromId(id, false);
-
-            if (neighbourResponse != nullptr) {
-                found = neighbourResponse;
-            }
-
-        }
-    }
-
-
-
-    return found;
+// For the UI
+void Chunk::clearAddedLifes() {
+    this->lifesAdded.clear();
 }
 
-Entity * Chunk::getEntityFromId(int id, bool askNeighbours) {
-    for (int it = 0; it < this->entities.size(); it++) {
-        if (this->entities.at(it)->getId() == id) {
-            return this->entities.at(it);
-        }
-    }
-
-    if (!askNeighbours)
-        return nullptr;
-
-    Entity * found = nullptr;
-
-    for (int it = 0; it < 3; it++) {
-        for (int jt = 0; jt < 3; jt++) {
-
-            Chunk * neighbour = neighbours.at(it).at(jt);
-
-            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
-                continue;
-
-            Entity * neighbourResponse = neighbour->getEntityFromId(id, false);
-
-            if (neighbourResponse != nullptr) {
-                found = neighbourResponse;
-            }
-
-        }
-    }
-
-
-
-    return found;
+void Chunk::clearAddedEntities() {
+    this->entityAdded.clear();
 }
+
+void Chunk::clearToDeleteLifes() {
+    this->lifesToDelete.clear();
+}
+
+void Chunk::clearToDeleteEntities() {
+    this->entityToDelete.clear();
+}
+
+
+
+
+
+
+
+
+
+
+
+// Java hell
+
+const std::string &Chunk::getStep() const {
+    return step;
+}
+
+const Point &Chunk::getChunkPosition() const {
+    return chunkPosition;
+}
+
+const std::vector<ActionDTO> &Chunk::getActions() const {
+    return actions;
+}
+
+void Chunk::setActions(const std::vector<ActionDTO> &actions) {
+    Chunk::actions = actions;
+}
+
 
 const std::vector<Life *> &Chunk::getLifes() const {
     return lifes;
@@ -1059,77 +1145,4 @@ void Chunk::setEntityToDelete(const std::vector<Entity *> &entityToDelete) {
 
 
 
-std::vector<Entity *> Chunk::getAccessibleEntities(std::vector<Point> selectedTiles) {
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
-    std::vector<Entity *> accessibleEntities;
-    for (int jt = 0; jt < selectedTiles.size(); jt++) {
-        Point currentTiles = selectedTiles.at(jt);
-
-        std::vector<Entity *> chunkEntities = getRelativeEntities(currentTiles.getX() - deltaX, currentTiles.getY() - deltaY);
-
-        accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
-    }
-    return accessibleEntities;
-
-}
-std::vector<Tile *> Chunk::getAccessibleTiles(std::vector<Point> selectedTiles) {
-    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
-    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
-
-    std::vector<Tile *> accessibleTiles;
-    for (int jt = 0; jt < selectedTiles.size(); jt++) {
-        Point currentTilePoint = selectedTiles.at(jt);
-
-        Tile * currentTile = getRelativeTile(currentTilePoint.getX() - deltaX, currentTilePoint.getY() - deltaY, false);
-
-        accessibleTiles.emplace_back(currentTile);
-    }
-    return accessibleTiles;
-
-}
-
-void Chunk::processImportedAndExportedLifes() {
-    std::vector<Life *> newLifes;
-    for (int it = 0; it < lifes.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < exportedLifes.size(); jt++) {
-            if (lifes.at(it)->getEntity()->getId() == exportedLifes.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (!found) {
-            newLifes.emplace_back(lifes.at(it));
-        }
-    }
-
-    lifes.clear();
-    lifes = newLifes;
-
-
-    lifes.insert(lifes.end(), importedLifes.begin(), importedLifes.end());
-
-    importedLifes.clear();
-    exportedLifes.clear();
-
-}
-
-void Chunk::clearAddedLifes() {
-    this->lifesAdded.clear();
-}
-
-void Chunk::clearAddedEntities() {
-    this->entityAdded.clear();
-}
-void Chunk::clearToDeleteLifes() {
-    this->lifesToDelete.clear();
-}
-
-void Chunk::clearToDeleteEntities() {
-    this->entityToDelete.clear();
-}
