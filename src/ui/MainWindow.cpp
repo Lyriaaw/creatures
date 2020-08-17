@@ -201,7 +201,7 @@ void MainWindow::updateInformationLabel() {
     informationStream << "Tick: " << farm->getDataAnalyser()->getPopulation()->getCount();
     informationStream << std::endl;
 
-    informationStream << "Creatures: " << farm->getDataAnalyser()->getPopulation()->getLastValue();
+    informationStream << "Creatures: " << farm->getDataAnalyser()->getPopulation()->getSecondToLastValue();
     informationStream << std::endl;
 
     generalInformationLabel.setString(informationStream.str());

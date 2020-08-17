@@ -50,12 +50,47 @@ void DataItem::addValue(double value) {
     averaged->addRawValue(average);
 }
 
+void DataItem::addRawToTick(int tick, double addedValue) {
+    std::lock_guard<std::mutex> guard(data_mutex);
+
+
+    if (values.size() == tick) {
+        values.emplace_back(addedValue);
+        return;
+    }
+
+
+    double currentValue = values.at(tick);
+    values[tick] = currentValue + addedValue;
+}
+void DataItem::setRawToTick(int tick, double newValue) {
+    std::lock_guard<std::mutex> guard(data_mutex);
+
+
+    if (values.size() == tick) {
+        values.emplace_back(newValue);
+        return;
+    }
+
+
+    double currentValue = values.at(tick);
+    values.insert(values.begin() + tick, newValue);
+}
+
+
 double DataItem::getLastValue() {
     if (values.size() == 0) {
         return 0;
     }
 
     return values.at(values.size() - 1);
+}
+double DataItem::getSecondToLastValue() {
+    if (values.size() <= 1) {
+        return 0;
+    }
+
+    return values.at(values.size() - 2);
 }
 
 double DataItem::getAveragedLastValue() {

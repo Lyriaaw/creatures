@@ -8,6 +8,8 @@
 #include <string>
 
 #include <vector>
+#include <shared_mutex>
+
 
 class DataItem {
 private:
@@ -21,6 +23,7 @@ private:
 
     std::string name;
 
+    std::mutex data_mutex;
 public:
     DataItem(std::string name, bool averaged);
 
@@ -46,6 +49,11 @@ public:
 
     const std::string &getName() const;
 
+    void addRawToTick(int tick, double addedValue);
+
+    void setRawToTick(int tick, double newValue);
+
+    double getSecondToLastValue();
 };
 
 

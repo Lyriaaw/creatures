@@ -43,6 +43,8 @@ private:
 
     DataAnalyser * dataAnalyser;
 
+    std::mutex entity_changes_mutex;
+
 public:
 
     Chunk(Point chunkPosition, CreatureNursery * nursery, DataAnalyser * dataAnalyser);

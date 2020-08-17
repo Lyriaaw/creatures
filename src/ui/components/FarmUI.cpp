@@ -63,12 +63,21 @@ void FarmUI::addEntity(Entity * entity) {
 }
 
 void FarmUI::addLifes(std::vector<Life *> addedToFarm) {
+    if (addedToFarm.empty()) {
+        return;
+    }
+
     for (int it = 0; it < addedToFarm.size(); it++) {
         addLife(addedToFarm.at(it));
     }
 }
 
 void FarmUI::addEntities(std::vector<Entity *> addedToFarm) {
+    if (addedToFarm.empty()) {
+        return;
+    }
+
+
     for (int it = 0; it < addedToFarm.size(); it++) {
         addEntity(addedToFarm.at(it));
     }
@@ -76,8 +85,17 @@ void FarmUI::addEntities(std::vector<Entity *> addedToFarm) {
 
 
 void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
+    if (deletedFromFarm.empty()) {
+        return;
+    }
+
+
     for (int it = 0; it < deletedFromFarm.size(); it++) {
         Life * lifeToDelete = deletedFromFarm.at(it);
+
+        if (lifeToDelete == nullptr || lifeToDelete->getEntity() == nullptr) {
+            continue;
+        }
 
         int index = -1;
         for (int jt = 0; jt < lifeUIs.size(); jt++) {
@@ -96,6 +114,10 @@ void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
 }
 
 void FarmUI::clearDeletedEntities(std::vector<Entity *> deletedFromFarm) {
+    if (deletedFromFarm.empty()) {
+        return;
+    }
+
     for (int it = 0; it < deletedFromFarm.size(); it++) {
         Entity * entityToDelete = deletedFromFarm.at(it);
 

@@ -223,8 +223,8 @@ void Farm::handleBigThread(bool *paused, bool *running) {
                     if (!*paused) {
                         chunk->executeCreaturesActions();
                         chunk->moveCreatures();
+                        chunk->statistics();
                         chunk->aTickHavePassed();
-//                        chunk->statistics();
                     }
                 }
             };

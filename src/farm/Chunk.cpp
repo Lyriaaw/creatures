@@ -365,7 +365,7 @@ void Chunk::moveCreatures() {
 
     this->step = "MOVE_CREATURES";
     steps.emplace_back("MOVE_CREATURES");
-    steps.emplace_back("TICK_PASS");
+    steps.emplace_back("STATISTICS");
     waitForNeighbours(steps);
 
 
@@ -389,30 +389,6 @@ void Chunk::moveCreatures() {
 
 }
 
-void Chunk::aTickHavePassed() {
-    std::vector<std::string> steps;
-    steps.clear();
-
-    this->step = "TICK_PASS";
-    steps.emplace_back("TICK_PASS");
-    steps.emplace_back("READY_TO_START");
-    steps.emplace_back("STATISTICS");
-    waitForNeighbours(steps);
-
-
-    for (int it = 0; it < lifes.size(); it++) {
-        lifes.at(it)->getEntity()->aTickHavePassed();
-    }
-    for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->aTickHavePassed();
-    }
-    tick++;
-
-    this->step = "READY_TO_START";
-
-
-}
-
 void Chunk::statistics() {
 
     std::vector<std::string> steps;
@@ -420,49 +396,39 @@ void Chunk::statistics() {
 
     this->step = "STATISTICS";
     steps.emplace_back("STATISTICS");
-    steps.emplace_back("READY_TO_START");
+    steps.emplace_back("TICK_PASS");
     waitForNeighbours(steps);
-
-    if (!chunkPosition.equals(Point(0, 0))) {
-        return;
-    }
 
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-    std::vector<Point> *empty = new std::vector<Point>();
-    std::vector<Life *> currentLifes = getAllLifes(empty);
-
-    empty = new std::vector<Point>();
-    std::vector<Tile *> currentTiles = getAllTiles(empty);
 
 
 
 //    std::vector<Life *> sortedLife = getScoreSortedCreatures();
 //    std::vector<BrainConnector *> sortedConnectors = connectors;
-    int populationSize = currentLifes.size();
+    int populationSize = lifes.size();
 
-    dataAnalyser->getPopulation()->addValue(populationSize);
+    dataAnalyser->getPopulation()->addRawToTick(tick, populationSize);
 
     double totalPopulationScore = 0.0;
     for (int it = 0; it < populationSize; it++) {
-        totalPopulationScore += currentLifes.at(it)->getEntity()->getAge();
+        totalPopulationScore += lifes.at(it)->getEntity()->getAge();
     }
 
-    double averagePopulationAge = totalPopulationScore / double(populationSize);
-
-    double maxScore = currentLifes.at(0)->getEntity()->getAge();
-
-    double firstQuartileScore = currentLifes.at(populationSize / 4)->getEntity()->getAge();
-    double median = currentLifes.at(populationSize / 2)->getEntity()->getAge();
-    double lastQuartileScore = currentLifes.at((3 * populationSize) / 4)->getEntity()->getAge();
-
-
-    dataAnalyser->getAverageScore()->addValue(averagePopulationAge);
-    dataAnalyser->getBestScore()->addValue(maxScore);
-    dataAnalyser->getFirstQuartileScore()->addValue(firstQuartileScore);
-    dataAnalyser->getMedianScore()->addValue(median);
-    dataAnalyser->getLastQuartileScore()->addValue(lastQuartileScore);
+//    double averagePopulationAge = totalPopulationScore / double(populationSize);
+//
+//    double maxScore = lifes.at(0)->getEntity()->getAge();
+//
+//    double firstQuartileScore = lifes.at(populationSize / 4)->getEntity()->getAge();
+//    double median = lifes.at(populationSize / 2)->getEntity()->getAge();
+//    double lastQuartileScore = lifes.at((3 * populationSize) / 4)->getEntity()->getAge();
+//
+//
+//    dataAnalyser->getAverageScore()->addRawToTick(tick, averagePopulationAge);
+//    dataAnalyser->getBestScore()->addRawToTick(tick, maxScore);
+//    dataAnalyser->getFirstQuartileScore()->addRawToTick(tick, firstQuartileScore);
+//    dataAnalyser->getMedianScore()->addRawToTick(tick, median);
+//    dataAnalyser->getLastQuartileScore()->addRawToTick(tick, lastQuartileScore);
 
 
 
@@ -472,8 +438,8 @@ void Chunk::statistics() {
     double totalFoodsMass = 0.f;
 
 
-    for (int it = 0; it < currentLifes.size(); it++) {
-        Life * currentLife = currentLifes.at(it);
+    for (int it = 0; it < lifes.size(); it++) {
+        Life * currentLife = lifes.at(it);
         totalCreaturesEnergy += currentLife->getEnergyManagement()->getEnergy();
         totalCreaturesMass += currentLife->getEntity()->getMass();
     }
@@ -488,11 +454,14 @@ void Chunk::statistics() {
     double totalGround = 0.0;
     double totalToAdd = 0.0;
 
-    for (int it = 0; it < currentTiles.size(); it++) {
-        totalHeat += currentTiles.at(it)->getHeat();
-        totalGround += currentTiles.at(it)->getGround();
-        totalToAdd += currentTiles.at(it)->getAddedHeat();
-        totalToAdd += currentTiles.at(it)->getAddedGround();
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * tile = getRelativeTile(it, jt, false);
+            totalHeat += tile->getHeat();
+            totalGround += tile->getGround();
+            totalToAdd += tile->getAddedHeat();
+            totalToAdd += tile->getAddedGround();
+        }
     }
 
 
@@ -500,13 +469,13 @@ void Chunk::statistics() {
 
 //    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser->getTotalEnergy()->getLastValue() << std::endl;
 
-    dataAnalyser->getTotalEnergy()->addValue(totalEnergy);
-    dataAnalyser->getFoodEnergy()->addValue(totalFoodsMass);
-    dataAnalyser->getCreaturesMass()->addValue(totalCreaturesMass);
-    dataAnalyser->getCreaturesEnergy()->addValue(totalCreaturesEnergy);
-    dataAnalyser->getHeatEnergy()->addValue(totalHeat);
-    dataAnalyser->getGroundEnergy()->addValue(totalGround);
-    dataAnalyser->getEnergyToAdd()->addValue(totalToAdd);
+    dataAnalyser->getTotalEnergy()->addRawToTick(tick, totalEnergy);
+    dataAnalyser->getFoodEnergy()->addRawToTick(tick, totalFoodsMass);
+    dataAnalyser->getCreaturesMass()->addRawToTick(tick, totalCreaturesMass);
+    dataAnalyser->getCreaturesEnergy()->addRawToTick(tick, totalCreaturesEnergy);
+    dataAnalyser->getHeatEnergy()->addRawToTick(tick, totalHeat);
+    dataAnalyser->getGroundEnergy()->addRawToTick(tick, totalGround);
+    dataAnalyser->getEnergyToAdd()->addRawToTick(tick, totalToAdd);
 
 
 
@@ -525,16 +494,35 @@ void Chunk::statistics() {
     std::chrono::duration<double> elapsed_time = end - start;
     double statisticsTime = elapsed_time.count();
 
-    dataAnalyser->getStatisticsTime()->addValue(statisticsTime);
+    dataAnalyser->getStatisticsTime()->addRawToTick(tick, statisticsTime);
     totalTime += statisticsTime;
 
-    dataAnalyser->getTotalTime()->addValue(totalTime);
+    dataAnalyser->getTotalTime()->setRawToTick(tick, totalTime);
 
-    empty = new std::vector<Point>();
-    getNeighboursReady(empty);
-    this->step = "READY_TO_START";
 }
 
+void Chunk::aTickHavePassed() {
+    std::vector<std::string> steps;
+    steps.clear();
+
+    this->step = "TICK_PASS";
+    steps.emplace_back("TICK_PASS");
+    steps.emplace_back("READY_TO_START");
+    waitForNeighbours(steps);
+
+
+    for (int it = 0; it < lifes.size(); it++) {
+        lifes.at(it)->getEntity()->aTickHavePassed();
+    }
+    for (int it = 0; it < entities.size(); it++) {
+        entities.at(it)->aTickHavePassed();
+    }
+    tick++;
+
+    this->step = "READY_TO_START";
+
+
+}
 
 
 // Find entities and lifes
@@ -654,6 +642,8 @@ std::vector<Entity *> Chunk::getEntitiesAt(int tileX, int tileY) {
 }
 
 Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     for (int it = 0; it < this->lifes.size(); it++) {
         if (this->lifes.at(it)->getEntity()->getId() == id) {
             return this->lifes.at(it);
@@ -938,27 +928,21 @@ void Chunk::getNeighboursReady(std::vector<Point> *visitedPoints) {
 
 // In and Out
 void Chunk::removeDeletedEntities() {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     std::vector<Life *> newLifes;
     for (int it = 0; it < lifes.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (lifes.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (found) {
+        Life * currentLife = lifes.at(it);
+        if (currentLife->getEnergyManagement()->getEnergy() > 0 && currentLife->getEntity()->getMass() > 0) {
+            newLifes.emplace_back(lifes.at(it));
+        } else {
             Life * currentLife = lifes.at(it);
             Point currentLifePosition = currentLife->getEntity()->getPosition();
             Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
 
             getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addGround(currentLife->getEntity()->getMass());
             getTileAt(int(currentLifeTilePosition.getX()), int(currentLifeTilePosition.getY()))->addHeat(currentLife->getEnergyManagement()->getEnergy());
-        } else {
-            newLifes.emplace_back(lifes.at(it));
+            lifesToDelete.emplace_back(currentLife);
         }
     }
 
@@ -1011,10 +995,13 @@ void Chunk::checkForLifeTransfer(Life * life) {
 }
 
 void Chunk::transferLife(Life * life) {
+
     importedLifes.emplace_back(life);
 }
 
 void Chunk::addLife(Life * life) {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
@@ -1051,6 +1038,8 @@ void Chunk::addLife(Life * life) {
 }
 
 void Chunk::processImportedAndExportedLifes() {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     std::vector<Life *> newLifes;
     for (int it = 0; it < lifes.size(); it++) {
 
@@ -1211,6 +1200,7 @@ bool Chunk::handleDuplication(Life * life) {
 
 
     if (life->getEnergyManagement()->getEnergy() <= 0) {
+        std::lock_guard<std::mutex> guard(entity_changes_mutex);
         lifesToDelete.emplace_back(life);
     }
 
@@ -1295,18 +1285,26 @@ bool Chunk::handleMating(Life * father, int entityId) {
 
 // For the UI
 void Chunk::clearAddedLifes() {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     this->lifesAdded.clear();
 }
 
 void Chunk::clearAddedEntities() {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     this->entityAdded.clear();
 }
 
 void Chunk::clearToDeleteLifes() {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     this->lifesToDelete.clear();
 }
 
 void Chunk::clearToDeleteEntities() {
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
     this->entityToDelete.clear();
 }
 
