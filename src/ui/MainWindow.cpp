@@ -401,14 +401,15 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
 
         bool found = false;
-        for (int it = 0; it < farm->getLifes().size(); it++) {
-            Life * connector = farm->getLifes().at(it);
+        std::vector<Life *> currentLifes = farm->fetchLifes();
+        for (int it = 0; it < currentLifes.size(); it++) {
+            Life * connector = currentLifes.at(it);
 
             double deltaX = abs(worldCoordinates.getX() - connector->getEntity()->getPosition().getX());
             double deltaY = abs(worldCoordinates.getY() - connector->getEntity()->getPosition().getY());
 
             if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
-                selectedLife = farm->getLifes().at(it);
+                selectedLife = currentLifes.at(it);
 
                 std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary()->getGenomeFor(selectedLife->getEntity()->getId());
                 std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();

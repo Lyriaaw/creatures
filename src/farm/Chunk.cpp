@@ -499,6 +499,10 @@ void Chunk::statistics() {
 
     dataAnalyser->getTotalTime()->setRawToTick(tick, totalTime);
 
+    if (chunkPosition.equals(Point(0, 0)) && tick % 100 == 0) {
+        populationControl();
+    }
+
 }
 
 void Chunk::aTickHavePassed() {
@@ -523,6 +527,72 @@ void Chunk::aTickHavePassed() {
 
 
 }
+
+
+void Chunk::populationControl() {
+
+
+
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
+    std::uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
+
+    std::vector<Point> *empty = new std::vector<Point>();
+    std::vector<Life *> allLifes = getAllLifes(empty);
+
+    std::vector<Life *> creatures;
+    for (int it = 0; it < allLifes.size(); it++) {
+        if (allLifes.at(it)->getType() == "ANIMAL") {
+            creatures.emplace_back(allLifes.at(it));
+        }
+    }
+
+
+    if (creatures.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
+        return;
+    }
+
+    std::cout << "Population control" << std::endl;
+
+
+
+    int selectedParentCount = creatures.size();
+
+    int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - creatures.size();
+
+    float totalEnergyRemoved = 0.f;
+    for (int it = 0; it < newConnectorNeeded; it++) {
+        int fatherIndex = rand() % selectedParentCount;
+        int motherIndex = rand() % selectedParentCount;
+
+        Life * father = creatures.at(fatherIndex);
+        Life * mother = creatures.at(motherIndex);
+
+        Life * child = this->nursery->Mate(father, mother);
+        child->getEnergyManagement()->setEnergy(child->getEnergyManagement()->getMaxMass() / 2.f);
+        child->setMass(child->getEnergyManagement()->getMaxMass() / 2.f);
+        Entity * childCreature = child->getEntity();
+
+//        float childSpawnX = distWidth(mt);
+//        float childSpawnY = distHeight(mt);
+//        Point childCreaturePosition = Point(childSpawnX, childSpawnY);
+//
+//        childCreature->setPosition(childCreaturePosition);
+
+        totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyManagement()->getEnergy();
+
+
+        addLife(child);
+    }
+
+    // TODO
+//    map->removeEnergyFromGround(totalEnergyRemoved);
+
+
+
+}
+
 
 
 // Find entities and lifes
@@ -1161,7 +1231,7 @@ void Chunk::handleCaptureGround(Life * life, ActionDTO action) {
 
 bool Chunk::handleDuplication(Life * life) {
 
-    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
+    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() * 0.75f;
 
     if (!fatherCanReproduce) {
 //        std::cout << "Father cannot reproduce" << std::endl;
@@ -1170,7 +1240,7 @@ bool Chunk::handleDuplication(Life * life) {
 //
     Life * child = this->nursery->Mate(life, nullptr);
 
-    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.f;
+    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 20.f;
 
     double givenFatherEnergy = std::min(life->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal);
 

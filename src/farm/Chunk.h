@@ -144,6 +144,8 @@ public:
 
 
     void statistics();
+
+    void populationControl();
 };
 
 
