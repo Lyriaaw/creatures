@@ -13,8 +13,9 @@
 
 class Chunk {
 private:
-    Point chunkPosition;
+    int tick;
 
+    Point chunkPosition;
 
     std::vector<Life *> lifes;
     std::vector<Entity *> entities;
@@ -50,6 +51,7 @@ public:
     void brainProcessing();
     void executeCreaturesActions();
     void moveCreatures();
+    void aTickHavePassed();
 
 
     // Find entities and lifes
@@ -129,12 +131,7 @@ public:
 
     void setEntityToDelete(const std::vector<Entity *> &entityToDelete);
 
-
-
-
-
-
-
+    void setStep(const std::string &step);
 
 
 };

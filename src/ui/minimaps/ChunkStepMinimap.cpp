@@ -16,6 +16,9 @@ void ChunkStepMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
 
     sf::Color pixelColor = sf::Color(0, 0, 0, 255);
 
+    if ("READY_TO_START") {
+        pixelColor = sf::Color(255, 255, 255, 255);
+    }
     if ("ENTITY_GRID") {
         pixelColor = sf::Color(55, 55, 55, 255);
     }
@@ -40,6 +43,11 @@ void ChunkStepMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     if ("MOVE_CREATURES") {
         pixelColor = sf::Color(100, 0, 100, 255);
     }
+    if ("MOVED_CREATURES") {
+        pixelColor = sf::Color(255, 0, 0, 255);
+    }
+
+
 
 
     int vertexArrayIndex = (tileX * TILE_COUNT_HEIGHT) + tileY;

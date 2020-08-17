@@ -3,6 +3,7 @@
 //
 
 #include "Farm.h"
+#include <zconf.h>
 
 #include <iostream>
 #include <sstream>
@@ -158,6 +159,7 @@ void Farm::InitFromRandom() {
 
             getChunkAt(it, jt)->setLifes(chunkLifeGrid.at(it).at(jt));
             getChunkAt(it, jt)->setEntities(chunkEntityGrid.at(it).at(jt));
+            getChunkAt(it, jt)->setStep("READY_TO_START");
 
         }
     }
@@ -166,8 +168,6 @@ void Farm::InitFromRandom() {
 
 
 void Farm::Tick(bool paused) {
-
-
 
 
 
@@ -187,7 +187,6 @@ void Farm::Tick(bool paused) {
 
 
     if (!paused) {
-        aTickHavePassed();
         statistics();
     }
     sortCreatures();
@@ -224,6 +223,7 @@ void Farm::handleBigThread() {
                 chunk->brainProcessing();
                 chunk->executeCreaturesActions();
                 chunk->moveCreatures();
+                chunk->aTickHavePassed();
             };
 
             int index = (it * CHUNK_COUNT_HEIGHT) + jt;
@@ -318,9 +318,45 @@ void Farm::aTickHavePassed() {
     tickCount++;
 }
 
+void Farm::waitForChunkReadyForStatistics() {
+    bool allNeighboursReady(true);
 
+    std::vector<std::string> steps;
+    steps.emplace_back("MOVED_CREATURES");
+
+    do {
+        allNeighboursReady = true;
+
+        for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+            for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+
+                Chunk * chunk = getChunkAt(it, jt);
+
+                bool found(false);
+                for (int kt = 0; kt < steps.size(); kt++) {
+                    if (chunk->getStep() == steps.at(kt)) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    allNeighboursReady = false;
+                }
+
+            }
+        }
+
+        if (!allNeighboursReady) {
+            usleep(100);
+        }
+
+    }while (!allNeighboursReady);
+}
 
 void Farm::statistics() {
+    waitForChunkReadyForStatistics();
+
+
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     std::vector<Life *> currentLifes = fetchLifes();
@@ -386,7 +422,7 @@ void Farm::statistics() {
 
     int totalEnergy = availableEnergy + totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
 
-    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
+//    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
 
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
@@ -418,6 +454,17 @@ void Farm::statistics() {
     totalTime += statisticsTime;
 
     dataAnalyser.getTotalTime()->addValue(totalTime);
+
+
+
+
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+
+            Chunk * chunk = getChunkAt(it, jt);
+            chunk->setStep("READY_TO_START");
+        }
+    }
 }
 
 void Farm::generateEntityGrid() {

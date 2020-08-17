@@ -6,7 +6,7 @@
 #include "Chunk.h"
 #include "../utils/perlin/PerlinNoise.h"
 
-Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chunkPosition), nursery(nursery), step("init") {
+Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery): chunkPosition(chunkPosition), nursery(nursery), step("init"), tick(0) {
     generateNeighbours();
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
@@ -24,6 +24,12 @@ void Chunk::generateEntityGrid() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     std::vector<std::string> steps;
+
+    steps.emplace_back("READY_TO_START");
+    steps.emplace_back("ENTITY_GRID");
+    waitForNeighbours(steps);
+
+
     steps.clear();
 
     this->step = "ENTITY_GRID";
@@ -359,6 +365,7 @@ void Chunk::moveCreatures() {
 
     this->step = "MOVE_CREATURES";
     steps.emplace_back("MOVE_CREATURES");
+    steps.emplace_back("MOVED_CREATURES");
     waitForNeighbours(steps);
 
 
@@ -380,7 +387,19 @@ void Chunk::moveCreatures() {
 
     removeDeletedEntities();
 
+    this->step = "MOVED_CREATURES";
 }
+
+void Chunk::aTickHavePassed() {
+    for (int it = 0; it < lifes.size(); it++) {
+        lifes.at(it)->getEntity()->aTickHavePassed();
+    }
+    for (int it = 0; it < entities.size(); it++) {
+        entities.at(it)->aTickHavePassed();
+    }
+    tick++;
+}
+
 
 
 
@@ -1142,7 +1161,6 @@ void Chunk::setEntityToDelete(const std::vector<Entity *> &entityToDelete) {
     Chunk::entityToDelete = entityToDelete;
 }
 
-
-
-
-
+void Chunk::setStep(const std::string &step) {
+    Chunk::step = step;
+}
