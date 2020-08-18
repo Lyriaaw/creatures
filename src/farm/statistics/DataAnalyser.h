@@ -38,6 +38,8 @@ private:
     DataItem * totalTime;
 
     DataItem * population;
+    DataItem * animals;
+    DataItem * vegetals;
     DataItem * naturalMatings;
 
     DataItem * totalEnergy;
@@ -137,6 +139,10 @@ public:
     DataItem *getMateActions() const;
 
     DataItem *getEnergyToAdd() const;
+
+    DataItem *getAnimals() const;
+
+    DataItem *getVegetals() const;
 };
 
 

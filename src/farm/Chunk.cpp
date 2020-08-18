@@ -112,8 +112,8 @@ void Chunk::processClimate() {
 
     this->step = "CLIMATE_START";
     std::vector<std::string> steps;
-    steps.emplace_back("CLIMATE_READY");
     steps.emplace_back("CLIMATE_START");
+    steps.emplace_back("BRAIN_PROCESSING");
     waitForNeighbours(steps);
     steps.clear();
 
@@ -131,12 +131,12 @@ void Chunk::processClimate() {
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
-    this->step = "CLIMATE_READY";
-    steps.clear();
-    steps.emplace_back("CLIMATE_READY");
-    steps.emplace_back("CLIMATE_SPREAD");
-    waitForNeighbours(steps);
-    steps.clear();
+//    this->step = "CLIMATE_READY";
+//    steps.clear();
+//    steps.emplace_back("CLIMATE_READY");
+//    steps.emplace_back("CLIMATE_SPREAD");
+//    waitForNeighbours(steps);
+//    steps.clear();
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
@@ -190,12 +190,12 @@ void Chunk::processClimate() {
 
 
 
-    this->step = "CLIMATE_SPREAD";
-    steps.clear();
-    steps.emplace_back("CLIMATE_SPREAD");
-    steps.emplace_back("BRAIN_PROCESSING");
-    waitForNeighbours(steps);
-    steps.clear();
+//    this->step = "CLIMATE_SPREAD";
+//    steps.clear();
+//    steps.emplace_back("CLIMATE_SPREAD");
+//    steps.emplace_back("BRAIN_PROCESSING");
+//    waitForNeighbours(steps);
+//    steps.clear();
 
 
 //    for (int it = 0; it < TILE_PER_CHUNK; it++) {
@@ -242,7 +242,6 @@ void Chunk::processClimate() {
 }
 
 void Chunk::brainProcessing() {
-    std::vector<std::string> steps;
     steps.clear();
 
     this->step = "BRAIN_PROCESSING";
@@ -250,6 +249,7 @@ void Chunk::brainProcessing() {
     steps.emplace_back("EXECUTE_ACTIONS");
     waitForNeighbours(steps);
     steps.clear();
+    processGlobalAddedEnergy();
 
 
     for (int it = 0; it < lifes.size(); it++) {
@@ -284,6 +284,7 @@ void Chunk::executeCreaturesActions() {
     steps.emplace_back("MOVE_CREATURES");
     waitForNeighbours(steps);
     steps.clear();
+    processGlobalAddedEnergy();
 
 
     int captureGroundActions = 0;
@@ -437,10 +438,21 @@ void Chunk::statistics() {
 
     dataAnalyser->getPopulation()->addRawToTick(tick, populationSize);
 
+    int totalAnimals = 0;
+    int totalVegetals = 0;
+
     double totalPopulationScore = 0.0;
     for (int it = 0; it < populationSize; it++) {
         totalPopulationScore += lifes.at(it)->getEntity()->getAge();
+        if (lifes.at(it)->getType() == "ANIMAL") {
+            totalAnimals++;
+        } else {
+            totalVegetals++;
+        }
     }
+
+    dataAnalyser->getAnimals()->addRawToTick(tick, totalAnimals);
+    dataAnalyser->getVegetals()->addRawToTick(tick, totalVegetals);
 
 //    double averagePopulationAge = totalPopulationScore / double(populationSize);
 //
@@ -729,6 +741,15 @@ void Chunk::removeEnergy(Point targetChunk, double energyToRemove, std::vector<P
 }
 
 
+void Chunk::processGlobalAddedEnergy() {
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * currentTile = getRelativeTile(it, jt, false);
+            currentTile->processAddedGround();
+            currentTile->processAddedHeat();
+        }
+    }
+}
 
 
 // Find entities and lifes

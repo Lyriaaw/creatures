@@ -44,7 +44,7 @@ std::vector<Entity *> Movement::executeAction() {
     return empty;
 }
 
-Movement::Movement(float rotation, Entity *entity) : InternalMuscle(rotation, entity) {
+Movement::Movement(float rotation, Entity *entity) : InternalMuscle(rotation, entity), speed(0.f) {
 
 }
 

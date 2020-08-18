@@ -9,6 +9,8 @@
 #include "InternalMuscle.h"
 
 class Movement: public InternalMuscle  {
+private:
+    float speed;
 public:
     Movement(float rotation, Entity *entity);
 

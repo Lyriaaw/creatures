@@ -17,8 +17,11 @@ void StatisticsScreen::loadGraphs() {
     Graph * populationGraph = new Graph("Population", font);
     populationGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
 
-    populationGraph->addLine(farm->getDataAnalyser()->getPopulation(), 1, 255, 0, 0);
-    populationGraph->addLine(farm->getDataAnalyser()->getNaturalMatings(), 1, 0, 0, 255);
+
+    populationGraph->addLine(farm->getDataAnalyser()->getPopulation(), 1, 0, 0, 255);
+    populationGraph->addLine(farm->getDataAnalyser()->getAnimals(), 1, 255, 0, 0);
+    populationGraph->addLine(farm->getDataAnalyser()->getVegetals(), 1, 0, 255, 0);
+
     populationGraph->windowResized(windowWidth, windowHeight);
 
     currentGraph = populationGraph;

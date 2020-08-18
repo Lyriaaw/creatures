@@ -23,6 +23,8 @@ DataAnalyser::DataAnalyser() {
     totalTime = new DataItem("totalTime", true);
 
     population = new DataItem("population", true);
+    animals = new DataItem("population", true);
+    vegetals = new DataItem("vegetals", true);
     naturalMatings = new DataItem("naturalMatings", true);
 
     totalEnergy = new DataItem("totalEnergy", true);
@@ -213,4 +215,12 @@ DataItem *DataAnalyser::getEatActions() const {
 
 DataItem *DataAnalyser::getEnergyToAdd() const {
     return energyToAdd;
+}
+
+DataItem *DataAnalyser::getAnimals() const {
+    return animals;
+}
+
+DataItem *DataAnalyser::getVegetals() const {
+    return vegetals;
 }
