@@ -28,6 +28,7 @@ void Chunk::generateEntityGrid() {
     steps.emplace_back("READY_TO_START");
     steps.emplace_back("ENTITY_GRID");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     steps.clear();
@@ -36,6 +37,7 @@ void Chunk::generateEntityGrid() {
     steps.emplace_back("ENTITY_GRID");
     steps.emplace_back("ENERGY_GIVEAWAY");
     waitForNeighbours(steps);
+    steps.clear();
 
     processImportedAndExportedLifes();
 
@@ -76,6 +78,7 @@ void Chunk::handleEnergyGiveaway() {
     steps.emplace_back("ENERGY_GIVEAWAY");
     steps.emplace_back("CLIMATE_START");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     for (int it = 0; it < lifes.size(); it++) {
@@ -112,6 +115,7 @@ void Chunk::processClimate() {
     steps.emplace_back("CLIMATE_READY");
     steps.emplace_back("CLIMATE_START");
     waitForNeighbours(steps);
+    steps.clear();
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
@@ -132,6 +136,7 @@ void Chunk::processClimate() {
     steps.emplace_back("CLIMATE_READY");
     steps.emplace_back("CLIMATE_SPREAD");
     waitForNeighbours(steps);
+    steps.clear();
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
         for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
@@ -190,6 +195,7 @@ void Chunk::processClimate() {
     steps.emplace_back("CLIMATE_SPREAD");
     steps.emplace_back("BRAIN_PROCESSING");
     waitForNeighbours(steps);
+    steps.clear();
 
 
 //    for (int it = 0; it < TILE_PER_CHUNK; it++) {
@@ -243,6 +249,7 @@ void Chunk::brainProcessing() {
     steps.emplace_back("BRAIN_PROCESSING");
     steps.emplace_back("EXECUTE_ACTIONS");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     for (int it = 0; it < lifes.size(); it++) {
@@ -269,13 +276,14 @@ void Chunk::brainProcessing() {
 }
 
 void Chunk::executeCreaturesActions() {
-    std::vector<std::string> steps;
+
     steps.clear();
 
     this->step = "EXECUTE_ACTIONS";
     steps.emplace_back("EXECUTE_ACTIONS");
     steps.emplace_back("MOVE_CREATURES");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     int captureGroundActions = 0;
@@ -379,13 +387,13 @@ void Chunk::executeCreaturesActions() {
 
 void Chunk::moveCreatures() {
 
-    std::vector<std::string> steps;
     steps.clear();
 
     this->step = "MOVE_CREATURES";
     steps.emplace_back("MOVE_CREATURES");
     steps.emplace_back("STATISTICS");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     std::vector<Life *> exportedLifes;
@@ -410,13 +418,13 @@ void Chunk::moveCreatures() {
 
 void Chunk::statistics() {
 
-    std::vector<std::string> steps;
     steps.clear();
 
     this->step = "STATISTICS";
     steps.emplace_back("STATISTICS");
     steps.emplace_back("TICK_PASS");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -525,13 +533,13 @@ void Chunk::statistics() {
 }
 
 void Chunk::aTickHavePassed() {
-    std::vector<std::string> steps;
     steps.clear();
 
     this->step = "TICK_PASS";
     steps.emplace_back("TICK_PASS");
     steps.emplace_back("READY_TO_START");
     waitForNeighbours(steps);
+    steps.clear();
 
 
     for (int it = 0; it < lifes.size(); it++) {
@@ -598,17 +606,52 @@ void Chunk::populationControl() {
 //
 //        childCreature->setPosition(childCreaturePosition);
 
-        double removedEnergy = child->getEntity()->getMass() + child->getEnergyManagement()->getEnergy();
+        totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyManagement()->getEnergy();
 
-        std::vector<Point> *empty = new std::vector<Point>();
         Point entityPoint = childCreature->getPosition();
         Point entityChunkPoint = entityPoint.getSimpleCoordinates();
-        removeEnergy(entityChunkPoint, removedEnergy, empty);
 
         addLife(child);
     }
 
-    // TODO
+    empty->clear();
+    std::vector<Tile *> allTiles = getAllTiles(empty);
+
+    double totalGround = 0.0;
+    for (int it = 0; it < allTiles.size(); it++) {
+        Tile * currentTile = allTiles.at(it);
+        currentTile->lockGroundMutex();
+
+        totalGround += currentTile->getGround();
+    }
+
+    if (totalEnergyRemoved > totalGround) {
+        std::cout << "Error, not enough energy" << std::endl;
+    }
+
+    double totalEnergyRemovedFromGround = 0.0;
+    for (int it = 0; it < allTiles.size(); it++) {
+        Tile * currentTile = allTiles.at(it);
+        double ratio = currentTile->getGround() / totalGround;
+
+        currentTile->lockOwnerRemoveGround(ratio * totalEnergyRemoved);
+        currentTile->unlockGroundMutex();
+
+        totalEnergyRemovedFromGround += ratio * totalEnergyRemoved;
+    }
+
+//    double totalGroundAfter = 0.0;
+//    for (int it = 0; it < allTiles.size(); it++) {
+//        Tile * currentTile = allTiles.at(it);
+//        currentTile->lockGroundMutex();
+//
+//        totalGroundAfter += currentTile->getGround();
+//    }
+//
+//    std::cout << "Before: " << totalGround << " After: " << totalGroundAfter << " Difference: " << (totalGround - totalEnergyRemoved) - totalGroundAfter  << std::endl;
+
+
+        // TODO
 //    map->removeEnergyFromGround(totalEnergyRemoved);
 
 
@@ -805,7 +848,6 @@ std::vector<Entity *> Chunk::getEntitiesAt(int tileX, int tileY) {
 }
 
 Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
-    std::lock_guard<std::mutex> guard(entity_changes_mutex);
 
     for (int it = 0; it < this->lifes.size(); it++) {
         if (this->lifes.at(it)->getEntity()->getId() == id) {
@@ -834,8 +876,6 @@ Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
 
         }
     }
-
-
 
     return found;
 }
@@ -930,6 +970,7 @@ std::vector<Tile *> Chunk::getAllTiles(std::vector<Point> *visitedPoints) {
             }
         }
     }
+
 
 
     for (int it = 0; it < TILE_PER_CHUNK; it++) {
@@ -1027,7 +1068,12 @@ void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
     neighbours.at(it + 1).at(jt + 1) = neighbour;
 }
 
+Chunk *Chunk::getNeighbourAt(int it, int jt) {
+    return neighbours.at(it).at(jt);
+}
+
 void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
+    steps.clear();
 
     bool allNeighboursReady(true);
 
@@ -1163,8 +1209,18 @@ void Chunk::transferLife(Life * life) {
     importedLifes.emplace_back(life);
 }
 
-void Chunk::addLife(Life * life) {
-    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+bool Chunk::addLife(Life * life) {
+
+    int counter = 0;
+    while (!entity_changes_mutex.try_lock()) {
+
+        usleep(10000);
+        if (counter == 10) {
+            return false;
+        }
+        counter++;
+    }
+
 
     int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
     int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
@@ -1191,14 +1247,18 @@ void Chunk::addLife(Life * life) {
         int requestedX = deltaX + tileX;
         int requestedY = deltaY + tileY;
 
-        neighbours.at(ratioX + 1).at(ratioY + 1)->addLife(life);
-        return;
+        bool response = neighbours.at(ratioX + 1).at(ratioY + 1)->addLife(life);
+        entity_changes_mutex.unlock();
+        return response;
     }
 
 
 
     lifes.emplace_back(life);
     lifesAdded.emplace_back(life);
+
+    entity_changes_mutex.unlock();
+    return true;
 }
 
 void Chunk::processImportedAndExportedLifes() {
@@ -1349,7 +1409,12 @@ bool Chunk::handleDuplication(Life * life) {
     if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
         child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
         child->setMass(totalGivenEnergy / 2.0);
-        addLife(child);
+        int counter = 0;
+        while (!addLife(child)) {
+            counter++;
+            std::cout << "Unable to add life (duplication), waiting for " << counter << "ms" << std::endl;
+            usleep(counter * 1000);
+        }
         return true;
     }
 
@@ -1417,9 +1482,13 @@ bool Chunk::handleMating(Life * father, int entityId) {
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
         child->setMass(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
-        lifesAdded.emplace_back(child);
 
+        int counter = 0;
+        while (!addLife(child)) {
+            counter++;
+            std::cout << "Unable to add life (duplication), waiting for " << counter << "ms" << std::endl;
+            usleep(counter * 1000);
+        }
         return true;
     }
 
@@ -1555,4 +1624,12 @@ void Chunk::setEntityToDelete(const std::vector<Entity *> &entityToDelete) {
 
 void Chunk::setStep(const std::string &step) {
     Chunk::step = step;
+}
+
+const std::vector<std::string> &Chunk::getSteps() const {
+    return steps;
+}
+
+void Chunk::setSteps(const std::vector<std::string> &steps) {
+    Chunk::steps = steps;
 }

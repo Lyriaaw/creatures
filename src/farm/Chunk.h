@@ -29,6 +29,7 @@ private:
     std::vector<std::vector<Chunk *>> neighbours;
 
     std::string step;
+    std::vector<std::string> steps;
 
     CreatureNursery * nursery;
 
@@ -86,7 +87,7 @@ public:
     void removeDeletedEntities();
     bool checkForLifeTransfer(Life *life);
     void transferLife(Life *life);
-    void addLife(Life *life);
+    bool addLife(Life *life);
     void processImportedAndExportedLifes();
 
 
@@ -141,12 +142,16 @@ public:
 
     void setStep(const std::string &step);
 
+    const std::vector<std::string> &getSteps() const;
 
-
+    void setSteps(const std::vector<std::string> &steps);
 
     void statistics();
 
     void populationControl();
+
+
+    Chunk *getNeighbourAt(int it, int jt);
 };
 
 

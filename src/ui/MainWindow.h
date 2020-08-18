@@ -93,6 +93,8 @@ private:
     void updateInformationLabel();
 
     std::thread runChunksLoop();
+
+    void handleDebugSteps();
 };
 
 

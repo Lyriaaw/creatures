@@ -502,6 +502,9 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::G:
             this->mainCamera->switchGrid();
             break;
+        case Keyboard::Key::D:
+            handleDebugSteps();
+            break;
         case Keyboard::Key::C:
             this->selectedEntity = nullptr;
             this->selectedLife = nullptr;
@@ -556,4 +559,60 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 
     }
 }
+
+void MainWindow::handleDebugSteps() {
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * currentChunk = farm->getChunkAt(it, jt);
+
+            std::cout << endl;
+            std::cout << endl;
+            std::cout << "X: " << currentChunk->getChunkPosition().getX() << " Y: " << currentChunk->getChunkPosition().getY() << " : " << std::endl;
+            std::cout << "Step: " << currentChunk->getStep() << std::endl;
+            std::cout << "Waiting for: " << std::endl;
+
+            const std::vector<std::string>& waitingSteps = currentChunk->getSteps();
+
+            for (int kt = 0; kt < waitingSteps.size(); kt++) {
+                std::cout << "  - " << waitingSteps.at(kt) << std::endl;
+            }
+
+            std::cout << endl;
+
+            std::cout << "Neighbours: " << std::endl;
+            for (int x = 0; x < 3; x++) {
+                for (int y = 0; y < 3; y++) {
+                    Chunk * neighbour = currentChunk->getNeighbourAt(x, y);
+                    if (neighbour == nullptr) {
+                        continue;
+                    }
+                    std::cout << " - X: " << neighbour->getChunkPosition().getX() << " Y: " << neighbour->getChunkPosition().getY() << " => " << neighbour->getStep() << std::endl;
+                }
+            }
+
+
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
