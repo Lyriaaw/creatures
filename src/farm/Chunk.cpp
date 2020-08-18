@@ -93,11 +93,6 @@ void Chunk::handleEnergyGiveaway() {
         } else {
             getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(releasedHeat);
         }
-
-        if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
-            this->lifesToDelete.emplace_back(currentLife);
-        }
-
     }
 
     removeDeletedEntities();
@@ -395,8 +390,9 @@ void Chunk::moveCreatures() {
     waitForNeighbours(steps);
     steps.clear();
 
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
 
-    std::vector<Life *> exportedLifes;
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
         Point entityPoint = currentLife->getEntity()->getPosition();
@@ -404,8 +400,22 @@ void Chunk::moveCreatures() {
 
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
 //        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
-
         checkForLifeTransfer(currentLife);
+
+
+        if (currentLife->getType() == "ANIMAL")
+            continue;
+
+
+
+        Tile * currentTile = getRelativeTile(tilePoint.getX() - deltaX, tilePoint.getY() - deltaY, false);
+        double collectedEnergy = std::min(currentTile->getGround() * 0.1 * (currentLife->getEntity()->getSize() / 5.0), currentTile->getGround());
+        currentTile->removeGround(collectedEnergy);
+        double wastedEnergy = currentLife->addEnergy(collectedEnergy);
+
+
+        currentTile->addGround(wastedEnergy);
+        currentTile->processAddedGround();
     }
 
 
@@ -657,7 +667,6 @@ void Chunk::populationControl() {
 
 
 }
-
 
 void Chunk::removeEnergy(Point targetChunk, double energyToRemove, std::vector<Point> *visitedPoints) {
     for (int it = 0; it < visitedPoints->size(); it++) {
@@ -992,6 +1001,8 @@ std::vector<Life *> Chunk::getAllLifes(std::vector<Point> *visitedPoints) {
         }
     }
     visitedPoints->emplace_back(chunkPosition);
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
+
 
     for (int it = 0; it < 3; it++) {
         for (int jt = 0; jt < 3; jt++) {
@@ -1498,6 +1509,8 @@ bool Chunk::handleMating(Life * father, int entityId) {
 
     getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
+
+    std::lock_guard<std::mutex> guard(entity_changes_mutex);
 
     if (father->getEnergyManagement()->getEnergy() <= 0) {
         lifesToDelete.emplace_back(father);

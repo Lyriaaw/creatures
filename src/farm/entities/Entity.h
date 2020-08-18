@@ -53,6 +53,7 @@ public:
     double getMass() const;
 
     void setMass(double mass);
+    void addMass(double addedMass);
 
 
 protected:

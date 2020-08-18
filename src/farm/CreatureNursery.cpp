@@ -314,10 +314,10 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 //    captureHeatMuscleEvolution->perform(life);
 //    creatureGenome.emplace_back(captureHeatMuscleEvolution);
 
-    CaptureGroundMuscleEvolution * captureGroundMuscleEvolution = new CaptureGroundMuscleEvolution();
-    captureGroundMuscleEvolution->setGenerationNumber(9);
-    captureGroundMuscleEvolution->perform(life);
-    creatureGenome.emplace_back(captureGroundMuscleEvolution);
+//    CaptureGroundMuscleEvolution * captureGroundMuscleEvolution = new CaptureGroundMuscleEvolution();
+//    captureGroundMuscleEvolution->setGenerationNumber(9);
+//    captureGroundMuscleEvolution->perform(life);
+//    creatureGenome.emplace_back(captureGroundMuscleEvolution);
 
 
 

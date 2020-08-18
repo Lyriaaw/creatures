@@ -48,6 +48,16 @@ std::vector<ActionDTO> Life::executeExternalActions(std::vector<Entity *> availa
                     lastCaptureGroundage = entity->getAge();
                 }
             }
+
+            if (muscleActions.at(jt).getType() == "DUPLICATE") {
+                if (entity->getMass() < energyManagement->getMaxMass() * 0.75f) {
+                    accepted = false;
+                }
+            }
+
+
+
+
         }
 
         if (accepted) {
@@ -75,6 +85,10 @@ double Life::giveawayEnergy() {
 
     double sensorEnergy = sensors.size();
     double biasEnergy = 10;
+
+    if (type == "VEGETAL") {
+        biasEnergy += (entity->getAge() / 100.0);
+    }
 //    double sensorEnergy = 0;
 //    double biasEnergy = 0;
 

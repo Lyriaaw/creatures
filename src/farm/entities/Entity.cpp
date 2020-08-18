@@ -104,3 +104,7 @@ void Entity::setMass(double mass) {
     Entity::mass = mass;
 }
 
+void Entity::addMass(double addedMass) {
+    this->mass += addedMass;
+}
+
