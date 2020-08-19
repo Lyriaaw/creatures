@@ -98,7 +98,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 
         }
 
-        float muscleSize = (currentMuscle->getValue() * relativeMuscleSize) * camera->getZoom();
+        float muscleSize = (((currentMuscle->getValue() / 2.f) + 0.5) * relativeMuscleSize) * camera->getZoom();
 
         relativeMuscleSize *= camera->getZoom();
 

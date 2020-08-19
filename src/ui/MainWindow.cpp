@@ -7,6 +7,7 @@
 #include "views/WorldScreen.h"
 #include "views/StatisticsScreen.h"
 #include "views/MinimapsScreen.h"
+#include "views/LifeScreen.h"
 
 
 #include <SFML/Window.hpp>
@@ -27,7 +28,7 @@ using namespace std;
 
 
 
-MainWindow::MainWindow(): brainUi(nullptr), leftMouseButtonDown(false), rightMouseButtonDown(false) {
+MainWindow::MainWindow(): leftMouseButtonDown(false), rightMouseButtonDown(false) {
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 }
@@ -47,10 +48,12 @@ void MainWindow::loadButtons() {
     Button * mainWorldButton = new Button("World", 1, font, 0, 0, 100, 50, backgroundColor, textColor);
     Button * statistics = new Button("Statistics", 2, font, 110, 0, 100, 50, backgroundColor, textColor);
     Button * Minimaps = new Button("Minimaps", 3, font, 220, 0, 100, 50, backgroundColor, textColor);
+    Button * lifes = new Button("LIfe", 4, font, 330, 0, 100, 50, backgroundColor, textColor);
 
     buttons.emplace_back(mainWorldButton);
     buttons.emplace_back(statistics);
     buttons.emplace_back(Minimaps);
+    buttons.emplace_back(lifes);
 }
 
 void MainWindow::loadFarm() {
@@ -74,6 +77,10 @@ void MainWindow::loadScreens() {
     MinimapsScreen * minimapsScreen = new MinimapsScreen(farm, font);
     minimapsScreen->init();
     screens.emplace_back(minimapsScreen);
+
+    LifeScreen * lifeScreen = new LifeScreen(farm, font);
+    lifeScreen->init();
+    screens.emplace_back(lifeScreen);
 
 
 
@@ -214,15 +221,14 @@ void MainWindow::updateInformationLabel() {
 void MainWindow::draw() {
     window->clear(sf::Color::Black);
 
+
+
+    currentScreen->draw(window);
+
+
     if (mainCamera != nullptr) {
         farmUi->draw(window, mainCamera, selectedLife);
     }
-
-    if (brainUi != nullptr) {
-        brainUi->draw(window);
-    }
-
-    currentScreen->draw(window);
 
     window->draw(topButtonBackground);
     for (int it = 0; it < buttons.size(); it++) {
@@ -414,14 +420,9 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
                 std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary()->getGenomeFor(selectedLife->getEntity()->getId());
                 std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
 
-                if (brainUi != nullptr) {
-                    delete brainUi;
-                }
-                brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
-
-
                 selectedEntity = nullptr;
                 found = true;
+                updateSelectedLife();
             }
         }
 
@@ -445,6 +446,12 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     }
 }
 
+void MainWindow::updateSelectedLife() {
+    for (int jt = 0; jt < screens.size(); jt++) {
+        screens.at(jt)->updateSelectedLife(selectedLife);
+    }
+}
+
 
 void MainWindow::handleButtonClicked(int id) {
     switch(id) {
@@ -457,6 +464,10 @@ void MainWindow::handleButtonClicked(int id) {
         case 3:
             openScreen(3);
             break;
+        case 4:
+            openScreen(4);
+            break;
+
         default:
             std::cout << "BUTTON ID NOT FOUND" << std::endl;
             break;
@@ -508,18 +519,12 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::C:
             this->selectedEntity = nullptr;
             this->selectedLife = nullptr;
-            delete brainUi;
-            brainUi = nullptr;
-            break;
         case Keyboard::Key::B:
             this->selectedEntity = nullptr;
             this->selectedLife = farm->getScoreSortedCreatures().at(0);
             if (mainCamera != nullptr) {
                 this->mainCamera->setCenter(selectedLife->getEntity()->getPosition());
             }
-            delete brainUi;
-            brainUi = nullptr;
-            break;
         case Keyboard::Key::T:
             if (this->mainCamera == nullptr) {
                 break;
@@ -541,17 +546,15 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::R:
             this->selectedEntity = nullptr;
             this->selectedLife = nullptr;
-            delete brainUi;
-            brainUi = nullptr;
 
-            int randomCreatureIndex = rand() % farm->getLifes().size();
-            Life * life = farm->getLifes().at(randomCreatureIndex);
+            std::vector<Point> *empty = new std::vector<Point>();
+            std::vector<Life *> allLifes = farm->getChunkAt(0, 0)->getAllLifes(empty);
+            int randomCreatureIndex = rand() % allLifes.size();
+            Life * life = allLifes.at(randomCreatureIndex);
 
             selectedLife = life;
 
-            brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
-
-
+            updateSelectedLife();
 
             break;
 

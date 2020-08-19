@@ -1461,6 +1461,7 @@ bool Chunk::handleDuplication(Life * life) {
 
     if (life->getEnergyManagement()->getEnergy() <= 0) {
         std::lock_guard<std::mutex> guard(entity_changes_mutex);
+        getRelativeTile(tileChildPosition.getX() - deltaX, tileChildPosition.getY() - deltaY, false)->addGround(life->getEntity()->getMass());
         lifesToDelete.emplace_back(life);
     }
 

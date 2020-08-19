@@ -61,8 +61,6 @@ private:
     Life * selectedLife = nullptr;
     Entity * selectedEntity = nullptr;
 
-    BrainUI * brainUi;
-
     sf::Font * font;
 
     std::vector<Button *> buttons;
@@ -95,6 +93,8 @@ private:
     std::thread runChunksLoop();
 
     void handleDebugSteps();
+
+    void updateSelectedLife();
 };
 
 

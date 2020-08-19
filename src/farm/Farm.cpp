@@ -611,6 +611,9 @@ std::vector<Life *> Farm::fetchLifes() {
             std::vector<Life *> chunkCreatures = chunk->getLifes();
 
             foundLifes.insert(foundLifes.begin(), chunkCreatures.begin(), chunkCreatures.end());
+            if (false) {
+                std::cout << "Fetching all lives" << std::endl;
+            }
         }
     }
 

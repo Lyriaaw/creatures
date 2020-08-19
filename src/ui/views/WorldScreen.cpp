@@ -22,7 +22,7 @@ void WorldScreen::draw(sf::RenderWindow *window) {
 
 }
 
-void WorldScreen::updateSelectedCreature(BrainConnector *connector) {
+void WorldScreen::updateSelectedLife(Life * life) {
 
 }
 
