@@ -27,7 +27,7 @@ void CaptureGroundMuscleEvolution::perform(Life * life) {
 }
 
 std::string CaptureGroundMuscleEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Capture Ground ";
+    return "#" +  std::to_string(this->generationNumber) + ": Capture Ground";
 }
 
 Evolution * CaptureGroundMuscleEvolution::generateWithMate(Evolution * mate) {

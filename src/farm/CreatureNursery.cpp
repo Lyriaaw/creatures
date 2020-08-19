@@ -246,7 +246,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
 
 
-Life * CreatureNursery::generateVegetalFromRandom() {
+Life * CreatureNursery::generateVegetalFromRandom(int initialGenerationNumber) {
     random_device rd;
     mt19937 mt(rd());
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
@@ -267,16 +267,18 @@ Life * CreatureNursery::generateVegetalFromRandom() {
     life->setEnergyManagement(energyManagement);
     energyManagement->setBody(entity);
 
+
+
     std::vector<Evolution *> creatureGenome;
 
     ColorEvolution * colorEvolution = new ColorEvolution();
-    colorEvolution->setGenerationNumber(1);
+    colorEvolution->setGenerationNumber(initialGenerationNumber +1);
     colorEvolution->generateFromRandom(life);
     colorEvolution->perform(life);
     creatureGenome.emplace_back(colorEvolution);
 
     SizeEvolution * sizeEvolution = new SizeEvolution();
-    sizeEvolution->setGenerationNumber(2);
+    sizeEvolution->setGenerationNumber(initialGenerationNumber +2);
     sizeEvolution->generateFromRandom(life);
     sizeEvolution->perform(life);
     creatureGenome.emplace_back(sizeEvolution);
@@ -284,39 +286,39 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 
 
     BiasInputEvolution * biasInputEvolution = new BiasInputEvolution();
-    biasInputEvolution->setGenerationNumber(3);
+    biasInputEvolution->setGenerationNumber(initialGenerationNumber +3);
     biasInputEvolution->perform(life);
     creatureGenome.emplace_back(biasInputEvolution);
 
     SelfEnergySensorEvolution * energySensorInputEvolution = new SelfEnergySensorEvolution();
-    energySensorInputEvolution->setGenerationNumber(4);
+    energySensorInputEvolution->setGenerationNumber(initialGenerationNumber +4);
     energySensorInputEvolution->perform(life);
     creatureGenome.emplace_back(energySensorInputEvolution);
 
     AccessibleGroundEnergyEvolution * accessibleGroundEnergyEvolution = new AccessibleGroundEnergyEvolution();
-    accessibleGroundEnergyEvolution->setGenerationNumber(5);
+    accessibleGroundEnergyEvolution->setGenerationNumber(initialGenerationNumber +5);
     accessibleGroundEnergyEvolution->perform(life);
     creatureGenome.emplace_back(accessibleGroundEnergyEvolution);
 
-    TileHeatEvolution * tileHeatEvolution = new TileHeatEvolution();
-    tileHeatEvolution->setGenerationNumber(6);
-    tileHeatEvolution->perform(life);
-    creatureGenome.emplace_back(tileHeatEvolution);
+//    TileHeatEvolution * tileHeatEvolution = new TileHeatEvolution();
+//    tileHeatEvolution->setGenerationNumber(initialGenerationNumber +6);
+//    tileHeatEvolution->perform(life);
+//    creatureGenome.emplace_back(tileHeatEvolution);
 
 
     DuplicationMuscleEvolution * duplicationMuscleEvolution = new DuplicationMuscleEvolution();
-    duplicationMuscleEvolution->setGenerationNumber(7);
+    duplicationMuscleEvolution->setGenerationNumber(initialGenerationNumber +7);
     duplicationMuscleEvolution->generateFromRandom(life);
     duplicationMuscleEvolution->perform(life);
     creatureGenome.emplace_back(duplicationMuscleEvolution);
 
 //    CaptureHeatMuscleEvolution * captureHeatMuscleEvolution = new CaptureHeatMuscleEvolution();
-//    captureHeatMuscleEvolution->setGenerationNumber(8);
+//    captureHeatMuscleEvolution->setGenerationNumber(initialGenerationNumber +8);
 //    captureHeatMuscleEvolution->perform(life);
 //    creatureGenome.emplace_back(captureHeatMuscleEvolution);
 
     CaptureGroundMuscleEvolution * captureGroundMuscleEvolution = new CaptureGroundMuscleEvolution();
-    captureGroundMuscleEvolution->setGenerationNumber(9);
+    captureGroundMuscleEvolution->setGenerationNumber(initialGenerationNumber +9);
     captureGroundMuscleEvolution->generateFromRandom(life);
     captureGroundMuscleEvolution->perform(life);
     creatureGenome.emplace_back(captureGroundMuscleEvolution);
@@ -328,13 +330,13 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 
 //
 //    RotationEvolution * rotationEvolution = new RotationEvolution();
-//    rotationEvolution->setGenerationNumber(8);
+//    rotationEvolution->setGenerationNumber(initialGenerationNumber +8);
 //    rotationEvolution->perform(life);
 //    creatureGenome.emplace_back(rotationEvolution);
 
 
 
-    int generationNumberIndex(10);
+    int generationNumberIndex(initialGenerationNumber + 10);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 

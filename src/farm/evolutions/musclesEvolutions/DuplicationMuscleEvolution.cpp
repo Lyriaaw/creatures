@@ -28,7 +28,7 @@ void DuplicationMuscleEvolution::perform(Life * life) {
 }
 
 std::string DuplicationMuscleEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Duplication ";
+    return "#" +  std::to_string(this->generationNumber) + ": Duplication";
 }
 
 Evolution * DuplicationMuscleEvolution::generateWithMate(Evolution * mate) {

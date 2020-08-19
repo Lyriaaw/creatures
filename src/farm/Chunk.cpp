@@ -51,6 +51,11 @@ void Chunk::generateEntityGrid() {
     }
 
     for (int it = 0; it < lifes.size(); it++) {
+        if (lifes.at(it)->getEntity() == nullptr) {
+            std::cout << "Generating entity grid but life have no entity" << std::endl;
+            continue;
+        }
+
         Point position = lifes.at(it)->getEntity()->getPosition();
         Point tileCoordinate = position.getTileCoordinates();
         Point chunkCoordinates = position.getSimpleCoordinates();
@@ -254,12 +259,8 @@ void Chunk::brainProcessing() {
 
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
+
         currentLife->processSelectedTiles();
-    }
-
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedTiles());
         std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedTiles());
@@ -298,7 +299,7 @@ void Chunk::executeCreaturesActions() {
         ActionDTO actionDto = actions.at(it);
 
 
-        Life * performer = getLifeFromId(actionDto.getPerformerId(), true);
+        Life * performer = getChunkLifeFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId(), true);
 
         if (actionDto.getSubjectId() != 0 && subject == nullptr) {
@@ -330,6 +331,7 @@ void Chunk::executeCreaturesActions() {
             Life * foundLife = getLifeFromId(actionDto.getSubjectId(), true);
             if (foundLife != nullptr) {
                 getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
+                lifesToDelete.emplace_back(foundLife);
             }
 
             getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(wastedEnergy);
@@ -876,14 +878,16 @@ std::vector<Entity *> Chunk::getEntitiesAt(int tileX, int tileY) {
 
 Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
 
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it);
+    std::vector<Life *> currentLifes = this->lifes;
+    for (int it = 0; it < currentLifes.size(); it++) {
+        if (currentLifes.at(it)->getEntity()->getId() == id) {
+            return currentLifes.at(it);
         }
     }
 
-    if (!askNeighbours)
+    if (askNeighbours == false) {
         return nullptr;
+    }
 
     Life * found = nullptr;
 
@@ -905,6 +909,19 @@ Life * Chunk::getLifeFromId(int id, bool askNeighbours) {
     }
 
     return found;
+}
+
+Life * Chunk::getChunkLifeFromId(int id) {
+
+    std::vector<Life *> currentLifes;
+    currentLifes.insert(currentLifes.end(), lifes.begin(), lifes.end());
+    for (int it = 0; it < currentLifes.size(); it++) {
+        if (currentLifes.at(it)->getEntity()->getId() == id) {
+            return currentLifes.at(it);
+        }
+    }
+
+    return nullptr;
 }
 
 Entity * Chunk::getEntityFromId(int id, bool askNeighbours) {

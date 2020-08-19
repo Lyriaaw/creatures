@@ -17,7 +17,8 @@ void SizeEvolution::perform(Life * life) {
 }
 
 std::string SizeEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Size ";
+    return "#" +  std::to_string(this->generationNumber) + ": Max mass => " + std::to_string(this->maxMass);
+
 }
 
 Evolution * SizeEvolution::generateWithMate(Evolution * mate) {

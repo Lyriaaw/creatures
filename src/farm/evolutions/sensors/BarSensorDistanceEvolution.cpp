@@ -25,7 +25,7 @@ void BarSensorDistanceEvolution::perform(Life * life) {
     InputNeuron * inputNeuron = new InputNeuron();
     inputNeuron->setHueOutline(sensorColor);
     inputNeuron->setBrightnessOutline(0.4);
-    inputNeuron->setName("Brightness -" + std::to_string(sensorLength));
+    inputNeuron->setName("Distance");
     inputNeuron->setGenerationNumber(this->generationNumber);
 
 
@@ -38,7 +38,8 @@ void BarSensorDistanceEvolution::perform(Life * life) {
 }
 
 std::string BarSensorDistanceEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Sensor => length: " + std::to_string(sensorLength) + " rotation: " + std::to_string(sensorRotation) + " color: " + std::to_string(sensorColor);
+    return "#" +  std::to_string(this->generationNumber) + ": BarSensor => L: " + std::to_string(sensorLength) + " R: " +  std::to_string(sensorRotation);
+
 }
 
 Evolution * BarSensorDistanceEvolution::generateWithMate(Evolution * mate) {

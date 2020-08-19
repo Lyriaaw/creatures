@@ -8,6 +8,7 @@
 
 #include "Screen.h"
 #include "../components/BrainUI.h"
+#include "../components/Button.h"
 
 class LifeScreen: public Screen {
 private:
@@ -19,8 +20,12 @@ private:
 
     sf::RectangleShape mapBackground;
 
+    std::vector<Button> buttons;
+
+    std::string informationToShow;
 
 
+    std::vector<sf::Text> genomeTexts;
 
 public:
     LifeScreen(Farm *farm, sf::Font *font);
@@ -40,6 +45,12 @@ public:
     void mouseMoved(int x, int y) override;
 
     void mouseClicked(int x, int y) override;
+
+    void handleButtonClick(int id);
+
+    void drawGenome(sf::RenderWindow *window);
+
+    void loadSelectedGenome();
 };
 
 

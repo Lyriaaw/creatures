@@ -28,7 +28,7 @@ void MouthEvolution::perform(Life * life) {
 }
 
 std::string MouthEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Mouth ";
+    return "#" +  std::to_string(this->generationNumber) + ": Mouth => " + std::to_string(rotation);
 }
 
 Evolution * MouthEvolution::generateWithMate(Evolution * mate) {

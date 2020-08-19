@@ -17,7 +17,7 @@ void ColorEvolution::perform(Life * life) {
 }
 
 std::string ColorEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Color";
+    return "#" +  std::to_string(this->generationNumber) + ": Color => " + std::to_string(this->hue);
 }
 
 Evolution * ColorEvolution::generateWithMate(Evolution * mate) {

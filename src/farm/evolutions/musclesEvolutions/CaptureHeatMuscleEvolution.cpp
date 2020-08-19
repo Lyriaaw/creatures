@@ -29,7 +29,7 @@ void CaptureHeatMuscleEvolution::perform(Life * life) {
 }
 
 std::string CaptureHeatMuscleEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Capture heat ";
+    return "#" +  std::to_string(this->generationNumber) + ": Capture heat";
 }
 
 Evolution * CaptureHeatMuscleEvolution::generateWithMate(Evolution * mate) {

@@ -26,7 +26,7 @@ void RotationEvolution::perform(Life * life) {
 }
 
 std::string RotationEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Rotation output ";
+    return "#" +  std::to_string(this->generationNumber) + ": Rotation";
 }
 
 Evolution * RotationEvolution::generateWithMate(Evolution * mate) {

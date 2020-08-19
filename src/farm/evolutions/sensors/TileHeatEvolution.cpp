@@ -25,8 +25,8 @@ void TileHeatEvolution::perform(Life *life) {
 }
 
 std::string TileHeatEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Accessible heat energy evolution";}
-
+    return "#" + std::to_string(this->generationNumber) + ": Tile heat energy";
+}
 Evolution *TileHeatEvolution::generateWithMate(Evolution *mate) {
     TileHeatEvolution * childEvolution = new TileHeatEvolution();
     childEvolution->setGenerationNumber(getGenerationNumber());

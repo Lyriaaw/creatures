@@ -25,7 +25,9 @@ void AccessibleGroundEnergyEvolution::perform(Life *life) {
 }
 
 std::string AccessibleGroundEnergyEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Accessible ground energy evolution";}
+    return "#" +  std::to_string(this->generationNumber) + ": Accessible ground energy";
+
+}
 
 Evolution *AccessibleGroundEnergyEvolution::generateWithMate(Evolution *mate) {
     AccessibleGroundEnergyEvolution * childEvolution = new AccessibleGroundEnergyEvolution();

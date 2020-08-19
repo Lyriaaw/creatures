@@ -135,8 +135,9 @@ void Farm::InitFromRandom() {
         lifes.push_back(initialLife);
     }
 
+    int initialGenerationNumber = Evolution::nextEvolutionNumber;
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
-        Life * initialLife = nursery->generateVegetalFromRandom();
+        Life * initialLife = nursery->generateVegetalFromRandom(initialGenerationNumber);
 
         float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
         initialLife->getEnergyManagement()->setEnergy(creatureEnergy);

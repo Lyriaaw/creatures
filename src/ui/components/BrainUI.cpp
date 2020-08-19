@@ -77,7 +77,14 @@ void BrainUI::initialize(sf::Font * font) {
         text.setString(currentNeuron->getName() + " (" + std::to_string(currentNeuron->getGenerationNumber()) + ")");
         text.setFillColor(sf::Color(255, 255, 255));
         text.setCharacterSize(18);
-        text.setPosition(neuronScreenX - text.getGlobalBounds().width - 20, neuronScreenY - (text.getGlobalBounds().height / 4.f));
+
+        int placementRatio = 40;
+        if (currentNeuron->getX() > 50) {
+            placementRatio = - (text.getGlobalBounds().width + 20);
+        }
+
+
+        text.setPosition(neuronScreenX + placementRatio, neuronScreenY - (text.getGlobalBounds().height / 4.f));
         neuronNames.emplace_back(text);
     }
 
@@ -94,8 +101,6 @@ void BrainUI::draw(sf::RenderWindow *window) {
         float currentNeuronValue = (currentNeuron->getValue() / 2.f) + 0.5;
 
         neurons.at(it).setFillColor(sf::Color(currentNeuronValue * 255, currentNeuronValue * 255, currentNeuronValue * 255, 255));
-
-        neuronNames.at(it).setString(currentNeuron->getName() + " (" + std::to_string(currentNeuronValue) + ")");
 
         window->draw(neurons.at(it));
     }

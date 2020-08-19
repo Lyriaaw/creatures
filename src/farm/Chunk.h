@@ -154,6 +154,8 @@ public:
     Chunk *getNeighbourAt(int it, int jt);
 
     void processGlobalAddedEnergy();
+
+    Life *getChunkLifeFromId(int id);
 };
 
 

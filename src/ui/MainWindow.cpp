@@ -519,6 +519,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
         case Keyboard::Key::C:
             this->selectedEntity = nullptr;
             this->selectedLife = nullptr;
+            updateSelectedLife();
         case Keyboard::Key::B:
             this->selectedEntity = nullptr;
             this->selectedLife = farm->getScoreSortedCreatures().at(0);

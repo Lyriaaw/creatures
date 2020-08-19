@@ -26,7 +26,7 @@ void SpeedEvolution::perform(Life * life) {
 }
 
 std::string SpeedEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Speed output ";
+    return "#" +  std::to_string(this->generationNumber) + ": Movement";
 }
 
 Evolution * SpeedEvolution::generateWithMate(Evolution * mate) {

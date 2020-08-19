@@ -47,7 +47,7 @@ void LinkEvolution::perform(Life * life) {
 }
 
 std::string LinkEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Link: " + std::to_string(inputGenerationNumber) + "->" + std::to_string(outputGenerationNumber);
+    return "#" +  std::to_string(this->generationNumber) + ": Link => " + std::to_string(inputGenerationNumber) + "->" + std::to_string(outputGenerationNumber);
 }
 
 Evolution * LinkEvolution::generateWithMate(Evolution * mate) {

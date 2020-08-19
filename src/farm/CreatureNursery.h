@@ -27,7 +27,7 @@ public:
     Life * generateCreatureFromRandom();
     Life * Mate(Life * father, Life * mother);
 
-    Life * generateVegetalFromRandom();
+    Life * generateVegetalFromRandom(int initialGenerationNumber);
 
     EvolutionLibrary *getEvolutionLibrary() const;
 

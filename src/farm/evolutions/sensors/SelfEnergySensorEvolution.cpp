@@ -26,7 +26,7 @@ void SelfEnergySensorEvolution::perform(Life * life) {
 }
 
 std::string SelfEnergySensorEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Energy sensor";
+    return "#" +  std::to_string(this->generationNumber) + ": Self energy";
 }
 
 Evolution * SelfEnergySensorEvolution::generateWithMate(Evolution * mate) {

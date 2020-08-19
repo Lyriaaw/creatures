@@ -9,7 +9,7 @@ std::string SelfEnergySensor::getName() {
 }
 
 void SelfEnergySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> availableTiles) {
-    this->value = this->energyManagement->getEnergy() / this->entity->getMass();
+    this->value = ((this->energyManagement->getEnergy() / this->entity->getMass()) * 2.0) - 1.0;
 }
 
 void SelfEnergySensor::findSelectedTiles() {

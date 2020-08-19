@@ -27,7 +27,8 @@ void BiasInputEvolution::perform(Life * life) {
 }
 
 std::string BiasInputEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Bias Input";
+    return "#" +  std::to_string(this->generationNumber) + ": Bias input";
+
 }
 
 Evolution * BiasInputEvolution::generateWithMate(Evolution * mate) {

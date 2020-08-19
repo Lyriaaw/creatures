@@ -28,7 +28,7 @@ void GenitalsEvolution::perform(Life * life) {
 }
 
 std::string GenitalsEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Genitals ";
+    return "#" +  std::to_string(this->generationNumber) + ": Genitals => " + std::to_string(rotation);
 }
 
 Evolution * GenitalsEvolution::generateWithMate(Evolution * mate) {
