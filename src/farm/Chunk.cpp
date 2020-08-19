@@ -1035,8 +1035,10 @@ std::vector<Life *> Chunk::getAllLifes(std::vector<Point> *visitedPoints) {
         }
     }
 
-    for (int it = 0; it < lifes.size(); it++) {
-        foundLifes.emplace_back(lifes.at(it));
+    std::vector<Life *> currentLifes;
+    currentLifes.insert(currentLifes.end(), lifes.begin(), lifes.end());
+    for (int it = 0; it < currentLifes.size(); it++) {
+        foundLifes.emplace_back(currentLifes.at(it));
     }
 
     return foundLifes;
@@ -1104,6 +1106,7 @@ void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
 
     bool allNeighboursReady(true);
 
+    int count = 1;
     do {
         allNeighboursReady = true;
 
@@ -1130,7 +1133,8 @@ void Chunk::waitForNeighbours(std::vector<std::string> requestedSteps) {
         }
 
         if (!allNeighboursReady) {
-            usleep(500);
+            usleep(count * 1000);
+            count++;
         }
 
     }while (!allNeighboursReady);
