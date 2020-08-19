@@ -10,7 +10,7 @@ DuplicationMuscleEvolution::DuplicationMuscleEvolution(): Evolution() {
 }
 
 void DuplicationMuscleEvolution::generateFromRandom(Life * life) {
-    rotation = 1.f;
+    rotation = ((rand() % 200) / 100.f) - 1.f ;
 }
 
 void DuplicationMuscleEvolution::perform(Life * life) {

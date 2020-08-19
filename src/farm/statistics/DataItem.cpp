@@ -114,6 +114,13 @@ double DataItem::getSecondToLastValue() {
 
     return values.at(values.size() - 2);
 }
+double DataItem::getThirdToLastValue() {
+    if (values.size() <= 2) {
+        return 0;
+    }
+
+    return values.at(values.size() - 3);
+}
 
 double DataItem::getAveragedLastValue() {
     if (!isAveraged) {

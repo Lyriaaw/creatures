@@ -14,6 +14,13 @@ LifeUI::LifeUI(Life *life, sf::Font *font): life(life), font(font) {
     muscles = sf::VertexArray(sf::Quads, life->getExternalMuscles().size() * 8);
     energyLabel.setFont(*font);
 
+    roundBody = sf::CircleShape(0.0);
+
+    for (int it = 0; it < life->getExternalMuscles().size() * 2; it++) {
+        roundMuscles.emplace_back(sf::CircleShape(0.0));
+    }
+
+
     RGBColor rgbColor = RGBColor(life->getEntity()->getColor(), 1.f, life->getEntity()->getBrightness());
     this->color = sf::Color(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
 }
@@ -31,23 +38,31 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 
     float screenSize = this->life->getEntity()->getSize() * camera->getZoom();
 
-    // Colored body
-    for (int it = 0; it < 4; it++) {
-        double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * M_PI);
+    if (life->getType() == "ANIMAL") {
+        // Colored body
+        for (int it = 0; it < 4; it++) {
+            double angle = ((2 * M_PI) * (it / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * M_PI);
 
-        float currentX = screenPoint.getX() + (screenSize * cos(angle));
-        float currentY = screenPoint.getY() + (screenSize * sin(angle));
-        body[it] = sf::Vector2f(currentX, currentY);
-        body[it].color =  this->color;
-
-        if (selectedEntity == this->life->getEntity()) {
-            body[it].color = sf::Color(255, 255, 255, 255);
-        } else {
+            float currentX = screenPoint.getX() + (screenSize * cos(angle));
+            float currentY = screenPoint.getY() + (screenSize * sin(angle));
+            body[it] = sf::Vector2f(currentX, currentY);
             body[it].color =  this->color;
+
+            if (selectedEntity == this->life->getEntity()) {
+                body[it].color = sf::Color(255, 255, 255, 255);
+            } else {
+                body[it].color =  this->color;
+            }
         }
+
+        window->draw(body);
+    } else {
+        roundBody.setRadius(screenSize);
+        roundBody.setFillColor(color);
+        roundBody.setPosition(screenPoint.getX() - (screenSize), screenPoint.getY() - (screenSize));
+        window->draw(roundBody);
     }
 
-    window->draw(body);
 
 
     float distance = screenSize;
@@ -61,6 +76,10 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
         sf::Color muscleBackColor = sf::Color(0, 0, 0, 255);
         sf::Color muscleColor = sf::Color(200, 200, 200, 255);
 
+        float muscleX = (cos(muscleRotation) * distance) + screenPoint.getX();
+        float muscleY = (sin(muscleRotation) * distance) + screenPoint.getY();
+
+
         if (currentMuscle->getName() == "MOUTH") {
             muscleColor = this->color;
         }
@@ -68,39 +87,60 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
         float relativeMuscleSize = this->life->getEntity()->getSize() / 3.f;
         if (currentMuscle->getName() == "GENITALS") {
             relativeMuscleSize = this->life->getEntity()->getSize() / 4.f;
+        }
+        if (currentMuscle->getName() == "CAPTURE_GROUND") {
+            relativeMuscleSize = this->life->getEntity()->getSize() / 10.f;
+
+        }
+        if (currentMuscle->getName() == "DUPLICATION") {
+            relativeMuscleSize = this->life->getEntity()->getSize() / 10.f;
+            muscleColor = this->color;
 
         }
 
-        float muscleX = (cos(muscleRotation) * distance) + screenPoint.getX();
-        float muscleY = (sin(muscleRotation) * distance) + screenPoint.getY();
+        float muscleSize = (currentMuscle->getValue() * relativeMuscleSize) * camera->getZoom();
 
-        float muscleSize = currentMuscle->getValue() * relativeMuscleSize;
+        relativeMuscleSize *= camera->getZoom();
 
-        for (int jt = 0; jt < 4; jt++) {
-            double angle = ((2 * M_PI) * (jt / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * float(M_PI));
+        roundMuscles.at((it * 2) + 0).setPosition(muscleX - (relativeMuscleSize), muscleY - (relativeMuscleSize));
+        roundMuscles.at((it * 2) + 0).setRadius(relativeMuscleSize);
+        roundMuscles.at((it * 2) + 0).setFillColor(muscleBackColor);
 
-            float currentX = muscleX + (((relativeMuscleSize) * camera->getZoom()) * cos(angle));
-            float currentY = muscleY + (((relativeMuscleSize) * camera->getZoom()) * sin(angle));
+        roundMuscles.at((it * 2) + 1).setPosition(muscleX - (muscleSize), muscleY - (muscleSize));
+        roundMuscles.at((it * 2) + 1).setRadius(muscleSize);
+        roundMuscles.at((it * 2) + 1).setFillColor(muscleColor);
 
-            int currentIt = (it * 8) + jt;
-            muscles[currentIt] = sf::Vector2f(currentX, currentY);
-            muscles[currentIt].color = muscleBackColor;
-        }
+        window->draw(roundMuscles.at((it * 2) + 0));
+        window->draw(roundMuscles.at((it * 2) + 1));
 
-        for (int jt = 0; jt < 4; jt++) {
-            double angle = ((2 * M_PI) * (jt / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * float(M_PI));
 
-            float currentX = muscleX + ((muscleSize * camera->getZoom()) * cos(angle));
-            float currentY = muscleY + ((muscleSize * camera->getZoom()) * sin(angle));
 
-            int currentIt = (it * 8) + 4 + jt;
-            muscles[currentIt] = sf::Vector2f(currentX, currentY);
-            muscles[currentIt].color = muscleColor;
-        }
+
+//        for (int jt = 0; jt < 4; jt++) {
+//            double angle = ((2 * M_PI) * (jt / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * float(M_PI));
+//
+//            float currentX = muscleX + (((relativeMuscleSize) * camera->getZoom()) * cos(angle));
+//            float currentY = muscleY + (((relativeMuscleSize) * camera->getZoom()) * sin(angle));
+//
+//            int currentIt = (it * 8) + jt;
+//            muscles[currentIt] = sf::Vector2f(currentX, currentY);
+//            muscles[currentIt].color = muscleBackColor;
+//        }
+//
+//        for (int jt = 0; jt < 4; jt++) {
+//            double angle = ((2 * M_PI) * (jt / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * float(M_PI));
+//
+//            float currentX = muscleX + ((muscleSize * camera->getZoom()) * cos(angle));
+//            float currentY = muscleY + ((muscleSize * camera->getZoom()) * sin(angle));
+//
+//            int currentIt = (it * 8) + 4 + jt;
+//            muscles[currentIt] = sf::Vector2f(currentX, currentY);
+//            muscles[currentIt].color = muscleColor;
+//        }
 
     }
 
-    window->draw(muscles);
+//    window->draw(muscles);
 
 
 

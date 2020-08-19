@@ -321,16 +321,19 @@ void Chunk::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
-            performer->addEnergy(subject->getMass());
+            float wastedEnergy = performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
+
+            Point performerPosition = performer->getEntity()->getPosition();
+            Point tilePosition = performerPosition.getTileCoordinates();
 
             Life * foundLife = getLifeFromId(actionDto.getSubjectId(), true);
             if (foundLife != nullptr) {
-                Point performerPosition = performer->getEntity()->getPosition();
-                Point tilePosition = performerPosition.getTileCoordinates();
-
                 getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
             }
+
+            getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(wastedEnergy);
+
 
             Point performerPoint = performer->getEntity()->getPosition();
             Point tilePoint = performerPoint.getTileCoordinates();
@@ -538,7 +541,7 @@ void Chunk::statistics() {
 
     dataAnalyser->getTotalTime()->setRawToTick(tick, totalTime);
 
-    if (chunkPosition.equals(Point(0, 0)) && tick % 100 == 0) {
+    if (chunkPosition.equals(Point(0, 0))/* && tick % 100 == 0*/) {
         populationControl();
     }
 
@@ -569,6 +572,10 @@ void Chunk::aTickHavePassed() {
 
 void Chunk::populationControl() {
 
+    int currentAnimalCount = dataAnalyser->getAnimals()->getThirdToLastValue();
+    if (currentAnimalCount > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
+        return;
+    }
 
 
     std::random_device rd;
@@ -739,7 +746,6 @@ void Chunk::removeEnergy(Point targetChunk, double energyToRemove, std::vector<P
     }
 
 }
-
 
 void Chunk::processGlobalAddedEnergy() {
     for (int it = 0; it < TILE_PER_CHUNK; it++) {

@@ -211,16 +211,12 @@ void Farm::handleBigThread(bool *paused, bool *running) {
 
             auto f = [](Chunk * chunk, bool *running, bool *paused) {
                 while(*running) {
-                    chunk->generateEntityGrid();
 
                     if (!*paused) {
+                        chunk->generateEntityGrid();
                         chunk->handleEnergyGiveaway();
                         chunk->processClimate();
-                    }
-
-                    chunk->brainProcessing();
-
-                    if (!*paused) {
+                        chunk->brainProcessing();
                         chunk->executeCreaturesActions();
                         chunk->moveCreatures();
                         chunk->statistics();

@@ -22,5 +22,5 @@ CaptureGroundMuscle::CaptureGroundMuscle(float rotation, Entity *entity) : Exter
 }
 
 std::string CaptureGroundMuscle::getName() {
-    return "CAPTURE_HEAT";
+    return "CAPTURE_GROUND";
 }

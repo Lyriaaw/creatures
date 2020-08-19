@@ -19,9 +19,11 @@ private:
     sf::VertexArray energyBar;
 
     sf::VertexArray muscles;
+    std::vector<sf::CircleShape> roundMuscles;
 
     sf::Color color;
     sf::VertexArray body;
+    sf::CircleShape roundBody;
 
     Life * life;
 

@@ -10,7 +10,7 @@ CaptureGroundMuscleEvolution::CaptureGroundMuscleEvolution(): Evolution() {
 }
 
 void CaptureGroundMuscleEvolution::generateFromRandom(Life * life) {
-    rotation = 0;
+    rotation = ((rand() % 200) / 100.f) - 1.f ;
 }
 
 void CaptureGroundMuscleEvolution::perform(Life * life) {

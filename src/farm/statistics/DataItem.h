@@ -54,6 +54,8 @@ public:
     void setRawToTick(int tick, double newValue);
 
     double getSecondToLastValue();
+
+    double getThirdToLastValue();
 };
 
 

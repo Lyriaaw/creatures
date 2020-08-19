@@ -306,6 +306,7 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 
     DuplicationMuscleEvolution * duplicationMuscleEvolution = new DuplicationMuscleEvolution();
     duplicationMuscleEvolution->setGenerationNumber(7);
+    duplicationMuscleEvolution->generateFromRandom(life);
     duplicationMuscleEvolution->perform(life);
     creatureGenome.emplace_back(duplicationMuscleEvolution);
 
@@ -316,6 +317,7 @@ Life * CreatureNursery::generateVegetalFromRandom() {
 
     CaptureGroundMuscleEvolution * captureGroundMuscleEvolution = new CaptureGroundMuscleEvolution();
     captureGroundMuscleEvolution->setGenerationNumber(9);
+    captureGroundMuscleEvolution->generateFromRandom(life);
     captureGroundMuscleEvolution->perform(life);
     creatureGenome.emplace_back(captureGroundMuscleEvolution);
 
