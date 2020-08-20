@@ -103,6 +103,8 @@ public:
     void waitForChunkReadyForStatistics();
 
     void setDataAnalyser(DataAnalyser *dataAnalyser);
+
+    std::vector<Entity *> fetchEntities();
 };
 
 

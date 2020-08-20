@@ -136,15 +136,32 @@ void Farm::InitFromRandom() {
     }
 
     int initialGenerationNumber = Evolution::nextEvolutionNumber;
+//    for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
+//        Life * initialLife = nursery->generateVegetalFromRandom(initialGenerationNumber);
+//
+//        float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
+//        initialLife->getEnergyManagement()->setEnergy(creatureEnergy);
+//        initialLife->setMass(creatureEnergy);
+//
+//        lifes.push_back(initialLife);
+//    }
+
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
-        Life * initialLife = nursery->generateVegetalFromRandom(initialGenerationNumber);
+        int x = distWidth(mt);
+        int y = distHeight(mt);
 
-        float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
-        initialLife->getEnergyManagement()->setEnergy(creatureEnergy);
-        initialLife->setMass(creatureEnergy);
+        Point point(x, y);
 
-        lifes.push_back(initialLife);
+
+//        float foodSize = ((rand() % 300) / 100.f) + 2;
+        float foodSize = 2;
+
+        Food * entity = new Food(point, foodSize);
+        entity->setMass(2000);
+        entities.push_back(entity);
     }
+
+
 
     availableEnergy = 0.f;
     tickCount = 0;
@@ -619,6 +636,23 @@ std::vector<Life *> Farm::fetchLifes() {
     }
 
     return foundLifes;
+}
+std::vector<Entity *> Farm::fetchEntities() {
+    std::vector<Entity *> foundEntities;
+    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+            Chunk * chunk = getChunkAt(it, jt);
+
+            std::vector<Entity *> chunkEntities = chunk->getEntities();
+
+            foundEntities.insert(foundEntities.begin(), chunkEntities.begin(), chunkEntities.end());
+            if (false) {
+                std::cout << "Fetching all lives" << std::endl;
+            }
+        }
+    }
+
+    return foundEntities;
 }
 
 DataAnalyser *Farm::getDataAnalyser() const {

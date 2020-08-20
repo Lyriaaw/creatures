@@ -323,7 +323,10 @@ void Chunk::executeCreaturesActions() {
 
         if (actionDto.getType() == "EAT") {
             float wastedEnergy = performer->addEnergy(subject->getMass());
+
+
             subject->setMass(0.0);
+
 
             Point performerPosition = performer->getEntity()->getPosition();
             Point tilePosition = performerPosition.getTileCoordinates();
@@ -488,10 +491,10 @@ void Chunk::statistics() {
         totalCreaturesMass += currentLife->getEntity()->getMass();
     }
 
-//    for (int it = 0; it < entities.size(); it++) {
-//        Entity * entity = entities.at(it);
-//        totalFoodsMass += entity->getMass();
-//    }
+    for (int it = 0; it < entities.size(); it++) {
+        Entity * entity = entities.at(it);
+        totalFoodsMass += entity->getMass();
+    }
 
 
     double totalHeat = 0.0;
@@ -509,7 +512,7 @@ void Chunk::statistics() {
     }
 
 
-    int totalEnergy = totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd;
+    int totalEnergy = totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd+ totalFoodsMass;
 
 //    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser->getTotalEnergy()->getLastValue() << std::endl;
 
@@ -520,6 +523,7 @@ void Chunk::statistics() {
     dataAnalyser->getHeatEnergy()->addRawToTick(tick, totalHeat);
     dataAnalyser->getGroundEnergy()->addRawToTick(tick, totalGround);
     dataAnalyser->getEnergyToAdd()->addRawToTick(tick, totalToAdd);
+    dataAnalyser->getFoodEnergy()->addRawToTick(tick, totalFoodsMass);
 
 
 
@@ -1059,6 +1063,42 @@ std::vector<Life *> Chunk::getAllLifes(std::vector<Point> *visitedPoints) {
     }
 
     return foundLifes;
+}
+
+
+std::vector<Entity *> Chunk::getAllEntities(std::vector<Point> *visitedPoints) {
+    std::vector<Entity *> foundEntities;
+
+
+    for (int it = 0; it < visitedPoints->size(); it++) {
+        if (chunkPosition.equals(visitedPoints->at(it))) {
+            return foundEntities;
+        }
+    }
+    visitedPoints->emplace_back(chunkPosition);
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            std::vector<Entity *>  neighbourResponse = neighbour->getAllEntities(visitedPoints);
+            if (neighbourResponse.size() > 0) {
+                foundEntities.insert(foundEntities.end(), neighbourResponse.begin(), neighbourResponse.end());
+            }
+        }
+    }
+
+    std::vector<Entity *> currentLifes;
+    currentLifes.insert(currentLifes.end(), entities.begin(), entities.end());
+    for (int it = 0; it < currentLifes.size(); it++) {
+        foundEntities.emplace_back(currentLifes.at(it));
+    }
+
+    return foundEntities;
 }
 
 

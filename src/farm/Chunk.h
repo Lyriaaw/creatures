@@ -156,6 +156,8 @@ public:
     void processGlobalAddedEnergy();
 
     Life *getChunkLifeFromId(int id);
+
+    std::vector<Entity *> getAllEntities(std::vector<Point> *visitedPoints);
 };
 
 
