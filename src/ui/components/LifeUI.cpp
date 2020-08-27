@@ -239,6 +239,12 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 //
 //
 //
+
+    if (selectedEntity == nullptr || selectedEntity->getId() != this->life->getEntity()->getId()) {
+        return;
+    }
+
+
     // Sensors
     for (int sensorIndex = 0; sensorIndex < this->life->getSensors().size(); sensorIndex++) {
         BarSensor * currentSensor = (BarSensor *) this->life->getSensors().at(sensorIndex);

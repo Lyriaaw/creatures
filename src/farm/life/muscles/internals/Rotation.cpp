@@ -9,12 +9,12 @@ std::vector<Entity *> Rotation::executeAction() {
     float currentEntityRotation = this->entity->getRotation();
     float newRotation = currentEntityRotation + this->neurons.at(0)->getValue();
 
-    if (newRotation < - 2 * M_PI) {
-        newRotation += 2 * M_PI;
+    if (newRotation < -2) {
+        newRotation += 2;
     }
 
-    if (newRotation > 2 * M_PI) {
-        newRotation -= 2 * M_PI;
+    if (newRotation > 2) {
+        newRotation -= 2;
     }
 
     this->entity->setRotation(newRotation);
