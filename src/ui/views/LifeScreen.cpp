@@ -78,9 +78,9 @@ void LifeScreen::updateSelectedLife(Life * life) {
         brainUi = nullptr;
     } else {
         brainUi = new BrainUI(life->getBrain(), windowWidth * 0.55, 0.1 * windowHeight, 0.40 * windowWidth,  0.8 * windowHeight, font);
+        loadSelectedGenome();
     }
 
-    loadSelectedGenome();
 
 }
 
