@@ -233,7 +233,7 @@ void Farm::handleBigThread(bool *paused, bool *running) {
                     if (!*paused) {
                         chunk->generateEntityGrid();
                         chunk->handleEnergyGiveaway();
-                        chunk->processClimate();
+//                        chunk->processClimate();
                         chunk->brainProcessing();
                         chunk->executeCreaturesActions();
                         chunk->moveCreatures();

@@ -5,6 +5,8 @@
 #include <zconf.h>
 #include "Chunk.h"
 #include "../utils/perlin/PerlinNoise.h"
+#include "entities/Food.h"
+
 
 Chunk::Chunk(Point chunkPosition, CreatureNursery * nursery, DataAnalyser * dataAnalyser): chunkPosition(chunkPosition), nursery(nursery), step("init"), tick(0), dataAnalyser(dataAnalyser) {
     generateNeighbours();
@@ -74,6 +76,45 @@ void Chunk::generateEntityGrid() {
     }
 }
 
+
+double Chunk::getTotalEnergy() {
+
+
+    double totalCreaturesEnergy = 0.f;
+    double totalCreaturesMass = 0.f;
+    double totalFoodsMass = 0.f;
+
+
+    for (int it = 0; it < lifes.size(); it++) {
+        Life * currentLife = lifes.at(it);
+        totalCreaturesEnergy += currentLife->getEnergyManagement()->getEnergy();
+        totalCreaturesMass += currentLife->getEntity()->getMass();
+    }
+
+    for (int it = 0; it < entities.size(); it++) {
+        Entity * entity = entities.at(it);
+        totalFoodsMass += entity->getMass();
+    }
+
+
+    double totalHeat = 0.0;
+    double totalGround = 0.0;
+    double totalToAdd = 0.0;
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * tile = getRelativeTile(it, jt, false);
+            totalHeat += tile->getHeat();
+            totalGround += tile->getGround();
+            totalToAdd += tile->getAddedHeat();
+            totalToAdd += tile->getAddedGround();
+        }
+    }
+
+
+    return totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd+ totalFoodsMass;
+}
+
 void Chunk::handleEnergyGiveaway() {
 
     std::vector<std::string> steps;
@@ -81,9 +122,14 @@ void Chunk::handleEnergyGiveaway() {
 
     this->step = "ENERGY_GIVEAWAY";
     steps.emplace_back("ENERGY_GIVEAWAY");
-    steps.emplace_back("CLIMATE_START");
+//    steps.emplace_back("CLIMATE_START");
+    steps.emplace_back("BRAIN_PROCESSING");
     waitForNeighbours(steps);
     steps.clear();
+
+
+
+    double totalEnergyBefore = getTotalEnergy();
 
 
     for (int it = 0; it < lifes.size(); it++) {
@@ -104,6 +150,14 @@ void Chunk::handleEnergyGiveaway() {
         }
 
     }
+
+    double totalEnergyAfter = getTotalEnergy();
+
+    if (totalEnergyAfter != totalEnergyBefore) {
+        std::cout << "ERROR HANDLE ENERGY GIVEWAY" << std::endl;
+    }
+
+
 
     removeDeletedEntities();
 
@@ -244,6 +298,29 @@ void Chunk::processClimate() {
     }
 
 
+
+    for (int it = 0; it < TILE_PER_CHUNK; it++) {
+        for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+            Tile * currentTile = getRelativeTile(it, jt, false);
+
+            if (currentTile->getGround() < 2000) {
+                continue;
+            }
+
+            float foodX = rand() % TILE_SIZE + (currentTile->getPosition().getX() * TILE_SIZE);
+            float foodY = rand() % TILE_SIZE + (currentTile->getPosition().getY() * TILE_SIZE);
+
+            Point point(foodX, foodY);
+
+            Food * food = new Food(point, 2);
+            currentTile->removeGround(2000);
+            food->setMass(2000);
+            entities.push_back(food);
+            entityAdded.push_back(food);
+        }
+    }
+
+
 }
 
 void Chunk::brainProcessing() {
@@ -285,7 +362,11 @@ void Chunk::executeCreaturesActions() {
     steps.emplace_back("MOVE_CREATURES");
     waitForNeighbours(steps);
     steps.clear();
+    double totalEnergyBefore = getTotalEnergy();
+
+
     processGlobalAddedEnergy();
+
 
 
     int captureGroundActions = 0;
@@ -322,9 +403,12 @@ void Chunk::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
-            float wastedEnergy = performer->addEnergy(subject->getMass());
+            double wastedEnergy = performer->getEnergyManagement()->addEnergy(subject->getMass());
+//            performer->getEnergyManagement()->addEnergy(subject->getMass());
 
-
+//            std::cout << "Subject mass: " << subject->getMass() << std::endl;
+//            performer->getEnergyManagement()->setEnergy(performer->getEnergyManagement()->getEnergy() + subject->getMass());
+//            performer->getEntity()->setMass(performer->getEntity()->getMass() + subject->getMass());
             subject->setMass(0.0);
 
 
@@ -333,18 +417,19 @@ void Chunk::executeCreaturesActions() {
 
             Life * foundLife = getLifeFromId(actionDto.getSubjectId(), true);
             if (foundLife != nullptr) {
-                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
-                lifesToDelete.emplace_back(foundLife);
+                std::cout << "Found life in eat action" << std::endl;
+//                getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(foundLife->getEnergyManagement()->getEnergy());
+//                foundLife->getEnergyManagement()->setEnergy(0);
             }
 
             getTileAt(tilePosition.getX(), tilePosition.getY())->addHeat(wastedEnergy);
 
 
-            Point performerPoint = performer->getEntity()->getPosition();
-            Point tilePoint = performerPoint.getTileCoordinates();
+//            Point performerPoint = performer->getEntity()->getPosition();
+//            Point tilePoint = performerPoint.getTileCoordinates();
 
-            entityToDelete.emplace_back(subject);
             eatActions++;
+            continue;
         }
 
         if (actionDto.getType() == "MATE") {
@@ -392,6 +477,11 @@ void Chunk::executeCreaturesActions() {
     dataAnalyser->getMateActions()->addRawToTick(tick, mateActions);
     dataAnalyser->getEatActions()->addRawToTick(tick, eatActions);
 
+    double totalEnergyAfter = getTotalEnergy();
+    if (totalEnergyAfter != totalEnergyBefore) {
+        std::cout << "ERROR ACTIONS: " << totalEnergyBefore - totalEnergyAfter << std::endl;
+    }
+
 }
 
 void Chunk::moveCreatures() {
@@ -405,17 +495,17 @@ void Chunk::moveCreatures() {
     steps.clear();
 
 
-    std::vector<Life *> exportedLifes;
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-        Point entityPoint = currentLife->getEntity()->getPosition();
-        Point tilePoint = entityPoint.getTileCoordinates();
-
-        std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
-//        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
-
-        checkForLifeTransfer(currentLife);
-    }
+//    std::vector<Life *> exportedLifes;
+//    for (int it = 0; it < lifes.size(); it++) {
+//        Life *currentLife = lifes.at(it);
+//        Point entityPoint = currentLife->getEntity()->getPosition();
+//        Point tilePoint = entityPoint.getTileCoordinates();
+//
+//        std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
+////        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
+//
+//        checkForLifeTransfer(currentLife);
+//    }
 
 
 
@@ -512,7 +602,7 @@ void Chunk::statistics() {
     }
 
 
-    int totalEnergy = totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd+ totalFoodsMass;
+    double totalEnergy = totalFoodsMass + totalCreaturesMass + totalCreaturesEnergy + totalHeat + totalGround + totalToAdd+ totalFoodsMass;
 
 //    std::cout << "Tick: " << tickCount << " Total: " << totalEnergy << " Difference: " << totalEnergy - dataAnalyser->getTotalEnergy()->getLastValue() << std::endl;
 

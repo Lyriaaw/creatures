@@ -158,6 +158,8 @@ public:
     Life *getChunkLifeFromId(int id);
 
     std::vector<Entity *> getAllEntities(std::vector<Point> *visitedPoints);
+
+    double getTotalEnergy();
 };
 
 
