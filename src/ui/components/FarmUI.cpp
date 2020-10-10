@@ -212,6 +212,27 @@ void FarmUI::setPositions(Camera *camera) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
+            Point chunkPoint = Point(it, jt);
+            Point chunkTopLeft = Point((it * TILE_SIZE), (jt * TILE_SIZE));
+            Point chunkBottomRight = Point((it * TILE_SIZE) + TILE_SIZE, (jt * TILE_SIZE) + TILE_SIZE);
+            Point chunkTopRight = Point((it * TILE_SIZE) + TILE_SIZE, jt * TILE_SIZE);
+            Point chunkBottomLeft = Point((it * TILE_SIZE), (jt * TILE_SIZE) + TILE_SIZE);
+
+            if (!camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkTopLeft)) &&
+                !camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkBottomRight)) &&
+                !camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkTopRight)) &&
+                !camera->shouldDisplayPoint(camera->getScreenCoordinates(chunkBottomLeft))
+                    ) {
+                int vertexArrayIndex = ((it * TILE_COUNT_HEIGHT) + jt) * 4;
+
+                tilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(-10, -10);
+                tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(-10, -10);
+                tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(-10, -10);
+                tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(-10, -10);
+                continue;
+            }
+
+
             int gridRatio = 0;
 
             if (camera->isShowGrid()) {
@@ -274,9 +295,13 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
         lifeUIs.at(it)->draw(window, camera, selected);
     }
 
+    Point worldCoordinates = Point(hoveredTile.getX() * TILE_SIZE, hoveredTile.getY() * TILE_SIZE);
+
+    if (camera->shouldDisplayPoint(camera->getScreenCoordinates(worldCoordinates))) {
+        window->draw(hoveredTileInfos);
+    }
 
 
-    window->draw(hoveredTileInfos);
 }
 
 

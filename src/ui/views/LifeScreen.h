@@ -27,6 +27,22 @@ private:
 
     std::vector<sf::Text> genomeTexts;
 
+    DataItem * grad0;
+    DataItem * grad1;
+    DataItem * gradm1;
+
+    Graph * inputNeuronsGraph;
+    Graph * bioGraph;
+
+    Graph * outputNeuronsGraph;
+    DataItem * movement;
+    DataItem * rotation;
+    DataItem * mouth;
+    DataItem * genitals;
+
+
+
+
 public:
     LifeScreen(Farm *farm, sf::Font *font);
 
@@ -51,6 +67,12 @@ public:
     void drawGenome(sf::RenderWindow *window);
 
     void loadSelectedGenome();
+
+    void loadSelectedGraphs();
+
+    void updateGraphs();
+
+    void drawGraphs(sf::RenderWindow *pWindow);
 };
 
 

@@ -6,7 +6,7 @@
 #include "../colors/RGBColor.h"
 
 
-BrainUI::BrainUI(Brain *brain, float x, float y, float width, float height, sf::Font * font, float windowWidth, float windowHeight) : brain(brain), x(x), y(y), width(width), height(height), selectedNeuron(nullptr), graph(nullptr), font(font), windowWidth(windowWidth), windowHeight(windowHeight) {
+BrainUI::BrainUI(Brain *brain, float x, float y, float width, float height, sf::Font * font, float windowWidth, float windowHeight) : brain(brain), x(x), y(y), width(width), height(height), font(font), windowWidth(windowWidth), windowHeight(windowHeight) {
     initialize();
 }
 
@@ -79,46 +79,11 @@ void BrainUI::initialize() {
         neuronNames.emplace_back(text);
     }
 
-    movement = new DataItem("movement", true);
-    rotation = new DataItem("rotation", true);
-    mouth = new DataItem("mouth", true);
-    genitals = new DataItem("genitals", true);
-    grad0 = new DataItem("0", true);
-    grad1 = new DataItem("1", true);
-    gradm1 = new DataItem("-1", true);
 
-    graph = new Graph("Population", font);
-    graph->setPosition(0.8f, 0.05f, 0.2f, 0.1f);
-
-
-    graph->addLine(grad0, 1, 100, 100, 100);
-    graph->addLine(grad1, 1, 100, 100, 100);
-    graph->addLine(gradm1, 1, 100, 100, 100);
-
-    graph->addLine(movement, 1, 255, 255, 255);
-    graph->addLine(rotation, 1, 0, 0, 0);
-    graph->addLine(mouth, 1, 0, 255, 0);
-    graph->addLine(genitals, 1, 0, 0, 255);
-
-    graph->windowResized(windowWidth, windowHeight);
 
 
 }
 
-void BrainUI::updateAndDrawSelectedNeuron(sf::RenderWindow *window) {
-    movement->addValue(brain->getOutputNeurons().at(0)->getValue());
-    rotation->addValue(brain->getOutputNeurons().at(1)->getValue());
-    mouth->addValue(brain->getOutputNeurons().at(2)->getValue());
-    genitals->addValue(brain->getOutputNeurons().at(3)->getValue());
-
-
-    grad0->addValue(0.0);
-    grad1->addValue(1.0);
-    gradm1->addValue(-1.0);
-
-    graph->draw(window);
-
-}
 
 void BrainUI::draw(sf::RenderWindow *window) {
 
@@ -140,9 +105,6 @@ void BrainUI::draw(sf::RenderWindow *window) {
     for (int it = 0; it < neuronNames.size(); it++) {
         window->draw(neuronNames.at(it));
     }
-
-    updateAndDrawSelectedNeuron(window);
-
 }
 
 bool BrainUI::mouseClicked(int mouseX, int mouseY) {

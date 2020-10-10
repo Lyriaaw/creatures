@@ -61,8 +61,6 @@ private:
     Life * selectedLife = nullptr;
     Entity * selectedEntity = nullptr;
 
-    BrainUI * brainUi;
-
     sf::Font * font;
 
     std::vector<Button *> buttons;
@@ -91,6 +89,8 @@ private:
     Entity * getSelectedEntity();
 
     void updateInformationLabel();
+
+    void updateSelectedCreature();
 };
 
 

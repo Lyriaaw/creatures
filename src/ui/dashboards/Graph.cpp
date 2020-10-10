@@ -49,10 +49,10 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
     sf::Color backgroundColor = sf::Color(55, 55, 55, 255);
     sf::Color textColor = sf::Color(red, green, blue, 255);
 
-    int yButtons = 300;
-    int xLine = (lineIndex * 210);
+    int yButtons = y;
+    int xLine = x + (lineIndex * (210 * widthScreenRatio));
 
-    sf::RectangleShape legendBackground = sf::RectangleShape(sf::Vector2f(200, 50));
+    sf::RectangleShape legendBackground = sf::RectangleShape(sf::Vector2f((200 * widthScreenRatio), 50));
     legendBackground.setPosition(xLine, yButtons);
     legendBackground.setFillColor(legendBackgroundColor);
     linesLegendBackgrounds.emplace_back(legendBackground);
@@ -61,15 +61,15 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
     text.setFont(*font);
     text.setString(item->getName());
     text.setFillColor(textColor);
-    text.setCharacterSize(15);
-    text.setPosition(xLine + 5, 0);
+    text.setCharacterSize((20 * (widthScreenRatio)));
+    text.setPosition(xLine + 5, yButtons);
     linesLegendTexts.emplace_back(text);
 
     sf::Color legendButtonBackgroundColor = sf::Color(100, 100, 100, 255);
 
-    Button * doNotShowButton = new Button("X", lineIndex, font, 5 + xLine, 0, 50, 20, legendButtonBackgroundColor, textColor);
-    Button * showNormalButton = new Button("V", lineIndex, font, 5 + xLine + 55, 0, 50, 20, legendButtonBackgroundColor, textColor);
-    Button * showAveragedButton = new Button("~", lineIndex, font,5 + xLine + 110, 0, 50, 20, legendButtonBackgroundColor, textColor);
+    Button * doNotShowButton = new Button("X", lineIndex, font, 5 + xLine, 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
+    Button * showNormalButton = new Button("V", lineIndex, font, 5 + xLine + (55 * widthScreenRatio), 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
+    Button * showAveragedButton = new Button("~", lineIndex, font,5 + xLine + (110 * widthScreenRatio), 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
 
     doNotShowButtons.emplace_back(doNotShowButton);
     showNormalButtons.emplace_back(showNormalButton);
@@ -89,7 +89,7 @@ void Graph::windowResized(float windowWidth, float windowHeight) {
     background.setSize(sf::Vector2f(width, height));
 
 
-    double buttonsPositionY = (0.1 * windowHeight) - 60;
+    double buttonsPositionY = y;
 
     for (int it = 0; it < linesLegendBackgrounds.size(); it++) {
         linesLegendBackgrounds.at(it).setPosition(linesLegendBackgrounds.at(it).getPosition().x, buttonsPositionY);

@@ -25,9 +25,11 @@ void LifeScreen::init() {
 
     Button genomeButton = Button("Brain", 1, font, 0, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
     Button brainButton = Button("Genome", 2, font, 110, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
+    Button graphButton = Button("Graphs", 3, font, 220, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
 
     buttons.emplace_back(brainButton);
     buttons.emplace_back(genomeButton);
+    buttons.emplace_back(graphButton);
 
 }
 
@@ -36,6 +38,7 @@ Camera *LifeScreen::open() {
 }
 
 void LifeScreen::draw(sf::RenderWindow *window) {
+    updateGraphs();
     window->draw(mapBackground);
 
 
@@ -61,6 +64,12 @@ void LifeScreen::draw(sf::RenderWindow *window) {
         drawGenome(window);
     }
 
+    if (informationToShow == "GRAPHS") {
+        drawGraphs(window);
+    }
+
+
+
 
 
 }
@@ -80,6 +89,7 @@ void LifeScreen::updateSelectedCreature(Life * life) {
     } else {
         brainUi = new BrainUI(life->getBrain(), windowWidth * 0.55, 0.1 * windowHeight, 0.40 * windowWidth,  0.8 * windowHeight, font, windowWidth, windowHeight);
         loadSelectedGenome();
+        loadSelectedGraphs();
     }
 
 
@@ -141,6 +151,13 @@ void LifeScreen::mouseClicked(int x, int y) {
         }
     }
 
+
+    if (brainUi != nullptr) {
+        if (brainUi->mouseClicked(x, y)) {
+            return;
+        }
+    }
+
 }
 
 void LifeScreen::handleButtonClick(int id) {
@@ -151,5 +168,71 @@ void LifeScreen::handleButtonClick(int id) {
         case 2:
             informationToShow = "GENOME";
             break;
+        case 3:
+            informationToShow = "GRAPHS";
+            break;
+
+            break;
     }
 }
+
+void LifeScreen::loadSelectedGraphs() {
+    grad0 = new DataItem("0", true);
+    grad1 = new DataItem("1", true);
+    gradm1 = new DataItem("-1", true);
+
+    inputNeuronsGraph = new Graph("InputNeurons", font);
+    inputNeuronsGraph->setPosition(0.6f, 0.1f, 0.35f, 0.2f);
+
+
+
+
+    outputNeuronsGraph = new Graph("Output Neurons", font);
+    outputNeuronsGraph->setPosition(0.6f, 0.1f, 0.35f, 0.2f);
+    outputNeuronsGraph->windowResized(windowWidth, windowHeight);
+
+
+    movement = new DataItem("movement", true);
+    rotation = new DataItem("rotation", true);
+    mouth = new DataItem("mouth", true);
+    genitals = new DataItem("genitals", true);
+
+    outputNeuronsGraph->addLine(movement, 1, 255, 255, 255);
+    outputNeuronsGraph->addLine(rotation, 1, 0, 0, 0);
+    outputNeuronsGraph->addLine(mouth, 1, 0, 255, 0);
+    outputNeuronsGraph->addLine(genitals, 1, 0, 0, 255);
+
+
+    outputNeuronsGraph->addLine(grad0, 1, 50, 50, 50);
+    outputNeuronsGraph->addLine(grad1, 1, 50, 50, 50);
+    outputNeuronsGraph->addLine(gradm1, 1, 50, 50, 50);
+
+    outputNeuronsGraph->windowResized(windowWidth, windowHeight);
+
+
+}
+
+void LifeScreen::updateGraphs() {
+    if (selectedEntity == nullptr) {
+        return;
+    }
+
+    movement->addValue(selectedEntity->getBrain()->getOutputNeurons().at(0)->getValue());
+    rotation->addValue(selectedEntity->getBrain()->getOutputNeurons().at(1)->getValue());
+    mouth->addValue(selectedEntity->getBrain()->getOutputNeurons().at(2)->getValue());
+    genitals->addValue(selectedEntity->getBrain()->getOutputNeurons().at(3)->getValue());
+
+
+    grad0->addValue(0.0);
+    grad1->addValue(1.0);
+    gradm1->addValue(-1.0);
+}
+
+void LifeScreen::drawGraphs(sf::RenderWindow *pWindow) {
+    if (selectedEntity == nullptr) {
+        return;
+    }
+    outputNeuronsGraph->draw(pWindow);
+}
+
+

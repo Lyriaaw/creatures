@@ -23,15 +23,6 @@ private:
 
     float x, y, width, height, windowWidth, windowHeight;
 
-    Neuron * selectedNeuron;
-    Graph * graph;
-    DataItem * movement;
-    DataItem * rotation;
-    DataItem * mouth;
-    DataItem * genitals;
-    DataItem * grad0;
-    DataItem * grad1;
-    DataItem * gradm1;
 
 public:
     BrainUI(Brain *brain, float x, float y, float width, float height, sf::Font * font, float windowWidth, float windowHeight);
@@ -41,7 +32,6 @@ public:
 
     bool mouseClicked(int x, int y);
 
-    void updateAndDrawSelectedNeuron(sf::RenderWindow *window);
 };
 
 
