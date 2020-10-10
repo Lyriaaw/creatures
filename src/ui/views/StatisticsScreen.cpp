@@ -130,7 +130,7 @@ void StatisticsScreen::draw(sf::RenderWindow *window) {
     }
 }
 
-void StatisticsScreen::updateSelectedCreature(BrainConnector *connector) {
+void StatisticsScreen::updateSelectedCreature(Life *connector) {
 
 }
 

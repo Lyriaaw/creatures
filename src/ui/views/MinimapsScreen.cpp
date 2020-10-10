@@ -76,7 +76,7 @@ void MinimapsScreen::draw(sf::RenderWindow *window) {
     drawMinimaps(window);
 }
 
-void MinimapsScreen::updateSelectedCreature(BrainConnector *connector) {
+void MinimapsScreen::updateSelectedCreature(Life *connector) {
 
 }
 

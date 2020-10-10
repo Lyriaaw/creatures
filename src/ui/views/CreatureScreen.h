@@ -1,18 +1,18 @@
 //
-// Created by Amalric Lombard de Buffières on 8/8/20.
+// Created by Amalric Lombard de Buffières on 10/10/20.
 //
 
-#ifndef CREATURES_WORLDSCREEN_H
-#define CREATURES_WORLDSCREEN_H
+#ifndef CREATURES_CREATURESCREEN_H
+#define CREATURES_CREATURESCREEN_H
 
 
 #include "Screen.h"
 
-class WorldScreen: public Screen {
+class CreatureScreen: public Screen {
 private:
     Camera *camera;
 public:
-    WorldScreen(Farm *farm, sf::Font * font);
+    CreatureScreen(Farm *farm, sf::Font * font);
 
     int getId() override;
 
@@ -34,4 +34,4 @@ public:
 };
 
 
-#endif //CREATURES_WORLDSCREEN_H
+#endif //CREATURES_CREATURESCREEN_H

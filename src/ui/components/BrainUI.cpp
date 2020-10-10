@@ -90,14 +90,16 @@ void BrainUI::initialize() {
     graph = new Graph("Population", font);
     graph->setPosition(0.8f, 0.05f, 0.2f, 0.1f);
 
+
+    graph->addLine(grad0, 1, 100, 100, 100);
+    graph->addLine(grad1, 1, 100, 100, 100);
+    graph->addLine(gradm1, 1, 100, 100, 100);
+
     graph->addLine(movement, 1, 255, 255, 255);
     graph->addLine(rotation, 1, 0, 0, 0);
     graph->addLine(mouth, 1, 0, 255, 0);
     graph->addLine(genitals, 1, 0, 0, 255);
 
-    graph->addLine(grad0, 1, 0, 0, 0);
-    graph->addLine(grad1, 1, 0, 0, 0);
-    graph->addLine(gradm1, 1, 0, 0, 0);
     graph->windowResized(windowWidth, windowHeight);
 
 
