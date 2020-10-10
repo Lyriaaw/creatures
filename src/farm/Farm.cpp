@@ -116,19 +116,22 @@ void Farm::InitFromRandom() {
         initialLife->getEnergyManagement()->setEnergy(creatureEnergy);
         initialLife->setMass(creatureEnergy);
 
-        lifes.push_back(initialLife);
         creatures.push_back(initialLife);
     }
 
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
-        Life * initialLife = nursery->generateVegetalFromRandom();
+        int x = distWidth(mt);
+        int y = distHeight(mt);
 
-        float creatureEnergy = initialLife->getEnergyManagement()->getMaxMass() / 2.0;
-        initialLife->getEnergyManagement()->setEnergy(creatureEnergy);
-        initialLife->setMass(creatureEnergy);
+        Point point(x, y);
 
-        lifes.push_back(initialLife);
-        vegetals.push_back(initialLife);
+
+//        float foodSize = ((rand() % 300) / 100.f) + 2;
+        float foodSize = 2;
+
+        Entity * entity = new Food(point, foodSize);
+        entity->setMass(1000);
+        entities.push_back(entity);
     }
 
     availableEnergy = 0.f;
@@ -185,8 +188,8 @@ void Farm::brainProcessing() {
 
 
     std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
+    for (int it = 0; it < creatures.size(); it++) {
+        Life *currentLife = creatures.at(it);
         currentLife->processSelectedTiles();
     }
     std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
@@ -200,8 +203,8 @@ void Farm::brainProcessing() {
     double totalActions = 0.0;
 
     std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
+    for (int it = 0; it < creatures.size(); it++) {
+        Life *currentLife = creatures.at(it);
 
         std::chrono::system_clock::time_point entityGridStart = std::chrono::system_clock::now();
 
@@ -274,8 +277,8 @@ void Farm::moveCreatures() {
 
     std::vector<Entity* > newEntities;
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
+    for (int it = 0; it < creatures.size(); it++) {
+        Life *currentLife = creatures.at(it);
         Point entityPoint = currentLife->getEntity()->getPosition();
         Point tilePoint = entityPoint.getTileCoordinates();
 
@@ -286,6 +289,7 @@ void Farm::moveCreatures() {
         map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
         if (currentLife->getEnergyManagement()->getEnergy() <= 0) {
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(currentLife->getEntity()->getMass());
             this->lifesToDelete.emplace_back(currentLife);
         }
 
@@ -326,6 +330,7 @@ void Farm::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
+            std::cout << "Eat ? " << std::endl;
             performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
 
@@ -480,57 +485,57 @@ void Farm::handleCaptureGround(Life * life, ActionDTO action) {
 
 
 bool Farm::handleDuplication(Life * life) {
-
-    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
-
-    if (!fatherCanReproduce) {
-//        std::cout << "Father cannot reproduce" << std::endl;
-        return false;
-    }
 //
-    Life * child = this->nursery->Mate(life, nullptr);
-
-    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.f;
-
-    double givenFatherEnergy = std::min(life->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal);
-
-    double actualGivenFatherEnergy = life->getEnergyManagement()->removeEnergy(givenFatherEnergy);
-
-    if (givenFatherEnergy != actualGivenFatherEnergy) {
-        std::cout << "Wrong energy given" << std::endl;
-    }
-
-    double totalGivenEnergy = actualGivenFatherEnergy;
-
-    if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
-        child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
-        child->setMass(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
-        lifesAdded.emplace_back(child);
-
-        vegetals.emplace_back(child);
-
-        return true;
-    }
-
-
-    Point childCoordinate = child->getEntity()->getPosition();
-    Point tileChildPosition = childCoordinate.getTileCoordinates();
-
-    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
-
-
-    if (life->getEnergyManagement()->getEnergy() <= 0) {
-        lifesToDelete.emplace_back(life);
-    }
-
-//    if (givenMotherEnergy + givenFatherEnergy == 0) {
-//        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
-//    } else {
-//        std::cout << "New Child " << std::endl;
+//    bool fatherCanReproduce = life->getEntity()->getMass() > life->getEnergyManagement()->getMaxMass() / 2.f;
 //
+//    if (!fatherCanReproduce) {
+////        std::cout << "Father cannot reproduce" << std::endl;
+//        return false;
 //    }
-
+////
+//    Life * child = this->nursery->Mate(life, nullptr);
+//
+//    double givenEnergyToChildGoal = child->getEnergyManagement()->getMaxMass() / 10.f;
+//
+//    double givenFatherEnergy = std::min(life->getEnergyManagement()->getEnergy(), givenEnergyToChildGoal);
+//
+//    double actualGivenFatherEnergy = life->getEnergyManagement()->removeEnergy(givenFatherEnergy);
+//
+//    if (givenFatherEnergy != actualGivenFatherEnergy) {
+//        std::cout << "Wrong energy given" << std::endl;
+//    }
+//
+//    double totalGivenEnergy = actualGivenFatherEnergy;
+//
+//    if (totalGivenEnergy > givenEnergyToChildGoal / 20.0) {
+//        child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
+//        child->setMass(totalGivenEnergy / 2.0);
+//        lifes.emplace_back(child);
+//        lifesAdded.emplace_back(child);
+//
+//        vegetals.emplace_back(child);
+//
+//        return true;
+//    }
+//
+//
+//    Point childCoordinate = child->getEntity()->getPosition();
+//    Point tileChildPosition = childCoordinate.getTileCoordinates();
+//
+//    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+//
+//
+//    if (life->getEnergyManagement()->getEnergy() <= 0) {
+//        lifesToDelete.emplace_back(life);
+//    }
+//
+////    if (givenMotherEnergy + givenFatherEnergy == 0) {
+////        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
+////    } else {
+////        std::cout << "New Child " << std::endl;
+////
+////    }
+//
 
 
 
@@ -573,7 +578,7 @@ bool Farm::handleMating(Life * father, int entityId) {
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEnergyManagement()->setEnergy(totalGivenEnergy / 2.0);
         child->setMass(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
+        creatures.emplace_back(child);
         lifesAdded.emplace_back(child);
 
         creatures.emplace_back(child);
@@ -613,7 +618,7 @@ bool Farm::handleMating(Life * father, int entityId) {
 void Farm::populationControl() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    if (this->lifes.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
+    if (this->creatures.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time = end - start;
         dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
@@ -630,7 +635,7 @@ void Farm::populationControl() {
     std::vector<Life *> sortedConnectors = getScoreSortedCreatures();
     int selectedParentCount = sortedConnectors.size() / 2;
 
-    int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - this->lifes.size();
+    int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - this->creatures.size();
 
     float totalEnergyRemoved = 0.f;
     for (int it = 0; it < newConnectorNeeded; it++) {
@@ -654,11 +659,12 @@ void Farm::populationControl() {
         totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyManagement()->getEnergy();
 
 
-        lifes.emplace_back(child);
+        creatures.emplace_back(child);
+        creatures.emplace_back(child);
         lifesAdded.emplace_back(child);
     }
 
-    map->removeEnergyFromGround(totalEnergyRemoved);
+    removeEnergy(totalEnergyRemoved);
 
 
 
@@ -734,8 +740,8 @@ void Farm::vegetalisation() {
 }
 
 void Farm::aTickHavePassed() {
-    for (int it = 0; it < lifes.size(); it++) {
-        lifes.at(it)->getEntity()->aTickHavePassed();
+    for (int it = 0; it < creatures.size(); it++) {
+        creatures.at(it)->getEntity()->aTickHavePassed();
     }
     for (int it = 0; it < entities.size(); it++) {
         entities.at(it)->aTickHavePassed();
@@ -782,8 +788,8 @@ void Farm::statistics() {
     double totalCreaturesMass = 0.f;
     double totalFoodsMass = 0.f;
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Life * currentLife = lifes.at(it);
+    for (int it = 0; it < creatures.size(); it++) {
+        Life * currentLife = creatures.at(it);
         totalCreaturesEnergy += currentLife->getEnergyManagement()->getEnergy();
         totalCreaturesMass += currentLife->getEntity()->getMass();
     }
@@ -845,11 +851,11 @@ void Farm::generateEntityGrid() {
         }
     }
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Point position = lifes.at(it)->getEntity()->getPosition();
+    for (int it = 0; it < creatures.size(); it++) {
+        Point position = creatures.at(it)->getEntity()->getPosition();
         Point tileCoordinate = position.getTileCoordinates();
 
-        entityGrid.at(tileCoordinate.getX()).at(tileCoordinate.getY()).push_back(lifes.at(it)->getEntity());
+        entityGrid.at(tileCoordinate.getX()).at(tileCoordinate.getY()).push_back(creatures.at(it)->getEntity());
     }
 
     for (int it = 0; it < entities.size(); it++) {
@@ -866,31 +872,6 @@ void Farm::generateEntityGrid() {
 }
 
 void Farm::removeDeletedEntities() {
-    std::vector<Life *> newLifes;
-    for (int it = 0; it < lifes.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (lifes.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (found) {
-            Life * currentLife = lifes.at(it);
-            Point currentLifePosition = currentLife->getEntity()->getPosition();
-            Point currentLifeTilePosition = currentLifePosition.getTileCoordinates();
-
-            map->getTileAt(currentLifeTilePosition.getX(), currentLifeTilePosition.getY())->addGround(currentLife->getEntity()->getMass());
-        } else {
-            newLifes.emplace_back(lifes.at(it));
-        }
-    }
-
-    lifes.clear();
-    lifes = newLifes;
 
     std::vector<Entity *> newEntities;
     for (int it = 0; it < entities.size(); it++) {
@@ -922,29 +903,6 @@ void Farm::removeDeletedEntities() {
     }
 
     creatures = newCreatures;
-
-    std::vector<Life *> newVegetals;
-    for (int it = 0; it < vegetals.size(); it++) {
-
-        bool found = false;
-        int foundIndex = -1;
-        for (int jt = 0; jt < lifesToDelete.size(); jt++) {
-            if (vegetals.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
-                found = true;
-                foundIndex = jt;
-            }
-        }
-
-        if (!found) {
-            newVegetals.emplace_back(vegetals.at(it));
-        }
-    }
-
-    vegetals = newVegetals;
-
-
-
-
 
 
 
@@ -981,7 +939,7 @@ std::vector<Life *> Farm::getScoreSortedCreatures() {
 void Farm::sortCreatures() {
     std::vector<Life *> sortResult;
 
-    std::vector<Life *> tmpLifes = this->lifes;
+    std::vector<Life *> tmpLifes = this->creatures;
 
     while (!tmpLifes.empty()) {
 
@@ -1008,9 +966,9 @@ void Farm::sortCreatures() {
 
 
 Life * Farm::getLifeFromId(int id) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it);
+    for (int it = 0; it < this->creatures.size(); it++) {
+        if (this->creatures.at(it)->getEntity()->getId() == id) {
+            return this->creatures.at(it);
         }
     }
 
@@ -1018,9 +976,9 @@ Life * Farm::getLifeFromId(int id) {
 }
 
 Entity * Farm::getEntityFromId(int id) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it)->getEntity();
+    for (int it = 0; it < this->creatures.size(); it++) {
+        if (this->creatures.at(it)->getEntity()->getId() == id) {
+            return this->creatures.at(it)->getEntity();
         }
     }
 
@@ -1049,7 +1007,7 @@ CreatureNursery *Farm::getNursery() const {
 
 
 void Farm::addLife(Life * life) {
-    this->lifes.push_back(life);
+    this->creatures.push_back(life);
 }
 
 
@@ -1115,10 +1073,6 @@ Map *Farm::getMap() const {
     return map;
 }
 
-const vector<Life *> &Farm::getLifes() const {
-    return lifes;
-}
-
 const vector<Entity *> &Farm::getEntities() const {
     return entities;
 }
@@ -1144,11 +1098,6 @@ const vector<Life *> &Farm::getCreatures() const {
     return creatures;
 }
 
-const vector<Life *> &Farm::getVegetals() const {
-    return vegetals;
-}
-
-
 
 Chunk * Farm::getChunkAt(int chunkX, int chunkY) {
     if (chunkX < 0 || chunkX >= TILE_COUNT_WIDTH || chunkY < 0 || chunkY >= TILE_COUNT_HEIGHT) {
@@ -1172,4 +1121,37 @@ Tile * Farm::getTileAt(int tileX, int tileY) {
     Point chunkPosition = Point(tileX / TILE_PER_CHUNK, tileY / TILE_PER_CHUNK);
 
     return getChunkAt(chunkPosition.getX(), chunkPosition.getY())->getTileAt(tileX, tileY);
+}
+
+
+void Farm::removeEnergy(double energyToRemove) {
+
+
+    double totalGround = 0.0;
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+
+            totalGround += currentTile->getGround();
+        }
+    }
+
+
+
+    double removedEnergy = 0.0;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * tile = map->getTileAt(it, jt);
+            double ratio = tile->getGround() / totalGround;
+
+            tile->removeGround(ratio * energyToRemove);
+            removedEnergy += ratio * energyToRemove;
+        }
+    }
+
+    std::cout << "Energy removed: " << removedEnergy << " (" << energyToRemove << ")" << std::endl;
+
+
+
 }

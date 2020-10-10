@@ -101,6 +101,10 @@ void Map::processGroundChanges(){
 
 void Map::removeEnergyFromGround(double amount) {
 
+    double totalGround = 0.0;
+
+
+
     double amountPerTile = amount / (TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT);
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {

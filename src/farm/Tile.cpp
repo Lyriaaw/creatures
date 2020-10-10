@@ -40,6 +40,16 @@ void Tile::addHeat(double value) {
     heat += value;
 }
 
+void Tile::removeGround(double value) {
+    ground -= value;
+}
+
+void Tile::removeHeat(double value) {
+    heat -= value;
+}
+
+
+
 void Tile::addHeight(double value) {
     height += value;
 }

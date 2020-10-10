@@ -79,3 +79,108 @@ Tile * Chunk::getTileAt(int tileX, int tileY) {
 void Chunk::setNeighbour(int it, int jt, Chunk * neighbour) {
     neighbours.at(it + 1).at(jt + 1) = neighbour;
 }
+
+void Chunk::removeEnergy(Point targetChunk, double energyToRemove, std::vector<Point> *visitedPoints) {
+    for (int it = 0; it < visitedPoints->size(); it++) {
+        if (chunkPosition.equals(visitedPoints->at(it))) {
+            return;
+        }
+    }
+
+    visitedPoints->emplace_back(chunkPosition);
+
+
+    if (chunkPosition.equals(targetChunk)) {
+
+        double totalGround = 0.0;
+
+        for (int it = 0; it < TILE_PER_CHUNK; it++) {
+            for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+                Tile * currentTile = getRelativeTile(it, jt, false);
+
+                totalGround += currentTile->getGround();
+            }
+        }
+
+
+
+        double removedEnergy = 0.0;
+        for (int it = 0; it < TILE_PER_CHUNK; it++) {
+            for (int jt = 0; jt < TILE_PER_CHUNK; jt++) {
+                Tile * tile = getRelativeTile(it, jt, false);
+                double ratio = tile->getGround() / totalGround;
+
+                tile->removeGround(ratio * energyToRemove);
+                removedEnergy += ratio * energyToRemove;
+            }
+        }
+
+        return;
+    }
+
+
+
+    visitedPoints->emplace_back(chunkPosition);
+
+    for (int it = 0; it < 3; it++) {
+        for (int jt = 0; jt < 3; jt++) {
+
+            Chunk * neighbour = neighbours.at(it).at(jt);
+
+            if (neighbour == nullptr || neighbour->getChunkPosition().equals(chunkPosition))
+                continue;
+
+            neighbour->removeEnergy(targetChunk, energyToRemove, visitedPoints);
+        }
+    }
+
+}
+
+Tile * Chunk::getRelativeTile(int tileX, int tileY, bool debug) {
+    int deltaX = chunkPosition.getX() * TILE_PER_CHUNK;
+    int deltaY = chunkPosition.getY() * TILE_PER_CHUNK;
+
+//    if (debug) {
+//        std::cout << "Requested tile X: " << tileX + deltaX << " Y: " << tileY + deltaY;
+//    }
+
+    if (tileX < 0 || tileX >= TILE_PER_CHUNK || tileY < 0 || tileY >= TILE_PER_CHUNK) {
+        int ratioX = 0;
+        if (tileX < 0)
+            ratioX = -1;
+        if (tileX >= TILE_PER_CHUNK)
+            ratioX = 1;
+
+        int ratioY = 0;
+        if (tileY < 0)
+            ratioY = -1;
+        if (tileY >= TILE_PER_CHUNK)
+            ratioY = 1;
+
+
+
+        int requestedX = deltaX + tileX;
+        int requestedY = deltaY + tileY;
+
+        Tile * foundTile = neighbours.at(ratioX + 1).at(ratioY + 1)->getTileAt(requestedX, requestedY);
+
+//        if (debug) {
+//            std::cout << " => X: " << foundTile->getPosition().getX() << " Y: " << foundTile->getPosition().getY() << std::endl;
+//        }
+
+
+        return foundTile;
+    }
+
+    Tile * tile = tiles.at(tileX).at(tileY);
+
+//    if (debug) {
+//        std::cout << " => X: " << tile->getPosition().getX() << " Y: " << tile->getPosition().getY() << std::endl;
+//    }
+    return tile;
+}
+
+const Point &Chunk::getChunkPosition() const {
+    return chunkPosition;
+}
+

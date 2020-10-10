@@ -385,14 +385,14 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
 
         bool found = false;
-        for (int it = 0; it < farm->getLifes().size(); it++) {
-            Life * connector = farm->getLifes().at(it);
+        for (int it = 0; it < farm->getCreatures().size(); it++) {
+            Life * connector = farm->getCreatures().at(it);
 
             double deltaX = abs(worldCoordinates.getX() - connector->getEntity()->getPosition().getX());
             double deltaY = abs(worldCoordinates.getY() - connector->getEntity()->getPosition().getY());
 
             if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
-                selectedLife = farm->getLifes().at(it);
+                selectedLife = farm->getCreatures().at(it);
 
                 std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedLife->getEntity()->getId());
                 std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
@@ -524,8 +524,8 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             delete brainUi;
             brainUi = nullptr;
 
-            int randomCreatureIndex = rand() % farm->getLifes().size();
-            Life * life = farm->getLifes().at(randomCreatureIndex);
+            int randomCreatureIndex = rand() % farm->getCreatures().size();
+            Life * life = farm->getCreatures().at(randomCreatureIndex);
 
             selectedLife = life;
 

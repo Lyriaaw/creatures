@@ -40,6 +40,12 @@ public:
     void generateNeighbours();
 
     void setNeighbour(int it, int jt, Chunk *neighbour);
+
+    Tile *getRelativeTile(int tileX, int tileY, bool debug);
+
+    void removeEnergy(Point targetChunk, double energyToRemove, std::vector<Point> *visitedPoints);
+
+    const Point &getChunkPosition() const;
 };
 
 

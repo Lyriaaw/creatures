@@ -34,6 +34,11 @@ public:
     void addHeat(double value);
     void addGround(double value);
 
+    void removeHeat(double value);
+    void removeGround(double value);
+
+
+
     const Point &getPosition() const;
 };
 

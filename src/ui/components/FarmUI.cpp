@@ -30,8 +30,8 @@ void FarmUI::loadMap() {
 }
 
 void FarmUI::loadLifes() {
-    for (int it = 0; it < farm->getLifes().size(); it++) {
-        Life * currentLife = farm->getLifes().at(it);
+    for (int it = 0; it < farm->getCreatures().size(); it++) {
+        Life * currentLife = farm->getCreatures().at(it);
 
         LifeUI * ui = new LifeUI(currentLife, font);
         lifeUIs.emplace_back(ui);

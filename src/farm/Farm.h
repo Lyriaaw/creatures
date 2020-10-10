@@ -26,10 +26,8 @@ private:
 
     std::vector<Life *> sorted;
 
-    std::vector<Life *> lifes;
 
     std::vector<Life *> creatures;
-    std::vector<Life *> vegetals;
 
     std::vector<Entity *> entities;
 
@@ -84,8 +82,6 @@ public:
     Entity * getEntityFromId(int id);
     Life * getLifeFromId(int id);
 
-    const std::vector<Life *> &getLifes() const;
-
     const std::vector<Entity *> &getEntities() const;
 
     static std::string getHumanReadableEnergy(float givenEnergy) ;
@@ -110,9 +106,6 @@ public:
 
     const std::vector<Life *> &getCreatures() const;
 
-    const std::vector<Life *> &getVegetals() const;
-
-
     void clearAddedLifes();
     void clearAddedEntities();
     void clearToDeleteLifes();
@@ -135,6 +128,8 @@ public:
     void generateRandomTerrain(int seed);
 
     Tile *getTileAt(int tileX, int tileY);
+
+    void removeEnergy(double energyToRemove);
 };
 
 
