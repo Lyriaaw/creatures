@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <thread>
 
 
 using namespace std;
@@ -79,7 +80,7 @@ void Farm::Tick(bool paused) {
 
 
     if (!paused) {
-        brainProcessing();
+        multithreadBrainProcessing();
         executeCreaturesActions();
         moveCreatures();
         vegetalisation();
@@ -111,6 +112,58 @@ void Farm::Tick(bool paused) {
 
         dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
     }
+}
+
+void Farm::multithreadBrainProcessing() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    std::thread chunkThreads[lifes.size()];
+
+
+
+    for (int it = 0; it < lifes.size(); it++) {
+
+        auto f = [](Life * life, Farm * farm) {
+
+            life->processSelectedChunks();
+
+
+            std::vector<Entity *> accessibleEntities = farm->getAccessibleEntities(life->getSelectedChunks());
+            std::vector<Tile *> accessibleTiles = farm->getAccessibleTiles(life->getSelectedChunks());
+            life->processSensors(accessibleEntities, accessibleTiles);
+
+
+            life->processBrain();
+
+
+//
+            std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
+
+            farm->addActions(currentCreatureActions);
+
+
+        };
+
+        Life *currentLife = lifes.at(it);
+
+        int index = it;
+        chunkThreads[index] = std::thread(f, currentLife, this);
+    }
+
+    for (int it = 0; it < lifes.size(); it++) {
+        chunkThreads[it].join();
+    }
+
+
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
+}
+
+void Farm::addActions(std::vector<ActionDTO> givenActions) {
+    std::lock_guard<std::mutex> guard(actions_mutex);
+    actions.insert(actions.end(), givenActions.begin(), givenActions.end());
 }
 
 
@@ -552,7 +605,11 @@ void Farm::generateEntityGrid() {
 
     for (int it = 0; it < lifes.size(); it++) {
         Point simpleCoordinates = lifes.at(it)->getEntity()->getSimpleCoordinates();
-        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(lifes.at(it)->getEntity());
+        try {
+            entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(lifes.at(it)->getEntity());
+        } catch (const std::exception&) {
+            std::cout << "Error for simple coordinates: " << simpleCoordinates.getX() << " - " << simpleCoordinates.getY() << std::endl;
+        }
     }
 
     for (int it = 0; it < entities.size(); it++) {
@@ -787,5 +844,6 @@ const vector<Entity *> &Farm::getEntityAdded() const {
 const vector<Entity *> &Farm::getEntityToDelete() const {
     return entityToDelete;
 }
+
 
 

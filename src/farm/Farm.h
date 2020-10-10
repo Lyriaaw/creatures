@@ -47,6 +47,7 @@ private:
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
 
+    std::mutex actions_mutex;
 
 public:
     Farm();
@@ -113,6 +114,9 @@ public:
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 
 
+    void multithreadBrainProcessing();
+
+    void addActions(std::vector<ActionDTO> actions);
 };
 
 
