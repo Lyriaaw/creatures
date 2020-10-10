@@ -5,7 +5,7 @@
 #include "Minimap.h"
 #include "../colors/RGBColor.h"
 
-Minimap::Minimap(): pixelSize(4) {
+Minimap::Minimap(): pixelSize(5) {
     load();
 }
 
@@ -122,6 +122,10 @@ void WorldMinimap::draw(sf::RenderWindow *window) {
 }
 
 WorldMinimap::WorldMinimap(): Minimap(){}
+
+double Minimap::getPixelSize() const {
+    return pixelSize;
+}
 
 
 

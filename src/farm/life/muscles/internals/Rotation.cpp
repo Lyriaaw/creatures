@@ -5,7 +5,18 @@
 #include "Rotation.h"
 
 std::vector<Entity *> Rotation::executeAction() {
-    this->entity->setRotation(this->neurons.at(0)->getValue());
+    float currentEntityRotation = this->entity->getRotation();
+    float newRotation = currentEntityRotation + this->neurons.at(0)->getValue();
+
+    if (newRotation < -2) {
+        newRotation += 2;
+    }
+
+    if (newRotation > 2) {
+        newRotation -= 2;
+    }
+
+    this->entity->setRotation(newRotation);
 
     std::vector<Entity *> empty;
     return empty;
