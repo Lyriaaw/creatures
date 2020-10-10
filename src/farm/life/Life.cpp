@@ -56,7 +56,7 @@ double Life::giveawayEnergy() {
     }
 
     double sensorEnergy = sensors.size();
-    double biasEnergy = 10;
+    double biasEnergy = 10 + (entity->getAge() / 100.0);
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
     double currentEntityEnergy = this->entity->getEnergy();

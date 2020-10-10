@@ -3,6 +3,7 @@
 //
 
 
+#include <sstream>
 #include "LifeScreen.h"
 
 LifeScreen::LifeScreen(Farm *farm, sf::Font *font) : Screen(farm, font), camera(nullptr), informationToShow("BRAIN") {}
@@ -31,6 +32,11 @@ void LifeScreen::init() {
     buttons.emplace_back(genomeButton);
     buttons.emplace_back(graphButton);
 
+    creatureAgeText.setString("Creature age ...");
+    creatureAgeText.setFont(*font);
+    creatureAgeText.setFillColor(textColor);
+    creatureAgeText.setCharacterSize(20);
+
 }
 
 Camera *LifeScreen::open() {
@@ -39,6 +45,9 @@ Camera *LifeScreen::open() {
 
 void LifeScreen::draw(sf::RenderWindow *window) {
     updateGraphs();
+
+
+
     window->draw(mapBackground);
 
 
@@ -52,6 +61,7 @@ void LifeScreen::draw(sf::RenderWindow *window) {
 
 
     camera->setCenter(selectedEntity->getEntity()->getPosition());
+
 
 
     if (informationToShow == "BRAIN") {
@@ -69,6 +79,12 @@ void LifeScreen::draw(sf::RenderWindow *window) {
     }
 
 
+
+    std::stringstream ageStream;
+
+    ageStream << "Age: " << selectedEntity->getEntity()->getAge();
+    creatureAgeText.setString(ageStream.str());
+    window->draw(creatureAgeText);
 
 
 
@@ -135,6 +151,9 @@ void LifeScreen::onWindowResize(int width, int height) {
         buttons.at(it).move(buttons.at(it).getX(), height - 100);
     }
 
+    creatureAgeText.setPosition(20, 75);
+
+
 }
 
 void LifeScreen::mouseMoved(int x, int y) {
@@ -187,8 +206,23 @@ void LifeScreen::loadSelectedGraphs() {
 
 
 
+    bioGraph = new Graph("Bio", font);
+    bioGraph->setPosition(0.55f, 0.31f, 0.4f, 0.2f);
+    bioGraph->windowResized(windowWidth, windowHeight);
+
+    energy = new DataItem("energy", true);
+    maxEnergy = new DataItem("maxEnergy", true);
+
+    bioGraph->addLine(energy, 1, 255, 255, 255);
+    bioGraph->addLine(maxEnergy, 1, 0, 0, 0);
+    bioGraph->addLine(grad0, 1, 0, 0, 0);
+    bioGraph->windowResized(windowWidth, windowHeight);
+
+
+
+
     outputNeuronsGraph = new Graph("Output Neurons", font);
-    outputNeuronsGraph->setPosition(0.6f, 0.1f, 0.35f, 0.2f);
+    outputNeuronsGraph->setPosition(0.55f, 0.1f, 0.4f, 0.2f);
     outputNeuronsGraph->windowResized(windowWidth, windowHeight);
 
 
@@ -226,6 +260,9 @@ void LifeScreen::updateGraphs() {
     grad0->addValue(0.0);
     grad1->addValue(1.0);
     gradm1->addValue(-1.0);
+
+    energy->addValue(selectedEntity->getEntity()->getEnergy());
+    maxEnergy->addValue(selectedEntity->getEntity()->getMaxEnergy());
 }
 
 void LifeScreen::drawGraphs(sf::RenderWindow *pWindow) {
@@ -233,6 +270,7 @@ void LifeScreen::drawGraphs(sf::RenderWindow *pWindow) {
         return;
     }
     outputNeuronsGraph->draw(pWindow);
+    bioGraph->draw(pWindow);
 }
 
 

@@ -27,18 +27,24 @@ private:
 
     std::vector<sf::Text> genomeTexts;
 
+    sf::Text creatureAgeText;
+
     DataItem * grad0;
     DataItem * grad1;
     DataItem * gradm1;
 
     Graph * inputNeuronsGraph;
-    Graph * bioGraph;
 
     Graph * outputNeuronsGraph;
     DataItem * movement;
     DataItem * rotation;
     DataItem * mouth;
     DataItem * genitals;
+
+    Graph * bioGraph;
+    DataItem * energy;
+    DataItem * maxEnergy;
+
 
 
 
