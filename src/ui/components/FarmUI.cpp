@@ -174,7 +174,7 @@ sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
     }
 
     if (camera->getMapMode() == 1) {
-        float heat = map->getTileAt(x, y)->getHeat() / 100.f;
+        float heat = map->getTileAt(x, y)->getHeat() / 1000.f;
         RGBColor rectangleColor = RGBColor(0.f, 1.f, heat);
 
         if (heat > 1.f) {

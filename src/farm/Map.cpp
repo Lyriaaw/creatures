@@ -151,7 +151,7 @@ void Map::processClimate() {
 
                     // If the other tile is lower than this one, we add some heat to be transfer
                     // the lowest the target tile, the biggest is the added energy
-                    double heightDifference = (currentHeight - getTileAt(it + x, jt + y)->getHeight()) / 5.f;
+                    double heightDifference = (currentHeight - getTileAt(it + x, jt + y)->getHeight());
 
                     double transferedHeat = availableHeat + (heightDifference * availableHeat);
                     newHeats[it + x][jt + y] += transferedHeat;
