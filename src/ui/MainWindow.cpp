@@ -206,11 +206,11 @@ void MainWindow::draw() {
         farmUi->draw(window, mainCamera, selectedLife);
     }
 
+    currentScreen->draw(window);
+
     if (brainUi != nullptr) {
         brainUi->draw(window);
     }
-
-    currentScreen->draw(window);
 
     window->draw(topButtonBackground);
     for (int it = 0; it < buttons.size(); it++) {
@@ -345,6 +345,7 @@ void MainWindow::handleMouseMove(int x, int y) {
     }
 
 
+
     farmUi->mouseMoved(newMousePosition, mainCamera);
 
 }
@@ -362,6 +363,7 @@ void MainWindow::handleMousePressed(sf::Mouse::Button button) {
 void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     if (button == Mouse::Right) {
         rightMouseButtonDown = false;
+
     }
 
     if (button == Mouse::Left) {
@@ -369,6 +371,13 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     }
 
     if (button == Mouse::Left) {
+
+        if (brainUi != nullptr) {
+            if (brainUi->mouseClicked(mouseX, mouseY)) {
+                return;
+            }
+        }
+
         for (int it = 0; it < buttons.size(); it++) {
             if (buttons.at(it)->clicked(mouseX, mouseY)) {
                 handleButtonClicked(buttons.at(it)->getId());
@@ -400,7 +409,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
                 if (brainUi != nullptr) {
                     delete brainUi;
                 }
-                brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
+                brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
                 selectedEntity = nullptr;
@@ -426,6 +435,8 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
             selectedLife = nullptr;
         }
     }
+
+
 }
 
 
@@ -529,7 +540,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 
             selectedLife = life;
 
-            brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font);
+            brainUi = new BrainUI(selectedLife->getBrain(), window->getSize().x * 0.8, 0, window->getSize().x * 0.2, window->getSize().y, font, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
 

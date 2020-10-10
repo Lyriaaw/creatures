@@ -15,6 +15,7 @@
 #include "CreatureNursery.h"
 #include "statistics/DataAnalyser.h"
 #include "life/Life.h"
+#include <thread>
 
 class Farm {
 private:
@@ -47,6 +48,7 @@ private:
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
 
+//    std::vector<std::thread> lifeThreads;
     std::mutex actions_mutex;
 
 public:

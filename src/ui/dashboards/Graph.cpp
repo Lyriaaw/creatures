@@ -3,7 +3,9 @@
 //
 
 #include <iostream>
+#include <cmath>
 #include "Graph.h"
+
 
 const std::string &Graph::getName() const {
     return name;
@@ -100,8 +102,8 @@ void Graph::windowResized(float windowWidth, float windowHeight) {
 }
 
 void Graph::getMinAndMaxValues() {
-    min = 10000000;
-    max = -10000000;
+    min = 10000000.0;
+    max = -10000000.0;
 
     for (int it = 0; it < lines.size(); it++) {
         if (lines.at(it).getDisplayMode() == 0) {
@@ -123,8 +125,8 @@ void Graph::getMinAndMaxValues() {
 
     heightRatio = 0;
 
-    if (max != 0) {
-        heightRatio = height / max;
+    if (max - min != 0) {
+        heightRatio = height / abs(max - min);
     }
 }
 
@@ -141,7 +143,7 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
 
     for (int it = 0; it < currentLineItemCount; it++) {
         double calculatedX = x + (it * widthRatio);
-        double calculatedY = (y + height) - (line.getValueForTick(it) * heightRatio);
+        double calculatedY = (y + height) - ((line.getValueForTick(it) - min) * heightRatio);
 
         lineVertexes[it].position = sf::Vector2f(calculatedX, calculatedY);
         lineVertexes[it].color = lineColor;
