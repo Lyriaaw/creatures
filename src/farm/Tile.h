@@ -13,6 +13,9 @@ private:
     float ground;
 
 public:
+
+    Tile(float height, float heat, float ground);
+
     float getHeight() const;
 
     void setHeight(float height);

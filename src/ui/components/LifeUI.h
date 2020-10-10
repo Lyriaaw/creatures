@@ -18,7 +18,7 @@ private:
     sf::VertexArray barSensors;
     sf::VertexArray energyBar;
 
-    sf::VertexArray muscles;
+    std::vector<sf::CircleShape> roundMuscles;
 
     sf::Color color;
     sf::VertexArray body;

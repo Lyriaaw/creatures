@@ -39,3 +39,5 @@ void Tile::addHeat(float value) {
 void Tile::addHeight(float value) {
     height += value;
 }
+
+Tile::Tile(float height, float heat, float ground) : height(height), heat(heat), ground(ground) {}

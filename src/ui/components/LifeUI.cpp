@@ -11,8 +11,11 @@ LifeUI::LifeUI(Life *life, sf::Font *font): life(life), font(font) {
     barSensors = sf::VertexArray(sf::Lines, life->getSensors().size() * 2);
     energyBar = sf::VertexArray(sf::Quads, 8);
     body = sf::VertexArray(sf::Quads, 4);
-    muscles = sf::VertexArray(sf::Quads, life->getExternalMuscles().size() * 8);
     energyLabel.setFont(*font);
+
+    for (int it = 0; it < life->getExternalMuscles().size() * 2; it++) {
+        roundMuscles.emplace_back(sf::CircleShape(0.0));
+    }
 
     RGBColor rgbColor = RGBColor(life->getEntity()->getColor(), 1.f, life->getEntity()->getBrightness());
     this->color = sf::Color(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
@@ -61,6 +64,10 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
         sf::Color muscleBackColor = sf::Color(0, 0, 0, 255);
         sf::Color muscleColor = sf::Color(200, 200, 200, 255);
 
+        float muscleX = (cos(muscleRotation) * distance) + screenPoint.getX();
+        float muscleY = (sin(muscleRotation) * distance) + screenPoint.getY();
+
+
         if (currentMuscle->getName() == "MOUTH") {
             muscleColor = this->color;
         }
@@ -68,39 +75,33 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
         float relativeMuscleSize = this->life->getEntity()->getSize() / 3.f;
         if (currentMuscle->getName() == "GENITALS") {
             relativeMuscleSize = this->life->getEntity()->getSize() / 4.f;
+        }
+        if (currentMuscle->getName() == "CAPTURE_GROUND") {
+            relativeMuscleSize = this->life->getEntity()->getSize() / 10.f;
+
+        }
+        if (currentMuscle->getName() == "DUPLICATION") {
+            relativeMuscleSize = this->life->getEntity()->getSize() / 10.f;
+            muscleColor = this->color;
 
         }
 
-        float muscleX = (cos(muscleRotation) * distance) + screenPoint.getX();
-        float muscleY = (sin(muscleRotation) * distance) + screenPoint.getY();
+        float muscleSize = (((currentMuscle->getValue() / 2.f) + 0.5) * relativeMuscleSize) * camera->getZoom();
 
-        float muscleSize = currentMuscle->getValue() * relativeMuscleSize;
+        relativeMuscleSize *= camera->getZoom();
 
-        for (int jt = 0; jt < 4; jt++) {
-            double angle = ((2 * M_PI) * (jt / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * float(M_PI));
+        roundMuscles.at((it * 2) + 0).setPosition(muscleX - (relativeMuscleSize), muscleY - (relativeMuscleSize));
+        roundMuscles.at((it * 2) + 0).setRadius(relativeMuscleSize);
+        roundMuscles.at((it * 2) + 0).setFillColor(muscleBackColor);
 
-            float currentX = muscleX + (((relativeMuscleSize) * camera->getZoom()) * cos(angle));
-            float currentY = muscleY + (((relativeMuscleSize) * camera->getZoom()) * sin(angle));
+        roundMuscles.at((it * 2) + 1).setPosition(muscleX - (muscleSize), muscleY - (muscleSize));
+        roundMuscles.at((it * 2) + 1).setRadius(muscleSize);
+        roundMuscles.at((it * 2) + 1).setFillColor(muscleColor);
 
-            int currentIt = (it * 8) + jt;
-            muscles[currentIt] = sf::Vector2f(currentX, currentY);
-            muscles[currentIt].color = muscleBackColor;
-        }
-
-        for (int jt = 0; jt < 4; jt++) {
-            double angle = ((2 * M_PI) * (jt / 4.0)) - (0.25 * M_PI) + (this->life->getEntity()->getRotation() * float(M_PI));
-
-            float currentX = muscleX + ((muscleSize * camera->getZoom()) * cos(angle));
-            float currentY = muscleY + ((muscleSize * camera->getZoom()) * sin(angle));
-
-            int currentIt = (it * 8) + 4 + jt;
-            muscles[currentIt] = sf::Vector2f(currentX, currentY);
-            muscles[currentIt].color = muscleColor;
-        }
+        window->draw(roundMuscles.at((it * 2) + 0));
+        window->draw(roundMuscles.at((it * 2) + 1));
 
     }
-
-    window->draw(muscles);
 
 
 
@@ -142,54 +143,57 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 //    window->draw(vertexArray);
 //
 //
-    if (true) {
-        int index = 0;
-
-        float energyDistance = (this->life->getEntity()->getSize() + 10) * camera->getZoom();
-        energyBar[index + 0].position = sf::Vector2f(screenPoint.getX() - energyDistance, screenPoint.getY() - energyDistance);
-        energyBar[index + 0].color =  sf::Color(0, 0, 0, 255);
-
-        energyBar[index + 1].position = sf::Vector2f(screenPoint.getX() + energyDistance, screenPoint.getY() - energyDistance);
-        energyBar[index + 1].color =  sf::Color(0, 0, 0, 255);
-
-        energyBar[index + 2].position = sf::Vector2f(screenPoint.getX() + energyDistance, screenPoint.getY() - energyDistance + (5 * camera->getZoom()));
-        energyBar[index + 2].color =  sf::Color(0, 0, 0, 255);
-
-        energyBar[index + 3].position = sf::Vector2f(screenPoint.getX() - energyDistance, screenPoint.getY() - energyDistance + (5 * camera->getZoom()));
-        energyBar[index + 3].color =  sf::Color(0, 0, 0, 255);
-
-        index++;
-
-        float energyRatio = (life->getEntity()->getEnergy() / life->getEntity()->getMaxEnergy()) * energyDistance;
-
-        energyBar[(index * 4) + 0].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + 1);
-        energyBar[(index * 4) + 0].color =  sf::Color(255, 255, 255, 255);
-
-        energyBar[(index * 4) + 1].position = sf::Vector2f(screenPoint.getX() + energyRatio, screenPoint.getY() - energyDistance + 1);
-        energyBar[(index * 4) + 1].color =  sf::Color(255, 255, 255, 255);
-
-        energyBar[(index * 4) + 2].position = sf::Vector2f(screenPoint.getX() + energyRatio, screenPoint.getY() - energyDistance + (std::max(5.0 * camera->getZoom(), 1.0)) - 1);
-        energyBar[(index * 4) + 2].color =  sf::Color(255, 255, 255, 255);
-
-        energyBar[(index * 4) + 3].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + (std::max(5.0 * camera->getZoom(), 1.0)) - 1);
-        energyBar[(index * 4) + 3].color =  sf::Color(255, 255, 255, 255);
-
-        window->draw(energyBar);
-
-
-
-        energyLabel.setCharacterSize(3 * camera->getZoom());
-
-        std::string energyText = std::to_string(life->getEntity()->getEnergy());
-        energyLabel.setString(energyText);
-
-        double xPosition = screenPoint.getX() - (energyLabel.getLocalBounds().width / 2);
-        double yPosition = screenPoint.getY() - energyDistance - ((5 - energyLabel.getLocalBounds().height) / 2);
-
-        energyLabel.setPosition(xPosition, yPosition);
-        energyLabel.setFillColor(sf::Color(128, 128, 128, 255));
-        window->draw(energyLabel);
+    if (!selectedEntity || selectedEntity->getId() != this->getLife()->getEntity()->getId()) {
+        return;
     }
+
+
+    int index = 0;
+
+    float energyDistance = (this->life->getEntity()->getSize() + 10) * camera->getZoom();
+    energyBar[index + 0].position = sf::Vector2f(screenPoint.getX() - energyDistance, screenPoint.getY() - energyDistance);
+    energyBar[index + 0].color =  sf::Color(0, 0, 0, 255);
+
+    energyBar[index + 1].position = sf::Vector2f(screenPoint.getX() + energyDistance, screenPoint.getY() - energyDistance);
+    energyBar[index + 1].color =  sf::Color(0, 0, 0, 255);
+
+    energyBar[index + 2].position = sf::Vector2f(screenPoint.getX() + energyDistance, screenPoint.getY() - energyDistance + (5 * camera->getZoom()));
+    energyBar[index + 2].color =  sf::Color(0, 0, 0, 255);
+
+    energyBar[index + 3].position = sf::Vector2f(screenPoint.getX() - energyDistance, screenPoint.getY() - energyDistance + (5 * camera->getZoom()));
+    energyBar[index + 3].color =  sf::Color(0, 0, 0, 255);
+
+    index++;
+
+    float energyRatio = (life->getEntity()->getEnergy() / life->getEntity()->getMaxEnergy()) * energyDistance;
+
+    energyBar[(index * 4) + 0].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + 1);
+    energyBar[(index * 4) + 0].color =  sf::Color(255, 255, 255, 255);
+
+    energyBar[(index * 4) + 1].position = sf::Vector2f(screenPoint.getX() + energyRatio, screenPoint.getY() - energyDistance + 1);
+    energyBar[(index * 4) + 1].color =  sf::Color(255, 255, 255, 255);
+
+    energyBar[(index * 4) + 2].position = sf::Vector2f(screenPoint.getX() + energyRatio, screenPoint.getY() - energyDistance + (std::max(5.0 * camera->getZoom(), 1.0)) - 1);
+    energyBar[(index * 4) + 2].color =  sf::Color(255, 255, 255, 255);
+
+    energyBar[(index * 4) + 3].position = sf::Vector2f(screenPoint.getX() - energyRatio, screenPoint.getY() - energyDistance + (std::max(5.0 * camera->getZoom(), 1.0)) - 1);
+    energyBar[(index * 4) + 3].color =  sf::Color(255, 255, 255, 255);
+
+    window->draw(energyBar);
+
+
+
+    energyLabel.setCharacterSize(3 * camera->getZoom());
+
+    std::string energyText = std::to_string(life->getEntity()->getEnergy());
+    energyLabel.setString(energyText);
+
+    double xPosition = screenPoint.getX() - (energyLabel.getLocalBounds().width / 2);
+    double yPosition = screenPoint.getY() - energyDistance - ((5 - energyLabel.getLocalBounds().height) / 2);
+
+    energyLabel.setPosition(xPosition, yPosition);
+    energyLabel.setFillColor(sf::Color(128, 128, 128, 255));
+    window->draw(energyLabel);
 //
 //
 //
