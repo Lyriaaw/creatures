@@ -48,7 +48,7 @@ private:
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
 
-//    std::vector<std::thread> lifeThreads;
+    std::vector<std::thread> lifeThreads;
     std::mutex actions_mutex;
 
 public:
@@ -119,6 +119,8 @@ public:
     void multithreadBrainProcessing();
 
     void addActions(std::vector<ActionDTO> actions);
+
+    void startNewCreature(Life *life);
 };
 
 

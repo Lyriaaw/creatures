@@ -24,7 +24,12 @@ private:
     std::vector<ExternalMuscle *> externalMuscles;
 
     Brain * brain;
+
+    bool canProcessBrain, brainProcessed;
 public:
+
+    Life();
+
     double giveawayEnergy();
 
     void processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
@@ -57,6 +62,16 @@ public:
     const std::vector<InternalMuscle *> &getInternalMuscles() const;
 
     const std::vector<ExternalMuscle *> &getExternalMuscles() const;
+
+    bool isCanProcessBrain() const;
+
+    void setCanProcessBrain(bool canProcessBrain);
+
+    bool isBrainProcessed() const;
+
+    void setBrainProcessed(bool brainProcessed);
+
+    void enableBrainProcessing();
 };
 
 

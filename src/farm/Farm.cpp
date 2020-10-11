@@ -7,6 +7,8 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <zconf.h>
+
 
 
 using namespace std;
@@ -49,6 +51,8 @@ void Farm::InitFromRandom() {
         initialLife->getEntity()->setEnergy(creatureEnergy);
 
         lifes.push_back(initialLife);
+
+        startNewCreature(initialLife);
     }
 
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
@@ -113,16 +117,15 @@ void Farm::Tick(bool paused) {
     }
 }
 
-void Farm::multithreadBrainProcessing() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+void Farm::startNewCreature(Life * life) {
+    auto f = [](Life * life, Farm * farm) {
 
-    std::thread chunkThreads[lifes.size()];
+        while (life->getEntity()->getEnergy() > 0) {
 
+            while (!life->isCanProcessBrain()) {
+                usleep(100000);
+            }
 
-
-    for (int it = 0; it < lifes.size(); it++) {
-
-        auto f = [](Life * life, Farm * farm) {
 
             life->processSelectedChunks();
 
@@ -135,23 +138,48 @@ void Farm::multithreadBrainProcessing() {
             life->processBrain();
 
 
-//
+    //
             std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
 
             farm->addActions(currentCreatureActions);
 
 
-        };
+            life->setBrainProcessed(true);
+        }
 
-        Life *currentLife = lifes.at(it);
+    };
 
-        int index = it;
-        chunkThreads[index] = std::thread(f, currentLife, this);
-    }
+    std::cout << "Adding thread" << std::endl;
+    auto thread = std::thread(f, life, this);
+    thread.detach();
+}
+
+void Farm::multithreadBrainProcessing() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     for (int it = 0; it < lifes.size(); it++) {
-        chunkThreads[it].join();
+        Life *currentLife = lifes.at(it);
+        currentLife->enableBrainProcessing();
     }
+
+
+
+    bool allFinished = true;
+
+    do {
+        allFinished = true;
+        for (int it = 0; it < lifes.size(); it++) {
+            Life *currentLife = lifes.at(it);
+            if (!currentLife->isBrainProcessed()) {
+                allFinished = false;
+            }
+        }
+
+
+        if (!allFinished) {
+            usleep(10000);
+        }
+    } while (!allFinished);
 
 
 
@@ -339,6 +367,7 @@ bool Farm::handleMating(Life * father, int entityId) {
         child->getEntity()->setEnergy(totalGivenEnergy);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
+        startNewCreature(child);
 
         return true;
     }
@@ -414,9 +443,9 @@ void Farm::populationControl() {
 
         totalEnergyRemoved += child->getEntity()->getEnergy();
 
-
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
+        startNewCreature(child);
     }
 
     map->removeEnergyFromGround(totalEnergyRemoved);

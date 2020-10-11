@@ -190,3 +190,25 @@ const std::vector<ExternalMuscle *> &Life::getExternalMuscles() const {
     return externalMuscles;
 }
 
+void Life::enableBrainProcessing() {
+    canProcessBrain = true;
+    brainProcessed = false;
+}
+
+bool Life::isCanProcessBrain() const {
+    return canProcessBrain;
+}
+
+void Life::setCanProcessBrain(bool canProcessBrain) {
+    Life::canProcessBrain = canProcessBrain;
+}
+
+bool Life::isBrainProcessed() const {
+    return brainProcessed;
+}
+
+void Life::setBrainProcessed(bool brainProcessed) {
+    Life::brainProcessed = brainProcessed;
+}
+
+Life::Life(): canProcessBrain(false), brainProcessed(false) {}
