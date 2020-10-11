@@ -98,20 +98,30 @@ void Map::processGroundChanges(){
 
 }
 
-void Map::removeEnergyFromGround(double amount) {
 
-    double amountPerTile = amount / (TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT);
+void Map::removeEnergyFromGround(double energyToRemove) {
+
+    double totalGround = 0.0;
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            if (getTileAt(it, jt)->getGround() < amountPerTile) {
-//                std::cout << "ERROR WHILE REMOVING GROUND. ADDED ENERGY: " << amountPerTile << std::endl;
-
-                continue;
-            }
-            getTileAt(it, jt)->addGround(-1.f * amountPerTile);
+            Tile * currentTile = getTileAt(it, jt);
+            totalGround += currentTile->getGround();
         }
     }
+
+
+    double removedEnergy = 0.0;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * tile = getTileAt(it, jt);
+            double ratio = tile->getGround() / totalGround;
+            tile->removeGround(ratio * energyToRemove);
+            removedEnergy += ratio * energyToRemove;
+        }
+    }
+
+
 }
 
 

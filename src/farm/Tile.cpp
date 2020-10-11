@@ -28,6 +28,11 @@ void Tile::setGround(float ground) {
     Tile::ground = ground;
 }
 
+void Tile::removeGround(float groundToRemove) {
+    Tile::ground -= groundToRemove;
+}
+
+
 void Tile::addGround(float value) {
     ground += value;
 }

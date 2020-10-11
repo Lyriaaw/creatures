@@ -58,6 +58,16 @@ double DataItem::getLastValue() {
     return values.at(values.size() - 1);
 }
 
+double DataItem::getSecondToLastValue() {
+    if (values.size() < 2) {
+        return 0;
+    }
+
+    return values.at(values.size() - 2);
+}
+
+
+
 double DataItem::getAveragedLastValue() {
     if (!isAveraged) {
         return 0;

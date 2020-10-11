@@ -31,6 +31,8 @@ public:
     void addHeight(float value);
     void addHeat(float value);
     void addGround(float value);
+
+    void removeGround(float groundToRemove);
 };
 
 

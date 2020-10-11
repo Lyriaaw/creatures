@@ -17,7 +17,7 @@ void SizeEvolution::perform(Life * life) {
 }
 
 std::string SizeEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Size ";
+    return std::to_string(this->generationNumber) + " => Size " + std::to_string(this->size);
 }
 
 Evolution * SizeEvolution::generateWithMate(Evolution * mate) {

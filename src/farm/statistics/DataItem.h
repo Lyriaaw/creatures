@@ -47,6 +47,7 @@ public:
 
     const std::string &getName() const;
 
+    double getSecondToLastValue();
 };
 
 
