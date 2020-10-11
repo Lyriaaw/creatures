@@ -206,25 +206,26 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
     // Sensors
     for (int sensorIndex = 0; sensorIndex < this->life->getSensors().size(); sensorIndex++) {
 
-//        if (entity->getSensorDistance(sensorIndex) > 0) {
-//        if (false) {
-//            float currentSensorDistance = entity->getSensorLength(sensorIndex) * (1.f - entity->getSensorDistance(sensorIndex));
-//
-//            RGBColor sensorDistanceRGBColor = RGBColor(this->entity->getSensorColor(sensorIndex), 0.f, this->entity->getSensorBrightness(sensorIndex));
-//            sf::Color sensorDistanceColor = sf::Color(sensorDistanceRGBColor.getRed(), sensorDistanceRGBColor.getGreen(), sensorDistanceRGBColor.getBlue(), 255);
-//
-//
-//            sf::RectangleShape currentSensorValue(sf::Vector2f(currentSensorDistance * camera->getZoom(), 2 * camera->getZoom()));
-//            currentSensorValue.rotate((entity->getRotation() + entity->getSensorRotation(sensorIndex)) * 180.f);
-//            currentSensorValue.setPosition(screenPoint.getX(), screenPoint.getY());
-//            currentSensorValue.setFillColor(sensorDistanceColor);
-//            window->draw(currentSensorValue);
-//        }
 
         BrightnessBarSensor * currentSensor = (BrightnessBarSensor *) this->life->getSensors().at(sensorIndex);
         if (currentSensor->getName() != "BRIGHTNESS_BAR") {
             continue;
         }
+
+        if (currentSensor->getValue() > 0) {
+            float currentSensorDistance = currentSensor->getLength() * (1.f - currentSensor->getValue());
+
+            RGBColor sensorDistanceRGBColor = RGBColor(currentSensor->getColor(), 0.f, 0.5f);
+            sf::Color sensorDistanceColor = sf::Color(sensorDistanceRGBColor.getRed(), sensorDistanceRGBColor.getGreen(), sensorDistanceRGBColor.getBlue(), 255);
+
+
+            sf::RectangleShape currentSensorValue(sf::Vector2f(currentSensorDistance * camera->getZoom(), 2 * camera->getZoom()));
+            currentSensorValue.rotate((life->getEntity()->getRotation() + currentSensor->getRotation()) * 180.f);
+            currentSensorValue.setPosition(screenPoint.getX(), screenPoint.getY());
+            currentSensorValue.setFillColor(sensorDistanceColor);
+            window->draw(currentSensorValue);
+        }
+
 
         RGBColor sensorRGB = RGBColor(currentSensor->getColor(), 1.f, 0.5f);
         sf::Color sensorColor = sf::Color(sensorRGB.getRed(), sensorRGB.getGreen(), sensorRGB.getBlue(), 128);
