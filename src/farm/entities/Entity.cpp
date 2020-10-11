@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), energy(0.0), size(0), age(0) {
+Entity::Entity(Point position): position(position), mass(0.0), size(0), age(0) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -83,44 +83,44 @@ void Entity::setExists(bool exists) {
     Entity::exists = exists;
 }
 
-float Entity::getEnergy() const {
-    return energy;
+float Entity::getMass() const {
+    return mass;
 }
 
-double Entity::setEnergy(double energy) {
-    Entity::energy = energy;
+double Entity::setMass(double mass) {
+    Entity::mass = mass;
 }
 
-double Entity::addEnergy(double addedEnergy) {
+double Entity::addMass(double addedMass) {
     double remaining = 0.f;
 
-    double newEnergy = this->energy + addedEnergy;
+    double newMass = this->mass + addedMass;
 
-    if (newEnergy > getMaxEnergy()) {
-        remaining = newEnergy - getMaxEnergy();
-        newEnergy = newEnergy - remaining;
+    if (newMass > getMaxMass()) {
+        remaining = newMass - getMaxMass();
+        newMass = newMass - remaining;
     }
 
-    this->energy = newEnergy;
+    this->mass = newMass;
 
     return remaining;
 }
 
-double Entity::removeEnergy(double removedEnergy) {
-    double newEnergy = this->energy - removedEnergy;
-    double returned = removedEnergy;
+double Entity::removeMass(double removedMass) {
+    double newMass = this->mass - removedMass;
+    double returned = removedMass;
 
-    if (newEnergy <= 0) {
-        returned = this->energy;
-        this->energy = 0;
+    if (newMass <= 0) {
+        returned = this->mass;
+        this->mass = 0;
     }
 
-    this->energy = newEnergy;
+    this->mass = newMass;
 
     return returned;
 }
 
-double Entity::getMaxEnergy() {
+double Entity::getMaxMass() {
 //    double result = this->size * pow(299792458, 2);
     double result = this->size * 1000;
     return result;

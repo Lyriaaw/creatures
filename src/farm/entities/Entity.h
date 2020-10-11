@@ -47,11 +47,11 @@ public:
 
     void setExists(bool exists);
 
-    float getEnergy() const;
-    double setEnergy(double energy);
-    double addEnergy(double addedEnergy);
-    double removeEnergy(double removedEnergy);
-    double getMaxEnergy();
+    float getMass() const;
+    double setMass(double energy);
+    double addMass(double addedMass);
+    double removeMass(double removedMass);
+    double getMaxMass();
 
     int getAge() const;
     void setAge(int age);
@@ -74,7 +74,7 @@ protected:
     float color;
     float brightness;
 
-    double energy;
+    double mass;
 
     bool exists;
 

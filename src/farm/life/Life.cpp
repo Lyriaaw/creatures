@@ -59,21 +59,21 @@ double Life::giveawayEnergy() {
     double biasEnergy = 10 + (entity->getAge() / 100.0);
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
-    double currentEntityEnergy = this->entity->getEnergy();
+    double currentEntityEnergy = this->entity->getMass();
 
 
     if (currentEntityEnergy - usedEnergy < 0) {
-        usedEnergy = this->entity->getEnergy();
+        usedEnergy = this->entity->getMass();
     }
 
     if (usedEnergy < 0) {
         std::cout << "Returned negative amount of energy: " << usedEnergy;
-        std::cout << " Entity energy: " << this->entity->getEnergy();
+        std::cout << " Entity energy: " << this->entity->getMass();
         std::cout << " Muscle Energy: " << muscleEnergy;
         std::cout << std::endl;
     }
 
-    this->entity->setEnergy(currentEntityEnergy - usedEnergy);
+    this->entity->setMass(currentEntityEnergy - usedEnergy);
 
     return usedEnergy;
 }
