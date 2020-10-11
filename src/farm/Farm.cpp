@@ -45,8 +45,9 @@ void Farm::InitFromRandom() {
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
         Life * initialLife = nursery->generateCreatureFromRandom();
 
-        float creatureEnergy = initialLife->getEntity()->getMaxEnergy() / 2.0;
-        initialLife->getEntity()->setEnergy(creatureEnergy);
+        float creatureInitialMass = initialLife->getMaxMass() / 2.0;
+        initialLife->getEntity()->setMass(creatureInitialMass);
+        initialLife->setAvailableEnergy(creatureInitialMass);
 
         lifes.push_back(initialLife);
     }
@@ -61,8 +62,8 @@ void Farm::InitFromRandom() {
 //        float foodSize = ((rand() % 300) / 100.f) + 2;
         float foodSize = 2;
 
-        Food * entity = new Food(point, foodSize);
-        entity->setEnergy(entity->getMaxEnergy());
+        Food * entity = new Food(point);
+        entity->setMass(foodSize * SIZE_TO_MASS_RATIO);
         entities.push_back(entity);
     }
 
@@ -246,7 +247,10 @@ void Farm::moveCreatures() {
         double releasedHeat = currentLife->giveawayEnergy();
         map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
-        if (currentLife->getEntity()->getEnergy() <= 0) {
+        if (currentLife->getAvailableEnergy() <= 0) {
+            std::cout << "Dead after moving " << std::endl;
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(currentLife->getEntity()->getMass());
+            currentLife->getEntity()->setMass(0.0);
             this->lifesToDelete.emplace_back(currentLife);
         }
 
@@ -272,19 +276,21 @@ void Farm::executeCreaturesActions() {
         Life * performer = getLifeFromId(actionDto.getPerformerId());
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
-        if (subject->getEnergy() <= 0 || performer->getEntity()->getEnergy() <= 0) {
+        if (subject->haveMass() || performer->isAlive()) {
             continue;
         }
 
         if (actionDto.getType() == "EAT") {
-            double wastedEnergy = performer->getEntity()->addEnergy(subject->getEnergy());
-            subject->setEnergy(0.0);
+            performer->eat(subject);
 
             Point performerPoint = performer->getEntity()->getPosition();
             Point tilePoint = performerPoint.getTileCoordinates();
 
-            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
-            entityToDelete.emplace_back(subject);
+            if (subject->getMass() < 10) {
+                map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(subject->getMass());
+                subject->setMass(0.0);
+                entityToDelete.emplace_back(subject);
+            }
         }
 
         if (actionDto.getType() == "MATE") {
@@ -312,8 +318,8 @@ bool Farm::handleMating(Life * father, int entityId) {
         return false;
     }
 
-    bool fatherCanReproduce = father->getEntity()->getEnergy() > father->getEntity()->getMaxEnergy() / 2.f;
-    bool motherCanReproduce = foundLife->getEntity()->getEnergy() > father->getEntity()->getMaxEnergy() / 2.f;
+    bool fatherCanReproduce = father->getEntity()->getMass() > father->getMaxMass() / 2.f;
+    bool motherCanReproduce = foundLife->getEntity()->getMass() > father->getMaxMass() / 2.f;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
         return false;
@@ -321,13 +327,13 @@ bool Farm::handleMating(Life * father, int entityId) {
 //
     Life * child = this->nursery->Mate(father, foundLife);
 
-    double givenEnergyToChildGoal = child->getEntity()->getMaxEnergy() / 4.f;
+    double givenEnergyToChildGoal = child->getMaxMass() / 4.f;
 
-    double givenFatherEnergy = std::min(father->getEntity()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
-    double givenMotherEnergy = std::min(foundLife->getEntity()->getEnergy() / 2.0, givenEnergyToChildGoal / 2.0);
+    double givenFatherEnergy = std::min(father->getEntity()->getMass() / 2.0, givenEnergyToChildGoal / 2.0);
+    double givenMotherEnergy = std::min(foundLife->getEntity()->getMass() / 2.0, givenEnergyToChildGoal / 2.0);
 
-    double actualGivenFatherEnergy = father->getEntity()->removeEnergy(givenFatherEnergy);
-    double actualGivenMotherEnergy = foundLife->getEntity()->removeEnergy(givenMotherEnergy);
+    double actualGivenFatherEnergy = father->getEntity()->removeMass(givenFatherEnergy);
+    double actualGivenMotherEnergy = foundLife->getEntity()->removeMass(givenMotherEnergy);
 
     if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
         std::cout << "Wrong energy given" << std::endl;
@@ -336,7 +342,8 @@ bool Farm::handleMating(Life * father, int entityId) {
     double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
 
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
-        child->getEntity()->setEnergy(totalGivenEnergy);
+        child->getEntity()->setMass(totalGivenEnergy / 2.0);
+        child->setAvailableEnergy(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
 
@@ -350,10 +357,12 @@ bool Farm::handleMating(Life * father, int entityId) {
     map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
 
-    if (father->getEntity()->getEnergy() <= 0) {
+    if (father->getEntity()->getMass() <= 0) {
+        std::cout << "No more mass after mating" << std::endl;
         lifesToDelete.emplace_back(father);
     }
-    if (foundLife->getEntity()->getEnergy() <= 0) {
+    if (foundLife->getEntity()->getMass() <= 0) {
+        std::cout << "No more mass after mating" << std::endl;
         lifesToDelete.emplace_back(foundLife);
     }
 
@@ -394,7 +403,7 @@ void Farm::populationControl() {
 
     int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - this->lifes.size();
 
-    float totalEnergyRemoved = 0.f;
+    double totalEnergyRemoved = 0.0;
     for (int it = 0; it < newConnectorNeeded; it++) {
         int fatherIndex = rand() % selectedParentCount;
         int motherIndex = rand() % selectedParentCount;
@@ -403,7 +412,8 @@ void Farm::populationControl() {
         Life * mother = sortedConnectors.at(motherIndex);
 
         Life * child = this->nursery->Mate(father, mother);
-        child->getEntity()->setEnergy(child->getEntity()->getMaxEnergy() / 4.f);
+        child->getEntity()->setMass(child->getMaxMass() / 4.f);
+        child->setAvailableEnergy(child->getMaxMass() / 4.f);
         Entity * childCreature = child->getEntity();
 
 //        float childSpawnX = distWidth(mt);
@@ -412,7 +422,7 @@ void Farm::populationControl() {
 //
 //        childCreature->setPosition(childCreaturePosition);
 
-        totalEnergyRemoved += child->getEntity()->getEnergy();
+        totalEnergyRemoved += child->getEntity()->getMass() + child->getAvailableEnergy();
 
 
         lifes.emplace_back(child);
@@ -427,6 +437,29 @@ void Farm::populationControl() {
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
 }
+
+void Farm::handleEntityDecay() {
+//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+//            Tile * currentTile = map->getTileAt(it, jt);
+//            std::vector<Entity *> tileEntities = entityGrid.at(it).at(jt);
+//
+//            for (int kt = 0; kt < tileEntities.size(); kt++) {
+//                Entity * currentEntity = tileEntities.at(kt);
+//
+//                if (currentEntity->getEnergy() < currentEntity->getMaxEnergy() / 10.0 || currentEntity->getEnergy() < 10.0) {
+//                    currentTile->addGround(currentEntity->getEnergy());
+//                    currentEntity->setEnergy(0.0);
+//                } else {
+//                    currentTile->addGround(1.0);
+//                    currentEntity->removeEnergy(1.0);
+//                }
+//            }
+//
+//        }
+//    }
+}
+
 
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -449,7 +482,7 @@ void Farm::vegetalisation() {
             float tileAvailableEnergy = currentTile->getGround();
 
 
-            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
+            int foodToGenerate = int(tileAvailableEnergy / (2 * SIZE_TO_MASS_RATIO));
             float totalEnergyAdded = 0.f;
 
 //            if (tileAvailableEnergy > 1950) {
@@ -466,10 +499,10 @@ void Farm::vegetalisation() {
                 //        float foodSize = ((rand() % 300) / 100.f) + 2;
                 float foodSize = 2;
 
-                Food * entity = new Food(point, foodSize);
-                entity->setEnergy(entity->getMaxEnergy());
+                Food * entity = new Food(point);
+                entity->setMass(2 * SIZE_TO_MASS_RATIO);
 
-                totalEnergyAdded += entity->getEnergy();
+                totalEnergyAdded += entity->getMass();
 
 
                 entities.emplace_back(entity);
@@ -539,16 +572,18 @@ void Farm::statistics() {
 
 
     double totalCreaturesEnergy = 0.f;
+    double totalCreaturesMass = 0.f;
     double totalFoodsEnergy = 0.f;
 
     for (int it = 0; it < lifes.size(); it++) {
         Entity * currentEntity = lifes.at(it)->getEntity();
-        totalCreaturesEnergy += currentEntity->getEnergy();
+        totalCreaturesMass += currentEntity->getMass();
+        totalCreaturesEnergy += lifes.at(it)->getAvailableEnergy();
     }
 
     for (int it = 0; it < entities.size(); it++) {
         Entity * entity = entities.at(it);
-        totalFoodsEnergy += entity->getEnergy();
+        totalFoodsEnergy += entity->getMass();
     }
 
 
@@ -567,6 +602,7 @@ void Farm::statistics() {
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
+    dataAnalyser.getCreaturesMass()->addValue(totalCreaturesMass);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
 
@@ -631,6 +667,11 @@ void Farm::removeDeletedEntities() {
         for (int jt = 0; jt < lifesToDelete.size(); jt++) {
             if (lifes.at(it)->getEntity()->getId() == lifesToDelete.at(jt)->getEntity()->getId()) {
                 found = true;
+
+                if (lifes.at(it)->isAlive()) {
+                    std::cout << "Error ! Removing alive creature " << std::endl;
+                }
+
             }
         }
 
@@ -645,7 +686,7 @@ void Farm::removeDeletedEntities() {
     std::vector<Entity *> newEntities;
     for (int it = 0; it < entities.size(); it++) {
 
-        if (entities.at(it)->getEnergy() > 0) {
+        if (entities.at(it)->haveMass()) {
             newEntities.emplace_back(entities.at(it));
         }
     }

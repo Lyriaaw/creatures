@@ -13,7 +13,7 @@ void SizeEvolution::generateFromRandom(Life * life) {
 }
 
 void SizeEvolution::perform(Life * life) {
-    life->getEntity()->setSize(this->size);
+    life->setMaxMass(10000);
 }
 
 std::string SizeEvolution::describe() {

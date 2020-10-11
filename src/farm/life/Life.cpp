@@ -59,21 +59,20 @@ double Life::giveawayEnergy() {
     double biasEnergy = 10 + (entity->getAge() / 100.0);
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
-    double currentEntityEnergy = this->entity->getEnergy();
 
 
-    if (currentEntityEnergy - usedEnergy < 0) {
-        usedEnergy = this->entity->getEnergy();
+    if (availableEnergy - usedEnergy < 0) {
+        usedEnergy = availableEnergy;
     }
 
     if (usedEnergy < 0) {
         std::cout << "Returned negative amount of energy: " << usedEnergy;
-        std::cout << " Entity energy: " << this->entity->getEnergy();
+        std::cout << " Entity energy: " << availableEnergy;
         std::cout << " Muscle Energy: " << muscleEnergy;
         std::cout << std::endl;
     }
 
-    this->entity->setEnergy(currentEntityEnergy - usedEnergy);
+    availableEnergy -= usedEnergy;
 
     return usedEnergy;
 }
@@ -190,3 +189,29 @@ const std::vector<ExternalMuscle *> &Life::getExternalMuscles() const {
     return externalMuscles;
 }
 
+double Life::getMaxMass() const {
+    return maxMass;
+}
+
+void Life::setMaxMass(double maxMass) {
+    Life::maxMass = maxMass;
+}
+
+double Life::getAvailableEnergy() const {
+    return availableEnergy;
+}
+
+void Life::setAvailableEnergy(double availableEnergy) {
+    Life::availableEnergy = availableEnergy;
+}
+
+bool Life::isAlive() {
+    return availableEnergy > 0 && entity->haveMass();
+}
+
+double Life::eat(Entity * eaten) {
+//    double takenEnergy = 0.0;
+    if (entity->getMass() >= getMaxMass()) {
+
+    }
+}

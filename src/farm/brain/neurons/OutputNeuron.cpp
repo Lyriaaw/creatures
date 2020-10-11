@@ -9,6 +9,10 @@ OutputNeuron::OutputNeuron(): Neuron() {
 }
 
 float OutputNeuron::getValue() {
+    if (isnan(this->value)) {
+        std::cout << "NaN value at neuron output" << std::endl;
+        return 0.0;
+    }
     return tanh(this->value);
 }
 
@@ -20,7 +24,7 @@ SpeedOutputNeuron::SpeedOutputNeuron(): OutputNeuron() {
 }
 
 void SpeedOutputNeuron::transferOutputValue(Creature *creature) {
-    creature->setSpeed(this->getValue());
+//    creature->setSpeed(this->getValue());
 }
 
 

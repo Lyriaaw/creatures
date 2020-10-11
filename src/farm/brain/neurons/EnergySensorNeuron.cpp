@@ -9,5 +9,6 @@ EnergySensorNeuron::EnergySensorNeuron(): InputNeuron() {
 }
 
 void EnergySensorNeuron::fetchInputValue(Creature * creature) {
-    this->value = creature->getEnergy() / creature->getMaxEnergy();
+//    this->value = creature->getM() / creature->getMaxEnergy();
+    this->value = 0.0;
 }

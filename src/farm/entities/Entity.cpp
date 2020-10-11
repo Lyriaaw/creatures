@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), energy(0.0), size(0), age(0) {
+Entity::Entity(Point position): position(position), mass(0.0), age(0) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -23,16 +23,12 @@ const Point &Entity::getPosition() const {
     return position;
 }
 
-float Entity::getSize() const {
-    return size;
+double Entity::getSize() const {
+    return mass / 1000.0;
 }
 
 float Entity::getRotation() const {
     return rotation;
-}
-
-float Entity::getSpeed() const {
-    return speed;
 }
 
 float Entity::getBrightness() const {
@@ -63,16 +59,8 @@ void Entity::setRotation(float rotation) {
     Entity::rotation = rotation;
 }
 
-void Entity::setSpeed(float speed) {
-    Entity::speed = speed;
-}
-
 void Entity::setColor(float color) {
     Entity::color = color;
-}
-
-void Entity::setSize(float size) {
-    Entity::size = size;
 }
 
 bool Entity::isExists() const {
@@ -83,47 +71,26 @@ void Entity::setExists(bool exists) {
     Entity::exists = exists;
 }
 
-float Entity::getEnergy() const {
-    return energy;
+double Entity::getMass() const {
+    return mass;
 }
 
-double Entity::setEnergy(double energy) {
-    Entity::energy = energy;
+double Entity::setMass(double mass) {
+    Entity::mass = mass;
 }
 
-double Entity::addEnergy(double addedEnergy) {
-    double remaining = 0.f;
+double Entity::removeMass(double removedMass) {
+    double newMass = this->mass - removedMass;
+    double returned = removedMass;
 
-    double newEnergy = this->energy + addedEnergy;
-
-    if (newEnergy > getMaxEnergy()) {
-        remaining = newEnergy - getMaxEnergy();
-        newEnergy = newEnergy - remaining;
+    if (newMass <= 0) {
+        returned = this->mass;
+        this->mass = 0;
     }
 
-    this->energy = newEnergy;
-
-    return remaining;
-}
-
-double Entity::removeEnergy(double removedEnergy) {
-    double newEnergy = this->energy - removedEnergy;
-    double returned = removedEnergy;
-
-    if (newEnergy <= 0) {
-        returned = this->energy;
-        this->energy = 0;
-    }
-
-    this->energy = newEnergy;
+    this->mass = newMass;
 
     return returned;
-}
-
-double Entity::getMaxEnergy() {
-//    double result = this->size * pow(299792458, 2);
-    double result = this->size * 1000;
-    return result;
 }
 
 int Entity::getAge() const {
@@ -140,4 +107,8 @@ void Entity::aTickHavePassed(){
 
 void Entity::setBrightness(float brightness) {
     Entity::brightness = brightness;
+}
+
+bool Entity::haveMass() {
+    return mass > 0;
 }

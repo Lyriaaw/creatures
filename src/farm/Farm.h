@@ -119,6 +119,8 @@ public:
     void multithreadBrainProcessing();
 
     void addActions(std::vector<ActionDTO> actions);
+
+    void handleEntityDecay();
 };
 
 

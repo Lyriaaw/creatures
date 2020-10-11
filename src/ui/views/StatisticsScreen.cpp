@@ -87,6 +87,7 @@ void StatisticsScreen::loadGraphs() {
     energyGraph->addLine(farm->getDataAnalyser().getAvailableEnergy(), 1, 100, 100, 255);
     energyGraph->addLine(farm->getDataAnalyser().getFoodEnergy(), 1, 0, 255, 0);
     energyGraph->addLine(farm->getDataAnalyser().getCreaturesEnergy(), 1, 255, 0, 0);
+    energyGraph->addLine(farm->getDataAnalyser().getCreaturesMass(), 1, 128, 0, 0);
 
     energyGraph->addLine(farm->getDataAnalyser().getHeatEnergy(), 1, 255, 0, 0);
     energyGraph->addLine(farm->getDataAnalyser().getGroundEnergy(), 1, 20, 100, 0);

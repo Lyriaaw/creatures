@@ -24,6 +24,10 @@ private:
     std::vector<ExternalMuscle *> externalMuscles;
 
     Brain * brain;
+
+    double maxMass;
+    double availableEnergy;
+
 public:
     double giveawayEnergy();
 
@@ -57,6 +61,19 @@ public:
     const std::vector<InternalMuscle *> &getInternalMuscles() const;
 
     const std::vector<ExternalMuscle *> &getExternalMuscles() const;
+
+    double getMaxMass() const;
+
+    void setMaxMass(double maxMass);
+
+    double getAvailableEnergy() const;
+
+    void setAvailableEnergy(double availableEnergy);
+
+
+    bool isAlive();
+
+    double eat(Entity * eaten);
 };
 
 

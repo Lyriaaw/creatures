@@ -33,9 +33,6 @@ double Creature::move() {
 }
 
 
-void Creature::addSpeed(float speedToAdd) {
-    this->speed += speedToAdd;
-}
 
 void Creature::addRotation(float rotationToAdd) {
     this->rotation += rotationToAdd;

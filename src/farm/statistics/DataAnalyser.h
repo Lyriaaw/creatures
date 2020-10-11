@@ -43,6 +43,7 @@ private:
     DataItem * availableEnergy;
     DataItem * foodEnergy;
     DataItem * creaturesEnergy;
+    DataItem * creaturesMass;
 
     DataItem * heatEnergy;
     DataItem * groundEnergy;
@@ -108,6 +109,8 @@ public:
     DataItem *getBrainProcessing() const;
 
     DataItem *getExternalActions() const;
+
+    DataItem *getCreaturesMass() const;
 };
 
 

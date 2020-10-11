@@ -38,6 +38,18 @@ std::vector<Entity *> Movement::executeAction() {
     currentEntityPosition.setX(nextX);
     currentEntityPosition.setY(nextY);
 
+    Point simpleCoordinates = currentEntityPosition.getSimpleCoordinates();
+
+    if (simpleCoordinates.getX() < 0 || simpleCoordinates.getX() >= CHUNK_COUNT_WIDTH || simpleCoordinates.getY() < 0 || simpleCoordinates.getY() >= CHUNK_COUNT_HEIGHT) {
+        std::cout << "ERROR WHILE MOVING !" << std::endl;
+        std::cout << "X: " << simpleCoordinates.getX() << " Y: " << simpleCoordinates.getY() << " mapX: " << currentEntityPosition.getX() << " mapY: " << currentEntityPosition.getY() << std::endl;
+    }
+
+
+
+
+
+
     this->entity->setPosition(currentEntityPosition);
 
     std::vector<Entity *> empty;

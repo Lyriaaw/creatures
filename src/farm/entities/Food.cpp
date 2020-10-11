@@ -4,8 +4,7 @@
 
 #include "Food.h"
 
-Food::Food(Point position, float size): Entity(position) {
+Food::Food(Point position): Entity(position) {
     this->color = 0.28;
     this->brightness = 0.2f;
-    this->size = size;
 }

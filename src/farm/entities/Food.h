@@ -10,7 +10,7 @@
 
 class Food: public Entity {
 public:
-    Food(Point position, float size);
+    Food(Point position);
 
 };
 
