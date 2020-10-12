@@ -9,10 +9,10 @@ std::string SelfEnergySensor::getName() {
 }
 
 void SelfEnergySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
-    this->value = this->entity->getMass() / this->entity->getMaxMass();
+    this->value = this->energyCenter->getAvailableEnergy() / this->energyCenter->getMaxMass();
 }
 
 void SelfEnergySensor::findSelectedChunks() {
 }
 
-SelfEnergySensor::SelfEnergySensor(Entity *entity) : Sensor(entity) {}
+SelfEnergySensor::SelfEnergySensor(Entity *entity, EnergyCenter *energyCenter) : Sensor(entity), energyCenter(energyCenter) {}

@@ -18,7 +18,7 @@ void EnergySensorEvolution::perform(Life * life) {
     inputNeuron->setName("Energy");
     inputNeuron->setGenerationNumber(this->generationNumber);
 
-    Sensor * energySensor = new SelfEnergySensor(life->getEntity());
+    Sensor * energySensor = new SelfEnergySensor(life->getEntity(), life->getEnergyCenter());
     energySensor->setConnectedNeuron(inputNeuron);
 
     life->getBrain()->addInputNeuron(inputNeuron);

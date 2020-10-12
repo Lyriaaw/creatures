@@ -13,7 +13,7 @@ void SizeEvolution::generateFromRandom(Life * life) {
 }
 
 void SizeEvolution::perform(Life * life) {
-    life->getEntity()->setSize(this->size);
+    life->getEnergyCenter()->setMaxMass(this->size * MASS_TO_SIZE_RATIO);
 }
 
 std::string SizeEvolution::describe() {

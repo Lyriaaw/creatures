@@ -262,7 +262,7 @@ void LifeScreen::updateGraphs() {
     gradm1->addValue(-1.0);
 
     energy->addValue(selectedEntity->getEntity()->getMass());
-    maxEnergy->addValue(selectedEntity->getEntity()->getMaxMass());
+    maxEnergy->addValue(selectedEntity->getEnergyCenter()->getMaxMass());
 }
 
 void LifeScreen::drawGraphs(sf::RenderWindow *pWindow) {

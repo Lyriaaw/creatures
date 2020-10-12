@@ -24,7 +24,7 @@ public:
 
     const Point &getPosition() const;
 
-    float getSize() const;
+    double getSize() const;
 
     float getRotation() const;
 
@@ -41,17 +41,13 @@ public:
 
     int getId() const;
 
-    void setSize(float size);
-
     bool isExists() const;
 
     void setExists(bool exists);
 
     float getMass() const;
     double setMass(double energy);
-    double addMass(double addedMass);
     double removeMass(double removedMass);
-    double getMaxMass();
 
     int getAge() const;
     void setAge(int age);
@@ -66,7 +62,6 @@ protected:
     int id;
 
     Point position;
-    float size;
 
     float rotation;
     float speed;

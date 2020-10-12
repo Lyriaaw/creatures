@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), mass(0.0), size(0), age(0) {
+Entity::Entity(Point position): position(position), mass(0.0), age(0) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -23,8 +23,8 @@ const Point &Entity::getPosition() const {
     return position;
 }
 
-float Entity::getSize() const {
-    return size;
+double Entity::getSize() const {
+    return mass / MASS_TO_SIZE_RATIO;
 }
 
 float Entity::getRotation() const {
@@ -71,10 +71,6 @@ void Entity::setColor(float color) {
     Entity::color = color;
 }
 
-void Entity::setSize(float size) {
-    Entity::size = size;
-}
-
 bool Entity::isExists() const {
     return exists;
 }
@@ -91,20 +87,7 @@ double Entity::setMass(double mass) {
     Entity::mass = mass;
 }
 
-double Entity::addMass(double addedMass) {
-    double remaining = 0.f;
 
-    double newMass = this->mass + addedMass;
-
-    if (newMass > getMaxMass()) {
-        remaining = newMass - getMaxMass();
-        newMass = newMass - remaining;
-    }
-
-    this->mass = newMass;
-
-    return remaining;
-}
 
 double Entity::removeMass(double removedMass) {
     double newMass = this->mass - removedMass;
@@ -120,11 +103,6 @@ double Entity::removeMass(double removedMass) {
     return returned;
 }
 
-double Entity::getMaxMass() {
-//    double result = this->size * pow(299792458, 2);
-    double result = this->size * 1000;
-    return result;
-}
 
 int Entity::getAge() const {
     return age;

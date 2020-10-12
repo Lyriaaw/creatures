@@ -59,11 +59,11 @@ double Life::giveawayEnergy() {
     double biasEnergy = 10 + (entity->getAge() / 100.0);
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy;
-    double currentEntityEnergy = this->entity->getMass();
+    double currentEntityEnergy = this->energyCenter->getAvailableEnergy();
 
 
     if (currentEntityEnergy - usedEnergy < 0) {
-        usedEnergy = this->entity->getMass();
+        usedEnergy = this->energyCenter->getAvailableEnergy();
     }
 
     if (usedEnergy < 0) {
@@ -73,7 +73,7 @@ double Life::giveawayEnergy() {
         std::cout << std::endl;
     }
 
-    this->entity->setMass(currentEntityEnergy - usedEnergy);
+    this->energyCenter->setAvailableEnergy(currentEntityEnergy - usedEnergy);
 
     return usedEnergy;
 }
@@ -190,3 +190,14 @@ const std::vector<ExternalMuscle *> &Life::getExternalMuscles() const {
     return externalMuscles;
 }
 
+EnergyCenter *Life::getEnergyCenter() const {
+    return energyCenter;
+}
+
+void Life::setEnergyCenter(EnergyCenter *energyCenter) {
+    Life::energyCenter = energyCenter;
+}
+
+double Life::addEnergy(double energyToAdd) {
+    return energyCenter->addEnergy(energyToAdd);
+}

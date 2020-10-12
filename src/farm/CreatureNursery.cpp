@@ -26,11 +26,13 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     Entity * entity = new Entity(Point(x, y));
     entity->setBrightness(0.5f);
     Brain * brain = new Brain();
+    EnergyCenter * energyCenter = new EnergyCenter(entity);
 
     Life * life = new Life();
     life->setEntity(entity);
     life->setBrain(brain);
     life->setEntity(entity);
+    life->setEnergyCenter(energyCenter);
 
     std::vector<Evolution *> creatureGenome;
 
@@ -208,9 +210,12 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
     Brain * childBrain = new Brain();
 
+    EnergyCenter * energyCenter = new EnergyCenter(childEntity);
+
     Life * life = new Life();
     life->setEntity(childEntity);
     life->setBrain(childBrain);
+    life->setEnergyCenter(energyCenter);
 
 
     for (int it = 0; it < childGenome.size(); it++) {

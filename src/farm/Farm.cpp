@@ -45,7 +45,7 @@ void Farm::InitFromRandom() {
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
         Life * initialLife = nursery->generateCreatureFromRandom();
 
-        float creatureEnergy = initialLife->getEntity()->getMaxMass() / 2.0;
+        float creatureEnergy = initialLife->getEnergyCenter()->getMaxMass() / 2.0;
         initialLife->getEntity()->setMass(creatureEnergy);
 
         lifes.push_back(initialLife);
@@ -62,7 +62,7 @@ void Farm::InitFromRandom() {
         float foodSize = 2;
 
         Food * entity = new Food(point, foodSize);
-        entity->setMass(entity->getMaxMass());
+        entity->setMass(2 * MASS_TO_SIZE_RATIO);
         entities.push_back(entity);
     }
 
@@ -246,7 +246,9 @@ void Farm::moveCreatures() {
         double releasedHeat = currentLife->giveawayEnergy();
         map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
-        if (currentLife->getEntity()->getMass() <= 0) {
+        if (currentLife->getEnergyCenter()->getAvailableEnergy() <= 0) {
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(currentLife->getEntity()->getMass());
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(currentLife->getEnergyCenter()->getWastedEnergy());
             this->lifesToDelete.emplace_back(currentLife);
         }
 
@@ -277,7 +279,7 @@ void Farm::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
-            double wastedEnergy = performer->getEntity()->addMass(subject->getMass());
+            double wastedEnergy = performer->addEnergy(subject->getMass());
             subject->setMass(0.0);
 
             Point performerPoint = performer->getEntity()->getPosition();
@@ -312,8 +314,8 @@ bool Farm::handleMating(Life * father, int entityId) {
         return false;
     }
 
-    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEntity()->getMaxMass() / 2.f;
-    bool motherCanReproduce = foundLife->getEntity()->getMass() > father->getEntity()->getMaxMass() / 2.f;
+    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 2.f;
+    bool motherCanReproduce = foundLife->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 2.f;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
         return false;
@@ -321,7 +323,7 @@ bool Farm::handleMating(Life * father, int entityId) {
 //
     Life * child = this->nursery->Mate(father, foundLife);
 
-    double givenEnergyToChildGoal = child->getEntity()->getMaxMass() / 4.f;
+    double givenEnergyToChildGoal = child->getEnergyCenter()->getMaxMass() / 4.f;
 
     double givenFatherEnergy = std::min(father->getEntity()->getMass() / 2.0, givenEnergyToChildGoal / 2.0);
     double givenMotherEnergy = std::min(foundLife->getEntity()->getMass() / 2.0, givenEnergyToChildGoal / 2.0);
@@ -336,7 +338,8 @@ bool Farm::handleMating(Life * father, int entityId) {
     double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
 
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
-        child->getEntity()->setMass(totalGivenEnergy);
+        child->getEntity()->setMass(totalGivenEnergy / 2.0);
+        child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
 
@@ -403,7 +406,8 @@ void Farm::populationControl() {
         Life * mother = sortedConnectors.at(motherIndex);
 
         Life * child = this->nursery->Mate(father, mother);
-        child->getEntity()->setMass(child->getEntity()->getMaxMass() / 4.f);
+        child->getEntity()->setMass(child->getEnergyCenter()->getMaxMass() / 4.f);
+        child->getEnergyCenter()->setAvailableEnergy(child->getEnergyCenter()->getMaxMass() / 4.f);
         Entity * childCreature = child->getEntity();
 
 //        float childSpawnX = distWidth(mt);
@@ -412,7 +416,7 @@ void Farm::populationControl() {
 //
 //        childCreature->setPosition(childCreaturePosition);
 
-        totalEnergyRemoved += child->getEntity()->getMass();
+        totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyCenter()->getAvailableEnergy();
 
 
         lifes.emplace_back(child);
@@ -467,7 +471,7 @@ void Farm::vegetalisation() {
                 float foodSize = 2;
 
                 Food * entity = new Food(point, foodSize);
-                entity->setMass(entity->getMaxMass());
+                entity->setMass(2 * MASS_TO_SIZE_RATIO);
 
                 totalEnergyAdded += entity->getMass();
 
@@ -539,11 +543,15 @@ void Farm::statistics() {
 
 
     double totalCreaturesEnergy = 0.f;
+    double totalCreaturesMass = 0.f;
+    double totalCreaturesWasted = 0.f;
     double totalFoodsEnergy = 0.f;
 
     for (int it = 0; it < lifes.size(); it++) {
-        Entity * currentEntity = lifes.at(it)->getEntity();
-        totalCreaturesEnergy += currentEntity->getMass();
+        Life * currentLife = lifes.at(it);
+        totalCreaturesEnergy += currentLife->getEnergyCenter()->getAvailableEnergy();
+        totalCreaturesMass += currentLife->getEntity()->getMass();
+        totalCreaturesWasted += currentLife->getEnergyCenter()->getWastedEnergy();
     }
 
     for (int it = 0; it < entities.size(); it++) {
@@ -562,13 +570,19 @@ void Farm::statistics() {
     }
 
 
-    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy + totalHeat + totalGround;
+    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy + totalCreaturesMass + totalCreaturesWasted + totalHeat + totalGround;
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
+
+//    std::cout << "Total: " << totalEnergy << " ";
+//    std::cout << "Available: " << totalCreaturesEnergy << " ";
+//    std::cout << "Mass: " << totalCreaturesMass << " ";
+//    std::cout << "Wasted: " << totalCreaturesWasted << " ";
+//    std::cout << std::endl;
 
 //    if (dataAnalyser.getTotalEnergy()->getLastValue() != dataAnalyser.getTotalEnergy()->getSecondToLastValue()) {
 //        std::cout << "ERROR : Lost total energy : " << dataAnalyser.getTotalEnergy()->getSecondToLastValue() - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
