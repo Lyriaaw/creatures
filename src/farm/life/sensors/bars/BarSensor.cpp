@@ -172,6 +172,6 @@ double BarSensor::getRotation() const {
 }
 
 double BarSensor::getLength() const {
-    return length;
+    return length * entity->getSize();
 }
 

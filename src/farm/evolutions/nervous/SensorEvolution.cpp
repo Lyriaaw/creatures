@@ -14,7 +14,7 @@ SensorEvolution::SensorEvolution(): Evolution() {
 }
 
 void SensorEvolution::generateFromRandom(Life * life) {
-    sensorLength = (((rand() % 300) / 100.f) + 2) * life->getEntity()->getSize();
+    sensorLength = (((rand() % 300) / 100.f) + 2);
     sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     sensorColor = ((rand() % 999) / 1000.f);
 }
