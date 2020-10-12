@@ -29,6 +29,8 @@ DataAnalyser::DataAnalyser() {
     availableEnergy = new DataItem("availableEnergy", true);
     foodEnergy = new DataItem("foodEnergy", true);
     creaturesEnergy = new DataItem("creaturesEnergy", true);
+    creaturesMass = new DataItem("creaturesMass", true);
+    creaturesWastedEnergy = new DataItem("creaturesWastedEnergy", true);
     heatEnergy = new DataItem("heatEnergy", true);
     groundEnergy = new DataItem("groundEnergy", true);
 
@@ -166,4 +168,12 @@ DataItem *DataAnalyser::getBrainProcessing() const {
 
 DataItem *DataAnalyser::getExternalActions() const {
     return externalActions;
+}
+
+DataItem *DataAnalyser::getCreaturesMass() const {
+    return creaturesMass;
+}
+
+DataItem *DataAnalyser::getCreaturesWastedEnergy() const {
+    return creaturesWastedEnergy;
 }

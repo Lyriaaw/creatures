@@ -211,10 +211,14 @@ void LifeScreen::loadSelectedGraphs() {
     bioGraph->windowResized(windowWidth, windowHeight);
 
     energy = new DataItem("energy", true);
+    mass = new DataItem("mass", true);
     maxEnergy = new DataItem("maxEnergy", true);
+    wasted = new DataItem("wasted", true);
 
-    bioGraph->addLine(energy, 1, 255, 255, 255);
+    bioGraph->addLine(energy, 1, 255, 255, 0);
     bioGraph->addLine(maxEnergy, 1, 0, 0, 0);
+    bioGraph->addLine(mass, 1, 102, 0, 51);
+    bioGraph->addLine(wasted, 1, 102, 51, 255);
     bioGraph->addLine(grad0, 1, 0, 0, 0);
     bioGraph->windowResized(windowWidth, windowHeight);
 
@@ -261,8 +265,10 @@ void LifeScreen::updateGraphs() {
     grad1->addValue(1.0);
     gradm1->addValue(-1.0);
 
-    energy->addValue(selectedEntity->getEntity()->getMass());
+    energy->addValue(selectedEntity->getEnergyCenter()->getAvailableEnergy());
+    mass->addValue(selectedEntity->getEntity()->getMass());
     maxEnergy->addValue(selectedEntity->getEnergyCenter()->getMaxMass());
+    wasted->addValue(selectedEntity->getEnergyCenter()->getWastedEnergy());
 }
 
 void LifeScreen::drawGraphs(sf::RenderWindow *pWindow) {

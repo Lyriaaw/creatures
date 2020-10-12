@@ -43,6 +43,8 @@ private:
 
     Graph * bioGraph;
     DataItem * energy;
+    DataItem * mass;
+    DataItem * wasted;
     DataItem * maxEnergy;
 
 

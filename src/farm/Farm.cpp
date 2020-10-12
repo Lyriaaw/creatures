@@ -432,10 +432,30 @@ void Farm::populationControl() {
     dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
 }
 
+void Farm::handleDecay() {
+    for (int it = 0; it < entities.size(); it++) {
+        Entity * entity = entities.at(it);
+        Point position = entity->getPosition();
+        Point tileCoordinate = position.getTileCoordinates();
+        Tile * tile = map->getTileAt(tileCoordinate.getX(), tileCoordinate.getY());
+
+        if (entity->getMass() < 10) {
+            tile->addGround(entity->getMass());
+            entity->setMass(0.0);
+            entityToDelete.emplace_back(entity);
+        } else {
+            tile->addGround(1.0);
+            entity->removeMass(1.0);
+        }
+
+    }
+}
+
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     map->processClimate();
+    handleDecay();
 
     random_device rd;
     mt19937 mt(rd());
@@ -575,6 +595,8 @@ void Farm::statistics() {
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
+    dataAnalyser.getCreaturesMass()->addValue(totalCreaturesMass);
+    dataAnalyser.getCreaturesWastedEnergy()->addValue(totalCreaturesWasted);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
 
