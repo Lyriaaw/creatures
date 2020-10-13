@@ -48,7 +48,11 @@ std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleE
     if (closestEntity->getSize() <= mouthSize) {
         ActionDTO action = ActionDTO(entity->getId(), closestEntity->getId(), "EAT");
         actions.emplace_back(action);
+    } else {
+        ActionDTO action = ActionDTO(entity->getId(), closestEntity->getId(), "BITE");
+        actions.emplace_back(action);
     }
+
     return actions;
 }
 

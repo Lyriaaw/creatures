@@ -247,12 +247,7 @@ void Farm::moveCreatures() {
         double releasedHeat = currentLife->giveawayEnergy();
         map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
-        if (currentLife->getEnergyCenter()->getAvailableEnergy() <= 0) {
-            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(currentLife->getEntity()->getMass());
-            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(currentLife->getEnergyCenter()->getWastedEnergy());
-            this->lifesToDelete.emplace_back(currentLife);
-        }
-
+        checkAndHandleLifeDying(currentLife);
     }
 
     removeDeletedEntities();
@@ -285,14 +280,7 @@ void Farm::executeCreaturesActions() {
         }
 
         if (actionDto.getType() == "EAT") {
-            double wastedEnergy = performer->addEnergy(subject->getMass());
-            subject->setMass(0.0);
-
-            Point performerPoint = performer->getEntity()->getPosition();
-            Point tilePoint = performerPoint.getTileCoordinates();
-
-            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
-            entityToDelete.emplace_back(subject);
+            handleEating(performer, subject);
         }
 
         if (actionDto.getType() == "MATE") {
@@ -303,9 +291,9 @@ void Farm::executeCreaturesActions() {
 
         }
 
-
-
-
+        if (actionDto.getType() == "BITE") {
+            handleBiting(performer, subject);
+        }
     }
     removeDeletedEntities();
 
@@ -317,6 +305,101 @@ void Farm::executeCreaturesActions() {
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 }
 
+void Farm::handleEating(Life * performer, Entity * subject) {
+    double wastedEnergy = performer->addEnergy(subject->getMass());
+    subject->setMass(0.0);
+
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+
+    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
+    entityToDelete.emplace_back(subject);
+
+    Life * foundLife = getLifeFromId(subject->getId());
+    if (foundLife != nullptr) {
+        Point performerPoint = performer->getEntity()->getPosition();
+        Point tilePoint = performerPoint.getTileCoordinates();
+
+        Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
+
+        tile->addGround(foundLife->getEnergyCenter()->getWastedEnergy());
+        tile->addHeat(foundLife->getEnergyCenter()->getAvailableEnergy());
+
+        foundLife->getEnergyCenter()->setAvailableEnergy(0.0);
+        foundLife->getEnergyCenter()->setWastedEnergy(0.0);
+        lifesToDelete.emplace_back(foundLife);
+    }
+}
+
+void Farm::checkAndHandleLifeDying(Life * life) {
+    if (life->getEnergyCenter()->getAvailableEnergy() <= 0) {
+        Point performerPoint = life->getEntity()->getPosition();
+        Point tilePoint = performerPoint.getTileCoordinates();
+        Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
+
+        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(life->getEntity()->getMass());
+        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(life->getEnergyCenter()->getWastedEnergy());
+
+        life->getEntity()->setMass(0.0);
+        life->getEnergyCenter()->setWastedEnergy(0.0);
+        this->lifesToDelete.emplace_back(life);
+    }
+}
+
+void Farm::handleBiting(Life * performer, Entity * subject) {
+
+    double mouthSize = performer->getEntity()->getSize() / 3.0;
+
+    Life * foundLife = getLifeFromId(subject->getId());
+    if (foundLife != nullptr) {
+        Point performerPoint = performer->getEntity()->getPosition();
+        Point tilePoint = performerPoint.getTileCoordinates();
+        Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
+
+        double takenEnergy = std::min(mouthSize * 10.0, foundLife->getEnergyCenter()->getAvailableEnergy());
+        foundLife->getEnergyCenter()->removeAvailableEnergy(takenEnergy);
+        tile->addHeat(takenEnergy);
+
+        checkAndHandleLifeDying(foundLife);
+        return;
+    }
+
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> dist(-subject->getSize() * 2, subject->getSize() * 2);
+    int x = dist(mt);
+    int y = dist(mt);
+
+    for (int it = 0; it < 2; it++) {
+        Point position(subject->getPosition().getX() + x, subject->getPosition().getY() + y);
+
+        if (position.getX() >= FARM_WIDTH) {
+            position.setX(FARM_WIDTH - 1);
+        }
+        if (position.getY() >= FARM_HEIGHT) {
+            position.setY(FARM_HEIGHT - 1);
+        }
+        if (position.getX() < 0) {
+            position.setX(0);
+        }
+        if (position.getY() < 0) {
+            position.setY(0);
+        }
+
+
+        Entity * bitenEntity = new Entity(position);
+        bitenEntity->setColor(subject->getColor());
+        bitenEntity->setBrightness(subject->getBrightness());
+        bitenEntity->setMass(subject->getMass() / 2.0);
+
+        entities.emplace_back(bitenEntity);
+        entityAdded.emplace_back(bitenEntity);
+    }
+
+    subject->setMass(0.0);
+    entityToDelete.emplace_back(subject);
+}
+
 void Farm::handlePoop(Life * subject) {
     if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
         return;
@@ -324,15 +407,45 @@ void Farm::handlePoop(Life * subject) {
 
     Point position = subject->getEntity()->getPosition();
 
-    Entity * poop = new Entity(position);
-    poop->setColor(0.04f);
-    poop->setBrightness(1.f);
-    poop->setMass(subject->getEnergyCenter()->getWastedEnergy());
-    subject->getEnergyCenter()->setWastedEnergy(0.0);
+    double maxPoopSize = 5;
 
-    entities.emplace_back(poop);
-    entityAdded.emplace_back(poop);
+    double poopedEnergy = subject->getEnergyCenter()->getWastedEnergy();
+    do {
+        double newEntityEnergy = std::min(poopedEnergy, (0.1 * subject->getEntity()->getSize() * MASS_TO_SIZE_RATIO));
+
+        float xRatio = ((rand() % 100) / 100.0f) * subject->getEntity()->getSize();
+        float yRatio = ((rand() % 100) / 100.0f) * subject->getEntity()->getSize();
+
+        Point entityPosition = Point(position.getX() + xRatio, position.getY() + yRatio);
+        if (entityPosition.getX() >= FARM_WIDTH) {
+            entityPosition.setX(FARM_WIDTH - 1);
+        }
+        if (entityPosition.getY() >= FARM_HEIGHT) {
+            entityPosition.setY(FARM_HEIGHT - 1);
+        }
+        if (entityPosition.getX() < 0) {
+            entityPosition.setX(0);
+        }
+        if (entityPosition.getY() < 0) {
+            entityPosition.setY(0);
+        }
+
+
+
+        poopedEnergy -= newEntityEnergy;
+
+        Entity * poop = new Entity(entityPosition);
+        poop->setColor(0.04f);
+        poop->setBrightness(0.2f);
+        poop->setMass(newEntityEnergy);
+        entities.emplace_back(poop);
+        entityAdded.emplace_back(poop);
+
+    } while (poopedEnergy > 0.0);
+
+    subject->getEnergyCenter()->setWastedEnergy(0.0);
 }
+
 
 bool Farm::handleMating(Life * father, int entityId) {
     Life * foundLife = getLifeFromId(entityId);
@@ -485,8 +598,8 @@ void Farm::vegetalisation() {
 
     random_device rd;
     mt19937 mt(rd());
-    uniform_real_distribution<double> distWidth(0, TILE_SIZE);
-    uniform_real_distribution<double> distHeight(0, TILE_SIZE);
+    uniform_real_distribution<double> distWidth(-10, TILE_SIZE + 10);
+    uniform_real_distribution<double> distHeight(-10, TILE_SIZE + 10);
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
@@ -511,6 +624,19 @@ void Farm::vegetalisation() {
                 int y = distHeight(mt);
 
                 Point point(tileX + x, tileY + y);
+
+                if (point.getX() >= FARM_WIDTH) {
+                    point.setX(FARM_WIDTH - 1);
+                }
+                if (point.getY() >= FARM_HEIGHT) {
+                    point.setY(FARM_HEIGHT - 1);
+                }
+                if (point.getX() < 0) {
+                    point.setX(0);
+                }
+                if (point.getY() < 0) {
+                    point.setY(0);
+                }
 
 
                 //        float foodSize = ((rand() % 300) / 100.f) + 2;

@@ -37,6 +37,8 @@ public:
     double getWastedEnergy() const;
 
     void setWastedEnergy(double wastedEnergy);
+
+    void removeAvailableEnergy(double availableEnergyToRemove);
 };
 
 

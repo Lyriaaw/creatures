@@ -72,7 +72,7 @@ void BrainUI::initialize() {
 
         sf::Text text;
         text.setFont(*font);
-        text.setString(currentNeuron->getName() + " (" + std::to_string(currentNeuron->getGenerationNumber()) + ")");
+        text.setString(currentNeuron->getName() + " (" + std::to_string(currentNeuron->getValue()) + ")");
         text.setFillColor(sf::Color(255, 255, 255));
         text.setCharacterSize(18);
         text.setPosition(neuronScreenX - text.getGlobalBounds().width - 20, neuronScreenY - (text.getGlobalBounds().height / 4.f));
@@ -96,6 +96,8 @@ void BrainUI::draw(sf::RenderWindow *window) {
         float currentNeuronValue = (currentNeuron->getValue() / 2.f) + 0.5;
 
         neurons.at(it).setFillColor(sf::Color(currentNeuronValue * 255, currentNeuronValue * 255, currentNeuronValue * 255, 255));
+
+        neuronNames.at(it).setString(currentNeuron->getName() + " (" + std::to_string(currentNeuron->getValue()) + ")");
 
         window->draw(neurons.at(it));
     }

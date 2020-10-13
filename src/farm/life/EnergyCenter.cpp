@@ -36,6 +36,10 @@ void EnergyCenter::setAvailableEnergy(double availableEnergy) {
     EnergyCenter::availableEnergy = availableEnergy;
 }
 
+void EnergyCenter::removeAvailableEnergy(double availableEnergyToRemove) {
+    EnergyCenter::availableEnergy -= availableEnergyToRemove;
+}
+
 double EnergyCenter::getMaxMass() const {
     return maxMass;
 }

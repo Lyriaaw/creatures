@@ -123,6 +123,11 @@ public:
     void handleDecay();
 
     void handlePoop(Life *subject);
+
+    void handleBiting(Life *performer, Entity *subject);
+    void handleEating(Life *performer, Entity *subject);
+
+    void checkAndHandleLifeDying(Life *life);
 };
 
 

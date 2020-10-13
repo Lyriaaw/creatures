@@ -215,7 +215,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
         if (currentSensor->getValue() > 0) {
             float currentSensorDistance = currentSensor->getLength() * (1.f - currentSensor->getValue());
 
-            RGBColor sensorDistanceRGBColor = RGBColor(currentSensor->getColor(), 0.f, 0.5f);
+            RGBColor sensorDistanceRGBColor = RGBColor(currentSensor->getColor(), 1.f, 0.5f);
             sf::Color sensorDistanceColor = sf::Color(sensorDistanceRGBColor.getRed(), sensorDistanceRGBColor.getGreen(), sensorDistanceRGBColor.getBlue(), 255);
 
 
