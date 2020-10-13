@@ -14,8 +14,8 @@ void BarSensor::findSelectedChunks() {
 
     float currentRotation = (rotation  + this->entity->getRotation()) * float(M_PI);
 
-    float sensorX = (cos(currentRotation) * length) + this->entity->getPosition().getX();
-    float sensorY = (sin(currentRotation) * length) + this->entity->getPosition().getY();
+    float sensorX = (cos(currentRotation) * getLength()) + this->entity->getPosition().getX();
+    float sensorY = (sin(currentRotation) * getLength()) + this->entity->getPosition().getY();
 
     Point sensorPosition = {sensorX, sensorY};
 
@@ -69,8 +69,8 @@ void BarSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
 
     float currentRotation = (rotation + this->entity->getRotation()) * float(M_PI);
 
-    float sensorX = (cos(currentRotation) * length) + this->entity->getPosition().getX();
-    float sensorY = (sin(currentRotation) * length) + this->entity->getPosition().getY();
+    float sensorX = (cos(currentRotation) * (length * this->entity->getSize())) + this->entity->getPosition().getX();
+    float sensorY = (sin(currentRotation) * (length * this->entity->getSize())) + this->entity->getPosition().getY();
 
     float deltaX = this->entity->getPosition().getX() - sensorX;
     float deltaY = this->entity->getPosition().getY() - sensorY;
@@ -110,7 +110,7 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, d
                 pow(this->entity->getPosition().getX() - currentAccessibleEntity->getPosition().getX(), 2) +
                 pow(this->entity->getPosition().getY() - currentAccessibleEntity->getPosition().getY(), 2));
 
-        if (entitiesDistance > this->length + currentAccessibleEntity->getSize()) {
+        if (entitiesDistance > (this->length * entity->getSize()) + currentAccessibleEntity->getSize()) {
             continue;
         }
 

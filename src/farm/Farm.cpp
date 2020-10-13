@@ -80,7 +80,7 @@ void Farm::Tick(bool paused) {
 
 
     if (!paused) {
-        multithreadBrainProcessing();
+        multithreadBrainProcessing(paused);
         executeCreaturesActions();
         moveCreatures();
         vegetalisation();
@@ -114,7 +114,7 @@ void Farm::Tick(bool paused) {
     }
 }
 
-void Farm::multithreadBrainProcessing() {
+void Farm::multithreadBrainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     std::thread chunkThreads[lifes.size()];
@@ -123,7 +123,7 @@ void Farm::multithreadBrainProcessing() {
 
     for (int it = 0; it < lifes.size(); it++) {
 
-        auto f = [](Life * life, Farm * farm) {
+        auto f = [](Life * life, Farm * farm, bool * paused) {
 
             life->processSelectedChunks();
 
@@ -136,10 +136,12 @@ void Farm::multithreadBrainProcessing() {
             life->processBrain();
 
 
-//
-            std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
 
-            farm->addActions(currentCreatureActions);
+            if (!*paused) {
+                std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
+
+                farm->addActions(currentCreatureActions);
+            }
 
 
         };
@@ -147,7 +149,7 @@ void Farm::multithreadBrainProcessing() {
         Life *currentLife = lifes.at(it);
 
         int index = it;
-        chunkThreads[index] = std::thread(f, currentLife, this);
+        chunkThreads[index] = std::thread(f, currentLife, this, &paused);
     }
 
     for (int it = 0; it < lifes.size(); it++) {

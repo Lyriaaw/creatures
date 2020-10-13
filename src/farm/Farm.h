@@ -116,7 +116,7 @@ public:
     const std::vector<std::vector<std::vector<Entity *>>> &getEntityGrid() const;
 
 
-    void multithreadBrainProcessing();
+    void multithreadBrainProcessing(bool paused);
 
     void addActions(std::vector<ActionDTO> actions);
 
