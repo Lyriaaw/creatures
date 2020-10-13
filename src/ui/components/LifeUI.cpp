@@ -208,12 +208,13 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
 
 
         BrightnessBarSensor * currentSensor = (BrightnessBarSensor *) this->life->getSensors().at(sensorIndex);
-        if (currentSensor->getName() != "BRIGHTNESS_BAR") {
-            continue;
-        }
-
         if (currentSensor->getValue() > 0) {
-            float currentSensorDistance = currentSensor->getLength() * (1.f - currentSensor->getValue());
+            float currentSensorDistance = 0.0f;
+            if (currentSensor->getName() == "DISTANCE_BAR") {
+                currentSensorDistance = currentSensor->getLength() * (1.f - currentSensor->getValue());
+            } else {
+                currentSensorDistance = currentSensor->getLength() * currentSensor->getValue();
+            }
 
             RGBColor sensorDistanceRGBColor = RGBColor(currentSensor->getColor(), 1.f, 0.5f);
             sf::Color sensorDistanceColor = sf::Color(sensorDistanceRGBColor.getRed(), sensorDistanceRGBColor.getGreen(), sensorDistanceRGBColor.getBlue(), 255);

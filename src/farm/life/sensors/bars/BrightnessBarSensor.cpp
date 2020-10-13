@@ -10,7 +10,7 @@ void BrightnessBarSensor::processSensorValue(double distance, Entity *closestEnt
 //    value = 1 - hueDistances;
 
 
-    this->value = 1.f - (distance / length);
+    this->value = 1.f - (distance / getLength());
 }
 
 float BrightnessBarSensor::getColor() const {
@@ -22,7 +22,8 @@ void BrightnessBarSensor::setColor(float color) {
 }
 
 std::string BrightnessBarSensor::getName() {
-    return "BRIGHTNESS_BAR";
+//    return "BRIGHTNESS_BAR";
+    return "DISTANCE_BAR";
 }
 
 BrightnessBarSensor::BrightnessBarSensor(Entity *entity, float rotation, float length, float color) : BarSensor(entity,

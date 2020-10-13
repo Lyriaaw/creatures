@@ -10,7 +10,7 @@ void DistanceBarSensor::processSensorValue(double distance, Entity *closestEntit
 }
 
 std::string DistanceBarSensor::getName() {
-    return "Distance bar";
+    return "DISTANCE_BAR";
 }
 
 DistanceBarSensor::DistanceBarSensor(Entity *entity, float rotation, float length) : BarSensor(entity, rotation,

@@ -352,6 +352,17 @@ void MainWindow::handleMouseMove(int x, int y) {
         this->mainCamera->setCenter(newCenter);
     }
 
+    if (leftMouseButtonDown) {
+
+        if (selectedEntity != nullptr) {
+            Point newMousePosition = mainCamera->getWorldCoordinates({this->mouseX, this->mouseY});
+
+            selectedEntity->setPosition(newMousePosition);
+        }
+
+
+    }
+
 
 
     farmUi->mouseMoved(newMousePosition, mainCamera);
@@ -409,7 +420,20 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
                 std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedLife->getEntity()->getId());
                 std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
 
-                selectedEntity = nullptr;
+                found = true;
+                updateSelectedCreature();
+            }
+        }
+
+        for (int it = 0; it < farm->getEntities().size(); it++) {
+            Entity * entity = farm->getEntities().at(it);
+
+            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
+            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+
+            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+                selectedEntity = entity;
+
                 found = true;
                 updateSelectedCreature();
             }

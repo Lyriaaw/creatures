@@ -80,9 +80,14 @@ void Farm::Tick(bool paused) {
 
     if (!paused) {
         moveCreatures();
-        generateEntityGrid();
+    }
 
-        multithreadBrainProcessing(paused);
+
+    generateEntityGrid();
+
+    multithreadBrainProcessing(paused);
+
+    if (!paused) {
         executeCreaturesActions();
         vegetalisation();
         populationControl();
