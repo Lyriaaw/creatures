@@ -7,6 +7,11 @@
 std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleEntities) {
     std::vector<ActionDTO> actions;
 
+    if (this->neurons.at(0)->getValue() < -0.5f) {
+        ActionDTO action = ActionDTO(entity->getId(), -1, "POOP");
+        actions.emplace_back(action);
+    }
+
     if (this->neurons.at(0)->getValue() < 0.5f) {
         return actions;
     }

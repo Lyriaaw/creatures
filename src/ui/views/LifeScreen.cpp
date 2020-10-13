@@ -216,9 +216,9 @@ void LifeScreen::loadSelectedGraphs() {
     wasted = new DataItem("wasted", true);
 
     bioGraph->addLine(energy, 1, 255, 255, 0);
-    bioGraph->addLine(maxEnergy, 1, 0, 0, 0);
+    bioGraph->addLine(maxEnergy, 1, 255, 255, 255);
     bioGraph->addLine(mass, 1, 102, 0, 51);
-    bioGraph->addLine(wasted, 1, 102, 51, 255);
+    bioGraph->addLine(wasted, 1, 102, 51, 0);
     bioGraph->addLine(grad0, 1, 0, 0, 0);
     bioGraph->windowResized(windowWidth, windowHeight);
 

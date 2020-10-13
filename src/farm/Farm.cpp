@@ -47,6 +47,7 @@ void Farm::InitFromRandom() {
 
         float creatureEnergy = initialLife->getEnergyCenter()->getMaxMass() / 2.0;
         initialLife->getEntity()->setMass(creatureEnergy);
+        initialLife->getEnergyCenter()->setAvailableEnergy(creatureEnergy);
 
         lifes.push_back(initialLife);
     }
@@ -270,8 +271,13 @@ void Farm::executeCreaturesActions() {
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
 
-
         Life * performer = getLifeFromId(actionDto.getPerformerId());
+
+        if (actionDto.getType() == "POOP") {
+            handlePoop(performer);
+            continue;
+        }
+
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
         if (subject->getMass() <= 0 || performer->getEntity()->getMass() <= 0) {
@@ -297,6 +303,9 @@ void Farm::executeCreaturesActions() {
 
         }
 
+
+
+
     }
     removeDeletedEntities();
 
@@ -308,14 +317,31 @@ void Farm::executeCreaturesActions() {
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 }
 
+void Farm::handlePoop(Life * subject) {
+    if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
+        return;
+    }
+
+    Point position = subject->getEntity()->getPosition();
+
+    Entity * poop = new Entity(position);
+    poop->setColor(0.04f);
+    poop->setBrightness(1.f);
+    poop->setMass(subject->getEnergyCenter()->getWastedEnergy());
+    subject->getEnergyCenter()->setWastedEnergy(0.0);
+
+    entities.emplace_back(poop);
+    entityAdded.emplace_back(poop);
+}
+
 bool Farm::handleMating(Life * father, int entityId) {
     Life * foundLife = getLifeFromId(entityId);
     if (foundLife == nullptr) {
         return false;
     }
 
-    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 2.f;
-    bool motherCanReproduce = foundLife->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 2.f;
+    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 2.f && father->getEntity()->getAge() > 10;
+    bool motherCanReproduce = foundLife->getEntity()->getMass() > foundLife->getEnergyCenter()->getMaxMass() / 2.f && foundLife->getEntity()->getAge() > 10;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
         return false;
@@ -444,8 +470,8 @@ void Farm::handleDecay() {
             entity->setMass(0.0);
             entityToDelete.emplace_back(entity);
         } else {
-            tile->addGround(1.0);
-            entity->removeMass(1.0);
+            tile->addGround(2.0);
+            entity->removeMass(2.0);
         }
 
     }
@@ -596,7 +622,7 @@ void Farm::statistics() {
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
     dataAnalyser.getCreaturesMass()->addValue(totalCreaturesMass);
-    dataAnalyser.getCreaturesWastedEnergy()->addValue(totalCreaturesWasted);
+    dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesWasted);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
 

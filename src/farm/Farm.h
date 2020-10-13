@@ -121,6 +121,8 @@ public:
     void addActions(std::vector<ActionDTO> actions);
 
     void handleDecay();
+
+    void handlePoop(Life *subject);
 };
 
 
