@@ -76,13 +76,14 @@ void Farm::InitFromRandom() {
 
 void Farm::Tick(bool paused) {
 
-    generateEntityGrid();
 
 
     if (!paused) {
+        moveCreatures();
+        generateEntityGrid();
+
         multithreadBrainProcessing(paused);
         executeCreaturesActions();
-        moveCreatures();
         vegetalisation();
         populationControl();
     }
@@ -1035,6 +1036,10 @@ const vector<Entity *> &Farm::getEntityAdded() const {
 
 const vector<Entity *> &Farm::getEntityToDelete() const {
     return entityToDelete;
+}
+
+int Farm::getTickCount() const {
+    return tickCount;
 }
 
 

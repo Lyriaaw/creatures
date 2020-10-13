@@ -83,7 +83,7 @@ Evolution * SensorEvolution::generateFromCastedMate(SensorEvolution * mate) {
         return childSensorEvolution;
     }
 
-    childSensorEvolution->sensorLength = sensorLength;
+    childSensorEvolution->sensorLength = (((rand() % 300) / 100.f) + 2);
     childSensorEvolution->sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     childSensorEvolution->sensorColor = ((rand() % 999) / 1000.f);
 

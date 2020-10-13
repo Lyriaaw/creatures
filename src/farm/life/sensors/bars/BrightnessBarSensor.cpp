@@ -6,7 +6,9 @@
 
 void BrightnessBarSensor::processSensorValue(double distance, Entity *closestEntity) {
 //    float hueDistances = std::min(abs(closestEntity->getColor() - color), 1.f - abs(closestEntity->getColor() - color));
-//    value = float(pow(2, - (hueDistances * 5)));
+////    value = float(pow(2, - (hueDistances * 5)));
+//    value = 1 - hueDistances;
+
 
     this->value = 1.f - (distance / length);
 }

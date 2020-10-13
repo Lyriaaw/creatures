@@ -128,6 +128,8 @@ public:
     void handleEating(Life *performer, Entity *subject);
 
     void checkAndHandleLifeDying(Life *life);
+
+    int getTickCount() const;
 };
 
 
