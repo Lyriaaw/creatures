@@ -5,12 +5,8 @@
 #include "BrightnessBarSensor.h"
 
 void BrightnessBarSensor::processSensorValue(double distance, Entity *closestEntity) {
-//    float hueDistances = std::min(abs(closestEntity->getColor() - color), 1.f - abs(closestEntity->getColor() - color));
-////    value = float(pow(2, - (hueDistances * 5)));
-//    value = 1 - hueDistances;
-
-
-    this->value = 1.f - (distance / getLength());
+    float hueDistances = std::min(abs(closestEntity->getColor() - color), 1.f - abs(closestEntity->getColor() - color));
+    value = float(pow(2, - (hueDistances * 5)));
 }
 
 float BrightnessBarSensor::getColor() const {
@@ -22,8 +18,7 @@ void BrightnessBarSensor::setColor(float color) {
 }
 
 std::string BrightnessBarSensor::getName() {
-//    return "BRIGHTNESS_BAR";
-    return "DISTANCE_BAR";
+    return "HUE_BAR";
 }
 
 BrightnessBarSensor::BrightnessBarSensor(Entity *entity, float rotation, float length, float color) : BarSensor(entity,

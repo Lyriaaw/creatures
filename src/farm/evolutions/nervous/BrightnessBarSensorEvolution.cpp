@@ -3,30 +3,30 @@
 //
 
 #include <iostream>
-#include "SensorEvolution.h"
+#include "BrightnessBarSensorEvolution.h"
 #include "../../brain/neurons/SensorNeuron.h"
 #include "../../life/sensors/bars/BarSensor.h"
 #include "../../life/sensors/bars/DistanceBarSensor.h"
 #include "../../life/sensors/bars/BrightnessBarSensor.h"
 
-SensorEvolution::SensorEvolution(): Evolution() {
+BrightnessBarSensorEvolution::BrightnessBarSensorEvolution(): Evolution() {
 
 }
 
-void SensorEvolution::generateFromRandom(Life * life) {
+void BrightnessBarSensorEvolution::generateFromRandom(Life * life) {
     sensorLength = (((rand() % 300) / 100.f) + 2);
     sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     sensorColor = ((rand() % 999) / 1000.f);
 }
 
-void SensorEvolution::perform(Life * life) {
+void BrightnessBarSensorEvolution::perform(Life * life) {
     BarSensor * barSensor = new BrightnessBarSensor(life->getEntity(), sensorRotation, sensorLength, sensorColor);
 
 
     InputNeuron * inputNeuron = new InputNeuron();
     inputNeuron->setHueOutline(sensorColor);
     inputNeuron->setBrightnessOutline(0.4);
-    inputNeuron->setName("Brightness -" + std::to_string(sensorLength));
+    inputNeuron->setName("Hue -" + std::to_string(sensorLength));
     inputNeuron->setGenerationNumber(this->generationNumber);
 
 
@@ -38,17 +38,17 @@ void SensorEvolution::perform(Life * life) {
 
 }
 
-std::string SensorEvolution::describe() {
-    return std::to_string(this->generationNumber) + " => Sensor => length: " + std::to_string(sensorLength) + " rotation: " + std::to_string(sensorRotation) + " color: " + std::to_string(sensorColor);
+std::string BrightnessBarSensorEvolution::describe() {
+    return std::to_string(this->generationNumber) + " => Color Sensor Bar => length: " + std::to_string(sensorLength) + " rotation: " + std::to_string(sensorRotation) + " color: " + std::to_string(sensorColor);
 }
 
-Evolution * SensorEvolution::generateWithMate(Evolution * mate) {
-    SensorEvolution * mateSensorEvolution(nullptr);
+Evolution * BrightnessBarSensorEvolution::generateWithMate(Evolution * mate) {
+    BrightnessBarSensorEvolution * mateSensorEvolution(nullptr);
 
     if (mate == nullptr) {
 //        std::cout << "NULL POINTER OF MATE SENSOR: " << generationNumber << std::endl;
     } else {
-        mateSensorEvolution = dynamic_cast<SensorEvolution *>(mate);
+        mateSensorEvolution = dynamic_cast<BrightnessBarSensorEvolution *>(mate);
         if (mateSensorEvolution == nullptr) {
             std::cout << "UNABLE TO CAST FATHER COLOR EVOLUTION" << std::endl;
         }
@@ -56,8 +56,8 @@ Evolution * SensorEvolution::generateWithMate(Evolution * mate) {
     return generateFromCastedMate(mateSensorEvolution);
 }
 
-Evolution * SensorEvolution::generateFromCastedMate(SensorEvolution * mate) {
-    SensorEvolution * childSensorEvolution = new SensorEvolution();
+Evolution * BrightnessBarSensorEvolution::generateFromCastedMate(BrightnessBarSensorEvolution * mate) {
+    BrightnessBarSensorEvolution * childSensorEvolution = new BrightnessBarSensorEvolution();
     childSensorEvolution->setGenerationNumber(getGenerationNumber());
 
     if (mate == nullptr) {

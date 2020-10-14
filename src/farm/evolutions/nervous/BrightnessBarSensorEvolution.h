@@ -2,21 +2,21 @@
 // Created by Amalric Lombard de Buffières on 8/2/20.
 //
 
-#ifndef CREATURES_SENSOREVOLUTION_H
-#define CREATURES_SENSOREVOLUTION_H
+#ifndef CREATURES_BRIGHTNESSBARSENSOREVOLUTION_H
+#define CREATURES_BRIGHTNESSBARSENSOREVOLUTION_H
 
 
 #include "../Evolution.h"
 #include "../../brain/BrainConnector.h"
 
-class SensorEvolution: public Evolution {
+class BrightnessBarSensorEvolution: public Evolution {
 public:
-    SensorEvolution();
+    BrightnessBarSensorEvolution();
     void generateFromRandom(Life * life) override;
     void perform(Life * life) override;
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
-    Evolution * generateFromCastedMate(SensorEvolution * mate);
+    Evolution * generateFromCastedMate(BrightnessBarSensorEvolution * mate);
 private:
     float sensorLength;
     float sensorRotation;
@@ -25,4 +25,4 @@ private:
 };
 
 
-#endif //CREATURES_SENSOREVOLUTION_H
+#endif //CREATURES_BRIGHTNESSBARSENSOREVOLUTION_H

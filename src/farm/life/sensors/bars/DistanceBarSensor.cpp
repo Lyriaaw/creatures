@@ -5,8 +5,7 @@
 #include "DistanceBarSensor.h"
 
 void DistanceBarSensor::processSensorValue(double distance, Entity *closestEntity) {
-    this->value = 1.f - (distance / length);
-    std::cout << "Distance sensor" << std::endl;
+    this->value = 1.f - (distance / getLength());
 }
 
 std::string DistanceBarSensor::getName() {

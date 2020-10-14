@@ -7,6 +7,7 @@
 #include "brain/BrainConnector.h"
 #include "brain/neurons/BiasNeuron.h"
 #include "evolutions/musclesEvolutions/SpeedEvolution.h"
+#include "evolutions/nervous/DistanceBarSensorEvolution.h"
 
 using namespace std;
 
@@ -62,35 +63,45 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
 
 
+    for (int it = 0; it < 2; it++) {
+        BrightnessBarSensorEvolution * sensorEvol = new BrightnessBarSensorEvolution();
+        sensorEvol->setGenerationNumber(it + 5);
+        sensorEvol->generateFromRandom(life);
+        sensorEvol->perform(life);
+        creatureGenome.emplace_back(sensorEvol);
+    }
+
     int sensorCount = rand() % 4 + 1;
     for (int it = 0; it < sensorCount; it++) {
 
-        SensorEvolution * sensorEvol = new SensorEvolution();
-        sensorEvol->setGenerationNumber((it * 3) + 5);
+        DistanceBarSensorEvolution * sensorEvol = new DistanceBarSensorEvolution();
+        sensorEvol->setGenerationNumber(it + 10);
         sensorEvol->generateFromRandom(life);
         sensorEvol->perform(life);
         creatureGenome.emplace_back(sensorEvol);
 
     }
 
+
+
     SpeedEvolution * speedEvolution = new SpeedEvolution();
-    speedEvolution->setGenerationNumber(35);
+    speedEvolution->setGenerationNumber(20);
     speedEvolution->perform(life);
     creatureGenome.emplace_back(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(36);
+    rotationEvolution->setGenerationNumber(21);
     rotationEvolution->perform(life);
     creatureGenome.emplace_back(rotationEvolution);
 
     MouthEvolution * mouthEvolution = new MouthEvolution();
-    mouthEvolution->setGenerationNumber(37);
+    mouthEvolution->setGenerationNumber(22);
     mouthEvolution->generateFromRandom(life);
     mouthEvolution->perform(life);
     creatureGenome.emplace_back(mouthEvolution);
 
     GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
-    genitalsEvolution->setGenerationNumber(38);
+    genitalsEvolution->setGenerationNumber(23);
     genitalsEvolution->generateFromRandom(life);
     genitalsEvolution->perform(life);
     creatureGenome.emplace_back(genitalsEvolution);
@@ -100,15 +111,14 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
 
 
-    int generationNumberIndex(39);
+    int generationNumberIndex(30);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
             LinkEvolution * linkEvolution = new LinkEvolution();
-            linkEvolution->setGenerationNumber(generationNumberIndex);
+            linkEvolution->setGenerationNumber(generationNumberIndex + (jt * 10) + it);
             linkEvolution->generateFromNeurons(life, brain->getInputNeurons().at(it), brain->getOutputNeurons().at(jt));
             linkEvolution->perform(life);
-            generationNumberIndex++;
             creatureGenome.emplace_back(linkEvolution);
 
         }

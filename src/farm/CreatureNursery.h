@@ -7,7 +7,7 @@
 
 
 #include "entities/Creature.h"
-#include "evolutions/nervous/SensorEvolution.h"
+#include "evolutions/nervous/BrightnessBarSensorEvolution.h"
 #include "evolutions/inputs/BiasInputEvolution.h"
 #include "evolutions/musclesEvolutions/RotationEvolution.h"
 #include "evolutions/nervous/LinkEvolution.h"
