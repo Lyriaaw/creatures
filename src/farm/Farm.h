@@ -130,6 +130,8 @@ public:
     void checkAndHandleLifeDying(Life *life);
 
     int getTickCount() const;
+
+    void generateEntities(Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio);
 };
 
 

@@ -345,8 +345,9 @@ void Farm::checkAndHandleLifeDying(Life * life) {
         Point tilePoint = performerPoint.getTileCoordinates();
         Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(life->getEntity()->getMass());
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(life->getEnergyCenter()->getWastedEnergy());
+        generateEntities(performerPoint, 1.f, 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
+        generateEntities(performerPoint, 0.04f, 0.2f, (0.1 * life->getEntity()->getSize() * MASS_TO_SIZE_RATIO), life->getEnergyCenter()->getWastedEnergy(), life->getEntity()->getSize());
+
 
         life->getEntity()->setMass(0.0);
         life->getEnergyCenter()->setWastedEnergy(0.0);
@@ -408,21 +409,12 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
     entityToDelete.emplace_back(subject);
 }
 
-void Farm::handlePoop(Life * subject) {
-    if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
-        return;
-    }
-
-    Point position = subject->getEntity()->getPosition();
-
-    double maxPoopSize = 5;
-
-    double poopedEnergy = subject->getEnergyCenter()->getWastedEnergy();
+void Farm::generateEntities(Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
     do {
-        double newEntityEnergy = std::min(poopedEnergy, (0.1 * subject->getEntity()->getSize() * MASS_TO_SIZE_RATIO));
+        double newEntityEnergy = std::min(totalEnergy, maxSize);
 
-        float xRatio = ((rand() % 100) / 100.0f) * subject->getEntity()->getSize();
-        float yRatio = ((rand() % 100) / 100.0f) * subject->getEntity()->getSize();
+        float xRatio = ((rand() % 100) / 100.0f) * spreadingRatio;
+        float yRatio = ((rand() % 100) / 100.0f) * spreadingRatio;
 
         Point entityPosition = Point(position.getX() + xRatio, position.getY() + yRatio);
         if (entityPosition.getX() >= FARM_WIDTH) {
@@ -440,16 +432,30 @@ void Farm::handlePoop(Life * subject) {
 
 
 
-        poopedEnergy -= newEntityEnergy;
+        totalEnergy -= newEntityEnergy;
 
         Entity * poop = new Entity(entityPosition);
-        poop->setColor(0.04f);
-        poop->setBrightness(0.2f);
+        poop->setColor(color);
+        poop->setBrightness(brightness);
         poop->setMass(newEntityEnergy);
         entities.emplace_back(poop);
         entityAdded.emplace_back(poop);
 
-    } while (poopedEnergy > 0.0);
+    } while (totalEnergy > 0.0);
+}
+
+void Farm::handlePoop(Life * subject) {
+    if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
+        return;
+    }
+
+    Point position = subject->getEntity()->getPosition();
+
+    double maxPoopSize = 5;
+
+    double poopedEnergy = subject->getEnergyCenter()->getWastedEnergy();
+    generateEntities(position, 0.04f, 0.2f, (0.1 * subject->getEntity()->getSize() * MASS_TO_SIZE_RATIO), poopedEnergy, subject->getEntity()->getSize());
+
 
     subject->getEnergyCenter()->setWastedEnergy(0.0);
 }
@@ -500,12 +506,8 @@ bool Farm::handleMating(Life * father, int entityId) {
     map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
 
-    if (father->getEntity()->getMass() <= 0) {
-        lifesToDelete.emplace_back(father);
-    }
-    if (foundLife->getEntity()->getMass() <= 0) {
-        lifesToDelete.emplace_back(foundLife);
-    }
+    checkAndHandleLifeDying(father);
+    checkAndHandleLifeDying(foundLife);
 
 //    if (givenMotherEnergy + givenFatherEnergy == 0) {
 //        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
