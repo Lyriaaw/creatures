@@ -3,23 +3,23 @@
 //
 
 #include <iostream>
-#include "BrightnessBarSensorEvolution.h"
+#include "HueBarSensorEvolution.h"
 #include "../../brain/neurons/SensorNeuron.h"
 #include "../../life/sensors/bars/BarSensor.h"
 #include "../../life/sensors/bars/DistanceBarSensor.h"
 #include "../../life/sensors/bars/BrightnessBarSensor.h"
 
-BrightnessBarSensorEvolution::BrightnessBarSensorEvolution(): Evolution() {
+HueBarSensorEvolution::HueBarSensorEvolution(): Evolution() {
 
 }
 
-void BrightnessBarSensorEvolution::generateFromRandom(Life * life) {
+void HueBarSensorEvolution::generateFromRandom(Life * life) {
     sensorLength = (((rand() % 300) / 100.f) + 2);
     sensorRotation = ((rand() % 200) / 100.f) - 1.f ;
     sensorColor = ((rand() % 999) / 1000.f);
 }
 
-void BrightnessBarSensorEvolution::perform(Life * life) {
+void HueBarSensorEvolution::perform(Life * life) {
     BarSensor * barSensor = new BrightnessBarSensor(life->getEntity(), sensorRotation, sensorLength, sensorColor);
 
 
@@ -38,17 +38,17 @@ void BrightnessBarSensorEvolution::perform(Life * life) {
 
 }
 
-std::string BrightnessBarSensorEvolution::describe() {
+std::string HueBarSensorEvolution::describe() {
     return std::to_string(this->generationNumber) + " => Color Sensor Bar => length: " + std::to_string(sensorLength) + " rotation: " + std::to_string(sensorRotation) + " color: " + std::to_string(sensorColor);
 }
 
-Evolution * BrightnessBarSensorEvolution::generateWithMate(Evolution * mate) {
-    BrightnessBarSensorEvolution * mateSensorEvolution(nullptr);
+Evolution * HueBarSensorEvolution::generateWithMate(Evolution * mate) {
+    HueBarSensorEvolution * mateSensorEvolution(nullptr);
 
     if (mate == nullptr) {
 //        std::cout << "NULL POINTER OF MATE SENSOR: " << generationNumber << std::endl;
     } else {
-        mateSensorEvolution = dynamic_cast<BrightnessBarSensorEvolution *>(mate);
+        mateSensorEvolution = dynamic_cast<HueBarSensorEvolution *>(mate);
         if (mateSensorEvolution == nullptr) {
             std::cout << "UNABLE TO CAST FATHER COLOR EVOLUTION" << std::endl;
         }
@@ -56,8 +56,8 @@ Evolution * BrightnessBarSensorEvolution::generateWithMate(Evolution * mate) {
     return generateFromCastedMate(mateSensorEvolution);
 }
 
-Evolution * BrightnessBarSensorEvolution::generateFromCastedMate(BrightnessBarSensorEvolution * mate) {
-    BrightnessBarSensorEvolution * childSensorEvolution = new BrightnessBarSensorEvolution();
+Evolution * HueBarSensorEvolution::generateFromCastedMate(HueBarSensorEvolution * mate) {
+    HueBarSensorEvolution * childSensorEvolution = new HueBarSensorEvolution();
     childSensorEvolution->setGenerationNumber(getGenerationNumber());
 
     if (mate == nullptr) {

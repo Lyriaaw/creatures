@@ -64,7 +64,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
 
     for (int it = 0; it < 2; it++) {
-        BrightnessBarSensorEvolution * sensorEvol = new BrightnessBarSensorEvolution();
+        HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
         sensorEvol->setGenerationNumber(it + 5);
         sensorEvol->generateFromRandom(life);
         sensorEvol->perform(life);
