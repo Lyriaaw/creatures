@@ -7,6 +7,7 @@
 
 
 #include "DataItem.h"
+#include "GeneGraphAnalyser.h"
 
 class DataAnalyser {
 private:
@@ -49,6 +50,9 @@ private:
     DataItem * heatEnergy;
     DataItem * groundEnergy;
 
+
+
+    GeneGraphAnalyser * colors;
 
 public:
     DataAnalyser();
@@ -114,6 +118,8 @@ public:
     DataItem *getCreaturesMass() const;
 
     DataItem *getCreaturesWastedEnergy() const;
+
+    GeneGraphAnalyser *getColors() const;
 };
 
 

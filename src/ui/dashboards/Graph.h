@@ -12,7 +12,7 @@
 #include "../components/Button.h"
 
 class Graph {
-private:
+protected:
     std::string name;
     std::vector<DataItemConnector> lines;
 
@@ -62,7 +62,6 @@ public:
     void mouseClicked(int x, int y);
 
     void setLegendsButtonColors();
-
 
 };
 

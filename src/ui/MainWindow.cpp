@@ -8,6 +8,7 @@
 #include "views/StatisticsScreen.h"
 #include "views/MinimapsScreen.h"
 #include "views/LifeScreen.h"
+#include "views/ColorsScreen.h"
 
 
 #include <SFML/Window.hpp>
@@ -49,11 +50,13 @@ void MainWindow::loadButtons() {
     Button * statistics = new Button("Statistics", 2, font, 110, 0, 100, 50, backgroundColor, textColor);
     Button * minimaps = new Button("Minimaps", 3, font, 220, 0, 100, 50, backgroundColor, textColor);
     Button * creature = new Button("Creatures", 4, font, 330, 0, 100, 50, backgroundColor, textColor);
+    Button * colors = new Button("Colors", 5, font, 440, 0, 100, 50, backgroundColor, textColor);
 
     buttons.emplace_back(mainWorldButton);
     buttons.emplace_back(statistics);
     buttons.emplace_back(minimaps);
     buttons.emplace_back(creature);
+    buttons.emplace_back(colors);
 }
 
 void MainWindow::loadFarm() {
@@ -81,6 +84,12 @@ void MainWindow::loadScreens() {
     LifeScreen * creatureScreen = new LifeScreen(farm, font);
     creatureScreen->init();
     screens.emplace_back(creatureScreen);
+
+    ColorsScreen * colorsScreen = new ColorsScreen(farm, font);
+    colorsScreen->init();
+    screens.emplace_back(colorsScreen);
+
+
 
 
 
@@ -481,6 +490,9 @@ void MainWindow::handleButtonClicked(int id) {
             break;
         case 4:
             openScreen(4);
+            break;
+        case 5:
+            openScreen(5);
             break;
         default:
             std::cout << "BUTTON ID NOT FOUND" << std::endl;

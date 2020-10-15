@@ -45,6 +45,9 @@ DataAnalyser::DataAnalyser() {
     brainProcessing = new DataItem("brainProcessing", true);
     externalActions = new DataItem("externalActions", true);
 
+
+    colors = new GeneGraphAnalyser("Colors");
+
 }
 
 
@@ -176,4 +179,8 @@ DataItem *DataAnalyser::getCreaturesMass() const {
 
 DataItem *DataAnalyser::getCreaturesWastedEnergy() const {
     return creaturesWastedEnergy;
+}
+
+GeneGraphAnalyser *DataAnalyser::getColors() const {
+    return colors;
 }

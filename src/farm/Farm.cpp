@@ -690,10 +690,38 @@ void Farm::aTickHavePassed() {
 }
 
 
+void Farm::analyseColors() {
+    std::vector<double> sortResult;
+
+    std::vector<Life *> tmpLifes = this->lifes;
+
+    while (!tmpLifes.empty()) {
+
+        int biggestIndex = -1;
+        float biggestScore = 0.f;
+
+        for (int it = 0; it < tmpLifes.size(); it++) {
+            if (tmpLifes.at(it)->getEntity()->getColor() >= biggestScore) {
+                biggestIndex = it;
+                biggestScore = tmpLifes.at(it)->getEntity()->getColor();
+            }
+        }
+
+        if (biggestIndex == -1) {
+            std::cout << "Error while sorting creatures by score - Life will probably crash" << std::endl;
+        }
+
+        sortResult.emplace_back(tmpLifes.at(biggestIndex)->getEntity()->getColor());
+        tmpLifes.erase(tmpLifes.begin() + biggestIndex);
+    }
+
+    dataAnalyser.getColors()->addTick(sortResult);
+}
 
 void Farm::statistics() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    analyseColors();
 
     std::vector<Life *> sortedLife = getScoreSortedCreatures();
 //    std::vector<BrainConnector *> sortedConnectors = connectors;
