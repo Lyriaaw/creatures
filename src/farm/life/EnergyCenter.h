@@ -38,7 +38,7 @@ public:
 
     void setWastedEnergy(double wastedEnergy);
 
-    void removeAvailableEnergy(double availableEnergyToRemove);
+    double removeAvailableEnergy(double availableEnergyToRemove);
 };
 
 

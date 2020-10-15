@@ -6,7 +6,7 @@
 #include <sstream>
 #include "LifeScreen.h"
 
-LifeScreen::LifeScreen(Farm *farm, sf::Font *font) : Screen(farm, font), camera(nullptr), informationToShow("BRAIN") {}
+LifeScreen::LifeScreen(Farm *farm, sf::Font *font) : Screen(farm, font), camera(nullptr), informationToShow("BRAIN"), brainUi(nullptr) {}
 
 int LifeScreen::getId() {
     return 4;

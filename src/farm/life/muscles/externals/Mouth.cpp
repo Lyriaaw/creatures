@@ -7,6 +7,8 @@
 std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleEntities) {
     std::vector<ActionDTO> actions;
 
+    energyConsumption += abs(this->neurons.at(0)->getValue() * 10);
+
     if (this->neurons.at(0)->getValue() < -0.5f) {
         ActionDTO action = ActionDTO(entity->getId(), -1, "POOP");
         actions.emplace_back(action);
@@ -16,7 +18,6 @@ std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleE
         return actions;
     }
 
-    energyConsumption += this->neurons.at(0)->getValue();
 
     float mouthTotalRotation = (float(rotation) + entity->getRotation()) * float(M_PI);
 
@@ -28,6 +29,9 @@ std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleE
     float smallestDistance = FARM_WIDTH;
 
     for (int it = 0; it < accessibleEntities.size(); it++) {
+        if (accessibleEntities.at(it)->getId() == entity->getId()) {
+            continue;
+        }
         float distanceX = abs(accessibleEntities.at(it)->getPosition().getX() - mouthX);
         float distanceY = abs(accessibleEntities.at(it)->getPosition().getY() - mouthY);
 

@@ -7,6 +7,8 @@
 std::vector<ActionDTO> Genitals::prepareActionDTO(std::vector<Entity *> accessibleEntities) {
     std::vector<ActionDTO> actions;
 
+    energyConsumption += abs(this->neurons.at(0)->getValue() * 10);
+
     if (this->neurons.at(0)->getValue() < 0.5f) {
         return actions;
     }

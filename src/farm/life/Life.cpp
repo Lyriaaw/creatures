@@ -56,10 +56,13 @@ double Life::giveawayEnergy() {
     }
 
     double sensorEnergy = sensors.size();
-    double biasEnergy = 10 + (entity->getAge() / 100.0);
+    double biasEnergy = 10;
     double wastedEnergyCarrying = 0.01 * energyCenter->getWastedEnergy();
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy + wastedEnergyCarrying;
+
+    usedEnergy *= (entity->getAge() / 1000.0) + 1;
+
     double currentEntityEnergy = this->energyCenter->getAvailableEnergy();
 
 
