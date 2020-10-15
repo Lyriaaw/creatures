@@ -51,6 +51,9 @@ private:
     DataItem * groundEnergy;
 
 
+    DataItem * zero;
+
+
 
     GeneGraphAnalyser * colors;
 
@@ -120,6 +123,8 @@ public:
     DataItem *getCreaturesWastedEnergy() const;
 
     GeneGraphAnalyser *getColors() const;
+
+    DataItem *getZero() const;
 };
 
 

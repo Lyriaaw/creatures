@@ -71,6 +71,7 @@ void StatisticsScreen::loadGraphs() {
     brainTimeGraph->addLine(farm->getDataAnalyser().getBrainProcessing(), 2, 0, 0, 255);
 
     brainTimeGraph->addLine(farm->getDataAnalyser().getExternalActions(), 2, 128, 255, 128);
+    brainTimeGraph->addLine(farm->getDataAnalyser().getZero(), 2, 0, 0, 0);
 
     brainTimeGraph->windowResized(windowWidth, windowHeight);
 
@@ -93,6 +94,9 @@ void StatisticsScreen::loadGraphs() {
 
     energyGraph->addLine(farm->getDataAnalyser().getHeatEnergy(), 1, 255, 0, 0);
     energyGraph->addLine(farm->getDataAnalyser().getGroundEnergy(), 1, 20, 100, 0);
+
+    energyGraph->addLine(farm->getDataAnalyser().getZero(), 2, 0, 0, 0);
+
 
 
     energyGraph->windowResized(windowWidth, windowHeight);

@@ -786,7 +786,7 @@ void Farm::statistics() {
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
     dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesEnergy);
     dataAnalyser.getCreaturesMass()->addValue(totalCreaturesMass);
-    dataAnalyser.getCreaturesEnergy()->addValue(totalCreaturesWasted);
+    dataAnalyser.getCreaturesWastedEnergy()->addValue(totalCreaturesWasted);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
 
@@ -820,6 +820,8 @@ void Farm::statistics() {
     totalTime += statisticsTime;
 
     dataAnalyser.getTotalTime()->addValue(totalTime);
+
+    dataAnalyser.getZero()->addValue(0);
 }
 
 void Farm::generateEntityGrid() {

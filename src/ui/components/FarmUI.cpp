@@ -283,16 +283,18 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
     }
 
 
+    std::vector<EntityUI *> currentEntities = entityUIs;
 
+    std::vector<LifeUI *> currentLifes = lifeUIs;
     setPositions(camera);
 
     window->draw(tilesVertexArray);
-    for (int it = 0; it < entityUIs.size(); it++) {
-        entityUIs.at(it)->draw(window, camera, selected);
+    for (int it = 0; it < currentEntities.size(); it++) {
+        currentEntities.at(it)->draw(window, camera, selected);
     }
 
-    for (int it = 0; it < lifeUIs.size(); it++) {
-        lifeUIs.at(it)->draw(window, camera, selected);
+    for (int it = 0; it < currentLifes.size(); it++) {
+        currentLifes.at(it)->draw(window, camera, selected);
     }
 
     Point worldCoordinates = Point(hoveredTile.getX() * TILE_SIZE, hoveredTile.getY() * TILE_SIZE);

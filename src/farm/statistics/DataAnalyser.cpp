@@ -45,6 +45,7 @@ DataAnalyser::DataAnalyser() {
     brainProcessing = new DataItem("brainProcessing", true);
     externalActions = new DataItem("externalActions", true);
 
+    zero = new DataItem("zero", true);
 
     colors = new GeneGraphAnalyser("Colors");
 
@@ -183,4 +184,8 @@ DataItem *DataAnalyser::getCreaturesWastedEnergy() const {
 
 GeneGraphAnalyser *DataAnalyser::getColors() const {
     return colors;
+}
+
+DataItem *DataAnalyser::getZero() const {
+    return zero;
 }
