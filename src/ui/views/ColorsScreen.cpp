@@ -36,3 +36,7 @@ void ColorsScreen::onWindowResize(int width, int height) {
 void ColorsScreen::mouseMoved(int x, int y) {
 
 }
+
+void ColorsScreen::mouseClicked(int x, int y) {
+    colorsGraph->switchMode();
+}

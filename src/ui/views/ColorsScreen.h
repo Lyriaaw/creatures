@@ -34,6 +34,8 @@ public:
     void loadCamera();
 
     void mouseMoved(int x, int y) override;
+
+    void mouseClicked(int x, int y) override;
 };
 
 

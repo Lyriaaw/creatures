@@ -24,7 +24,7 @@ void ColorsGraph::getMinAndMaxValues() {
     }
 }
 
-ColorsGraph::ColorsGraph(const std::string &name, sf::Font *font, GeneGraphAnalyser *dataAnalyser) : Graph(name, font),dataAnalyser(dataAnalyser) {
+ColorsGraph::ColorsGraph(const std::string &name, sf::Font *font, GeneGraphAnalyser *dataAnalyser) : Graph(name, font),dataAnalyser(dataAnalyser), mode("POPULATION") {
     texture = sf::Texture();
     texture.create(0, 0);
 
@@ -55,11 +55,25 @@ void ColorsGraph::draw(sf::RenderWindow *window) {
 
     std::vector<std::vector<double>> values = dataAnalyser->getValues();
 
+
+
+    double currentHeightRatio;
     for (int it = 0; it < W; it++) {
         int currentTick = it / widthRatio;
 
+        if (mode == "RATIO") {
+            currentHeightRatio = height / double(values.at(currentTick).size());
+        }
+
         for (int jt = 0; jt < H; jt++) {
-            int currentHeight = max - (jt / heightRatio);
+            int currentHeight = 0;
+            if (mode == "POPULATION") {
+                currentHeight = max - (jt / heightRatio);
+
+            }
+            if (mode == "RATIO") {
+                currentHeight = values.at(currentTick).size() - (jt / currentHeightRatio);
+            }
 
             int index = ((jt * W) + it) * 4;
 
@@ -99,4 +113,13 @@ void ColorsGraph::windowResized(float windowWidth, float windowHeight) {
 
     sprite = sf::Sprite(texture);
     sprite.setPosition(x, y);
+}
+
+
+void ColorsGraph::switchMode() {
+    if (mode == "POPULATION"){
+        mode = "RATIO";
+    } else if (mode == "RATIO") {
+        mode = "POPULATION";
+    }
 }

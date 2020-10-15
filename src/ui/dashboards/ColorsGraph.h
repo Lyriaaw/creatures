@@ -20,6 +20,10 @@ private:
 
     sf::Sprite sprite;
 
+    // Population
+    // Ratio
+    std::string mode;
+
 public:
     ColorsGraph(const std::string &name, sf::Font *font, GeneGraphAnalyser *dataAnalyser);
 
@@ -27,6 +31,8 @@ public:
 
 
     void windowResized(float windowWidth, float windowHeight);
+
+    void switchMode();
 };
 
 
