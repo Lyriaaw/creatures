@@ -22,7 +22,7 @@ void GroundEnergyMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     float height = values[tileX][tileY];
     float color = colors[tileX][tileY];
 
-    RGBColor rectangleColor = RGBColor(color, 1.f, height);
+    RGBColor rectangleColor = RGBColor(0.28f, 1.f, height);
 
     sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 

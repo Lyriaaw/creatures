@@ -37,7 +37,7 @@ std::vector<ActionDTO> Mouth::prepareActionDTO(std::vector<Entity *> accessibleE
 
         float distance = sqrt(pow(distanceX, 2) + pow(distanceY, 2));
 
-        if (distance <= mouthSize) {
+        if (distance <= mouthSize + accessibleEntities.at(it)->getSize()) {
             if (distance < smallestDistance) {
                 smallestDistance = distance;
                 closestEntity = accessibleEntities.at(it);

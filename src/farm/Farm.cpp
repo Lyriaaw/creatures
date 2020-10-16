@@ -67,7 +67,7 @@ void Farm::InitFromRandom() {
         entity->setMass(2 * MASS_TO_SIZE_RATIO);
 
         Tile * currentTile = map->getTileAt(tilePosition.getX(), tilePosition.getY());
-        entity->setColor(currentTile->getColor());
+        entity->setColor(0.28f);
         entity->setBrightness(0.3f);
 
         entities.push_back(entity);
@@ -661,7 +661,7 @@ void Farm::vegetalisation() {
 
                 Entity * entity = new Entity(point);
                 entity->setMass(2 * MASS_TO_SIZE_RATIO);
-                entity->setColor(currentTile->getColor());
+                entity->setColor(0.28f);
                 entity->setBrightness(0.3f);
 
                 totalEnergyAdded += entity->getMass();

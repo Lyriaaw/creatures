@@ -16,7 +16,7 @@ std::string FoodTileCountMinimap::getName() {
 
 void FoodTileCountMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     float hue = averageHues[tileX][tileY];
-    float light = values[tileX][tileY] / 5.f;
+    float light = values[tileX][tileY] / 50.f;
 
     RGBColor rectangleColor = RGBColor(hue, 1.f, light);
 
@@ -49,8 +49,8 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
         Point point = currentEntities.at(it)->getPosition();
         Point tilePosition = point.getTileCoordinates();
 
-        values[int(tilePosition.getX())][int(tilePosition.getY())]++;
-        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getColor();
+        values[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getSize();
+        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getColor() * currentEntities.at(it)->getSize();
     }
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
