@@ -9,6 +9,7 @@
 #include "evolutions/musclesEvolutions/SpeedEvolution.h"
 #include "evolutions/nervous/DistanceBarSensorEvolution.h"
 #include "evolutions/inputs/sensors/MassSensorEvolution.h"
+#include "evolutions/musclesEvolutions/MemoryEvolution.h"
 
 using namespace std;
 
@@ -114,12 +115,15 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     genitalsEvolution->perform(life);
     creatureGenome.emplace_back(genitalsEvolution);
 
+    MemoryEvolution * memoryEvolution = new MemoryEvolution();
+    memoryEvolution->setGenerationNumber(35);
+    memoryEvolution->generateFromRandom(life);
+    memoryEvolution->perform(life);
+    creatureGenome.emplace_back(memoryEvolution);
 
 
 
-
-
-    int generationNumberIndex(40);
+    int generationNumberIndex(50);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
