@@ -128,7 +128,9 @@ void FarmUI::generateTileInfoText() {
     float currentHeight = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getHeight();
     float currentHeat = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getHeat();
     float currentGround = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getGround();
+    float currentColor = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getColor();
     tileInfo = tileInfo + "Height: " + std::to_string(currentHeight) + "\n";
+    tileInfo = tileInfo + "Color: " + std::to_string(currentColor) + "\n";
     tileInfo = tileInfo + "Heat: " + std::to_string(currentHeat) + "\n";
     tileInfo = tileInfo + "Ground: " + std::to_string(currentGround) + "\n";
 
@@ -193,6 +195,17 @@ sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
 
         return pixelColor;
     }
+
+    if (camera->getMapMode() == 3) {
+        float ground = map->getTileAt(x, y)->getColor();
+
+        RGBColor rectangleColor = RGBColor(ground, 1.f, 0.2f);
+        sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+
+        return pixelColor;
+    }
+
+
 
 
     return sf::Color(0, 0, 0, 255);

@@ -15,9 +15,10 @@ std::string FoodTileCountMinimap::getName() {
 }
 
 void FoodTileCountMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
-    float height = values[tileX][tileY] / 5.f;
+    float hue = averageHues[tileX][tileY];
+    float light = values[tileX][tileY] / 5.f;
 
-    RGBColor rectangleColor = RGBColor(0.28f, 1.f, height);
+    RGBColor rectangleColor = RGBColor(hue, 1.f, light);
 
     sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
@@ -37,6 +38,7 @@ void FoodTileCountMinimap::draw(sf::RenderWindow *window) {
 void FoodTileCountMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            averageHues[it][jt] = 0;
             values[it][jt] = 0;
         }
     }
@@ -48,6 +50,13 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
         Point tilePosition = point.getTileCoordinates();
 
         values[int(tilePosition.getX())][int(tilePosition.getY())]++;
+        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getColor();
+    }
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            averageHues[it][jt] /= float(values[it][jt]);
+        }
     }
 }
 

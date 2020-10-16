@@ -57,13 +57,19 @@ void Farm::InitFromRandom() {
         int y = distHeight(mt);
 
         Point point(x, y);
+        Point tilePosition = point.getTileCoordinates();
 
 
 //        float foodSize = ((rand() % 300) / 100.f) + 2;
         float foodSize = 2;
 
-        Food * entity = new Food(point, foodSize);
+        Entity * entity = new Entity(point);
         entity->setMass(2 * MASS_TO_SIZE_RATIO);
+
+        Tile * currentTile = map->getTileAt(tilePosition.getX(), tilePosition.getY());
+        entity->setColor(currentTile->getColor());
+        entity->setBrightness(0.3f);
+
         entities.push_back(entity);
     }
 
@@ -345,7 +351,7 @@ void Farm::checkAndHandleLifeDying(Life * life) {
         Point tilePoint = performerPoint.getTileCoordinates();
         Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
-        generateEntities(performerPoint, 1.f, 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
+        generateEntities(performerPoint, life->getEntity()->getColor(), 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
         generateEntities(performerPoint, 0.04f, 0.2f, (0.1 * life->getEntity()->getSize() * MASS_TO_SIZE_RATIO), life->getEnergyCenter()->getWastedEnergy(), life->getEntity()->getSize());
 
 
@@ -653,8 +659,10 @@ void Farm::vegetalisation() {
                 //        float foodSize = ((rand() % 300) / 100.f) + 2;
                 float foodSize = 2;
 
-                Food * entity = new Food(point, foodSize);
+                Entity * entity = new Entity(point);
                 entity->setMass(2 * MASS_TO_SIZE_RATIO);
+                entity->setColor(currentTile->getColor());
+                entity->setBrightness(0.3f);
 
                 totalEnergyAdded += entity->getMass();
 

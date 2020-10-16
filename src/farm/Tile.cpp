@@ -45,4 +45,12 @@ void Tile::addHeight(float value) {
     height += value;
 }
 
-Tile::Tile(float height, float heat, float ground) : height(height), heat(heat), ground(ground) {}
+Tile::Tile(float height, float color, float heat, float ground) : height(height), color(color), heat(heat), ground(ground) {}
+
+float Tile::getColor() const {
+    return color;
+}
+
+void Tile::setColor(float color) {
+    Tile::color = color;
+}

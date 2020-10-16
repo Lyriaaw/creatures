@@ -8,13 +8,14 @@
 
 class Tile {
 private:
+    float color;
     float height;
     float heat;
     float ground;
 
 public:
 
-    Tile(float height, float heat, float ground);
+    Tile(float height, float color, float heat, float ground);
 
     float getHeight() const;
 
@@ -33,6 +34,10 @@ public:
     void addGround(float value);
 
     void removeGround(float groundToRemove);
+
+    float getColor() const;
+
+    void setColor(float color);
 };
 
 

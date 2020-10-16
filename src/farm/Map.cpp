@@ -18,12 +18,18 @@ std::mutex mapMutex;
 void Map::generateRandomTerrain() {
     float seed = rand() % 1000000;
     PerlinNoise perlin(seed);
+    PerlinNoise colorPerlin(seed * 3.14);
 
     cout << "Map generated with seed " << seed << endl;
     cout << "Map Width: " << TILE_COUNT_WIDTH << " Map Height: " << TILE_COUNT_HEIGHT << endl;
 
     float min = 11111110.f;
     float max = 0.f;
+
+    float minColor = 11111110.f;
+    float maxColor = 0.f;
+
+
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
@@ -34,6 +40,7 @@ void Map::generateRandomTerrain() {
             float yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * 2.5;
 
             float height = perlin.noise(xComponent, yComponent, 0.8);
+            float color = colorPerlin.noise(xComponent, yComponent, 0.8);
 
 
             if (height < min) {
@@ -43,8 +50,17 @@ void Map::generateRandomTerrain() {
                 max = height;
             }
 
+            if (color < minColor) {
+                minColor = color;
+            }
+            if (color > maxColor) {
+                maxColor = color;
+            }
 
-            Tile * currentTile = new Tile(height, 0.0, 1500.0);
+
+
+
+            Tile * currentTile = new Tile(height, color, 0.0, 1500.0);
 
             line.emplace_back(currentTile);
         }
@@ -53,11 +69,20 @@ void Map::generateRandomTerrain() {
 
 
     float removed = ((max - min) / 2.f) + min;
-
     float ratio = (1.f / (max - min)) * 2.f;
+
+    float removedColor = ((maxColor - minColor) / 2.f) + minColor;
+    float ratioColor = (1.f / (maxColor - minColor)) * 2.f;
+
+
 
     min = 11111110.f;
     max = 0.f;
+
+    minColor = 11111110.f;
+    maxColor = 0.f;
+
+
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             float currentHeight = getTileAt(it, jt)->getHeight();
@@ -75,6 +100,25 @@ void Map::generateRandomTerrain() {
             }
 
             getTileAt(it, jt)->setHeight(currentHeight);
+
+
+            float currentColor = getTileAt(it, jt)->getColor();
+
+            currentColor -= removedColor;
+            currentColor *= ratioColor;
+
+
+            if (currentColor < minColor) {
+                minColor = currentColor;
+            }
+            if (currentColor > maxColor) {
+                maxColor = currentColor;
+            }
+
+            getTileAt(it, jt)->setColor(abs(currentColor));
+
+
+
         }
     }
 }

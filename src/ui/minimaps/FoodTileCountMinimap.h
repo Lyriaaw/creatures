@@ -16,6 +16,7 @@ public:
 
 private:
 
+    double averageHues[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
     double values[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
 public:

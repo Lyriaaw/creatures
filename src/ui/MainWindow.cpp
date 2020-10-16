@@ -570,6 +570,12 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             }
             this->mainCamera->setMapMode(2);
             break;
+        case Keyboard::Key::P:
+            if (this->mainCamera == nullptr) {
+                break;
+            }
+            this->mainCamera->setMapMode(3);
+            break;
         case Keyboard::Key::R:
             this->selectedEntity = nullptr;
             this->selectedLife = nullptr;
