@@ -45,6 +45,8 @@ void StatisticsScreen::loadGraphs() {
     timeGraph->addLine(farm->getDataAnalyser().getTotalTime(), 2, 0, 0, 0);
 
     timeGraph->addLine(farm->getDataAnalyser().getEntityGridTime(), 2, 0, 0, 255);
+    timeGraph->addLine(farm->getDataAnalyser().getCreatureSortingTime(), 2, 255, 0, 255);
+    timeGraph->addLine(farm->getDataAnalyser().getATickHavePassedTime(), 2, 0, 255, 255);
 
     timeGraph->addLine(farm->getDataAnalyser().getPrepareActionsTime(), 2, 128, 255, 128);
     timeGraph->addLine(farm->getDataAnalyser().getBrainProcessingTime(), 2, 255, 65, 255);

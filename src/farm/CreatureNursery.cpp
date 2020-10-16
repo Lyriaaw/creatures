@@ -80,8 +80,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
         creatureGenome.emplace_back(sensorEvol);
     }
 
-    int sensorCount = rand() % 4 + 1;
-    for (int it = 0; it < sensorCount; it++) {
+    for (int it = 0; it < 4; it++) {
 
         DistanceBarSensorEvolution * sensorEvol = new DistanceBarSensorEvolution();
         sensorEvol->setGenerationNumber(it + 20);

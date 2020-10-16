@@ -101,12 +101,14 @@ void Farm::Tick(bool paused) {
 
 
 
+    sortCreatures();
 
     if (!paused) {
         aTickHavePassed();
         statistics();
     }
-    sortCreatures();
+
+
 
 
     tickEnd = std::chrono::system_clock::now();
@@ -689,6 +691,8 @@ void Farm::vegetalisation() {
 }
 
 void Farm::aTickHavePassed() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
     for (int it = 0; it < lifes.size(); it++) {
         lifes.at(it)->getEntity()->aTickHavePassed();
     }
@@ -696,6 +700,10 @@ void Farm::aTickHavePassed() {
         entities.at(it)->aTickHavePassed();
     }
     tickCount++;
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    dataAnalyser.getATickHavePassedTime()->addValue(elapsed_time.count());
 }
 
 
@@ -820,6 +828,8 @@ void Farm::statistics() {
     totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
     totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
     totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
+    totalTime += dataAnalyser.getCreatureSortingTime()->getLastValue();
+    totalTime += dataAnalyser.getATickHavePassedTime()->getLastValue();
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -923,6 +933,8 @@ std::vector<Life *> Farm::getScoreSortedCreatures() {
     return sorted;
 }
 void Farm::sortCreatures() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
     std::vector<Life *> sortResult;
 
     std::vector<Life *> tmpLifes = this->lifes;
@@ -947,6 +959,12 @@ void Farm::sortCreatures() {
         tmpLifes.erase(tmpLifes.begin() + biggestIndex);
     }
     this->sorted = sortResult;
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    double statisticsTime = elapsed_time.count();
+
+    dataAnalyser.getCreatureSortingTime()->addValue(statisticsTime);
 }
 
 

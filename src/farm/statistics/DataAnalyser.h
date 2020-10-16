@@ -22,6 +22,8 @@ private:
 
     DataItem * entityGridTime;
     DataItem * brainOutputsTime;
+    DataItem * creatureSortingTime;
+    DataItem * aTickHavePassedTime;
     DataItem * moveCreaturesTime;
     DataItem * prepareActionsTime;
     DataItem * executeActionsTime;
@@ -125,6 +127,10 @@ public:
     GeneGraphAnalyser *getColors() const;
 
     DataItem *getZero() const;
+
+    DataItem *getCreatureSortingTime() const;
+
+    DataItem *getATickHavePassedTime() const;
 };
 
 

@@ -19,6 +19,8 @@ DataAnalyser::DataAnalyser() {
     vegetalisationTime = new DataItem("vegetalisationTime", true);
     brainProcessingTime = new DataItem("brainProcessingTime", true);
     statisticsTime = new DataItem("statisticsTime", true);
+    creatureSortingTime = new DataItem("creatureSortingTime", true);
+    aTickHavePassedTime = new DataItem("aTickHavePassedTime", true);
 
     totalTime = new DataItem("totalTime", true);
 
@@ -189,3 +191,12 @@ GeneGraphAnalyser *DataAnalyser::getColors() const {
 DataItem *DataAnalyser::getZero() const {
     return zero;
 }
+
+DataItem *DataAnalyser::getCreatureSortingTime() const {
+    return creatureSortingTime;
+}
+
+DataItem *DataAnalyser::getATickHavePassedTime() const {
+    return aTickHavePassedTime;
+}
+
