@@ -480,8 +480,8 @@ bool Farm::handleMating(Life * father, int entityId) {
     }
 
 
-    bool fatherCanReproduce = father->getEnergyCenter()->getAvailableEnergy() > father->getEnergyCenter()->getMaxMass() / 4.f && father->getEntity()->getAge() > 10;
-    bool motherCanReproduce = foundLife->getEnergyCenter()->getAvailableEnergy() > foundLife->getEnergyCenter()->getMaxMass() / 4.f && foundLife->getEntity()->getAge() > 10;
+    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 3.f && father->getEntity()->getAge() > 10;
+    bool motherCanReproduce = foundLife->getEntity()->getMass() > foundLife->getEnergyCenter()->getMaxMass() / 3.f && foundLife->getEntity()->getAge() > 10;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
         return false;
@@ -491,11 +491,11 @@ bool Farm::handleMating(Life * father, int entityId) {
 
     double givenEnergyToChildGoal = child->getEnergyCenter()->getMaxMass() / 2.f;
 
-    double givenFatherEnergy = std::min(father->getEnergyCenter()->getAvailableEnergy() / 4.0, givenEnergyToChildGoal / 2.0);
-    double givenMotherEnergy = std::min(foundLife->getEnergyCenter()->getAvailableEnergy() / 4.0, givenEnergyToChildGoal / 2.0);
+    double givenFatherEnergy = std::min(father->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
+    double givenMotherEnergy = std::min(foundLife->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
 
-    double actualGivenFatherEnergy = father->getEnergyCenter()->removeAvailableEnergy(givenFatherEnergy);
-    double actualGivenMotherEnergy = foundLife->getEnergyCenter()->removeAvailableEnergy(givenMotherEnergy);
+    double actualGivenFatherEnergy = father->getEntity()->removeMass(givenFatherEnergy);
+    double actualGivenMotherEnergy = foundLife->getEntity()->removeMass(givenMotherEnergy);
 
     if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
         std::cout << "Wrong energy given" << std::endl;
