@@ -91,6 +91,8 @@ private:
     void updateInformationLabel();
 
     void updateSelectedCreature();
+
+    std::thread runFarmUiUpdate();
 };
 
 

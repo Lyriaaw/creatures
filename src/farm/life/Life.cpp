@@ -205,3 +205,7 @@ void Life::setEnergyCenter(EnergyCenter *energyCenter) {
 double Life::addEnergy(double energyToAdd) {
     return energyCenter->addEnergy(energyToAdd);
 }
+
+bool Life::isAlive() {
+    return energyCenter->getAvailableEnergy() > 0 && entity->isExists();
+}

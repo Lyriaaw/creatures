@@ -66,6 +66,8 @@ public:
     void setEnergyCenter(EnergyCenter *energyCenter);
 
     double addEnergy(double energyToAdd);
+
+    bool isAlive();
 };
 
 

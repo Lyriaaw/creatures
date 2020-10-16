@@ -72,7 +72,7 @@ void Entity::setColor(float color) {
 }
 
 bool Entity::isExists() const {
-    return exists;
+    return this->mass > 0;
 }
 
 void Entity::setExists(bool exists) {

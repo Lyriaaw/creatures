@@ -51,6 +51,10 @@ private:
 //    std::vector<std::thread> lifeThreads;
     std::mutex actions_mutex;
 
+    std::mutex add_mutex;
+    std::mutex delete_mutex;
+
+
 public:
     Farm();
     void InitFromRandom();
@@ -134,6 +138,13 @@ public:
     void generateEntities(Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio);
 
     void analyseColors();
+
+    std::vector<Entity *> getAndClearEntitiesToDelete();
+    std::vector<Life *> getAndClearLifesToDelete();
+
+    std::vector<Entity *> getAndClearEntitiesToAdd();
+
+    std::vector<Life *> getAndClearLifesToAdd();
 };
 
 

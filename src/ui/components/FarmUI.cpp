@@ -119,16 +119,18 @@ void FarmUI::clearDeletedEntities(std::vector<Entity *> deletedFromFarm) {
 
 void FarmUI::generateTileInfoText() {
 
-    if (hoveredTile.getX() < 0 || hoveredTile.getX() >= TILE_COUNT_WIDTH || hoveredTile.getY() < 0 || hoveredTile.getY() >= TILE_COUNT_HEIGHT) {
+    Point currentHoveredTile = hoveredTile;
+
+    if (currentHoveredTile.getX() < 0 || currentHoveredTile.getX() >= TILE_COUNT_WIDTH || currentHoveredTile.getY() < 0 || currentHoveredTile.getY() >= TILE_COUNT_HEIGHT) {
         return;
     }
 
-    std::string tileInfo = "{" + std::to_string(int(hoveredTile.getX())) + "," + std::to_string(int(hoveredTile.getY())) + "}\n";
+    std::string tileInfo = "{" + std::to_string(int(currentHoveredTile.getX())) + "," + std::to_string(int(currentHoveredTile.getY())) + "}\n";
 
-    float currentHeight = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getHeight();
-    float currentHeat = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getHeat();
-    float currentGround = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getGround();
-    float currentColor = farm->getMap()->getTileAt(hoveredTile.getX(), hoveredTile.getY())->getColor();
+    float currentHeight = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getHeight();
+    float currentHeat = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getHeat();
+    float currentGround = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getGround();
+    float currentColor = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getColor();
     tileInfo = tileInfo + "Height: " + std::to_string(currentHeight) + "\n";
     tileInfo = tileInfo + "Color: " + std::to_string(currentColor) + "\n";
     tileInfo = tileInfo + "Heat: " + std::to_string(currentHeat) + "\n";
@@ -144,17 +146,13 @@ void FarmUI::generateTileInfoText() {
 void FarmUI::update() {
     // TODO OPTI Clear to_delete
 
-    clearDeletedEntities(farm->getEntityToDelete());
-    farm->clearToDeleteEntities();
+    clearDeletedEntities(farm->getAndClearEntitiesToDelete());
 
-    clearDeletedLifes(farm->getLifesToDelete());
-    farm->clearToDeleteLifes();
+    clearDeletedLifes(farm->getAndClearLifesToDelete());
 
-    addLifes(farm->getLifesAdded());
-    farm->clearAddedLifes();
+    addLifes(farm->getAndClearLifesToAdd());
 
-    addEntities(farm->getEntityAdded());
-    farm->clearAddedEntities();
+    addEntities(farm->getAndClearEntitiesToAdd());
 
     generateTileInfoText();
 }

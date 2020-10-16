@@ -145,23 +145,34 @@ void MainWindow::start() {
 
     running = true;
     std::thread farmThread = runFarmLoop();
+    std::thread farmUiThread = runFarmUiUpdate();
 
     runLoop();
     farmThread.join();
+    farmUiThread.join();
 }
 
 
 
 std::thread MainWindow::runFarmLoop() {
-    auto f = [](Farm *threadedFarm, FarmUI *threadedFarmUI, bool *running, bool *paused){
+    auto f = [](Farm *threadedFarm, bool *running, bool *paused){
         while (*running) {
             threadedFarm->Tick(*paused);
+        }
+    };
 
+    std::thread farmThread(f, farm, &running, &paused);
+
+    return farmThread;
+}
+std::thread MainWindow::runFarmUiUpdate() {
+    auto f = [](FarmUI *threadedFarmUI, bool *running, bool *paused){
+        while (*running) {
             threadedFarmUI->update();
         }
     };
 
-    std::thread farmThread(f, farm, farmUi, &running, &paused);
+    std::thread farmThread(f, farmUi, &running, &paused);
 
     return farmThread;
 }
