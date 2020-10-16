@@ -61,7 +61,7 @@ double Life::giveawayEnergy() {
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy + wastedEnergyCarrying;
 
-    usedEnergy *= (entity->getAge() / 1000.0) + 1;
+    usedEnergy *= (entity->getAge() / 1000.0);
 
     double currentEntityEnergy = this->energyCenter->getAvailableEnergy();
 

@@ -9,8 +9,6 @@
 #include "../../Evolution.h"
 
 class EnergySensorEvolution: public Evolution {
-private:
-    float rotation;
 public:
     EnergySensorEvolution();
     void generateFromRandom(Life * life) override;

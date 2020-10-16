@@ -18,20 +18,24 @@ std::vector<ActionDTO> Genitals::prepareActionDTO(std::vector<Entity *> accessib
 
     float genitalsTotalRotation = (float(rotation) + entity->getRotation()) * float(M_PI);
 
-    float genitalsSize = entity->getRotation() / 4.f;
-    float genitalsX = (cos(genitalsTotalRotation) * entity->getRotation()) + entity->getPosition().getX();
-    float genitalsY = (sin(genitalsTotalRotation) * entity->getRotation()) + entity->getPosition().getY();
+    float genitalsSize = entity->getSize() / 4.f;
+    float genitalsX = (cos(genitalsTotalRotation) * entity->getSize()) + entity->getPosition().getX();
+    float genitalsY = (sin(genitalsTotalRotation) * entity->getSize()) + entity->getPosition().getY();
 
     Entity * closestEntity = nullptr;
     float smallestDistance = FARM_WIDTH;
 
     for (int it = 0; it < accessibleEntities.size(); it++) {
+        if (accessibleEntities.at(it)->getId() == entity->getId()) {
+            continue;
+        }
+
         float distanceX = abs(accessibleEntities.at(it)->getPosition().getX() - genitalsX);
         float distanceY = abs(accessibleEntities.at(it)->getPosition().getY() - genitalsY);
 
         float distance = sqrt(pow(distanceX, 2) + pow(distanceY, 2));
 
-        if (distance <= genitalsSize) {
+        if (distance <= genitalsSize + accessibleEntities.at(it)->getSize()) {
             if (distance < smallestDistance) {
                 smallestDistance = distance;
                 closestEntity = accessibleEntities.at(it);
