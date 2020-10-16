@@ -3,6 +3,8 @@
 //
 
 #include <iostream>
+#include <sstream>
+
 #include "FarmUI.h"
 #include "Camera.h"
 #include "../colors/RGBColor.h"
@@ -253,23 +255,25 @@ void FarmUI::setPositions(Camera *camera) {
             int vertexArrayIndex = ((it * TILE_COUNT_HEIGHT) + jt) * 4;
             Point point = camera->getScreenCoordinates({float(it) * TILE_SIZE, float(jt) * TILE_SIZE});
             tilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(
-                    point.getX(),
-                    point.getY());
+                    std::max(double(point.getX()), double(camera->getTopLeft().getX())),
+                    std::max(double(point.getY()), double(camera->getTopLeft().getY())));
 
 
+            double currentX = point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio;
+            double currentY = point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio;
             tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
-                    point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio,
-                    point.getY());
+                    std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
+                    std::max(double(point.getY()), double(camera->getTopLeft().getY())));
 
 
             tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
-                    point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio,
-                    point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio);
+                    std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
+                    std::min(double(currentY), double(camera->getTopLeft().getY()) + double(camera->getHeight())));
 
 
             tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
-                    point.getX(),
-                    point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio);
+                    std::max(double(point.getX()), double(camera->getTopLeft().getX())),
+                    std::min(double(currentY), double(camera->getTopLeft().getY()) + double(camera->getHeight())));
 
 
 
