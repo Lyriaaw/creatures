@@ -29,7 +29,12 @@ void MinimapsScreen::init() {
     placeMinimap(0, 1, heatMinimap);
 
     groundMinimap = new GroundEnergyMinimap();
-    placeMinimap(1, 1, groundMinimap);
+    placeMinimap(2, 1, groundMinimap);
+
+    actionsMinimap = new ActionsMinimap();
+    placeMinimap(1, 1, actionsMinimap);
+
+
 
 
 
@@ -72,6 +77,7 @@ void MinimapsScreen::draw(sf::RenderWindow *window) {
     foodTileCountMinimap->generateValues(farm);
     heatMinimap->generateValues(farm);
     groundMinimap->generateValues(farm);
+    actionsMinimap->generateValues(farm);
     window->draw(background);
     drawMinimaps(window);
 }

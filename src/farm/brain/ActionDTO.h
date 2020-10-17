@@ -7,6 +7,7 @@
 
 
 #include <string>
+#include "../../utils/Point.h"
 
 class ActionDTO {
 private:
@@ -14,6 +15,9 @@ private:
     int subjectId;
 
     std::string type;
+
+    Point tilePosition;
+    int tick;
 
 public:
     ActionDTO(int performerId, int subjectId, const std::string &type);
@@ -23,6 +27,14 @@ public:
     int getSubjectId() const;
 
     const std::string &getType() const;
+
+    const Point &getTilePosition() const;
+
+    void setTilePosition(const Point &tilePosition);
+
+    int getTick() const;
+
+    void setTick(int tick);
 };
 
 

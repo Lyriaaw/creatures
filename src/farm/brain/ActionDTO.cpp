@@ -5,7 +5,7 @@
 #include "ActionDTO.h"
 
 ActionDTO::ActionDTO(int performerId, int subjectId, const std::string &type) : performerId(performerId),
-                                                                                subjectId(subjectId), type(type) {}
+                                                                                subjectId(subjectId), type(type), tilePosition(Point(0, 0)) {}
 
 int ActionDTO::getPerformerId() const {
     return performerId;
@@ -17,4 +17,20 @@ int ActionDTO::getSubjectId() const {
 
 const std::string &ActionDTO::getType() const {
     return type;
+}
+
+const Point &ActionDTO::getTilePosition() const {
+    return tilePosition;
+}
+
+void ActionDTO::setTilePosition(const Point &tilePosition) {
+    ActionDTO::tilePosition = tilePosition;
+}
+
+int ActionDTO::getTick() const {
+    return tick;
+}
+
+void ActionDTO::setTick(int tick) {
+    ActionDTO::tick = tick;
 }

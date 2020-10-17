@@ -31,6 +31,7 @@ private:
     CreatureNursery * nursery;
 
     std::vector<ActionDTO> actions;
+    std::vector<ActionDTO> executedActions;
 
     double availableEnergy;
 
@@ -50,6 +51,7 @@ private:
 
 //    std::vector<std::thread> lifeThreads;
     std::mutex actions_mutex;
+    std::mutex executed_actions_mutex;
 
     std::mutex add_mutex;
     std::mutex delete_mutex;
@@ -145,6 +147,8 @@ public:
     std::vector<Entity *> getAndClearEntitiesToAdd();
 
     std::vector<Life *> getAndClearLifesToAdd();
+
+    std::vector<ActionDTO> getAndClearExecutedActions();
 };
 
 

@@ -336,13 +336,10 @@ void Farm::handleEating(Life * performer, Entity * subject) {
 
     map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
 
+    Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
+
     Life * foundLife = getLifeFromId(subject->getId());
     if (foundLife != nullptr) {
-        Point performerPoint = performer->getEntity()->getPosition();
-        Point tilePoint = performerPoint.getTileCoordinates();
-
-        Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
-
         tile->addGround(foundLife->getEnergyCenter()->getWastedEnergy());
         tile->addHeat(foundLife->getEnergyCenter()->getAvailableEnergy());
 
@@ -350,7 +347,22 @@ void Farm::handleEating(Life * performer, Entity * subject) {
         foundLife->getEnergyCenter()->setWastedEnergy(0.0);
 
         checkAndHandleLifeDying(foundLife);
+
+        std::lock_guard<std::mutex> guard(executed_actions_mutex);
+        ActionDTO executedAction = ActionDTO(0, 0, "EAT_LIFE");
+        executedAction.setTilePosition(tilePoint);
+        executedAction.setTick(tickCount);
+        executedActions.emplace_back(executedAction);
+        return;
     }
+
+    std::lock_guard<std::mutex> guard(executed_actions_mutex);
+    ActionDTO executedAction = ActionDTO(0, 0, "EAT_ENTITY");
+    executedAction.setTilePosition(tilePoint);
+    executedAction.setTick(tickCount);
+    executedActions.emplace_back(executedAction);
+
+
 }
 
 void Farm::checkAndHandleLifeDying(Life * life) {
@@ -372,10 +384,11 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
 
     double mouthSize = performer->getEntity()->getSize() / 3.0;
 
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+
     Life * foundLife = getLifeFromId(subject->getId());
     if (foundLife != nullptr) {
-        Point performerPoint = performer->getEntity()->getPosition();
-        Point tilePoint = performerPoint.getTileCoordinates();
         Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
         double takenEnergy = std::min(mouthSize * 10.0, foundLife->getEnergyCenter()->getAvailableEnergy());
@@ -383,8 +396,16 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
         tile->addHeat(takenEnergy);
 
         checkAndHandleLifeDying(foundLife);
+
+        std::lock_guard<std::mutex> guard(executed_actions_mutex);
+        ActionDTO executedAction = ActionDTO(0, 0, "BITE_LIFE");
+        executedAction.setTilePosition(tilePoint);
+        executedAction.setTick(tickCount);
+        executedActions.emplace_back(executedAction);
         return;
     }
+
+
 
     random_device rd;
     mt19937 mt(rd());
@@ -419,6 +440,13 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
     }
 
     subject->setMass(0.0);
+
+
+    std::lock_guard<std::mutex> guard(executed_actions_mutex);
+    ActionDTO executedAction = ActionDTO(0, 0, "BITE_ENTITY");
+    executedAction.setTilePosition(tilePoint);
+    executedAction.setTick(tickCount);
+    executedActions.emplace_back(executedAction);
 }
 
 void Farm::generateEntities(Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
@@ -470,6 +498,11 @@ void Farm::handlePoop(Life * subject) {
 
 
     subject->getEnergyCenter()->setWastedEnergy(0.0);
+
+    std::lock_guard<std::mutex> guard(executed_actions_mutex);
+    ActionDTO executedAction = ActionDTO(0, 0, "POOP");
+    executedAction.setTilePosition(position.getTileCoordinates());
+    executedActions.emplace_back(executedAction);
 }
 
 
@@ -507,18 +540,26 @@ bool Farm::handleMating(Life * father, int entityId) {
     checkAndHandleLifeDying(father);
     checkAndHandleLifeDying(foundLife);
 
+
+    Point childCoordinate = child->getEntity()->getPosition();
+    Point tileChildPosition = childCoordinate.getTileCoordinates();
+
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEntity()->setMass(totalGivenEnergy / 2.0);
         child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
         lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
 
+
+        std::lock_guard<std::mutex> guard(executed_actions_mutex);
+        ActionDTO executedAction = ActionDTO(0, 0, "MATE");
+        executedAction.setTilePosition(tileChildPosition);
+        executedActions.emplace_back(executedAction);
+
         return true;
     }
 
 
-    Point childCoordinate = child->getEntity()->getPosition();
-    Point tileChildPosition = childCoordinate.getTileCoordinates();
 
     map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
@@ -1163,7 +1204,15 @@ vector<Life *> Farm::getAndClearLifesToAdd() {
     return currentLifesToAdd;
 }
 
+vector<ActionDTO> Farm::getAndClearExecutedActions() {
+    std::lock_guard<std::mutex> guard(executed_actions_mutex);
 
+    vector<ActionDTO> currentExecutedActions;
+    currentExecutedActions.insert(currentExecutedActions.begin(), executedActions.begin(), executedActions.end());
+    executedActions.clear();
+
+    return currentExecutedActions;
+}
 
 
 
