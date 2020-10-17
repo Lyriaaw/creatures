@@ -13,7 +13,13 @@ class EvolutionScreen: public Screen {
 private:
     int windowWidth, windowHeight;
 
-    std::vector<Button *> graphButtons;
+    std::vector<Button *> evolutionButtons;
+
+    sf::Text * currentGenerationNumberText;
+
+    int lastEvolutionsCount;
+
+    std::map<int, Evolution *> allEvolutions;
 
 
 public:
@@ -33,13 +39,18 @@ public:
 
     void mouseMoved(int x, int y) override;
 
-    void loadGraphs();
+    void loadTexts();
     void loadButtons(sf::Font *font);
 
     void mouseClicked(int x, int y) override;
 
     void clickedOnButton(int id);
 
+    void placeElements();
+
+    void updateTexts();
+
+    void updateEvolutions(std::map<int, Evolution *> allEvolutions);
 };
 
 
