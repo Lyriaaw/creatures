@@ -33,12 +33,12 @@ void LifeScreen::init() {
     double buttonWidth = 0.08;
     double buttonHeight = 0.028;
 
-    UiComponent * genomeButton = new UiButton("Brain", 0 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
-    genomeButton->setOnClick([&](){ informationToShow = "BRAIN";});
-    UiComponent * brainButton = new UiButton("Genome", 1 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
-    brainButton->setOnClick([&](){ informationToShow = "GENOME";});
-    UiComponent * graphButton = new UiButton("Graphs", 2 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
-    graphButton->setOnClick([&](){ informationToShow = "GRAPHS";});
+    UiButton * genomeButton = new UiButton(1, "Brain", 0 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+    genomeButton->setOnClick([&](int id){ informationToShow = "BRAIN";});
+    UiButton * brainButton = new UiButton(2, "Genome", 1 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+    brainButton->setOnClick([&](int id){ informationToShow = "GENOME";});
+    UiButton * graphButton = new UiButton(3, "Graphs", 2 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+    graphButton->setOnClick([&](int id){ informationToShow = "GRAPHS";});
 
     uiComponents.emplace_back(brainButton);
     uiComponents.emplace_back(genomeButton);

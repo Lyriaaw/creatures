@@ -12,9 +12,6 @@ UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double
     this->yRatio = yRatio;
     this->widthRatio = widthRatio;
     this->heightRatio = heightRatio;
-
-    onClick = []() {
-    };
 }
 
 void UiComponent::setFixedSizeAndPosition(double x, double y, double width, double height) {
@@ -70,13 +67,10 @@ void UiComponent::mouseClicked(int mouseX, int mouseY) {
     if (mouseX < x || mouseY < y || mouseX > x + width || mouseY > y + height) {
         return;
     }
-    onClick();
     mouseClickedInside(mouseX, mouseY);
 }
 
-void UiComponent::setOnClick(std::function<void()> function) {
-    onClick = function;
-}
+
 
 
 //

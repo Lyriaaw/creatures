@@ -3,6 +3,7 @@
 //
 
 #include "StatisticsScreen.h"
+#include "../elements/UiButton.h"
 
 StatisticsScreen::StatisticsScreen(FarmUI * farmUi) : Screen(farmUi) {
     windowWidth = 0;
@@ -122,9 +123,19 @@ void StatisticsScreen::loadButtons(sf::Font *font) {
     sf::Color backgroundColor = sf::Color(55, 55, 55, 255);
     sf::Color textColor = sf::Color(195, 195, 195, 255);
 
+    double buttonWidth = 0.08;
+    double buttonHeight = 0.028;
+
+
     for (int it = 0; it < graphs.size(); it++) {
-//        Button * button = new Button(graphs.at(it)->getName(), it, font, it * 160, 0, 150, 50, backgroundColor, textColor);
-//        graphButtons.emplace_back(button);
+        UiButton * button = new UiButton(it, graphs.at(it)->getName(), it * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+
+        button->setOnClick([&](int id) {
+            std::cout << id << std::endl;
+            this->currentGraph = graphs.at(id);
+        });
+
+        uiComponents.emplace_back(button);
     }
 }
 
@@ -138,8 +149,8 @@ void StatisticsScreen::init() {
 void StatisticsScreen::draw(sf::RenderWindow *window) {
     currentGraph->draw(window);
 
-    for (int it = 0; it < graphButtons.size(); it++) {
-        graphButtons.at(it)->draw(window);
+    for (int it = 0; it < uiComponents.size(); it++) {
+        uiComponents.at(it)->draw(window);
     }
 }
 
@@ -148,6 +159,8 @@ void StatisticsScreen::updateSelectedCreature() {
 }
 
 void StatisticsScreen::onWindowResize(int width, int height) {
+    Screen::onWindowResize(width, height);
+
     windowWidth = width;
     windowHeight = height;
 
@@ -167,11 +180,7 @@ void StatisticsScreen::mouseMoved(int x, int y) {
 }
 
 void StatisticsScreen::mouseClicked(int x, int y) {
-    for (int it = 0; it < graphButtons.size(); it++) {
-        if (graphButtons.at(it)->clicked(x, y)) {
-            clickedOnButton(graphButtons.at(it)->getId());
-        }
-    }
+    Screen::mouseClicked(x, y);
 
     currentGraph->mouseClicked(x, y);
 

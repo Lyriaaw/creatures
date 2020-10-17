@@ -14,8 +14,11 @@ class UiButton: public UiComponent {
 private:
     sf::RectangleShape background;
     sf::Text text;
+    int id;
+    std::function<void(int)> onClick;
+
 public:
-    UiButton(const std::string& textString, double xRatio, double yRatio, double widthRatio, double heightRatio);
+    UiButton(int id, const std::string& textString, double xRatio, double yRatio, double widthRatio, double heightRatio);
 
     void mouseHovering(int mouseX, int mouseY) override;
 
@@ -28,6 +31,9 @@ public:
     void mouseLeave() override;
 
     void draw(sf::RenderWindow *window) override;
+
+    void setOnClick(std::function<void(int)> function);
+
 };
 
 

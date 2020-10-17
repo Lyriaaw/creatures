@@ -6,6 +6,7 @@
 #include <cmath>
 #include "Graph.h"
 #include "../elements/GlobalFont.h"
+#include "../elements/UiButton.h"
 
 
 const std::string &Graph::getName() const {
@@ -57,8 +58,6 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
     double xLine = xRatio + (lineIndex * 0.1);
     double currentHeightRatio = heightRatio;
     double yButtons = double(yRatio) + double(currentHeightRatio);
-
-    std::cout << "y: " << yRatio << " height: " << currentHeightRatio << " = " << yButtons << " => " << yRatio + heightRatio << std::endl;
 
     UiBackground * legendBackground = new UiBackground(xLine, yButtons, 0.1, 0.01);
     legendBackground->setFillColor(legendBackgroundColor);
@@ -184,12 +183,7 @@ void Graph::draw(sf::RenderWindow *window) {
 
 
     for (int it = 0; it < lines.size(); it++) {
-//        window->draw(linesLegendBackgrounds.at(it));
-//        window->draw(linesLegendTexts.at(it));
-//        doNotShowButtons.at(it)->draw(window);
-//        showAveragedButtons.at(it)->draw(window);
-//        showNormalButtons.at(it)->draw(window);
-//        drawStat(window, lines.at(it));
+        drawStat(window, lines.at(it));
     }
 
     if (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height) {

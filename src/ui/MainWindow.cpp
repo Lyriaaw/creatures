@@ -84,38 +84,38 @@ void MainWindow::loadButtons() {
 
     double buttonHeight = 0.028;
 
-    UiButton * mainWorldButton = new UiButton("World", 0 * (buttonWidth + 0.001), 0.001, buttonWidth, buttonHeight);
-    mainWorldButton->setOnClick([&]() {
+    UiButton * mainWorldButton = new UiButton(1, "World", 0 * (buttonWidth + 0.001), 0.001, buttonWidth, buttonHeight);
+    mainWorldButton->setOnClick([&](int id) {
         this->openScreen(1);
     });
 
-    UiButton * statistics = new UiButton("Statistics", 1 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
-    statistics->setOnClick([&] () {
+    UiButton * statistics = new UiButton(1, "Statistics", 1 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
+    statistics->setOnClick([&] (int id) {
         this->openScreen(2);
     });
 
-    UiButton * minimaps = new UiButton("Minimaps", 2 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
-    minimaps->setOnClick([&] () {
+    UiButton * minimaps = new UiButton(1, "Minimaps", 2 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
+    minimaps->setOnClick([&] (int id) {
         this->openScreen(3);
     });
 
-    UiButton * creature = new UiButton("Creatures", 3 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
-    creature->setOnClick([&] () {
+    UiButton * creature = new UiButton(1, "Creatures", 3 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
+    creature->setOnClick([&] (int id) {
         this->openScreen(4);
     });
 
-    UiButton * colors = new UiButton("Colors", 4 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
-    colors->setOnClick([&] () {
+    UiButton * colors = new UiButton(1, "Colors", 4 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
+    colors->setOnClick([&] (int id) {
         this->openScreen(5);
     });
 
-    UiButton * evolutions = new UiButton("Evolutions", 5 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
-    evolutions->setOnClick([&] () {
+    UiButton * evolutions = new UiButton(1, "Evolutions", 5 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
+    evolutions->setOnClick([&] (int id) {
         this->openScreen(6);
     });
 
-    UiButton * tests = new UiButton("Tests", 6 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
-    tests->setOnClick([&] () {
+    UiButton * tests = new UiButton(1, "Tests", 6 * (buttonWidth + 0.001),  0.001, buttonWidth, buttonHeight);
+    tests->setOnClick([&] (int id) {
         this->openScreen(7);
     });
 

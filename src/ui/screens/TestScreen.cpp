@@ -7,8 +7,8 @@
 
 TestScreen::TestScreen(FarmUI * farmUi) : Screen(farmUi) {
 
-    UiButton * buttonTest = new UiButton("Test", 0.1, 0.1, 0.2, 0.1);
-    buttonTest->setOnClick([]() {
+    UiButton * buttonTest = new UiButton(1, "Test", 0.1, 0.1, 0.2, 0.1);
+    buttonTest->setOnClick([](int id) {
        std::cout << "Clicked !" << std::endl;
     });
 

@@ -3,16 +3,21 @@
 //
 
 #include "UiButton.h"
+
+#include <utility>
 #include "GlobalFont.h"
 
-UiButton::UiButton(const std::string& textString, double xRatio, double yRatio, double widthRatio, double heightRatio)
-        : UiComponent(xRatio, yRatio, widthRatio, heightRatio) {
+UiButton::UiButton(int id, const std::string& textString, double xRatio, double yRatio, double widthRatio, double heightRatio)
+        : UiComponent(xRatio, yRatio, widthRatio, heightRatio), id(id) {
     background.setFillColor(sf::Color(50, 50, 50, 255));
 
     text.setFillColor(sf::Color(255, 255, 255, 255));
     text.setCharacterSize(20);
     text.setFont(*GlobalFont::MainFont);
     text.setString(textString);
+
+    onClick = [](int id) {
+    };
 }
 
 
@@ -35,6 +40,7 @@ void UiButton::mouseHovering(int mouseX, int mouseY) {
 }
 
 void UiButton::mouseClickedInside(int mouseX, int mouseY) {
+    onClick(id);
 }
 
 void UiButton::mouseEnter() {
@@ -48,4 +54,7 @@ void UiButton::mouseLeave() {
 void UiButton::draw(sf::RenderWindow *window) {
     window->draw(background);
     window->draw(text);
+}
+void UiButton::setOnClick(std::function<void(int)> function) {
+    onClick = std::move(function);
 }
