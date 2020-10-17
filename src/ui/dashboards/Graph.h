@@ -21,11 +21,19 @@ protected:
 
     float x, y, width, height;
 
+    int mouseX, mouseY;
+
     double min, max;
 
     double widthRatio, heightRatio;
 
     sf::RectangleShape background;
+
+    sf::RectangleShape hoverInfoBackground;
+    std::vector<sf::Text *> hoveredInfoTexts;
+    sf::Text * hoveredTickText;
+    sf::RectangleShape hoveredTickBar;
+
 
     sf::Font * font;
 
@@ -63,6 +71,9 @@ public:
 
     void setLegendsButtonColors();
 
+    void mouseMoved(int x, int y);
+
+    void drawHoveredInfo(sf::RenderWindow *window);
 };
 
 
