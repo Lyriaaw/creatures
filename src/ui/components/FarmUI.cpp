@@ -9,10 +9,13 @@
 #include "Camera.h"
 #include "../colors/RGBColor.h"
 #include "../elements/GlobalFont.h"
+#include "../minimaps/ActionsMinimap.h"
 
 FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)), selectedLife(nullptr) {
     loadTexts();
     loadFarm();
+
+    currentMinimap = new ActionsMinimap();
 }
 
 
@@ -161,57 +164,7 @@ void FarmUI::update() {
 }
 
 sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
-
-    if (camera->getMapMode() == 0) {
-        float height = map->getTileAt(x, y)->getHeight();
-        RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
-        if (height < -0.05f) {
-            rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
-        }
-        if (height > 0.7f) {
-            rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
-        }
-
-        sf::Color tileColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
-        return tileColor;
-    }
-
-    if (camera->getMapMode() == 1) {
-        float heat = map->getTileAt(x, y)->getHeat() / 1000.f;
-        RGBColor rectangleColor = RGBColor(0.f, 1.f, heat);
-
-        if (heat > 1.f) {
-            rectangleColor = RGBColor(0.68f, 1.f, heat - 1);
-        }
-
-        sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
-        return pixelColor;
-    }
-
-    if (camera->getMapMode() == 2) {
-        float ground = map->getTileAt(x, y)->getGround();
-
-        RGBColor rectangleColor = RGBColor(0.28f, 1.f, ground / 10000.f);
-        sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
-
-        return pixelColor;
-    }
-
-    if (camera->getMapMode() == 3) {
-        float ground = map->getTileAt(x, y)->getColor();
-
-        RGBColor rectangleColor = RGBColor(ground, 1.f, 0.2f);
-        sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
-
-        return pixelColor;
-    }
-
-
-
-
-    return sf::Color(0, 0, 0, 255);
-
-
+    return currentMinimap->getColorAt(x, y);
 }
 
 void FarmUI::setPositions(Camera *camera) {
@@ -222,6 +175,7 @@ void FarmUI::setPositions(Camera *camera) {
     }
 
     Map *map = farm->getMap();
+    currentMinimap->generateValues(farm);
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {

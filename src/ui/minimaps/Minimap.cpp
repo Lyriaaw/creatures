@@ -53,6 +53,8 @@ void Minimap::move(double positionX, double positionY, double width, double heig
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
+            colorGrid[it][jt] = sf::Color(0, 0, 0);
+
             int vertexArrayIndex = (it * TILE_COUNT_HEIGHT) + jt;
 
 
@@ -81,6 +83,10 @@ void Minimap::move(double positionX, double positionY, double width, double heig
 
 void Minimap::changeSize(double width, double height) {
     move(positionX, positionY, width, height);
+}
+
+sf::Color Minimap::getColorAt(int it, int jt) {
+    return colorGrid[it][jt];
 }
 
 
@@ -122,6 +128,25 @@ void WorldMinimap::draw(sf::RenderWindow *window) {
 }
 
 WorldMinimap::WorldMinimap(): Minimap(){}
+
+void WorldMinimap::generateValues(Farm *farm) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            float height = farm->getMap()->getTileAt(it, jt)->getHeight();
+            RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
+            if (height < -0.05f) {
+                rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
+            }
+            if (height > 0.7f) {
+                rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
+            }
+
+            sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+
+            colorGrid[it][jt] = pixelColor;
+        }
+    }
+}
 
 double Minimap::getPixelSize() const {
     return pixelSize;

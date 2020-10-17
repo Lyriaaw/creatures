@@ -15,6 +15,7 @@
 #include "../../farm/entities/Food.h"
 #include "../../farm/Farm.h"
 #include "LifeUI.h"
+#include "../minimaps/Minimap.h"
 
 class FarmUI {
 private:
@@ -32,6 +33,8 @@ private:
     Entity * selectedEntity;
 
     std::function<void()> selectedLifeChanged;
+
+    Minimap * currentMinimap;
 
 public:
 

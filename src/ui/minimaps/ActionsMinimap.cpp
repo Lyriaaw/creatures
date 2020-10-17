@@ -42,7 +42,7 @@ sf::Color ActionsMinimap::getColorFromActionName(ActionDTO action) {
     }
 
     if (action.getType() == "BITE_LIFE") {
-        return sf::Color(50, 50, 50);
+        return sf::Color(128, 128, 0);
     }
     if (action.getType() == "BITE_ENTITY") {
         return sf::Color(58, 0, 94);
@@ -234,10 +234,17 @@ void ActionsMinimap::generateValues(Farm * farm) {
         this->r[tileX][tileY] = currentColor.r;
         this->g[tileX][tileY] = currentColor.g;
         this->b[tileX][tileY] = currentColor.b;
+
     }
 
     processRed();
     processGreen();
     processBlue();
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            colorGrid[it][jt] = sf::Color(r[it][jt], g[it][jt], b[it][jt]);
+        }
+    }
 }
 

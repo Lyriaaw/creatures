@@ -18,6 +18,8 @@ protected:
 
     double pixelSize;
 
+    sf::Color colorGrid[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
+
 
 public:
 
@@ -30,6 +32,8 @@ public:
 
     virtual void setPixelColor(int tileX, int tileY, Farm * farm) = 0;
     virtual void draw(sf::RenderWindow *window) = 0;
+    virtual void generateValues(Farm * farm) = 0;
+    sf::Color getColorAt(int it, int jt);
 
     virtual std::string getName() = 0;
 
@@ -48,6 +52,9 @@ public:
 
     void setPixelColor(int tileX, int tileY, Farm * farm) override;
     void draw(sf::RenderWindow *window) override;
+
+    void generateValues(Farm *farm) override;
+
 
 };
 
