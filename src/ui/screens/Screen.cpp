@@ -4,7 +4,8 @@
 
 #include "Screen.h"
 
-Screen::Screen(FarmUI * farmUi): farmUi(farmUi), rightMouseButtonDown(false), leftMouseButtonDown(false) {}
+Screen::Screen(FarmUI * farmUi): farmUi(farmUi), rightMouseButtonDown(false), leftMouseButtonDown(false), selectedEntity(
+        nullptr) {}
 
 void Screen::setMouseButtons(bool left, bool right) {
     rightMouseButtonDown = right;

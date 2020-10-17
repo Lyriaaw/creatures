@@ -6,8 +6,13 @@
 #include <sstream>
 #include "LifeScreen.h"
 #include "../elements/GlobalFont.h"
+#include "../elements/UiButton.h"
 
-LifeScreen::LifeScreen(FarmUI * farmUi) : Screen(farmUi), camera(nullptr), informationToShow("BRAIN"), brainUi(nullptr) {}
+LifeScreen::LifeScreen(FarmUI * farmUi) : Screen(farmUi), camera(nullptr), informationToShow("BRAIN"), brainUi(nullptr), creatureAgeText(nullptr) {
+    creatureAgeText = new UiLabel(0.01, 0.92, 0, 0);
+    uiComponents.emplace_back(creatureAgeText);
+
+}
 
 int LifeScreen::getId() {
     return 4;
@@ -25,24 +30,29 @@ void LifeScreen::init() {
     sf::Color backgroundColor = sf::Color(55, 55, 55, 255);
     sf::Color textColor = sf::Color(200, 200, 200, 255);
 
-//    Button genomeButton = Button("Brain", 1, font, 0, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
-//    Button brainButton = Button("Genome", 2, font, 110, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
-//    Button graphButton = Button("Graphs", 3, font, 220, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
-//
-//    buttons.emplace_back(brainButton);
-//    buttons.emplace_back(genomeButton);
-//    buttons.emplace_back(graphButton);
+    double buttonWidth = 0.08;
+    double buttonHeight = 0.028;
 
-    creatureAgeText.setString("Creature age ...");
-    creatureAgeText.setFont(*GlobalFont::MainFont);
-    creatureAgeText.setFillColor(textColor);
-    creatureAgeText.setCharacterSize(20);
+    UiComponent * genomeButton = new UiButton("Brain", 0 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+    genomeButton->setOnClick([&](){ informationToShow = "BRAIN";});
+    UiComponent * brainButton = new UiButton("Genome", 1 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+    brainButton->setOnClick([&](){ informationToShow = "GENOME";});
+    UiComponent * graphButton = new UiButton("Graphs", 2 * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
+    graphButton->setOnClick([&](){ informationToShow = "GRAPHS";});
+
+    uiComponents.emplace_back(brainButton);
+    uiComponents.emplace_back(genomeButton);
+    uiComponents.emplace_back(graphButton);
+
+    creatureAgeText->setText("Creature age ...");
+    creatureAgeText->setFillColor(textColor);
 
 }
 
 
 void LifeScreen::draw(sf::RenderWindow *window) {
-    updateGraphs();
+    Screen::draw(window);
+
 
 
 
@@ -58,6 +68,13 @@ void LifeScreen::draw(sf::RenderWindow *window) {
     if (selectedEntity == nullptr || camera == nullptr) {
         return ;
     }
+    updateGraphs();
+
+
+    std::stringstream ageStream;
+
+    ageStream << "Age: " << selectedEntity->getEntity()->getAge();
+    creatureAgeText->setText(ageStream.str());
 
 
     camera->setCenter(selectedEntity->getEntity()->getPosition());
@@ -77,14 +94,6 @@ void LifeScreen::draw(sf::RenderWindow *window) {
     if (informationToShow == "GRAPHS") {
         drawGraphs(window);
     }
-
-
-
-    std::stringstream ageStream;
-
-    ageStream << "Age: " << selectedEntity->getEntity()->getAge();
-    creatureAgeText.setString(ageStream.str());
-    window->draw(creatureAgeText);
 
 
 
@@ -143,6 +152,8 @@ void LifeScreen::loadSelectedGenome() {
 }
 
 void LifeScreen::onWindowResize(int width, int height) {
+    Screen::onWindowResize(width, height);
+
     windowWidth = width;
     windowHeight = height;
 
@@ -157,15 +168,8 @@ void LifeScreen::onWindowResize(int width, int height) {
     for (int it = 0; it < buttons.size(); it++) {
         buttons.at(it).move(buttons.at(it).getX(), height - 100);
     }
-
-    creatureAgeText.setPosition(0.01 * windowWidth, 0.92 * height);
-
-
 }
 
-void LifeScreen::mouseMoved(int x, int y) {
-
-}
 
 void LifeScreen::mouseClicked(int x, int y) {
     Screen::mouseClicked(x, y);

@@ -9,6 +9,7 @@
 #include "Screen.h"
 #include "../components/BrainUI.h"
 #include "../components/Button.h"
+#include "../elements/UiLabel.h"
 
 class LifeScreen: public Screen {
 private:
@@ -27,7 +28,7 @@ private:
 
     std::vector<sf::Text> genomeTexts;
 
-    sf::Text creatureAgeText;
+    UiLabel * creatureAgeText;
 
     DataItem * grad0;
     DataItem * grad1;
