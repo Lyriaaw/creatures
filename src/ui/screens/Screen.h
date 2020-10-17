@@ -43,6 +43,8 @@ public:
     virtual void mouseClicked(int x, int y);
 
     void setMouseButtons(bool left, bool right);
+
+    virtual void mouseScrolled(float delta, int mouseX, int mouseY);
 };
 
 

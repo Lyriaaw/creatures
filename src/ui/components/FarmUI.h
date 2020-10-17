@@ -27,6 +27,11 @@ private:
 
     Point hoveredTile;
     sf::Text hoveredTileInfos;
+
+    Life * selectedLife;
+    Entity * selectedEntity;
+
+    std::function<void()> selectedLifeChanged;
 public:
 
 public:
@@ -55,8 +60,15 @@ public:
     void clearDeletedLifes(std::vector<Life *> deletedFromFarm);
     void clearDeletedEntities(std::vector<Entity *> deletedFromFarm);
 
+    Life *getSelectedLife() const;
+
+    Entity *getSelectedEntity() const;
+
     Farm *getFarm() const;
 
+    void setSelectedLifeChanged(const std::function<void()> &selectedLifeChanged);
+
+    void processClick(float screenX, float screenY, Camera * camera);
 };
 
 

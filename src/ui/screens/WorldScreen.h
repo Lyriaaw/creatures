@@ -29,6 +29,8 @@ public:
 
     void mouseClicked(int x, int y) override;
 
+    void mouseScrolled(float delta, int mouseX, int mouseY) override;
+
 };
 
 

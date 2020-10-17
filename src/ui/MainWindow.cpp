@@ -136,6 +136,12 @@ void MainWindow::loadFarm() {
     farm->InitFromRandom();
 
     farmUi = new FarmUI(farm);
+    farmUi->setSelectedLifeChanged([&]() {
+        for (int it = 0; it < this->screens.size(); it++) {
+            std::cout << "Reloading selected life ! " << std::endl;
+            screens.at(it)->updateSelectedCreature(farmUi->getSelectedLife());
+        }
+    });
 }
 
 void MainWindow::loadScreens() {
@@ -367,63 +373,25 @@ void MainWindow::handleResized(int width, int height) {
         uiComponents.at(it)->onWindowResized(width, height);
     }
 
-
-
-
     window->setView(view);
 }
 
 void MainWindow::handleScroll(float delta) {
-//    if (mainCamera == nullptr) {
-//        return;
-//    }
-//
-//    float deltaRatio;
-//    if (delta < 0) {
-//        mainCamera->changeZoom(0.9f);
-//        deltaRatio = 1.1;
-//    } else if (delta > 0) {
-//        mainCamera->changeZoom(1.1f);
-//        deltaRatio = 0.9;
-//    } else {
-//        return;
-//    }
-//
-//    Point cameraCenter = mainCamera->getCenter();
-//    Point mouseWorldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
-//
-//    float deltaX = cameraCenter.getX() - mouseWorldCoordinates.getX();
-//    float deltaY = cameraCenter.getY() - mouseWorldCoordinates.getY();
-//
-//    float newX = mouseWorldCoordinates.getX() + (deltaX * (deltaRatio));
-//    float newY = mouseWorldCoordinates.getY() + (deltaY * (deltaRatio));
-//
-//    Point newCameraCenter = {newX, newY};
-//    mainCamera->setCenter(newCameraCenter);
-//
-//    Point worldMousePosition = mainCamera->getWorldCoordinates({float(mouseX), float(mouseY)});
-//
-//    farmUi->mouseMoved(worldMousePosition, mainCamera);
+    currentScreen->mouseScrolled(delta, mouseX, mouseY);
 }
 
 void MainWindow::handleMouseMove(int x, int y) {
-
     float previousX = this->mouseX;
     float previousY = this->mouseY;
 
     this->mouseX = float(x);
     this->mouseY = float(y);
 
-    for (int it = 0; it < screens.size(); it++) {
-        screens.at(it)->mouseMoved(x, y, previousX, previousY);
-    }
+    currentScreen->mouseMoved(x, y, previousX, previousY);
 
     for (int it = 0; it < uiComponents.size(); it++) {
         uiComponents.at(it)->mouseMoved(x, y, previousX, previousY);
     }
-
-
-
 }
 
 void MainWindow::handleMousePressed(sf::Mouse::Button button) {
@@ -455,109 +423,18 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
 
     if (button == Mouse::Left) {
+        currentScreen->mouseClicked(mouseX, mouseY);
+
         for (int it = 0; it < uiComponents.size(); it++) {
             uiComponents.at(it)->mouseClicked(mouseX, mouseY);
         }
-
-        for (int it = 0; it < screens.size(); it++) {
-            screens.at(it)->mouseClicked(mouseX, mouseY);
-        }
     }
-
-//    if (button == Mouse::Left && mainCamera != nullptr) {
-//        Point worldCoordinates = mainCamera->getWorldCoordinates({mouseX, mouseY});
-//
-//        bool found = false;
-//        std::vector<Life *> currentLifes = farm->getLifes();
-//        for (int it = 0; it < currentLifes.size(); it++) {
-//            Life * connector = currentLifes.at(it);
-//
-//            double deltaX = abs(worldCoordinates.getX() - connector->getEntity()->getPosition().getX());
-//            double deltaY = abs(worldCoordinates.getY() - connector->getEntity()->getPosition().getY());
-//
-//            if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
-//                selectedLife = currentLifes.at(it);
-//
-//                std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedLife->getEntity()->getId());
-//                std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
-//
-//                found = true;
-//                updateSelectedCreature();
-//            }
-//        }
-//
-//
-//        std::vector<Entity *> currentEntities = farm->getEntities();
-//        for (int it = 0; it < currentEntities.size(); it++) {
-//            Entity * entity = currentEntities.at(it);
-//
-//            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
-//            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
-//
-//            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
-//                selectedEntity = entity;
-//
-//                found = true;
-//                updateSelectedCreature();
-//            }
-//        }
-//
-////        for (int it = 0; it < farm->getFoods().size(); it++) {
-////            Entity * entity = farm->getFoods().at(it);
-////
-////            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
-////            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
-////
-////            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
-////                selectedEntity = entity;
-////                selectedLife = nullptr;
-////                found = true;
-////            }
-////        }
-//
-//        if (!found) {
-//            selectedEntity = nullptr;
-//            selectedLife = nullptr;
-//        }
-//    }
-
 
 }
 
 void MainWindow::updateSelectedCreature() {
     for (int jt = 0; jt < screens.size(); jt++) {
         screens.at(jt)->updateSelectedCreature(selectedLife);
-    }
-}
-
-
-void MainWindow::handleButtonClicked(int id) {
-    switch(id) {
-        case 1:
-            openScreen(1);
-            break;
-        case 2:
-            openScreen(2);
-            break;
-        case 3:
-            openScreen(3);
-            break;
-        case 4:
-            openScreen(4);
-            break;
-        case 5:
-            openScreen(5);
-            break;
-        case 6:
-            openScreen(6);
-            break;
-        case 7:
-            openScreen(7);
-            break;
-        default:
-            std::cout << "BUTTON ID NOT FOUND" << std::endl;
-            break;
-
     }
 }
 

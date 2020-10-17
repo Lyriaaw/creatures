@@ -343,6 +343,90 @@ Farm *FarmUI::getFarm() const {
     return farm;
 }
 
+Life *FarmUI::getSelectedLife() const {
+    return selectedLife;
+}
+
+Entity *FarmUI::getSelectedEntity() const {
+    return selectedEntity;
+}
+
+void FarmUI::setSelectedLifeChanged(const std::function<void()> &selectedLifeChanged) {
+    FarmUI::selectedLifeChanged = selectedLifeChanged;
+}
+
+void FarmUI::processClick(float screenX, float screenY, Camera * camera) {
+    if (screenX < camera->getTopLeft().getX() || screenY < camera->getTopLeft().getY()) {
+        return;
+    }
+
+    if (screenX > camera->getTopLeft().getX() + camera->getWidth() || screenY > camera->getTopLeft().getY() + camera->getHeight()) {
+        return;
+    }
+
+
+
+    Point worldCoordinates = camera->getWorldCoordinates({screenX, screenY});
+    if (!(worldCoordinates.getX() > 0 && worldCoordinates.getY() > 0 && worldCoordinates.getX() < FARM_WIDTH && worldCoordinates.getY() < FARM_HEIGHT)) {
+        return;
+    }
+
+
+    bool found = false;
+    std::vector<Life *> currentLifes = farm->getLifes();
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Life * connector = currentLifes.at(it);
+
+        double deltaX = abs(worldCoordinates.getX() - connector->getEntity()->getPosition().getX());
+        double deltaY = abs(worldCoordinates.getY() - connector->getEntity()->getPosition().getY());
+
+        if (deltaX < connector->getEntity()->getSize() && deltaY < connector->getEntity()->getSize()) {
+            selectedLife = currentLifes.at(it);
+
+            std::vector<Evolution *>  genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedLife->getEntity()->getId());
+            std::vector<Neuron *> neurons = selectedLife->getBrain()->getNeurons();
+
+            found = true;
+            selectedLifeChanged();
+        }
+    }
+
+
+    std::vector<Entity *> currentEntities = farm->getEntities();
+    for (int it = 0; it < currentEntities.size(); it++) {
+        Entity * entity = currentEntities.at(it);
+
+        double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
+        double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+
+        if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+            selectedEntity = entity;
+
+            found = true;
+            selectedLifeChanged();
+        }
+    }
+
+//        for (int it = 0; it < farm->getFoods().size(); it++) {
+//            Entity * entity = farm->getFoods().at(it);
+//
+//            double deltaX = abs(worldCoordinates.getX() - entity->getPosition().getX());
+//            double deltaY = abs(worldCoordinates.getY() - entity->getPosition().getY());
+//
+//            if (deltaX < entity->getSize() && deltaY < entity->getSize()) {
+//                selectedEntity = entity;
+//                selectedLife = nullptr;
+//                found = true;
+//            }
+//        }
+
+    if (!found) {
+        selectedLifeChanged();
+        selectedEntity = nullptr;
+        selectedLife = nullptr;
+    }
+}
+
 
 
 

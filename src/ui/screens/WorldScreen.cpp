@@ -37,12 +37,13 @@ void WorldScreen::onWindowResize(int width, int height) {
 
     camera->setWidth(width);
     camera->setHeight(height);
+    camera->setTopLeft(Point(0, 0.03 * height));
 }
 
 void WorldScreen::draw(sf::RenderWindow *window) {
     Screen::draw(window);
 
-    farmUi->draw(window, camera, nullptr);
+    farmUi->draw(window, camera, farmUi->getSelectedLife());
 }
 
 void WorldScreen::mouseMoved(int x, int y, int previousX, int previousY) {
@@ -74,6 +75,39 @@ void WorldScreen::mouseMoved(int x, int y, int previousX, int previousY) {
 
 void WorldScreen::mouseClicked(int x, int y) {
     Screen::mouseClicked(x, y);
+
+    farmUi->processClick(float(x), float(y), camera);
+
+
 }
 
+void WorldScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
+    Screen::mouseScrolled(delta, mouseX, mouseY);
+
+    float deltaRatio;
+    if (delta < 0) {
+        camera->changeZoom(0.9f);
+        deltaRatio = 1.1;
+    } else if (delta > 0) {
+        camera->changeZoom(1.1f);
+        deltaRatio = 0.9;
+    } else {
+        return;
+    }
+
+    Point cameraCenter = camera->getCenter();
+    Point mouseWorldCoordinates = camera->getWorldCoordinates({float(mouseX), float(mouseY)});
+
+    float deltaX = cameraCenter.getX() - mouseWorldCoordinates.getX();
+    float deltaY = cameraCenter.getY() - mouseWorldCoordinates.getY();
+
+    float newX = mouseWorldCoordinates.getX() + (deltaX * (deltaRatio));
+    float newY = mouseWorldCoordinates.getY() + (deltaY * (deltaRatio));
+
+    Point newCameraCenter = {newX, newY};
+    camera->setCenter(newCameraCenter);
+
+
+    farmUi->mouseMoved(mouseWorldCoordinates, camera);
+}
 
