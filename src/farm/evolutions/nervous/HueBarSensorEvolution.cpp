@@ -23,7 +23,7 @@ void HueBarSensorEvolution::perform(Life * life) {
     BarSensor * barSensor = new BrightnessBarSensor(life->getEntity(), sensorRotation, sensorLength, sensorColor);
 
 
-    InputNeuron * inputNeuron = new InputNeuron();
+    inputNeuron = new InputNeuron();
     inputNeuron->setHueOutline(sensorColor);
     inputNeuron->setBrightnessOutline(0.4);
     inputNeuron->setName("Hue -" + std::to_string(sensorLength));

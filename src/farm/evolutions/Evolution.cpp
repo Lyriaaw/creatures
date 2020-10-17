@@ -25,3 +25,11 @@ void Evolution::generateGenerationNumber() {
     generationNumber = Evolution::nextEvolutionNumber;
     Evolution::nextEvolutionNumber++;
 }
+
+InputNeuron *Evolution::getInputNeuron() const {
+    return inputNeuron;
+}
+
+const std::vector<OutputNeuron *> &Evolution::getOutputNeurons() const {
+    return outputNeurons;
+}

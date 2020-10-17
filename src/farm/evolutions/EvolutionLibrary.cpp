@@ -21,3 +21,15 @@ std::vector<Evolution *> EvolutionLibrary::getGenomeFor(int creatureIndex) const
 
     std::cout << "Genome not found for index " << creatureIndex << ", this is stange" << std::endl;
 }
+
+int EvolutionLibrary::getCurrentEvolutionNumber() const {
+    return currentEvolutionNumber;
+}
+
+void EvolutionLibrary::setCurrentEvolutionNumber(int currentEvolutionNumber) {
+    EvolutionLibrary::currentEvolutionNumber = currentEvolutionNumber;
+}
+
+void EvolutionLibrary::increaseEvolutionNumber() {
+    currentEvolutionNumber++;
+}

@@ -30,6 +30,8 @@ public:
     Life * Mate(Life * father, Life * mother);
 
     const EvolutionLibrary &getEvolutionLibrary() const;
+
+    std::vector<Evolution *> generateNewRandomEvolution(Life * life);
 };
 
 

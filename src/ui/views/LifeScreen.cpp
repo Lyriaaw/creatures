@@ -118,7 +118,14 @@ void LifeScreen::loadSelectedGenome() {
     std::vector<Evolution *> genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedEntity->getEntity()->getId());
     sf::Color textColor = sf::Color(200, 200, 200, 255);
 
+    int displayedCount = 0;
     for (int it = 0; it < genome.size(); it++) {
+        if (genome.at(it)->describe().find("Link:") != std::string::npos) {
+            continue;
+        }
+        displayedCount++;
+
+
         sf::Text currentText;
         currentText.setString(genome.at(it)->describe());
         currentText.setFont(*font);
@@ -126,7 +133,7 @@ void LifeScreen::loadSelectedGenome() {
         currentText.setCharacterSize(20);
 
         int x = 0.6 * windowWidth;
-        int y = (0.1 * windowHeight) + (it * 30);
+        int y = (0.1 * windowHeight) + (displayedCount * 30);
 
         currentText.setPosition(x, y);
 

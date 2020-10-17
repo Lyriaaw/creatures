@@ -12,9 +12,18 @@ class EvolutionLibrary {
 public:
     void addGenome(int creatureIndex, std::vector<Evolution *> genome);
     std::vector<Evolution *> getGenomeFor(int creatureIndex) const;
+
+    int getCurrentEvolutionNumber() const;
+
+    void setCurrentEvolutionNumber(int currentEvolutionNumber);
+    void increaseEvolutionNumber();
+
 private:
     std::vector<int> creatureIndexes;
     std::vector<std::vector<Evolution *>> genomes;
+
+    int currentEvolutionNumber;
+
 };
 
 

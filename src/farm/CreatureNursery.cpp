@@ -136,11 +136,15 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     }
 
 
+
+
     brain->generateLinkGrid();
 
     life->connectSensorAndMuscles();
 
     evolutionLibrary.addGenome(life->getEntity()->getId(), creatureGenome);
+
+    evolutionLibrary.setCurrentEvolutionNumber(1000);
     return life;
 }
 
@@ -243,11 +247,47 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
         childGenome.at(it)->perform(life);
     }
 
+
+    std::vector<Evolution *> randomEvolutions = generateNewRandomEvolution(life);
+    if (!randomEvolutions.empty()) {
+        childGenome.insert(childGenome.end(), randomEvolutions.begin(), randomEvolutions.end());
+    }
+
     life->getBrain()->generateLinkGrid();
     evolutionLibrary.addGenome(life->getEntity()->getId(), childGenome);
 
     life->connectSensorAndMuscles();
     return life;
+}
+
+std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life) {
+    std::vector<Evolution *> newEvolutions;
+
+    if (rand() % MUTATION_RATIO != 0) {
+        return newEvolutions;
+    }
+
+    std::cout << "New evolution " << std::endl;
+
+
+    HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
+    sensorEvol->generateGenerationNumber();
+    evolutionLibrary.increaseEvolutionNumber();
+    sensorEvol->generateFromRandom(life);
+    sensorEvol->perform(life);
+    newEvolutions.emplace_back(sensorEvol);
+
+    for (int jt = 0; jt < life->getBrain()->getOutputNeurons().size(); jt++) {
+
+        LinkEvolution * linkEvolution = new LinkEvolution();
+        linkEvolution->generateGenerationNumber();
+        linkEvolution->generateFromNeurons(life, sensorEvol->getInputNeuron(), life->getBrain()->getOutputNeurons().at(jt));
+        linkEvolution->perform(life);
+        newEvolutions.emplace_back(linkEvolution);
+
+    }
+
+    return newEvolutions;
 }
 
 const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {

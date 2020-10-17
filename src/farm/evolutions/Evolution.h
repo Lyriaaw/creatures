@@ -14,6 +14,9 @@ class Evolution {
 protected:
     int generationNumber;
 
+    InputNeuron * inputNeuron;
+    std::vector<OutputNeuron *> outputNeurons;
+
 public:
     static int nextEvolutionNumber;
 
@@ -32,6 +35,10 @@ public:
 
     void setGenerationNumber(int generationNumber);
     void generateGenerationNumber();
+
+    InputNeuron *getInputNeuron() const;
+
+    const std::vector<OutputNeuron *> &getOutputNeurons() const;
 };
 
 
