@@ -34,3 +34,8 @@ Evolution * RotationEvolution::generateWithMate(Evolution * mate) {
     childEvolution->setGenerationNumber(getGenerationNumber());
     return childEvolution;
 }
+
+
+std::string RotationEvolution::getName() {
+    return "Rotation";
+}

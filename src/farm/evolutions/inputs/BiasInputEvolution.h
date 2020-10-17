@@ -15,6 +15,7 @@ public:
     void perform(Life * life) override;
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
+    std::string getName() override;
 };
 
 

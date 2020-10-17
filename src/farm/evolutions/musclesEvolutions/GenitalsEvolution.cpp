@@ -87,3 +87,8 @@ Evolution * GenitalsEvolution::generateFromCastedMate(GenitalsEvolution * mate) 
 
     return evolution;
 }
+
+
+std::string GenitalsEvolution::getName() {
+    return "Genitals";
+}

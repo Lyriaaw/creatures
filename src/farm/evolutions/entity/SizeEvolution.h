@@ -18,7 +18,8 @@ public:
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(SizeEvolution * mate);
-};
+
+    std::string getName() override;};
 
 
 #endif //CREATURES_SIZEEVOLUTION_H

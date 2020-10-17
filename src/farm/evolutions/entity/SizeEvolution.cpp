@@ -60,3 +60,8 @@ Evolution * SizeEvolution::generateFromCastedMate(SizeEvolution * mate) {
 
     return childSizeEvolution;
 }
+
+
+std::string SizeEvolution::getName() {
+    return "Size";
+}

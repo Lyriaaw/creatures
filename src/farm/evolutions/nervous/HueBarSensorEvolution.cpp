@@ -131,3 +131,8 @@ Evolution * HueBarSensorEvolution::generateFromCastedMate(HueBarSensorEvolution 
 
     return childSensorEvolution;
 }
+
+
+std::string HueBarSensorEvolution::getName() {
+    return "Hue bar sensor";
+}

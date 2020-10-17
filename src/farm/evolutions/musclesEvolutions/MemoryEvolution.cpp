@@ -46,3 +46,9 @@ Evolution * MemoryEvolution::generateWithMate(Evolution * mate) {
     childEvolution->setGenerationNumber(getGenerationNumber());
     return childEvolution;
 }
+
+
+std::string MemoryEvolution::getName() {
+    return "Memory";
+}
+

@@ -34,3 +34,8 @@ Evolution * MassSensorEvolution::generateWithMate(Evolution * mate) {
     childEvolution->setGenerationNumber(getGenerationNumber());
     return childEvolution;
 }
+
+
+std::string MassSensorEvolution::getName() {
+    return "Mass sensor";
+}

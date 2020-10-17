@@ -22,6 +22,8 @@ public:
 
     void setHue(float hue);
 
+    std::string getName() override;
+
 
 };
 

@@ -19,6 +19,7 @@ public:
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(LinkEvolution * mate);
+    std::string getName() override;
 
     void generateFromNeurons(Life * life, Neuron * input, Neuron * output);
 

@@ -16,6 +16,7 @@ public:
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(DistanceBarSensorEvolution * mate);
+    std::string getName() override;
 private:
     float sensorLength;
     float sensorRotation;

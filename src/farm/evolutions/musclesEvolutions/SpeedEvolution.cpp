@@ -34,3 +34,8 @@ Evolution * SpeedEvolution::generateWithMate(Evolution * mate) {
     childEvolution->setGenerationNumber(getGenerationNumber());
     return childEvolution;
 }
+
+
+std::string SpeedEvolution::getName() {
+    return "Speed";
+}

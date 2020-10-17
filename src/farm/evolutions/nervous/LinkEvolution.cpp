@@ -94,3 +94,8 @@ Evolution * LinkEvolution::generateFromCastedMate(LinkEvolution * mate) {
 
     return childSensorEvolution;
 }
+
+
+std::string LinkEvolution::getName() {
+    return "Link";
+}

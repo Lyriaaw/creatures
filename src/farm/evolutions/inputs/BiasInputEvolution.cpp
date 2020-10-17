@@ -35,3 +35,8 @@ Evolution * BiasInputEvolution::generateWithMate(Evolution * mate) {
     childEvolution->setGenerationNumber(getGenerationNumber());
     return childEvolution;
 }
+
+
+std::string BiasInputEvolution::getName() {
+    return "Bias input";
+}

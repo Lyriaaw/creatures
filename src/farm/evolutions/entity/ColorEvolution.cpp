@@ -83,3 +83,7 @@ Evolution * ColorEvolution::generateFromCastedMate(ColorEvolution * mate) {
 void ColorEvolution::setHue(float hue) {
     ColorEvolution::hue = hue;
 }
+
+std::string ColorEvolution::getName() {
+    return "Color";
+}

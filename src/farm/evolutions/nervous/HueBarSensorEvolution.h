@@ -17,6 +17,7 @@ public:
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(HueBarSensorEvolution * mate);
+    std::string getName() override;
 private:
     float sensorLength;
     float sensorRotation;

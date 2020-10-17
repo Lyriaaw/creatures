@@ -28,6 +28,8 @@ public:
 
     virtual std::string describe() = 0;
 
+    virtual std::string getName() = 0;
+
     virtual Evolution * generateWithMate(Evolution * mate) = 0;
 
 

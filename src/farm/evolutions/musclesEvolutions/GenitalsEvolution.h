@@ -17,6 +17,7 @@ public:
     std::string describe() override;
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(GenitalsEvolution * mate);
+    std::string getName() override;
 };
 
 

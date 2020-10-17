@@ -87,3 +87,8 @@ Evolution * MouthEvolution::generateFromCastedMate(MouthEvolution * mate) {
 
     return evolution;
 }
+
+
+std::string MouthEvolution::getName() {
+    return "Mouth";
+}

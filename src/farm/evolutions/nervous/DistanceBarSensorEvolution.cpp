@@ -86,3 +86,8 @@ Evolution * DistanceBarSensorEvolution::generateFromCastedMate(DistanceBarSensor
 
     return childSensorEvolution;
 }
+
+
+std::string DistanceBarSensorEvolution::getName() {
+    return "Distance bar sensor";
+}
