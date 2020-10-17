@@ -14,13 +14,6 @@ UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double
     this->heightRatio = heightRatio;
 }
 
-void UiComponent::setFixedSizeAndPosition(double x, double y, double width, double height) {
-    this->x = x;
-    this->y = y;
-    this->width = width;
-    this->height = height;
-}
-
 void UiComponent::onWindowResized(double windowWidth, double windowHeight) {
     if (xRatio != 0) {
         x = xRatio * windowWidth;
@@ -68,6 +61,18 @@ void UiComponent::mouseClicked(int mouseX, int mouseY) {
         return;
     }
     mouseClickedInside(mouseX, mouseY);
+}
+
+
+
+void UiComponent::setScreenPlacementInformation(int x, int y, int width, int height) {
+    this->x = x;
+    this->y = y;
+    this->width = width;
+    this->height = height;
+
+
+    resized();
 }
 
 

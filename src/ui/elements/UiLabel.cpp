@@ -2,6 +2,7 @@
 // Created by Amalric Lombard de Buffières on 10/17/20.
 //
 
+#include <iostream>
 #include "UiLabel.h"
 #include "GlobalFont.h"
 
@@ -19,7 +20,6 @@ void UiLabel::setCharacterSize(int characterSize) {
 void UiLabel::resized() {
     text.setPosition(sf::Vector2f(x, y));
 }
-
 
 void UiLabel::mouseEnter() {
 }

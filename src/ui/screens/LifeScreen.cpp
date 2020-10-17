@@ -219,7 +219,7 @@ void LifeScreen::loadSelectedGraphs() {
 
 
 
-    bioGraph = new Graph("Bio", 0.55f, 0.31f, 0.4f, 0.2f);
+    bioGraph = new Graph("Bio", 0.55f, 0.41f, 0.4f, 0.2f);
     bioGraph->windowResized(windowWidth, windowHeight);
 
     energy = new DataItem("energy", true);

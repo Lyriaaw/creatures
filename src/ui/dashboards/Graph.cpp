@@ -32,16 +32,26 @@ Graph::Graph(const std::string &name, float xRatio, float yRatio, float widthRat
     background = sf::RectangleShape();
     background.setFillColor(sf::Color(100, 100, 100, 255));
 
-    hoverInfoBackground = sf::RectangleShape();
-    hoverInfoBackground.setFillColor(sf::Color(20, 20, 20, 128));
-    hoverInfoBackground.setPosition(-100, -100);
+    hoveredValuesBackground = new UiBackground(0, 0, 0, 0);
+    hoveredValuesBackground->setFillColor(sf::Color(60, 60, 60, 200));
+    uiComponents.emplace_back(hoveredValuesBackground);
 
-    hoveredTickText = new sf::Text();
-    hoveredTickText->setFont(*GlobalFont::MainFont);
-    hoveredTickText->setString("Tick");
-    hoveredTickText->setFillColor(sf::Color(255, 255, 255, 128));
-    hoveredTickText->setCharacterSize(20);
-    hoveredTickText->setPosition(-100, -100);
+    hoveredTickMarker = new UiBackground(0, 0, 0, 0);
+    hoveredTickMarker->setFillColor(sf::Color(0, 0, 0, 200));
+    uiComponents.emplace_back(hoveredTickMarker);
+
+
+
+    UiLabel * hoveredInfoLabel = new UiLabel(0, 0, 0, 0);
+    hoveredInfoLabel->setText("ticks");
+    hoveredInfoLabel->setCharacterSize(15);
+    hoveredInfoLabel->setFillColor(sf::Color(255, 255, 255, 255));
+    uiComponents.emplace_back(hoveredInfoLabel);
+    hoveredInfoValues.emplace_back(hoveredInfoLabel);
+
+
+
+
 }
 
 void Graph::addLine(DataItem * item, int displayMode, int red, int green, int blue) {
@@ -96,16 +106,14 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
     setLegendsButtonColors();
 
     UiLabel * hoveredInfoLabel = new UiLabel(0, 0, 0, 0);
+    hoveredInfoLabel->setText(item->getName());
+    hoveredInfoLabel->setCharacterSize(15);
+    hoveredInfoLabel->setFillColor(textColor);
     uiComponents.emplace_back(hoveredInfoLabel);
     hoveredInfoValues.emplace_back(hoveredInfoLabel);
 
-//    sf::Text text;
-//    text.setFont(*font);
-//    text.setString(item->getName());
-//    text.setFillColor(textColor);
-//    text.setCharacterSize((20 * (widthScreenRatio)));
-//    text.setPosition(xLine + 5, yButtons);
-//    linesLegendTexts.emplace_back(text);
+
+
 //
 //    sf::Text * hoveredText = new sf::Text();
 //    hoveredText->setFont(*font);
@@ -138,9 +146,6 @@ void Graph::windowResized(float windowWidth, float windowHeight) {
 
     background.setPosition(x, y);
     background.setSize(sf::Vector2f(width, height));
-
-    hoveredTickBar.setSize(sf::Vector2f(1, height));
-    hoveredTickBar.setFillColor(sf::Color(0, 0, 0, 128));
 
 
     double buttonsPositionY = y;
@@ -212,6 +217,7 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
 void Graph::draw(sf::RenderWindow *window) {
     getMinAndMaxValues();
 
+    updateHoveredTickInformation();
     window->draw(background);
 
 
@@ -312,7 +318,36 @@ void Graph::setLegendsButtonColors() {
 }
 
 void Graph::mouseHovering(int mouseX, int mouseY) {
+    int textX = std::min(double(width - 500), double(mouseX));
+    lastMouseX = mouseX;
 
+    hoveredValuesBackground->setScreenPlacementInformation(textX, mouseY, 500, 500);
+    hoveredTickMarker->setScreenPlacementInformation(mouseX, y, 1, height);
+
+    for (int it = 0; it < hoveredInfoValues.size(); it++) {
+        hoveredInfoValues.at(it)->setScreenPlacementInformation(textX + 20, mouseY + (30 * it) + 30, 0, 0);
+    }
+
+    updateHoveredTickInformation();
+}
+
+void Graph::updateHoveredTickInformation() {
+    hoveredTick = lastMouseX / tickWidthRatio;
+
+    for (int it = 0; it < hoveredInfoValues.size(); it++) {
+        if (it == 0) {
+            hoveredInfoValues.at(it)->setText("Tick: " + std::to_string(hoveredTick));
+            continue;
+        }
+
+        DataItemConnector currentLine = lines.at(it - 1);
+        DataItem * currentItem = currentLine.getItem();
+
+        double currentValue = currentLine.getDisplayMode() == 2 ? currentItem->getAveragedValueForTick(hoveredTick) : currentItem->getValueForTick(hoveredTick);
+
+
+        hoveredInfoValues.at(it)->setText(currentItem->getName() + " : " + std::to_string(currentValue));
+    }
 }
 
 void Graph::mouseClickedInside(int mouseX, int mouseY) {
@@ -328,5 +363,10 @@ void Graph::mouseEnter() {
 }
 
 void Graph::mouseLeave() {
+    hoveredValuesBackground->setScreenPlacementInformation(0, 0, 0, 0);
+    hoveredTickMarker->setScreenPlacementInformation(0, 0, 0, 0);
 
+    for (int it = 0; it < hoveredInfoValues.size(); it++) {
+        hoveredInfoValues.at(it)->setScreenPlacementInformation(-100, -100, 0, 0);
+    }
 }

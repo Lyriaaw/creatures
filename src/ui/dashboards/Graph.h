@@ -29,21 +29,21 @@ protected:
 
     double tickWidthRatio, tickHeightRatio;
 
+    double lastMouseX;
+    int hoveredTick;
+
     sf::RectangleShape background;
 
-    sf::RectangleShape hoverInfoBackground;
-    std::vector<sf::Text *> hoveredInfoTexts;
-    sf::Text * hoveredTickText;
-    sf::RectangleShape hoveredTickBar;
 
-    std::vector<sf::RectangleShape> linesLegendBackgrounds;
-    std::vector<sf::Text> linesLegendTexts;
 
 
     std::vector<UiButton *> doNotShowButtons;
     std::vector<UiButton *> showNormalButtons;
     std::vector<UiButton *> showAveragedButtons;
     std::vector<UiLabel *> hoveredInfoValues;
+
+    UiBackground * hoveredValuesBackground;
+    UiBackground * hoveredTickMarker;
 
 
 public:
@@ -84,6 +84,8 @@ public:
     void mouseEnter() override;
 
     void mouseLeave() override;
+
+    void updateHoveredTickInformation();
 };
 
 
