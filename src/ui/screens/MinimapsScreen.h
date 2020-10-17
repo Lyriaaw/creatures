@@ -37,7 +37,7 @@ public:
 
     void draw(sf::RenderWindow *window);
 
-    void updateSelectedCreature(Life *connector) override;
+    void updateSelectedCreature() override;
 
     void onWindowResize(int width, int height);
 

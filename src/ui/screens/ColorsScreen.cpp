@@ -18,7 +18,7 @@ void ColorsScreen::draw(sf::RenderWindow *window) {
     colorsGraph->draw(window);
 }
 
-void ColorsScreen::updateSelectedCreature(Life *connector) {
+void ColorsScreen::updateSelectedCreature() {
 
 }
 

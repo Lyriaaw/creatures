@@ -10,7 +10,7 @@
 #include "../colors/RGBColor.h"
 #include "../elements/GlobalFont.h"
 
-FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)) {
+FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)), selectedLife(nullptr) {
     loadTexts();
     loadFarm();
 }
@@ -427,6 +427,27 @@ void FarmUI::processClick(float screenX, float screenY, Camera * camera) {
     }
 }
 
+void FarmUI::selectedCreatureChange(std::string type) {
+    std::vector<Life *> currentLifes = farm->getLifes();
+
+    if (type == "RANDOM") {
+        int randomCreatureIndex = rand() % currentLifes.size();
+        Life * life = currentLifes.at(randomCreatureIndex);
+        selectedLife = life;
+    }
+
+    if (type == "DISMISS") {
+        selectedLife = nullptr;
+    }
+    if (type == "BEST") {
+        selectedLife = farm->getScoreSortedCreatures().at(0);
+    }
+
+
+
+
+    selectedLifeChanged();
+}
 
 
 

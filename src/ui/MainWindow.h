@@ -56,10 +56,6 @@ private:
     bool rightMouseButtonDown;
     bool leftMouseButtonDown;
 
-    Life * selectedLife = nullptr;
-    Entity * selectedEntity = nullptr;
-
-    std::vector<Button *> buttons;
 
     sf::Text generalInformationLabel;
     sf::Text speedInformationLabel;
@@ -81,11 +77,7 @@ private:
     void handleMouseReleased(sf::Mouse::Button button) ;
     void draw();
 
-    void handleButtonClicked(int id);
-
     void openScreen(int id);
-
-    Entity * getSelectedEntity();
 
     void updateInformationLabel();
 

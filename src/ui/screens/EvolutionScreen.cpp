@@ -99,7 +99,7 @@ void EvolutionScreen::draw(sf::RenderWindow *window) {
     }
 }
 
-void EvolutionScreen::updateSelectedCreature(Life *connector) {
+void EvolutionScreen::updateSelectedCreature() {
 
 }
 

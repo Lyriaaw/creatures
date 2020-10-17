@@ -17,7 +17,7 @@ public:
 
     void init() override;
 
-    void updateSelectedCreature(Life *connector) override;
+    void updateSelectedCreature() override;
 };
 
 

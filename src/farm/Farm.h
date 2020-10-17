@@ -149,6 +149,8 @@ public:
     std::vector<Life *> getAndClearLifesToAdd();
 
     std::vector<ActionDTO> getAndClearExecutedActions();
+
+    void selectedCreatureChange(std::string type);
 };
 
 

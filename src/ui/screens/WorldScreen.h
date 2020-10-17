@@ -7,6 +7,7 @@
 
 
 #include "Screen.h"
+#include "../elements/UiBackground.h"
 
 class WorldScreen: public Screen {
 private:
@@ -17,7 +18,7 @@ public:
     int getId() override;
     void init() override;
 
-    void updateSelectedCreature(Life *connector) override;
+    void updateSelectedCreature() override;
 
     void loadCamera();
 

@@ -32,6 +32,7 @@ private:
     Entity * selectedEntity;
 
     std::function<void()> selectedLifeChanged;
+
 public:
 
 public:
@@ -69,6 +70,8 @@ public:
     void setSelectedLifeChanged(const std::function<void()> &selectedLifeChanged);
 
     void processClick(float screenX, float screenY, Camera * camera);
+
+    void selectedCreatureChange(std::string type);
 };
 
 

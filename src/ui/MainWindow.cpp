@@ -138,8 +138,7 @@ void MainWindow::loadFarm() {
     farmUi = new FarmUI(farm);
     farmUi->setSelectedLifeChanged([&]() {
         for (int it = 0; it < this->screens.size(); it++) {
-            std::cout << "Reloading selected life ! " << std::endl;
-            screens.at(it)->updateSelectedCreature(farmUi->getSelectedLife());
+            screens.at(it)->updateSelectedCreature();
         }
     });
 }
@@ -314,20 +313,6 @@ void MainWindow::draw() {
 }
 
 
-
-
-Entity * MainWindow::getSelectedEntity() {
-    if (selectedLife != nullptr) {
-        return selectedLife->getEntity();
-    }
-    if (selectedEntity != nullptr) {
-        return selectedEntity;
-    }
-
-    return nullptr;
-}
-
-
 void MainWindow::handleEvents() {
     // check all the window's events that were triggered since the last iteration of the loop
     Event event;
@@ -434,7 +419,7 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
 
 void MainWindow::updateSelectedCreature() {
     for (int jt = 0; jt < screens.size(); jt++) {
-        screens.at(jt)->updateSelectedCreature(selectedLife);
+        screens.at(jt)->updateSelectedCreature();
     }
 }
 
@@ -456,38 +441,20 @@ void MainWindow::openScreen(int id) {
 }
 
 void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
-//    switch (event.code) {
-//        case Keyboard::Key::Up:
-//            mainCamera->move(0, -10);
-//            break;
-//        case Keyboard::Key::Down:
-//            mainCamera->move(0, +10);
-//            break;
-//        case Keyboard::Key::Left:
-//            mainCamera->move(-10, 0);
-//            break;
-//        case Keyboard::Key::Right:
-//            mainCamera->move(10, 0);
-//            break;
-//        case Keyboard::Key::Space:
-//            this->paused = !this->paused;
-//            break;
-//        case Keyboard::Key::G:
+    switch (event.code) {
+        case Keyboard::Key::Space:
+            this->paused = !this->paused;
+            break;
+        case Keyboard::Key::Num3:
 //            this->mainCamera->switchGrid();
-//            break;
-//        case Keyboard::Key::C:
-//            this->selectedEntity = nullptr;
-//            this->selectedLife = nullptr;
-//            updateSelectedCreature();
-//            break;
-//        case Keyboard::Key::B:
-//            this->selectedEntity = nullptr;
-//            this->selectedLife = farm->getScoreSortedCreatures().at(0);
-//            if (mainCamera != nullptr) {
-//                this->mainCamera->setCenter(selectedLife->getEntity()->getPosition());
-//            }
-//            updateSelectedCreature();
-//            break;
+            break;
+        case Keyboard::Key::C:
+            farmUi->selectedCreatureChange("DISMISS");
+            break;
+        case Keyboard::Key::B:
+            farmUi->selectedCreatureChange("BEST");
+            updateSelectedCreature();
+            break;
 //        case Keyboard::Key::T:
 //            if (this->mainCamera == nullptr) {
 //                break;
@@ -512,19 +479,13 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 //            }
 //            this->mainCamera->setMapMode(3);
 //            break;
-//        case Keyboard::Key::R:
-//            this->selectedEntity = nullptr;
-//            this->selectedLife = nullptr;
-//
-//            int randomCreatureIndex = rand() % farm->getLifes().size();
-//            Life * life = farm->getLifes().at(randomCreatureIndex);
-//            selectedLife = life;
-//            updateSelectedCreature();
-//
-//            break;
-//
-//
-//
-//    }
+        case Keyboard::Key::R:
+            farmUi->selectedCreatureChange("RANDOM");
+
+            break;
+
+
+
+    }
 }
 

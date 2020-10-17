@@ -60,7 +60,7 @@ public:
 
     void draw(sf::RenderWindow *window);
 
-    void updateSelectedCreature(Life * life);
+    void updateSelectedCreature();
 
     void onWindowResize(int width, int height);
 

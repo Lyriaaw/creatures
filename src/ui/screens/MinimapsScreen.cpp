@@ -79,7 +79,7 @@ void MinimapsScreen::draw(sf::RenderWindow *window) {
     drawMinimaps(window);
 }
 
-void MinimapsScreen::updateSelectedCreature(Life *connector) {
+void MinimapsScreen::updateSelectedCreature() {
 
 }
 

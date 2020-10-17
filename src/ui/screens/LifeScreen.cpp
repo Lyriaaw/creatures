@@ -94,13 +94,13 @@ void LifeScreen::drawGenome(sf::RenderWindow *window) {
 }
 
 
-void LifeScreen::updateSelectedCreature(Life * life) {
-    selectedEntity = life;
+void LifeScreen::updateSelectedCreature() {
+    selectedEntity = farmUi->getSelectedLife();
 
     if (selectedEntity == nullptr) {
         brainUi = nullptr;
     } else {
-        brainUi = new BrainUI(life->getBrain(), windowWidth * 0.55, 0.1 * windowHeight, 0.44 * windowWidth,  0.8 * windowHeight, font, windowWidth, windowHeight);
+        brainUi = new BrainUI(selectedEntity->getBrain(), windowWidth * 0.55, 0.1 * windowHeight, 0.44 * windowWidth,  0.8 * windowHeight, font, windowWidth, windowHeight);
         loadSelectedGenome();
         loadSelectedGraphs();
     }

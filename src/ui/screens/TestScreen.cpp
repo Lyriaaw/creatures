@@ -24,7 +24,7 @@ void TestScreen::init() {
 }
 
 
-void TestScreen::updateSelectedCreature(Life *connector) {
+void TestScreen::updateSelectedCreature() {
 
 }
 

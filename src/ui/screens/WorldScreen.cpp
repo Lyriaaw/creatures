@@ -6,7 +6,6 @@
 
 
 WorldScreen::WorldScreen(FarmUI *farmUi) : Screen(farmUi) {
-
 }
 
 int WorldScreen::getId() {
@@ -19,7 +18,7 @@ void WorldScreen::init() {
 }
 
 
-void WorldScreen::updateSelectedCreature(Life *connector) {
+void WorldScreen::updateSelectedCreature() {
 
 }
 
@@ -29,7 +28,7 @@ void WorldScreen::loadCamera() {
     Point topLeft = Point(0, 0);
 
     camera = new Camera(center, topLeft);
-    camera->setZoom(.48f);
+    camera->setZoom(.5f);
 }
 
 void WorldScreen::onWindowResize(int width, int height) {
@@ -37,7 +36,11 @@ void WorldScreen::onWindowResize(int width, int height) {
 
     camera->setWidth(width);
     camera->setHeight(height);
-    camera->setTopLeft(Point(0, 0.03 * height));
+    camera->setTopLeft(Point(0, 0.03f * float(height)));
+    camera->setWidth(width);
+    camera->setHeight(0.97f * float(height));
+//    float cameraCenterY = ((0.97f * height) / 2.0f) + (0.03f * height);
+//    camera->setCenter(Point(width / 2.0, cameraCenterY));
 }
 
 void WorldScreen::draw(sf::RenderWindow *window) {

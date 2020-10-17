@@ -39,7 +39,7 @@ void Screen::draw(sf::RenderWindow *window) {
     }
 }
 
-void Screen::updateSelectedCreature(Life *connector) {
+void Screen::updateSelectedCreature() {
 
 }
 

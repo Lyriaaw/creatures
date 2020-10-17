@@ -33,7 +33,7 @@ public:
     virtual int getId() = 0;
 
     virtual void init() = 0;
-    virtual void updateSelectedCreature(Life * connector) = 0;
+    virtual void updateSelectedCreature() = 0;
 
     virtual void draw(sf::RenderWindow *window);
     virtual void onWindowResize(int width, int height);
