@@ -4,23 +4,20 @@
 
 #include "WorldScreen.h"
 
-WorldScreen::WorldScreen(Farm *farm, sf::Font * font) : Screen(farm, font) {}
+
+WorldScreen::WorldScreen(FarmUI *farmUi) : Screen(farmUi) {
+
+}
 
 int WorldScreen::getId() {
     return 1;
 }
 
 void WorldScreen::init() {
-
+    loadCamera();
+    farmUi->setPositions(camera);
 }
 
-Camera *WorldScreen::open() {
-    return camera;
-}
-
-void WorldScreen::draw(sf::RenderWindow *window) {
-
-}
 
 void WorldScreen::updateSelectedCreature(Life *connector) {
 
@@ -36,10 +33,18 @@ void WorldScreen::loadCamera() {
 }
 
 void WorldScreen::onWindowResize(int width, int height) {
+    Screen::onWindowResize(width, height);
+
     camera->setWidth(width);
     camera->setHeight(height);
 }
 
-void WorldScreen::mouseMoved(int x, int y) {
+void WorldScreen::draw(sf::RenderWindow *window) {
+    Screen::draw(window);
+
+    farmUi->draw(window, camera, nullptr);
+
 
 }
+
+

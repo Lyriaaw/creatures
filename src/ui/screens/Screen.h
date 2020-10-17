@@ -11,29 +11,30 @@
 #include "../../farm/brain/BrainConnector.h"
 #include "../../farm/Farm.h"
 #include "../elements/UiComponent.h"
+#include "../components/FarmUI.h"
 
 class Screen {
 protected:
-    int id;
 
     Life * selectedEntity;
 
-    Farm * farm;
     sf::Font * font;
 
+
+    int id;
     std::vector<UiComponent *> uiComponents;
+    FarmUI * farmUi;
 
 public:
-    Screen(Farm * farm, sf::Font * font);
+    Screen(FarmUI * farmUi);
 
     virtual int getId() = 0;
 
     virtual void init() = 0;
-    virtual Camera *open() = 0;
     virtual void updateSelectedCreature(Life * connector) = 0;
 
-    void draw(sf::RenderWindow *window);
-    void onWindowResize(int width, int height);
+    virtual void draw(sf::RenderWindow *window);
+    virtual void onWindowResize(int width, int height);
     void mouseMoved(int x, int y);
     void mouseClicked(int x, int y);
 };

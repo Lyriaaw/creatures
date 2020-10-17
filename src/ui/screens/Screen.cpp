@@ -4,7 +4,7 @@
 
 #include "Screen.h"
 
-Screen::Screen(Farm * farm, sf::Font * font): farm(farm), selectedEntity(nullptr), font(font) {}
+Screen::Screen(FarmUI * farmUi): farmUi(farmUi) {}
 
 
 void Screen::onWindowResize(int width, int height) {

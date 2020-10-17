@@ -6,7 +6,7 @@
 #include <sstream>
 #include "LifeScreen.h"
 
-LifeScreen::LifeScreen(Farm *farm, sf::Font *font) : Screen(farm, font), camera(nullptr), informationToShow("BRAIN"), brainUi(nullptr) {}
+LifeScreen::LifeScreen(FarmUI * farmUi) : Screen(farmUi), camera(nullptr), informationToShow("BRAIN"), brainUi(nullptr) {}
 
 int LifeScreen::getId() {
     return 4;
@@ -24,13 +24,13 @@ void LifeScreen::init() {
     sf::Color backgroundColor = sf::Color(55, 55, 55, 255);
     sf::Color textColor = sf::Color(200, 200, 200, 255);
 
-    Button genomeButton = Button("Brain", 1, font, 0, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
-    Button brainButton = Button("Genome", 2, font, 110, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
-    Button graphButton = Button("Graphs", 3, font, 220, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
-
-    buttons.emplace_back(brainButton);
-    buttons.emplace_back(genomeButton);
-    buttons.emplace_back(graphButton);
+//    Button genomeButton = Button("Brain", 1, font, 0, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
+//    Button brainButton = Button("Genome", 2, font, 110, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
+//    Button graphButton = Button("Graphs", 3, font, 220, 0.95 * windowHeight, 100, 50, backgroundColor, textColor);
+//
+//    buttons.emplace_back(brainButton);
+//    buttons.emplace_back(genomeButton);
+//    buttons.emplace_back(graphButton);
 
     creatureAgeText.setString("Creature age ...");
     creatureAgeText.setFont(*font);
@@ -39,9 +39,6 @@ void LifeScreen::init() {
 
 }
 
-Camera *LifeScreen::open() {
-    return camera;
-}
 
 void LifeScreen::draw(sf::RenderWindow *window) {
     updateGraphs();
@@ -115,7 +112,7 @@ void LifeScreen::loadSelectedGenome() {
     genomeTexts.clear();
 
 
-    std::vector<Evolution *> genome = farm->getNursery()->getEvolutionLibrary().getGenomeFor(selectedEntity->getEntity()->getId());
+    std::vector<Evolution *> genome = farmUi->getFarm()->getNursery()->getEvolutionLibrary().getGenomeFor(selectedEntity->getEntity()->getId());
     sf::Color textColor = sf::Color(200, 200, 200, 255);
 
     int displayedCount = 0;

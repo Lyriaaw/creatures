@@ -27,12 +27,10 @@ private:
 
     Point hoveredTile;
     sf::Text hoveredTileInfos;
-
-    sf::Font * font;
 public:
 
 public:
-    FarmUI(Farm *farm, sf::Font * font);
+    FarmUI(Farm *farm);
 
     void loadMap();
     void loadTexts();
@@ -56,6 +54,8 @@ public:
     void addEntities(std::vector<Entity *> addedToFarm);
     void clearDeletedLifes(std::vector<Life *> deletedFromFarm);
     void clearDeletedEntities(std::vector<Entity *> deletedFromFarm);
+
+    Farm *getFarm() const;
 
 };
 

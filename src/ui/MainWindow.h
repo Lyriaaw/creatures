@@ -38,7 +38,6 @@ private:
     Farm *farm;
 
     FarmUI *farmUi;
-    Camera *mainCamera;
 
     sf::RenderWindow *window;
 
@@ -60,8 +59,6 @@ private:
     Life * selectedLife = nullptr;
     Entity * selectedEntity = nullptr;
 
-    sf::Font * font;
-
     std::vector<Button *> buttons;
 
     sf::Text generalInformationLabel;
@@ -70,6 +67,9 @@ private:
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
     double fps;
+
+    std::vector<UiComponent *> uiComponents;
+
 
 
     void handleEvents();

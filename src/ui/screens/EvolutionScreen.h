@@ -23,13 +23,11 @@ private:
 
 
 public:
-    EvolutionScreen(Farm *farm, sf::Font * font);
+    EvolutionScreen(FarmUI * farmUi);
 
     int getId() override;
 
     void init() override;
-
-    Camera *open() override;
 
     void draw(sf::RenderWindow *window);
 
@@ -37,12 +35,10 @@ public:
 
     void onWindowResize(int width, int height);
 
-    void mouseMoved(int x, int y);
 
     void loadTexts();
     void loadButtons(sf::Font *font);
 
-    void mouseClicked(int x, int y);
 
     void clickedOnButton(int id);
 

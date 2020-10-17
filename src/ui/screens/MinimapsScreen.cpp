@@ -5,7 +5,7 @@
 #include "MinimapsScreen.h"
 #include "../minimaps/CreatureTileCountMinimap.h"
 
-MinimapsScreen::MinimapsScreen(Farm *farm, sf::Font * font) : Screen(farm, font) {}
+MinimapsScreen::MinimapsScreen(FarmUI * farmUi) : Screen(farmUi) {}
 
 int MinimapsScreen::getId() {
     return 3;
@@ -48,16 +48,13 @@ void MinimapsScreen::placeMinimap(int x, int y, Minimap * minimap) {
     minimaps.emplace_back(minimap);
 }
 
-Camera *MinimapsScreen::open() {
-    return nullptr;
-}
 
 void MinimapsScreen::drawMinimaps(sf::RenderWindow *window) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
             for (int kt = 0; kt < minimaps.size(); kt++) {
-                minimaps.at(kt)->setPixelColor(it, jt, farm);
+                minimaps.at(kt)->setPixelColor(it, jt, farmUi->getFarm());
             }
 
         }
@@ -73,11 +70,11 @@ void MinimapsScreen::drawMinimaps(sf::RenderWindow *window) {
 
 
 void MinimapsScreen::draw(sf::RenderWindow *window) {
-    creatureCountMinimap->generateValues(farm);
-    foodTileCountMinimap->generateValues(farm);
-    heatMinimap->generateValues(farm);
-    groundMinimap->generateValues(farm);
-    actionsMinimap->generateValues(farm);
+    creatureCountMinimap->generateValues(farmUi->getFarm());
+    foodTileCountMinimap->generateValues(farmUi->getFarm());
+    heatMinimap->generateValues(farmUi->getFarm());
+    groundMinimap->generateValues(farmUi->getFarm());
+    actionsMinimap->generateValues(farmUi->getFarm());
     window->draw(background);
     drawMinimaps(window);
 }

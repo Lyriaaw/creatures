@@ -4,7 +4,7 @@
 
 #include "EvolutionScreen.h"
 
-EvolutionScreen::EvolutionScreen(Farm *farm, sf::Font * font) : Screen(farm, font), lastEvolutionsCount(0) {
+EvolutionScreen::EvolutionScreen(FarmUI * farmUi) : Screen(farmUi), lastEvolutionsCount(0) {
     windowWidth = 0;
     windowHeight = 0;
 }
@@ -42,9 +42,6 @@ void EvolutionScreen::init() {
     loadButtons(font);
 }
 
-Camera *EvolutionScreen::open() {
-    return nullptr;
-}
 
 void EvolutionScreen::updateEvolutions(std::map<int, Evolution *> newAllEvolutions) {
     if (allEvolutions.size() == newAllEvolutions.size()) {
@@ -87,7 +84,7 @@ void EvolutionScreen::updateEvolutions(std::map<int, Evolution *> newAllEvolutio
 }
 
 void EvolutionScreen::updateTexts() {
-    std::map<int, Evolution *> newAllEvolutions = farm->getNursery()->getEvolutionLibrary().getAllEvolutions();
+    std::map<int, Evolution *> newAllEvolutions = farmUi->getFarm()->getNursery()->getEvolutionLibrary().getAllEvolutions();
     updateEvolutions(newAllEvolutions);
 
     currentGenerationNumberText->setString("Evolutions: " + std::to_string(lastEvolutionsCount));
@@ -112,11 +109,6 @@ void EvolutionScreen::onWindowResize(int width, int height) {
     placeElements();
 }
 
-void EvolutionScreen::mouseMoved(int x, int y) {
-}
-
-void EvolutionScreen::mouseClicked(int x, int y) {
-}
 
 void EvolutionScreen::clickedOnButton(int id) {
 }

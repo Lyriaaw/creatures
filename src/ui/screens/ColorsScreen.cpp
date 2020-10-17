@@ -3,19 +3,15 @@
 //
 
 #include "ColorsScreen.h"
-ColorsScreen::ColorsScreen(Farm *farm, sf::Font * font) : Screen(farm, font), colorsGraph(nullptr) {}
+ColorsScreen::ColorsScreen(FarmUI * farmUi) : Screen(farmUi), colorsGraph(nullptr) {}
 
 int ColorsScreen::getId() {
     return 5;
 }
 
 void ColorsScreen::init() {
-    colorsGraph = new ColorsGraph("Colors", font, farm->getDataAnalyser().getColors());
+    colorsGraph = new ColorsGraph("Colors", font, farmUi->getFarm()->getDataAnalyser().getColors());
     colorsGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
-}
-
-Camera *ColorsScreen::open() {
-    return nullptr;
 }
 
 void ColorsScreen::draw(sf::RenderWindow *window) {

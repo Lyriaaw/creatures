@@ -86,15 +86,15 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
 
     sf::Color legendButtonBackgroundColor = sf::Color(100, 100, 100, 255);
 
-    Button * doNotShowButton = new Button("X", lineIndex, font, 5 + xLine, 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
-    Button * showNormalButton = new Button("V", lineIndex, font, 5 + xLine + (55 * widthScreenRatio), 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
-    Button * showAveragedButton = new Button("~", lineIndex, font,5 + xLine + (110 * widthScreenRatio), 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
+//    Button * doNotShowButton = new Button("X", lineIndex, font, 5 + xLine, 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
+//    Button * showNormalButton = new Button("V", lineIndex, font, 5 + xLine + (55 * widthScreenRatio), 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
+//    Button * showAveragedButton = new Button("~", lineIndex, font,5 + xLine + (110 * widthScreenRatio), 0, (50 * widthScreenRatio), 20, legendButtonBackgroundColor, textColor);
 
-    doNotShowButtons.emplace_back(doNotShowButton);
-    showNormalButtons.emplace_back(showNormalButton);
-    showAveragedButtons.emplace_back(showAveragedButton);
+//    doNotShowButtons.emplace_back(doNotShowButton);
+//    showNormalButtons.emplace_back(showNormalButton);
+//    showAveragedButtons.emplace_back(showAveragedButton);
 
-    setLegendsButtonColors();
+//    setLegendsButtonColors();
 }
 
 void Graph::windowResized(float windowWidth, float windowHeight) {
@@ -113,14 +113,14 @@ void Graph::windowResized(float windowWidth, float windowHeight) {
 
     double buttonsPositionY = y;
 
-    for (int it = 0; it < linesLegendBackgrounds.size(); it++) {
-        linesLegendBackgrounds.at(it).setPosition(linesLegendBackgrounds.at(it).getPosition().x, buttonsPositionY);
-        linesLegendTexts.at(it).setPosition(linesLegendTexts.at(it).getPosition().x, buttonsPositionY + 5);
-
-        doNotShowButtons.at(it)->move(doNotShowButtons.at(it)->getX(), buttonsPositionY + 25);
-        showNormalButtons.at(it)->move(showNormalButtons.at(it)->getX(), buttonsPositionY + 25);
-        showAveragedButtons.at(it)->move(showAveragedButtons.at(it)->getX(), buttonsPositionY + 25);
-    }
+//    for (int it = 0; it < linesLegendBackgrounds.size(); it++) {
+//        linesLegendBackgrounds.at(it).setPosition(linesLegendBackgrounds.at(it).getPosition().x, buttonsPositionY);
+//        linesLegendTexts.at(it).setPosition(linesLegendTexts.at(it).getPosition().x, buttonsPositionY + 5);
+//
+//        doNotShowButtons.at(it)->move(doNotShowButtons.at(it)->getX(), buttonsPositionY + 25);
+//        showNormalButtons.at(it)->move(showNormalButtons.at(it)->getX(), buttonsPositionY + 25);
+//        showAveragedButtons.at(it)->move(showAveragedButtons.at(it)->getX(), buttonsPositionY + 25);
+//    }
 
     hoveredTickText->setCharacterSize((20 * (widthScreenRatio)));
 }

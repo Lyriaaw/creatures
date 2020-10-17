@@ -52,13 +52,11 @@ private:
 
 
 public:
-    LifeScreen(Farm *farm, sf::Font *font);
+    LifeScreen(FarmUI * farmUi);
 
     int getId() override;
 
     void init() override;
-
-    Camera *open() override;
 
     void draw(sf::RenderWindow *window);
 

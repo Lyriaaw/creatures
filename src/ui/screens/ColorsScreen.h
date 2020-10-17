@@ -15,13 +15,11 @@ private:
 
     ColorsGraph * colorsGraph;
 public:
-    ColorsScreen(Farm *farm, sf::Font * font);
+    ColorsScreen(FarmUI * farmUi);
 
     int getId() override;
 
     void init() override;
-
-    Camera *open() override;
 
     void draw(sf::RenderWindow *window);
 

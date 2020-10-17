@@ -11,20 +11,13 @@
 class TestScreen: public Screen {
 private:
 public:
-    TestScreen(Farm *farm, sf::Font * font);
+    TestScreen(FarmUI * farmUi);
 
     int getId() override;
 
     void init() override;
 
-    Camera *open() override;
-
-    void draw(sf::RenderWindow *window);
-
     void updateSelectedCreature(Life *connector) override;
-
-
-    void loadCamera();
 };
 
 

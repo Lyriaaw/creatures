@@ -8,15 +8,16 @@
 #include "FarmUI.h"
 #include "Camera.h"
 #include "../colors/RGBColor.h"
+#include "../elements/GlobalFont.h"
 
-FarmUI::FarmUI(Farm *farm, sf::Font * font): farm(farm), hoveredTile(Point(-1, -1)), font(font) {
+FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)) {
     loadTexts();
     loadFarm();
 }
 
 
 void FarmUI::loadTexts() {
-    hoveredTileInfos.setFont(*font);
+    hoveredTileInfos.setFont(*GlobalFont::MainFont);
     hoveredTileInfos.setCharacterSize(0);
 }
 
@@ -35,7 +36,7 @@ void FarmUI::loadLifes() {
     for (int it = 0; it < farm->getLifes().size(); it++) {
         Life * currentLife = farm->getLifes().at(it);
 
-        LifeUI * ui = new LifeUI(currentLife, font);
+        LifeUI * ui = new LifeUI(currentLife, GlobalFont::MainFont);
         lifeUIs.emplace_back(ui);
     }
 }
@@ -44,7 +45,7 @@ void FarmUI::loadEntities() {
     for (int it = 0; it < farm->getEntities().size(); it++) {
         Entity * currentEntity = farm->getEntities().at(it);
 
-        EntityUI * ui = new EntityUI(currentEntity, font);
+        EntityUI * ui = new EntityUI(currentEntity, GlobalFont::MainFont);
         entityUIs.emplace_back(ui);
     }
 }
@@ -54,12 +55,12 @@ void FarmUI::loadEntities() {
 
 
 void FarmUI::addLife(Life * life) {
-    LifeUI * ui = new LifeUI(life, font);
+    LifeUI * ui = new LifeUI(life, GlobalFont::MainFont);
     lifeUIs.emplace_back(ui);
 }
 
 void FarmUI::addEntity(Entity * entity) {
-    EntityUI * ui = new EntityUI(entity, font);
+    EntityUI * ui = new EntityUI(entity, GlobalFont::MainFont);
     entityUIs.emplace_back(ui);
 }
 
@@ -336,6 +337,10 @@ void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
     hoveredTileInfos.setFillColor(sf::Color(100, 0, 0));
     hoveredTileInfos.setCharacterSize((5 / TILE_PER_CHUNK) * camera->getZoom());
     generateTileInfoText();
+}
+
+Farm *FarmUI::getFarm() const {
+    return farm;
 }
 
 

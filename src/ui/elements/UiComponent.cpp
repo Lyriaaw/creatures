@@ -13,7 +13,8 @@ UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double
     this->widthRatio = widthRatio;
     this->heightRatio = heightRatio;
 
-    onClick = []() {};
+    onClick = []() {
+    };
 }
 
 void UiComponent::setFixedSizeAndPosition(double x, double y, double width, double height) {

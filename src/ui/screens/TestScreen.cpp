@@ -5,7 +5,7 @@
 #include "TestScreen.h"
 #include "../elements/UiButton.h"
 
-TestScreen::TestScreen(Farm *farm, sf::Font * font) : Screen(farm, font) {
+TestScreen::TestScreen(FarmUI * farmUi) : Screen(farmUi) {
 
     UiButton * buttonTest = new UiButton("Test", 0.1, 0.1, 0.2, 0.1);
     buttonTest->setOnClick([]() {
@@ -21,10 +21,6 @@ int TestScreen::getId() {
 }
 
 void TestScreen::init() {
-}
-
-Camera *TestScreen::open() {
-    return nullptr;
 }
 
 
