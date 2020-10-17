@@ -21,6 +21,7 @@ protected:
     Farm * farm;
     sf::Font * font;
 
+    std::vector<UiComponent *> uiComponents;
 
 public:
     Screen(Farm * farm, sf::Font * font);
@@ -29,12 +30,12 @@ public:
 
     virtual void init() = 0;
     virtual Camera *open() = 0;
-    virtual void draw(sf::RenderWindow *window) = 0;
     virtual void updateSelectedCreature(Life * connector) = 0;
-    virtual void onWindowResize(int width, int height) = 0;
-    virtual void mouseMoved(int x, int y) = 0;
 
-    virtual void mouseClicked(int x, int y);
+    void draw(sf::RenderWindow *window);
+    void onWindowResize(int width, int height);
+    void mouseMoved(int x, int y);
+    void mouseClicked(int x, int y);
 };
 
 

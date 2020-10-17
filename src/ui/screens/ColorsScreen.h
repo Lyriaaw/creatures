@@ -23,19 +23,19 @@ public:
 
     Camera *open() override;
 
-    void draw(sf::RenderWindow *window) override;
+    void draw(sf::RenderWindow *window);
 
     void updateSelectedCreature(Life *connector) override;
 
-    void onWindowResize(int width, int height) override;
+    void onWindowResize(int width, int height);
 
 
 
     void loadCamera();
 
-    void mouseMoved(int x, int y) override;
+    void mouseMoved(int x, int y);
 
-    void mouseClicked(int x, int y) override;
+    void mouseClicked(int x, int y);
 };
 
 

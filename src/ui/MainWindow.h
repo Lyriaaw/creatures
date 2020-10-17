@@ -34,7 +34,6 @@ public:
 
 
 
-
 private:
     Farm *farm;
 

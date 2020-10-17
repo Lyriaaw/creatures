@@ -11,6 +11,7 @@
 #include "screens/ColorsScreen.h"
 #include "screens/EvolutionScreen.h"
 #include "screens/TestScreen.h"
+#include "elements/GlobalFont.h"
 
 
 #include <SFML/Window.hpp>
@@ -30,7 +31,6 @@ using namespace sf;
 using namespace std;
 
 
-
 MainWindow::MainWindow(): leftMouseButtonDown(false), rightMouseButtonDown(false) {
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
@@ -42,6 +42,8 @@ void MainWindow::loadFont() {
     if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
         std::cout << "Font not loaded properly !" << std::endl;
     }
+
+    GlobalFont::MainFont = font;
 }
 
 void MainWindow::loadButtons() {

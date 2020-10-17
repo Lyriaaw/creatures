@@ -6,10 +6,7 @@
 #include "UiComponent.h"
 
 
-UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double heightRatio) {
-    background = sf::RectangleShape(sf::Vector2f(width, height));
-    background.setFillColor(sf::Color(50, 50, 50, 255));
-
+UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double heightRatio): mouseInside(false) {
     this->xRatio = xRatio;
     this->yRatio = yRatio;
     this->widthRatio = widthRatio;
@@ -37,18 +34,23 @@ void UiComponent::onWindowResized(double windowWidth, double windowHeight) {
     if (heightRatio != 0) {
         height = heightRatio * windowHeight;
     }
-
-    background.setSize(sf::Vector2f(width, height));
-    background.setPosition(sf::Vector2f(x, y));
+    resized();
 }
 
 void UiComponent::mouseMoved(int mouseX, int mouseY) {
     if (mouseX < x || mouseY < y || mouseX > x + width || mouseY > y + height) {
-        background.setFillColor(sf::Color(50, 50, 50, 255));
+        if (mouseInside) {
+            mouseLeave();
+            mouseInside = false;
+        }
         return;
     }
 
-    background.setFillColor(sf::Color(100, 100, 100, 255));
+    if (!mouseInside) {
+        mouseEnter();
+        mouseInside = true;
+    }
+
     mouseHovering(mouseX, mouseY);
 }
 
@@ -60,15 +62,23 @@ void UiComponent::mouseClicked(int mouseX, int mouseY) {
     mouseClickedInside(mouseX, mouseY);
 }
 
-void UiComponent::mouseClickedInside(int mouseX, int mouseY) {
 
-}
-void UiComponent::mouseHovering(int mouseX, int mouseY) {
-
-}
-
-
-
-void UiComponent::draw(sf::RenderWindow *window) {
-    window->draw(background);
-}
+//
+//void UiComponent::resized() {
+//}
+//
+//void UiComponent::mouseClickedInside(int mouseX, int mouseY) {
+//
+//}
+//void UiComponent::mouseHovering(int mouseX, int mouseY) {
+//
+//}
+//
+//void UiComponent::mouseEnter() {
+//}
+//void UiComponent::mouseLeave() {
+//
+//}
+//
+//void UiComponent::draw(sf::RenderWindow *window) {
+//}

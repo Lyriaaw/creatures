@@ -31,18 +31,18 @@ public:
 
     Camera *open() override;
 
-    void draw(sf::RenderWindow *window) override;
+    void draw(sf::RenderWindow *window);
 
     void updateSelectedCreature(Life *connector) override;
 
-    void onWindowResize(int width, int height) override;
+    void onWindowResize(int width, int height);
 
-    void mouseMoved(int x, int y) override;
+    void mouseMoved(int x, int y);
 
     void loadTexts();
     void loadButtons(sf::Font *font);
 
-    void mouseClicked(int x, int y) override;
+    void mouseClicked(int x, int y);
 
     void clickedOnButton(int id);
 
