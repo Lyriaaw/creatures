@@ -4,6 +4,7 @@
 
 #include "BrainUI.h"
 #include "../colors/RGBColor.h"
+#include "../elements/GlobalFont.h"
 
 
 BrainUI::BrainUI(Brain *brain, float x, float y, float width, float height, sf::Font * font, float windowWidth, float windowHeight) : brain(brain), x(x), y(y), width(width), height(height), font(font), windowWidth(windowWidth), windowHeight(windowHeight) {
@@ -71,7 +72,7 @@ void BrainUI::initialize() {
         neurons.emplace_back(circle);
 
         sf::Text text;
-        text.setFont(*font);
+        text.setFont(*GlobalFont::MainFont);
         text.setString(currentNeuron->getName() + " (" + std::to_string(currentNeuron->getGenerationNumber()) + ")");
         text.setFillColor(sf::Color(255, 255, 255));
         text.setCharacterSize(18);
