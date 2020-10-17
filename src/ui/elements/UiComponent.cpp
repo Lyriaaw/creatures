@@ -7,7 +7,7 @@
 #include "UiComponent.h"
 
 
-UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double heightRatio): mouseInside(false) {
+UiComponent::UiComponent(double xRatio, double yRatio, double widthRatio, double heightRatio) {
     this->xRatio = xRatio;
     this->yRatio = yRatio;
     this->widthRatio = widthRatio;
@@ -41,21 +41,28 @@ void UiComponent::onWindowResized(double windowWidth, double windowHeight) {
     resized();
 }
 
-void UiComponent::mouseMoved(int mouseX, int mouseY) {
-    if (mouseX < x || mouseY < y || mouseX > x + width || mouseY > y + height) {
-        if (mouseInside) {
-            mouseLeave();
-            mouseInside = false;
-        }
-        return;
+void UiComponent::mouseMoved(int mouseX, int mouseY, int previousX, int previousY) {
+    bool currentInside = false;
+    bool previousInside = false;
+
+    if (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height) {
+        currentInside = true;
+    }
+    if (previousX > x && previousY > y && previousX < x + width && previousY < y + height) {
+        previousInside = true;
     }
 
-    if (!mouseInside) {
+    if (currentInside && !previousInside) {
         mouseEnter();
-        mouseInside = true;
+    }
+    if (previousInside && !currentInside) {
+        mouseLeave();
     }
 
-    mouseHovering(mouseX, mouseY);
+
+    if (currentInside) {
+        mouseHovering(mouseX, mouseY);
+    }
 }
 
 

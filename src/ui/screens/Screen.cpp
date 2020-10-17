@@ -4,8 +4,12 @@
 
 #include "Screen.h"
 
-Screen::Screen(FarmUI * farmUi): farmUi(farmUi) {}
+Screen::Screen(FarmUI * farmUi): farmUi(farmUi), rightMouseButtonDown(false), leftMouseButtonDown(false) {}
 
+void Screen::setMouseButtons(bool left, bool right) {
+    rightMouseButtonDown = right;
+    leftMouseButtonDown = left;
+}
 
 void Screen::onWindowResize(int width, int height) {
     for (int it = 0; it < uiComponents.size(); it++) {
@@ -13,9 +17,9 @@ void Screen::onWindowResize(int width, int height) {
     }
 }
 
-void Screen::mouseMoved(int x, int y) {
+void Screen::mouseMoved(int x, int y, int previousX, int previousY) {
     for (int it = 0; it < uiComponents.size(); it++) {
-        uiComponents.at(it)->mouseMoved(x, y);
+        uiComponents.at(it)->mouseMoved(x, y, previousX, previousY);
     }
 }
 

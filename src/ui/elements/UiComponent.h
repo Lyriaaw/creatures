@@ -10,9 +10,6 @@
 
 class UiComponent {
 protected:
-
-    bool mouseInside;
-
     double x, y, width, height;
     double xRatio, yRatio, widthRatio, heightRatio;
     double windowWidth, windowHeight;
@@ -24,7 +21,7 @@ public:
     void onWindowResized(double windowWidth, double windowHeight);
 
     void setFixedSizeAndPosition(double x, double y, double width, double height);
-    void mouseMoved(int mouseX, int mouseY);
+    void mouseMoved(int mouseX, int mouseY, int previousX, int previousY);
     void mouseClicked(int mouseX, int mouseY);
 
 

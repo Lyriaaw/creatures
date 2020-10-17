@@ -25,6 +25,10 @@ public:
 
     void draw(sf::RenderWindow *window) override;
 
+    void mouseMoved(int x, int y, int previousX, int previousY) override;
+
+    void mouseClicked(int x, int y) override;
+
 };
 
 

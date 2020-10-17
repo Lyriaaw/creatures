@@ -25,6 +25,8 @@ protected:
     std::vector<UiComponent *> uiComponents;
     FarmUI * farmUi;
 
+    bool rightMouseButtonDown, leftMouseButtonDown;
+
 public:
     Screen(FarmUI * farmUi);
 
@@ -35,8 +37,12 @@ public:
 
     virtual void draw(sf::RenderWindow *window);
     virtual void onWindowResize(int width, int height);
-    void mouseMoved(int x, int y);
-    void mouseClicked(int x, int y);
+
+    virtual void mouseMoved(int x, int y, int previousX, int previousY);
+
+    virtual void mouseClicked(int x, int y);
+
+    void setMouseButtons(bool left, bool right);
 };
 
 

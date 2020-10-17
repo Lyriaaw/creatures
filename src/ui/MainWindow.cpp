@@ -407,51 +407,22 @@ void MainWindow::handleScroll(float delta) {
 }
 
 void MainWindow::handleMouseMove(int x, int y) {
+
+    float previousX = this->mouseX;
+    float previousY = this->mouseY;
+
+    this->mouseX = float(x);
+    this->mouseY = float(y);
+
     for (int it = 0; it < screens.size(); it++) {
-        screens.at(it)->mouseMoved(x, y);
+        screens.at(it)->mouseMoved(x, y, previousX, previousY);
     }
 
     for (int it = 0; it < uiComponents.size(); it++) {
-        uiComponents.at(it)->mouseMoved(x, y);
+        uiComponents.at(it)->mouseMoved(x, y, previousX, previousY);
     }
 
-//    float previousX = this->mouseX;
-//    float previousY = this->mouseY;
-//
-    this->mouseX = float(x);
-    this->mouseY = float(y);
-//
-//
-//    if (mainCamera == nullptr) {
-//        return;
-//    }
-//
-//    Point lastMousePosition = mainCamera->getWorldCoordinates({previousX, previousY});
-//    Point newMousePosition = mainCamera->getWorldCoordinates({this->mouseX, this->mouseY});
-//
-//    if (rightMouseButtonDown) {
-//        float deltaX = lastMousePosition.getX() - newMousePosition.getX();
-//        float deltaY = lastMousePosition.getY() - newMousePosition.getY();
-//
-//        Point newCenter = {mainCamera->getCenter().getX() + deltaX, mainCamera->getCenter().getY() + deltaY};
-//
-//        this->mainCamera->setCenter(newCenter);
-//    }
-//
-//    if (leftMouseButtonDown) {
-//
-//        if (selectedEntity != nullptr) {
-//            Point newMousePosition = mainCamera->getWorldCoordinates({this->mouseX, this->mouseY});
-//
-//            selectedEntity->setPosition(newMousePosition);
-//        }
-//
-//
-//    }
-//
-//
-//
-//    farmUi->mouseMoved(newMousePosition, mainCamera);
+
 
 }
 
@@ -463,21 +434,27 @@ void MainWindow::handleMousePressed(sf::Mouse::Button button) {
         leftMouseButtonDown = true;
     }
 
+    for (int it = 0; it < screens.size(); it++) {
+        screens.at(it)->setMouseButtons(leftMouseButtonDown, rightMouseButtonDown);
+    }
 }
 
 void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
     if (button == Mouse::Right) {
         rightMouseButtonDown = false;
-
     }
 
     if (button == Mouse::Left) {
         leftMouseButtonDown = false;
     }
 
+
+    for (int it = 0; it < screens.size(); it++) {
+        screens.at(it)->setMouseButtons(leftMouseButtonDown, rightMouseButtonDown);
+    }
+
+
     if (button == Mouse::Left) {
-
-
         for (int it = 0; it < uiComponents.size(); it++) {
             uiComponents.at(it)->mouseClicked(mouseX, mouseY);
         }
@@ -485,7 +462,6 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         for (int it = 0; it < screens.size(); it++) {
             screens.at(it)->mouseClicked(mouseX, mouseY);
         }
-
     }
 
 //    if (button == Mouse::Left && mainCamera != nullptr) {
