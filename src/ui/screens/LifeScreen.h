@@ -79,6 +79,8 @@ public:
     void updateGraphs();
 
     void drawGraphs(sf::RenderWindow *pWindow);
+
+    void mouseScrolled(float delta, int mouseX, int mouseY);
 };
 
 

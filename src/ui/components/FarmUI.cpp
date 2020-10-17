@@ -403,7 +403,6 @@ void FarmUI::processClick(float screenX, float screenY, Camera * camera) {
             selectedEntity = entity;
 
             found = true;
-            selectedLifeChanged();
         }
     }
 
@@ -421,9 +420,9 @@ void FarmUI::processClick(float screenX, float screenY, Camera * camera) {
 //        }
 
     if (!found) {
-        selectedLifeChanged();
         selectedEntity = nullptr;
         selectedLife = nullptr;
+        selectedLifeChanged();
     }
 }
 

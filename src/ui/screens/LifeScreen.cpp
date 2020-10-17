@@ -5,6 +5,7 @@
 
 #include <sstream>
 #include "LifeScreen.h"
+#include "../elements/GlobalFont.h"
 
 LifeScreen::LifeScreen(FarmUI * farmUi) : Screen(farmUi), camera(nullptr), informationToShow("BRAIN"), brainUi(nullptr) {}
 
@@ -33,7 +34,7 @@ void LifeScreen::init() {
 //    buttons.emplace_back(graphButton);
 
     creatureAgeText.setString("Creature age ...");
-    creatureAgeText.setFont(*font);
+    creatureAgeText.setFont(*GlobalFont::MainFont);
     creatureAgeText.setFillColor(textColor);
     creatureAgeText.setCharacterSize(20);
 
@@ -51,6 +52,8 @@ void LifeScreen::draw(sf::RenderWindow *window) {
     for (int it = 0; it < buttons.size(); it++) {
         buttons.at(it).draw(window);
     }
+
+    farmUi->draw(window, camera, farmUi->getSelectedLife());
 
     if (selectedEntity == nullptr || camera == nullptr) {
         return ;
@@ -125,7 +128,7 @@ void LifeScreen::loadSelectedGenome() {
 
         sf::Text currentText;
         currentText.setString(genome.at(it)->describe());
-        currentText.setFont(*font);
+        currentText.setFont(*GlobalFont::MainFont);
         currentText.setFillColor(textColor);
         currentText.setCharacterSize(20);
 
@@ -155,7 +158,7 @@ void LifeScreen::onWindowResize(int width, int height) {
         buttons.at(it).move(buttons.at(it).getX(), height - 100);
     }
 
-    creatureAgeText.setPosition(20, 75);
+    creatureAgeText.setPosition(0.01 * windowWidth, 0.92 * height);
 
 
 }
@@ -180,6 +183,8 @@ void LifeScreen::mouseClicked(int x, int y) {
             return;
         }
     }
+
+    farmUi->processClick(float(x), float(y), camera);
 
 }
 
@@ -284,3 +289,33 @@ void LifeScreen::drawGraphs(sf::RenderWindow *pWindow) {
 }
 
 
+
+void LifeScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
+    Screen::mouseScrolled(delta, mouseX, mouseY);
+
+    float deltaRatio;
+    if (delta < 0) {
+        camera->changeZoom(0.9f);
+        deltaRatio = 1.1;
+    } else if (delta > 0) {
+        camera->changeZoom(1.1f);
+        deltaRatio = 0.9;
+    } else {
+        return;
+    }
+
+    Point cameraCenter = camera->getCenter();
+    Point mouseWorldCoordinates = camera->getWorldCoordinates({float(mouseX), float(mouseY)});
+
+    float deltaX = cameraCenter.getX() - mouseWorldCoordinates.getX();
+    float deltaY = cameraCenter.getY() - mouseWorldCoordinates.getY();
+
+    float newX = mouseWorldCoordinates.getX() + (deltaX * (deltaRatio));
+    float newY = mouseWorldCoordinates.getY() + (deltaY * (deltaRatio));
+
+    Point newCameraCenter = {newX, newY};
+    camera->setCenter(newCameraCenter);
+
+
+    farmUi->mouseMoved(mouseWorldCoordinates, camera);
+}

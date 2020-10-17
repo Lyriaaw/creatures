@@ -481,11 +481,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 //            break;
         case Keyboard::Key::R:
             farmUi->selectedCreatureChange("RANDOM");
-
             break;
-
-
-
     }
 }
 
