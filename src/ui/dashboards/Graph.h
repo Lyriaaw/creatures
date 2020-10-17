@@ -73,8 +73,6 @@ public:
 
     void mouseMoved(int mouseX, int mouseY, int previousX, int previousY);
 
-    void drawHoveredInfo(sf::RenderWindow *window);
-
     void mouseHovering(int mouseX, int mouseY) override;
 
     void mouseClickedInside(int mouseX, int mouseY) override;
