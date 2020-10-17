@@ -99,9 +99,23 @@ void StatisticsScreen::loadGraphs() {
 
     energyGraph->addLine(farm->getDataAnalyser().getZero(), 2, 0, 0, 0);
 
-
-
     energyGraph->windowResized(windowWidth, windowHeight);
+
+
+
+    Graph * brainsGraph = new Graph("Brains", font);
+    brainsGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+
+    brainsGraph->addLine(farm->getDataAnalyser().getAverageInputNeurons(), 1, 0, 255, 0);
+    brainsGraph->addLine(farm->getDataAnalyser().getAverageOutputNeurons(), 1, 0, 0, 255);
+    brainsGraph->addLine(farm->getDataAnalyser().getAverageLinks(), 1, 255, 255, 255);
+    brainsGraph->addLine(farm->getDataAnalyser().getZero(), 1, 0, 0, 0);
+
+
+    brainsGraph->windowResized(windowWidth, windowHeight);
+
+
+
 
 
     graphs.emplace_back(populationGraph);
@@ -109,6 +123,7 @@ void StatisticsScreen::loadGraphs() {
     graphs.emplace_back(timeGraph);
     graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(energyGraph);
+    graphs.emplace_back(brainsGraph);
 }
 
 void StatisticsScreen::loadButtons(sf::Font *font) {

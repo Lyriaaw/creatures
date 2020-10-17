@@ -777,6 +777,9 @@ void Farm::statistics() {
     dataAnalyser.getLastQuartileScore()->addValue(lastQuartileScore);
 
 
+    double totalInputNeurons = 0;
+    double totalOutputNeurons = 0;
+    double totalLinks = 0;
 
 
     double totalCreaturesEnergy = 0.f;
@@ -789,6 +792,10 @@ void Farm::statistics() {
         totalCreaturesEnergy += currentLife->getEnergyCenter()->getAvailableEnergy();
         totalCreaturesMass += currentLife->getEntity()->getMass();
         totalCreaturesWasted += currentLife->getEnergyCenter()->getWastedEnergy();
+
+        totalInputNeurons += currentLife->getBrain()->getInputNeurons().size();
+        totalOutputNeurons += currentLife->getBrain()->getOutputNeurons().size();
+        totalLinks += currentLife->getBrain()->getLinks().size();
     }
 
     for (int it = 0; it < entities.size(); it++) {
@@ -816,6 +823,11 @@ void Farm::statistics() {
     dataAnalyser.getCreaturesWastedEnergy()->addValue(totalCreaturesWasted);
     dataAnalyser.getHeatEnergy()->addValue(totalHeat);
     dataAnalyser.getGroundEnergy()->addValue(totalGround);
+
+
+    dataAnalyser.getAverageInputNeurons()->addValue(totalInputNeurons / double(lifes.size()));
+    dataAnalyser.getAverageOutputNeurons()->addValue(totalOutputNeurons / double(lifes.size()));
+    dataAnalyser.getAverageLinks()->addValue(totalLinks / double(lifes.size()));
 
 //    std::cout << "Total: " << totalEnergy << " ";
 //    std::cout << "Available: " << totalCreaturesEnergy << " ";

@@ -51,6 +51,10 @@ DataAnalyser::DataAnalyser() {
 
     colors = new GeneGraphAnalyser("Colors");
 
+    averageInputNeurons = new DataItem("averageInputNeurons", true);
+    averageOutputNeurons = new DataItem("averageOutputNeurons", true);
+    averageLinks = new DataItem("averageLinks", true);
+
 }
 
 
@@ -198,5 +202,17 @@ DataItem *DataAnalyser::getCreatureSortingTime() const {
 
 DataItem *DataAnalyser::getATickHavePassedTime() const {
     return aTickHavePassedTime;
+}
+
+DataItem *DataAnalyser::getAverageInputNeurons() const {
+    return averageInputNeurons;
+}
+
+DataItem *DataAnalyser::getAverageOutputNeurons() const {
+    return averageOutputNeurons;
+}
+
+DataItem *DataAnalyser::getAverageLinks() const {
+    return averageLinks;
 }
 

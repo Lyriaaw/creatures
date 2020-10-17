@@ -55,9 +55,16 @@ private:
 
     DataItem * zero;
 
-
-
     GeneGraphAnalyser * colors;
+
+
+
+
+
+
+    DataItem * averageInputNeurons;
+    DataItem * averageOutputNeurons;
+    DataItem * averageLinks;
 
 public:
     DataAnalyser();
@@ -131,6 +138,12 @@ public:
     DataItem *getCreatureSortingTime() const;
 
     DataItem *getATickHavePassedTime() const;
+
+    DataItem *getAverageInputNeurons() const;
+
+    DataItem *getAverageOutputNeurons() const;
+
+    DataItem *getAverageLinks() const;
 };
 
 
