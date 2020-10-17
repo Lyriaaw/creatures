@@ -17,6 +17,8 @@ protected:
     double xRatio, yRatio, widthRatio, heightRatio;
     double windowWidth, windowHeight;
 
+    std::function<void()> onClick;
+
 public:
     UiComponent(double xRatio, double yRatio, double widthRatio, double heightRatio);
     void onWindowResized(double windowWidth, double windowHeight);
@@ -32,6 +34,8 @@ public:
     virtual void mouseEnter() = 0;
     virtual void mouseLeave() = 0;
     virtual void draw(sf::RenderWindow *window) = 0;
+
+    void setOnClick(std::function<void()> function);
 };
 
 

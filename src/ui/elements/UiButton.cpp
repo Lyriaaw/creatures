@@ -35,7 +35,6 @@ void UiButton::mouseHovering(int mouseX, int mouseY) {
 }
 
 void UiButton::mouseClickedInside(int mouseX, int mouseY) {
-
 }
 
 void UiButton::mouseEnter() {
