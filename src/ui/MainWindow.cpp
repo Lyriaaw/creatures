@@ -4,12 +4,13 @@
 
 #include "MainWindow.h"
 #include "components/FarmUI.h"
-#include "views/WorldScreen.h"
-#include "views/StatisticsScreen.h"
-#include "views/MinimapsScreen.h"
-#include "views/LifeScreen.h"
-#include "views/ColorsScreen.h"
-#include "views/EvolutionScreen.h"
+#include "screens/WorldScreen.h"
+#include "screens/StatisticsScreen.h"
+#include "screens/MinimapsScreen.h"
+#include "screens/LifeScreen.h"
+#include "screens/ColorsScreen.h"
+#include "screens/EvolutionScreen.h"
+#include "screens/TestScreen.h"
 
 
 #include <SFML/Window.hpp>
@@ -53,6 +54,7 @@ void MainWindow::loadButtons() {
     Button * creature = new Button("Creatures", 4, font, 330, 0, 100, 50, backgroundColor, textColor);
     Button * colors = new Button("Colors", 5, font, 440, 0, 100, 50, backgroundColor, textColor);
     Button * evolutions = new Button("Evolutions", 6, font, 550, 0, 100, 50, backgroundColor, textColor);
+    Button * tests = new Button("Tests", 7, font, 550, 0, 100, 50, backgroundColor, textColor);
 
     buttons.emplace_back(mainWorldButton);
     buttons.emplace_back(statistics);
@@ -60,6 +62,7 @@ void MainWindow::loadButtons() {
     buttons.emplace_back(creature);
     buttons.emplace_back(colors);
     buttons.emplace_back(evolutions);
+    buttons.emplace_back(tests);
 }
 
 void MainWindow::loadFarm() {
@@ -95,6 +98,12 @@ void MainWindow::loadScreens() {
     EvolutionScreen * evolutionScreen = new EvolutionScreen(farm, font);
     evolutionScreen->init();
     screens.emplace_back(evolutionScreen);
+
+    TestScreen * testScreen = new TestScreen(farm, font);
+    testScreen->init();
+    screens.emplace_back(testScreen);
+
+
 
 
 
@@ -517,7 +526,9 @@ void MainWindow::handleButtonClicked(int id) {
         case 6:
             openScreen(6);
             break;
-
+        case 7:
+            openScreen(7);
+            break;
         default:
             std::cout << "BUTTON ID NOT FOUND" << std::endl;
             break;

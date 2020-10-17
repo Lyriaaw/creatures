@@ -10,6 +10,7 @@
 #include "../components/Camera.h"
 #include "../../farm/brain/BrainConnector.h"
 #include "../../farm/Farm.h"
+#include "../elements/UiComponent.h"
 
 class Screen {
 protected:
@@ -19,6 +20,7 @@ protected:
 
     Farm * farm;
     sf::Font * font;
+
 
 public:
     Screen(Farm * farm, sf::Font * font);

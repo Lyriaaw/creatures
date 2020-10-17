@@ -10,7 +10,7 @@
 #include "components/Camera.h"
 #include "components/BrainUI.h"
 #include "components/FarmUI.h"
-#include "views/Screen.h"
+#include "screens/Screen.h"
 #include "components/Button.h"
 
 
