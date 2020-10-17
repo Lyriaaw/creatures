@@ -12,6 +12,9 @@ UiLabel::UiLabel(double xRatio, double yRatio, double widthRatio, double heightR
     text.setFont(*GlobalFont::MainFont);
 }
 
+void UiLabel::setCharacterSize(int characterSize) {
+    text.setCharacterSize(characterSize);
+}
 
 void UiLabel::resized() {
     text.setPosition(sf::Vector2f(x, y));

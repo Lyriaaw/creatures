@@ -9,6 +9,7 @@
 #include "Screen.h"
 #include "../dashboards/Graph.h"
 #include "../components/Button.h"
+#include "../elements/UiButton.h"
 
 class StatisticsScreen: public Screen {
 private:
@@ -18,6 +19,7 @@ private:
     std::vector<Button *> graphButtons;
 
     Graph * currentGraph;
+
 
 public:
     StatisticsScreen(FarmUI * farmUi);
@@ -32,7 +34,7 @@ public:
 
     void onWindowResize(int width, int height);
 
-    void mouseMoved(int x, int y);
+    void mouseMoved(int x, int y, int previousX, int previousY);
 
     void loadGraphs();
     void loadButtons(sf::Font *font);

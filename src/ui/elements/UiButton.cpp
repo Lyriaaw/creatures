@@ -58,3 +58,7 @@ void UiButton::draw(sf::RenderWindow *window) {
 void UiButton::setOnClick(std::function<void(int)> function) {
     onClick = std::move(function);
 }
+
+void UiButton::setFillColor(sf::Color color) {
+    background.setFillColor(color);
+}

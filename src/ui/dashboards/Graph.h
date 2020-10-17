@@ -13,6 +13,7 @@
 #include "../elements/UiComponent.h"
 #include "../elements/UiLabel.h"
 #include "../elements/UiBackground.h"
+#include "../elements/UiButton.h"
 
 class Graph: public UiComponent {
 protected:
@@ -23,8 +24,6 @@ protected:
 
     std::vector<UiBackground *> labelsBackgrounds;
     std::vector<UiLabel *> labels;
-
-    int mouseX, mouseY;
 
     double min, max;
 
@@ -40,9 +39,12 @@ protected:
     std::vector<sf::RectangleShape> linesLegendBackgrounds;
     std::vector<sf::Text> linesLegendTexts;
 
-    std::vector<Button *> doNotShowButtons;
-    std::vector<Button *> showNormalButtons;
-    std::vector<Button *> showAveragedButtons;
+
+    std::vector<UiButton *> doNotShowButtons;
+    std::vector<UiButton *> showNormalButtons;
+    std::vector<UiButton *> showAveragedButtons;
+    std::vector<UiLabel *> hoveredInfoValues;
+
 
 public:
     Graph(const std::string &name, float xRatio, float yRatio, float widthRatio, float heightRatio);
@@ -57,8 +59,6 @@ public:
 
     void addLine(DataItem * item, int displayMode, int red, int green, int blue);
 
-    // X and Y are
-    void setPosition(float xScreenRatio, float yScreenRatio, float width, float height);
 
     void windowResized(float windowWidth, float windowHeight);
 
@@ -71,7 +71,7 @@ public:
 
     void setLegendsButtonColors();
 
-    void mouseMoved(int x, int y);
+    void mouseMoved(int mouseX, int mouseY, int previousX, int previousY);
 
     void drawHoveredInfo(sf::RenderWindow *window);
 

@@ -31,6 +31,8 @@ public:
     void mouseClickedInside(int mouseX, int mouseY) override;
 
     void setText(std::string textString);
+
+    void setCharacterSize(int characterSize);
 };
 
 

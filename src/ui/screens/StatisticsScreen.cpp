@@ -131,7 +131,6 @@ void StatisticsScreen::loadButtons(sf::Font *font) {
         UiButton * button = new UiButton(it, graphs.at(it)->getName(), it * (buttonWidth + 0.001), 0.04, buttonWidth, buttonHeight);
 
         button->setOnClick([&](int id) {
-            std::cout << id << std::endl;
             this->currentGraph = graphs.at(id);
         });
 
@@ -175,8 +174,12 @@ void StatisticsScreen::onWindowResize(int width, int height) {
 
 }
 
-void StatisticsScreen::mouseMoved(int x, int y) {
-    currentGraph->mouseMoved(x, y);
+void StatisticsScreen::mouseMoved(int x, int y, int previousX, int previousY) {
+    for (int it = 0; it < uiComponents.size(); it++) {
+        uiComponents.at(it)->mouseMoved(x, y, previousX, previousY);
+    }
+
+    currentGraph->mouseMoved(x, y, previousX, previousY);
 }
 
 void StatisticsScreen::mouseClicked(int x, int y) {

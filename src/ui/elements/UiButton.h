@@ -34,6 +34,7 @@ public:
 
     void setOnClick(std::function<void(int)> function);
 
+    void setFillColor(sf::Color color);
 };
 
 

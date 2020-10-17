@@ -25,7 +25,7 @@ void Graph::setLines(const std::vector<DataItemConnector> &lines) {
     Graph::lines = lines;
 }
 
-Graph::Graph(const std::string &name, float xRatio, float yRatio, float widthRatio, float heightRatio): UiComponent(xRatio, yRatio, widthRatio, heightRatio), name(name), mouseX(0), mouseY(0) {
+Graph::Graph(const std::string &name, float xRatio, float yRatio, float widthRatio, float heightRatio): UiComponent(xRatio, yRatio, widthRatio, heightRatio), name(name) {
     min = 10000000;
     max = -10000000;
 
@@ -50,19 +50,54 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
 
     int lineIndex = lines.size() - 1;
 
-    sf::Color legendBackgroundColor = sf::Color(255, 255, 255, 255);
+    sf::Color legendBackgroundColor = sf::Color(75, 75, 75, 255);
     sf::Color backgroundColor = sf::Color(55, 55, 55, 255);
     sf::Color textColor = sf::Color(red, green, blue, 255);
 
 
-    double xLine = xRatio + (lineIndex * 0.1);
+    double xLine = xRatio + (lineIndex * 0.08);
     double currentHeightRatio = heightRatio;
-    double yButtons = double(yRatio) + double(currentHeightRatio);
+    double yButtons = double(yRatio) + double(currentHeightRatio) + 0.01;
 
-    UiBackground * legendBackground = new UiBackground(xLine, yButtons, 0.1, 0.01);
+    UiBackground * legendBackground = new UiBackground(xLine, yButtons, 0.07, 0.04);
     legendBackground->setFillColor(legendBackgroundColor);
-    labelsBackgrounds.emplace_back(legendBackground);
     uiComponents.emplace_back(legendBackground);
+
+    UiLabel * legendLabel = new UiLabel(xLine + 0.001, yButtons + 0.001, 0, 0);
+    legendLabel->setCharacterSize(15);
+    legendLabel->setText(item->getName());
+    legendLabel->setFillColor(textColor);
+    uiComponents.emplace_back(legendLabel);
+
+    UiButton * doNotShowButton = new UiButton(lineIndex, "X", xLine, yButtons + 0.02, 0.02, 0.02);
+    doNotShowButton->setOnClick([&](int it) {
+        lines.at(it).setDisplayMode(0);
+        setLegendsButtonColors();
+    });
+    uiComponents.emplace_back(doNotShowButton);
+    doNotShowButtons.emplace_back(doNotShowButton);
+
+    UiButton * showNormal = new UiButton(lineIndex, "V", xLine + 0.021, yButtons + 0.02, 0.02, 0.02);
+    showNormal->setOnClick([&](int it) {
+        lines.at(it).setDisplayMode(1);
+        setLegendsButtonColors();
+    });
+    uiComponents.emplace_back(showNormal);
+    showNormalButtons.emplace_back(showNormal);
+
+    UiButton * showAveraged = new UiButton(lineIndex, "~", xLine + 0.042, yButtons + 0.02, 0.02, 0.02);
+    showAveraged->setOnClick([&](int it) {
+        lines.at(it).setDisplayMode(2);
+        setLegendsButtonColors();
+    });
+    uiComponents.emplace_back(showAveraged);
+    showAveragedButtons.emplace_back(showAveraged);
+
+    setLegendsButtonColors();
+
+    UiLabel * hoveredInfoLabel = new UiLabel(0, 0, 0, 0);
+    uiComponents.emplace_back(hoveredInfoLabel);
+    hoveredInfoValues.emplace_back(hoveredInfoLabel);
 
 //    sf::Text text;
 //    text.setFont(*font);
@@ -92,6 +127,7 @@ void Graph::addLine(DataItem * item, int displayMode, int red, int green, int bl
 
 //    setLegendsButtonColors();
 }
+
 
 void Graph::windowResized(float windowWidth, float windowHeight) {
     UiComponent::onWindowResized(windowWidth, windowHeight);
@@ -171,26 +207,23 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
     lineVertexes.clear();
 }
 
+
+
 void Graph::draw(sf::RenderWindow *window) {
     getMinAndMaxValues();
 
-
-
-
-
     window->draw(background);
-
 
 
     for (int it = 0; it < lines.size(); it++) {
         drawStat(window, lines.at(it));
     }
 
-    if (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height) {
-        hoveredTickBar.setPosition(mouseX, y);
-        window->draw(hoveredTickBar);
-    }
-    drawHoveredInfo(window);
+//    if (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height) {
+//        hoveredTickBar.setPosition(mouseX, y);
+//        window->draw(hoveredTickBar);
+//    }
+//    drawHoveredInfo(window);
 
     for (int it = 0; it < uiComponents.size(); it++) {
         uiComponents.at(it)->draw(window);
@@ -201,62 +234,56 @@ void Graph::draw(sf::RenderWindow *window) {
 }
 
 void Graph::drawHoveredInfo(sf::RenderWindow *window) {
-    if (mouseX < x || mouseY < y || mouseX > x + width || mouseY > y + height) {
-        return;
-    }
-
-    int textX = std::min(double(width - 500), double(mouseX));
-
-    window->draw(hoverInfoBackground);
-
-    hoverInfoBackground.setPosition(textX, mouseY);
-    hoverInfoBackground.setSize(sf::Vector2f(500, 500));
-
-    int hoveredTick = mouseX / widthRatio;
-
-    hoveredTickText->setString("Tick: " + std::to_string(hoveredTick));
-    hoveredTickText->setPosition(textX + 20, mouseY + 30);
-    window->draw(*hoveredTickText);
-
-
-
-    for (int it = 0; it < lines.size(); it++) {
-        DataItemConnector currentLine = lines.at(it);
-
-        sf::Text * currentText = hoveredInfoTexts.at(it);
-
-        double currentValue = currentLine.getDisplayMode() == 2 ? currentLine.getItem()->getAveragedValueForTick(hoveredTick) : currentLine.getItem()->getValueForTick(hoveredTick);
-
-        currentText->setString(currentLine.getItem()->getName() + " : " + std::to_string(currentValue));
-
-        currentText->setPosition(textX + 20, mouseY + ((it + 1) * 30) + 30);
-
-
-        window->draw(*currentText);
-    }
+//    if (mouseX < x || mouseY < y || mouseX > x + width || mouseY > y + height) {
+//        return;
+//    }
+//
+//    int textX = std::min(double(width - 500), double(mouseX));
+//
+//    window->draw(hoverInfoBackground);
+//
+//    hoverInfoBackground.setPosition(textX, mouseY);
+//    hoverInfoBackground.setSize(sf::Vector2f(500, 500));
+//
+//    int hoveredTick = mouseX / widthRatio;
+//
+//    hoveredTickText->setString("Tick: " + std::to_string(hoveredTick));
+//    hoveredTickText->setPosition(textX + 20, mouseY + 30);
+//    window->draw(*hoveredTickText);
+//
+//
+//
+//    for (int it = 0; it < lines.size(); it++) {
+//        DataItemConnector currentLine = lines.at(it);
+//
+//        sf::Text * currentText = hoveredInfoTexts.at(it);
+//
+//        double currentValue = currentLine.getDisplayMode() == 2 ? currentLine.getItem()->getAveragedValueForTick(hoveredTick) : currentLine.getItem()->getValueForTick(hoveredTick);
+//
+//        currentText->setString(currentLine.getItem()->getName() + " : " + std::to_string(currentValue));
+//
+//        currentText->setPosition(textX + 20, mouseY + ((it + 1) * 30) + 30);
+//
+//
+//        window->draw(*currentText);
+//    }
 
 }
 
-void Graph::mouseClicked(int x, int y) {
-    for (int it = 0; it < doNotShowButtons.size(); it++) {
-        if (doNotShowButtons.at(it)->clicked(x, y)) {
-            lines.at(it).setDisplayMode(0);
-        }
-        if (showNormalButtons.at(it)->clicked(x, y)) {
-            lines.at(it).setDisplayMode(1);
 
-        }
-        if (showAveragedButtons.at(it)->clicked(x, y)) {
-            lines.at(it).setDisplayMode(2);
-        }
+
+void Graph::mouseClicked(int x, int y) {
+    UiComponent::mouseClicked(x, y);
+
+    for (int it = 0; it < uiComponents.size(); it++) {
+        uiComponents.at(it)->mouseClicked(x, y);
     }
 
     setLegendsButtonColors();
 }
 
-void Graph::mouseMoved(int mouseX, int mouseY) {
-    this->mouseX = mouseX;
-    this->mouseY = mouseY;
+void Graph::mouseMoved(int mouseX, int mouseY, int previousX, int previousY) {
+    UiComponent::mouseMoved(mouseX, mouseY, previousX, previousY);
 }
 
 
@@ -266,21 +293,21 @@ void Graph::setLegendsButtonColors() {
     sf::Color selectedBackgroundColor = sf::Color(100, 100, 100, 255);
 
     for (int it = 0; it < lines.size(); it++) {
-//        doNotShowButtons.at(it)->changeBackgroundColor(notSelectedBackgroundColor);
-//        showNormalButtons.at(it)->changeBackgroundColor(notSelectedBackgroundColor);
-//        showAveragedButtons.at(it)->changeBackgroundColor(notSelectedBackgroundColor);
-//
-//        switch (lines.at(it).getDisplayMode()) {
-//            case 0:
-//                doNotShowButtons.at(it)->changeBackgroundColor(selectedBackgroundColor);
-//                break;
-//            case 1:
-//                showNormalButtons.at(it)->changeBackgroundColor(selectedBackgroundColor);
-//                break;
-//            case 2:
-//                showAveragedButtons.at(it)->changeBackgroundColor(selectedBackgroundColor);
-//                break;
-//        }
+        doNotShowButtons.at(it)->setFillColor(notSelectedBackgroundColor);
+        showNormalButtons.at(it)->setFillColor(notSelectedBackgroundColor);
+        showAveragedButtons.at(it)->setFillColor(notSelectedBackgroundColor);
+
+        switch (lines.at(it).getDisplayMode()) {
+            case 0:
+                doNotShowButtons.at(it)->setFillColor(selectedBackgroundColor);
+                break;
+            case 1:
+                showNormalButtons.at(it)->setFillColor(selectedBackgroundColor);
+                break;
+            case 2:
+                showAveragedButtons.at(it)->setFillColor(selectedBackgroundColor);
+                break;
+        }
     }
 }
 
