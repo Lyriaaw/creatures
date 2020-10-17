@@ -58,6 +58,15 @@ void CreatureTileCountMinimap::generateValues(Farm * farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             averageHues[it][jt] /= float(values[it][jt]);
+
+            float hue = averageHues[it][jt];
+            float light = values[it][jt] / 5.f;
+
+            RGBColor rectangleColor = RGBColor(hue, 1.f, light);
+
+            sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+
+            colorGrid[it][jt] = pixelColor;
         }
     }
 }

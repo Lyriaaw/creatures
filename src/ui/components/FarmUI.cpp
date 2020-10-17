@@ -10,12 +10,14 @@
 #include "../colors/RGBColor.h"
 #include "../elements/GlobalFont.h"
 #include "../minimaps/ActionsMinimap.h"
+#include "../minimaps/CreatureTileCountMinimap.h"
+#include "../minimaps/FoodTileCountMinimap.h"
 
 FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)), selectedLife(nullptr) {
     loadTexts();
     loadFarm();
 
-    currentMinimap = new ActionsMinimap();
+    currentMinimap = new WorldMinimap();
 }
 
 
