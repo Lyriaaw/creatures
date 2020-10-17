@@ -44,12 +44,14 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     colorEvolution->generateFromRandom(life);
     colorEvolution->perform(life);
     creatureGenome.emplace_back(colorEvolution);
+    evolutionLibrary.addEvolution(colorEvolution);
 
     SizeEvolution * sizeEvolution = new SizeEvolution();
     sizeEvolution->setGenerationNumber(2);
     sizeEvolution->generateFromRandom(life);
     sizeEvolution->perform(life);
     creatureGenome.emplace_back(sizeEvolution);
+    evolutionLibrary.addEvolution(sizeEvolution);
 
 
 
@@ -57,16 +59,19 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     biasInputEvolution->setGenerationNumber(3);
     biasInputEvolution->perform(life);
     creatureGenome.emplace_back(biasInputEvolution);
+    evolutionLibrary.addEvolution(biasInputEvolution);
 
     EnergySensorEvolution * energySensorInputEvolution = new EnergySensorEvolution();
     energySensorInputEvolution->setGenerationNumber(4);
     energySensorInputEvolution->perform(life);
     creatureGenome.emplace_back(energySensorInputEvolution);
+    evolutionLibrary.addEvolution(energySensorInputEvolution);
 
     MassSensorEvolution * massSensorEvolution = new MassSensorEvolution();
     massSensorEvolution->setGenerationNumber(5);
     massSensorEvolution->perform(life);
     creatureGenome.emplace_back(massSensorEvolution);
+    evolutionLibrary.addEvolution(massSensorEvolution);
 
 
 
@@ -78,6 +83,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
         sensorEvol->generateFromRandom(life);
         sensorEvol->perform(life);
         creatureGenome.emplace_back(sensorEvol);
+        evolutionLibrary.addEvolution(sensorEvol);
     }
 
     for (int it = 0; it < 4; it++) {
@@ -87,6 +93,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
         sensorEvol->generateFromRandom(life);
         sensorEvol->perform(life);
         creatureGenome.emplace_back(sensorEvol);
+        evolutionLibrary.addEvolution(sensorEvol);
 
     }
 
@@ -96,29 +103,34 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     speedEvolution->setGenerationNumber(30);
     speedEvolution->perform(life);
     creatureGenome.emplace_back(speedEvolution);
+    evolutionLibrary.addEvolution(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
     rotationEvolution->setGenerationNumber(31);
     rotationEvolution->perform(life);
     creatureGenome.emplace_back(rotationEvolution);
+    evolutionLibrary.addEvolution(rotationEvolution);
 
     MouthEvolution * mouthEvolution = new MouthEvolution();
     mouthEvolution->setGenerationNumber(32);
     mouthEvolution->generateFromRandom(life);
     mouthEvolution->perform(life);
     creatureGenome.emplace_back(mouthEvolution);
+    evolutionLibrary.addEvolution(mouthEvolution);
 
     GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
     genitalsEvolution->setGenerationNumber(33);
     genitalsEvolution->generateFromRandom(life);
     genitalsEvolution->perform(life);
     creatureGenome.emplace_back(genitalsEvolution);
+    evolutionLibrary.addEvolution(genitalsEvolution);
 
     MemoryEvolution * memoryEvolution = new MemoryEvolution();
     memoryEvolution->setGenerationNumber(35);
     memoryEvolution->generateFromRandom(life);
     memoryEvolution->perform(life);
     creatureGenome.emplace_back(memoryEvolution);
+    evolutionLibrary.addEvolution(memoryEvolution);
 
 
 
@@ -131,6 +143,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
             linkEvolution->generateFromNeurons(life, brain->getInputNeurons().at(it), brain->getOutputNeurons().at(jt));
             linkEvolution->perform(life);
             creatureGenome.emplace_back(linkEvolution);
+            evolutionLibrary.addEvolution(linkEvolution);
 
         }
     }
@@ -272,10 +285,10 @@ std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life
 
     HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
     sensorEvol->generateGenerationNumber();
-    evolutionLibrary.increaseEvolutionNumber();
     sensorEvol->generateFromRandom(life);
     sensorEvol->perform(life);
     newEvolutions.emplace_back(sensorEvol);
+    evolutionLibrary.addEvolution(sensorEvol);
 
     for (int jt = 0; jt < life->getBrain()->getOutputNeurons().size(); jt++) {
 
@@ -284,6 +297,7 @@ std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life
         linkEvolution->generateFromNeurons(life, sensorEvol->getInputNeuron(), life->getBrain()->getOutputNeurons().at(jt));
         linkEvolution->perform(life);
         newEvolutions.emplace_back(linkEvolution);
+        evolutionLibrary.addEvolution(linkEvolution);
 
     }
 

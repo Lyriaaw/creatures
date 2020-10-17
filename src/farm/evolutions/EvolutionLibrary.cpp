@@ -33,3 +33,14 @@ void EvolutionLibrary::setCurrentEvolutionNumber(int currentEvolutionNumber) {
 void EvolutionLibrary::increaseEvolutionNumber() {
     currentEvolutionNumber++;
 }
+
+const std::map<int, Evolution *> &EvolutionLibrary::getAllEvolutions() const {
+    return allEvolutions;
+}
+
+void EvolutionLibrary::addEvolution(Evolution * evolution) {
+    if (allEvolutions.find(evolution->getGenerationNumber()) == allEvolutions.end()) {
+        allEvolutions[evolution->getGenerationNumber()] = evolution;
+    }
+
+}
