@@ -27,9 +27,11 @@ public:
 
     void onWindowResize(int width, int height);
 
-    void mouseMoved(int x, int y);
+    void mouseMoved(int x, int y, int previousX, int previousY);
 
     void mouseClicked(int x, int y);
+
+    void mouseScrolled(float delta, int mouseX, int mouseY);
 };
 
 

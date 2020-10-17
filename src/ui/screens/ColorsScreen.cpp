@@ -10,12 +10,11 @@ int ColorsScreen::getId() {
 }
 
 void ColorsScreen::init() {
-//    colorsGraph = new ColorsGraph("Colors", font, farmUi->getFarm()->getDataAnalyser().getColors());
-//    colorsGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    colorsGraph = new ColorsGraph("Colors", 0.f, 0.1f, 1.f, 0.8f, farmUi->getFarm()->getDataAnalyser().getColors());
 }
 
 void ColorsScreen::draw(sf::RenderWindow *window) {
-//    colorsGraph->draw(window);
+    colorsGraph->draw(window);
 }
 
 void ColorsScreen::updateSelectedCreature() {
@@ -24,15 +23,25 @@ void ColorsScreen::updateSelectedCreature() {
 
 
 void ColorsScreen::onWindowResize(int width, int height) {
-    this->windowWidth = width;
-    this->windowHeight = height;
-//    colorsGraph->windowResized(width, height);
+    Screen::onWindowResize(width, height);
+    colorsGraph->windowResized(width, height);
+
 }
 
-void ColorsScreen::mouseMoved(int x, int y) {
+
+void ColorsScreen::mouseMoved(int x, int y, int previousX, int previousY) {
+    Screen::mouseMoved(x, y, previousX, previousY);
 
 }
 
 void ColorsScreen::mouseClicked(int x, int y) {
+    Screen::mouseClicked(x, y);
+
     colorsGraph->switchMode();
+}
+
+void ColorsScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
+    Screen::mouseScrolled(delta, mouseX, mouseY);
+
+
 }
