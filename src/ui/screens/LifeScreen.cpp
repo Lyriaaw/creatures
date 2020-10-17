@@ -213,14 +213,13 @@ void LifeScreen::loadSelectedGraphs() {
     grad1 = new DataItem("1", true);
     gradm1 = new DataItem("-1", true);
 
-    inputNeuronsGraph = new Graph("InputNeurons", font);
-    inputNeuronsGraph->setPosition(0.6f, 0.1f, 0.35f, 0.2f);
+    inputNeuronsGraph = new Graph("InputNeuron", 0.6f, 0.1f, 0.35f, 0.2f);
 
 
 
 
-    bioGraph = new Graph("Bio", font);
-    bioGraph->setPosition(0.55f, 0.31f, 0.4f, 0.2f);
+
+    bioGraph = new Graph("Bio", 0.55f, 0.31f, 0.4f, 0.2f);
     bioGraph->windowResized(windowWidth, windowHeight);
 
     energy = new DataItem("energy", true);
@@ -238,8 +237,7 @@ void LifeScreen::loadSelectedGraphs() {
 
 
 
-    outputNeuronsGraph = new Graph("Output Neurons", font);
-    outputNeuronsGraph->setPosition(0.55f, 0.1f, 0.4f, 0.2f);
+    outputNeuronsGraph = new Graph("Output Neurons", 0.55f, 0.1f, 0.4f, 0.2f);
     outputNeuronsGraph->windowResized(windowWidth, windowHeight);
 
 

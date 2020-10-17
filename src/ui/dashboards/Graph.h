@@ -10,22 +10,25 @@
 #include <SFML/Graphics.hpp>
 #include "DataItemConnector.h"
 #include "../components/Button.h"
+#include "../elements/UiComponent.h"
+#include "../elements/UiLabel.h"
+#include "../elements/UiBackground.h"
 
-class Graph {
+class Graph: public UiComponent {
 protected:
     std::string name;
     std::vector<DataItemConnector> lines;
 
-    float xScreenRatio, yScreenRatio;
-    float widthScreenRatio, heightScreenRatio;
+    std::vector<UiComponent *> uiComponents;
 
-    float x, y, width, height;
+    std::vector<UiBackground *> labelsBackgrounds;
+    std::vector<UiLabel *> labels;
 
     int mouseX, mouseY;
 
     double min, max;
 
-    double widthRatio, heightRatio;
+    double tickWidthRatio, tickHeightRatio;
 
     sf::RectangleShape background;
 
@@ -33,9 +36,6 @@ protected:
     std::vector<sf::Text *> hoveredInfoTexts;
     sf::Text * hoveredTickText;
     sf::RectangleShape hoveredTickBar;
-
-
-    sf::Font * font;
 
     std::vector<sf::RectangleShape> linesLegendBackgrounds;
     std::vector<sf::Text> linesLegendTexts;
@@ -45,7 +45,7 @@ protected:
     std::vector<Button *> showAveragedButtons;
 
 public:
-    Graph(const std::string &name, sf::Font *font);
+    Graph(const std::string &name, float xRatio, float yRatio, float widthRatio, float heightRatio);
 
     const std::string &getName() const;
 
@@ -74,6 +74,16 @@ public:
     void mouseMoved(int x, int y);
 
     void drawHoveredInfo(sf::RenderWindow *window);
+
+    void mouseHovering(int mouseX, int mouseY) override;
+
+    void mouseClickedInside(int mouseX, int mouseY) override;
+
+    void resized() override;
+
+    void mouseEnter() override;
+
+    void mouseLeave() override;
 };
 
 

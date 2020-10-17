@@ -14,8 +14,7 @@ int StatisticsScreen::getId() {
 }
 
 void StatisticsScreen::loadGraphs() {
-    Graph * populationGraph = new Graph("Population", font);
-    populationGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    Graph * populationGraph = new Graph("Population", 0.f, 0.1f, 1.f, 0.8f);
 
     populationGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPopulation(), 1, 255, 0, 0);
     populationGraph->addLine(farmUi->getFarm()->getDataAnalyser().getNaturalMatings(), 1, 0, 0, 255);
@@ -25,8 +24,7 @@ void StatisticsScreen::loadGraphs() {
 
 
 
-    Graph * scoreGraph = new Graph("Score", font);
-    scoreGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    Graph * scoreGraph = new Graph("Score", 0.f, 0.1f, 1.f, 0.8f);
 
     scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAverageScore(), 1, 255, 0, 0);
     scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMedianScore(), 1, 100, 100, 255);
@@ -37,8 +35,7 @@ void StatisticsScreen::loadGraphs() {
     scoreGraph->windowResized(windowWidth, windowHeight);
 
 
-    Graph * timeGraph = new Graph("Time", font);
-    timeGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    Graph * timeGraph = new Graph("Time", 0.f, 0.1f, 1.f, 0.8f);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTickTime(), 2, 255, 255, 255);
 
@@ -61,8 +58,7 @@ void StatisticsScreen::loadGraphs() {
 
 
 
-    Graph * brainTimeGraph = new Graph("Brain times", font);
-    brainTimeGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    Graph * brainTimeGraph = new Graph("Brain times", 0.f, 0.1f, 1.f, 0.8f);
 
     brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getChunkSelection(), 2, 255, 255, 255);
 
@@ -81,8 +77,7 @@ void StatisticsScreen::loadGraphs() {
 
 
 
-    Graph * energyGraph = new Graph("Energies", font);
-    energyGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    Graph * energyGraph = new Graph("Energies", 0.f, 0.1f, 1.f, 0.8f);
 
     energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTotalEnergy(), 1, 0, 0, 255);
     energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAvailableEnergy(), 1, 100, 100, 255);
@@ -101,8 +96,7 @@ void StatisticsScreen::loadGraphs() {
 
 
 
-    Graph * brainsGraph = new Graph("Brains", font);
-    brainsGraph->setPosition(0.f, 0.1f, 1.f, 0.8f);
+    Graph * brainsGraph = new Graph("Brains", 0.f, 0.1f, 1.f, 0.8f);
 
     brainsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAverageInputNeurons(), 1, 0, 255, 0);
     brainsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAverageOutputNeurons(), 1, 0, 0, 255);
@@ -129,8 +123,8 @@ void StatisticsScreen::loadButtons(sf::Font *font) {
     sf::Color textColor = sf::Color(195, 195, 195, 255);
 
     for (int it = 0; it < graphs.size(); it++) {
-        Button * button = new Button(graphs.at(it)->getName(), it, font, it * 160, 0, 150, 50, backgroundColor, textColor);
-        graphButtons.emplace_back(button);
+//        Button * button = new Button(graphs.at(it)->getName(), it, font, it * 160, 0, 150, 50, backgroundColor, textColor);
+//        graphButtons.emplace_back(button);
     }
 }
 

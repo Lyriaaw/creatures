@@ -24,7 +24,7 @@ void ColorsGraph::getMinAndMaxValues() {
     }
 }
 
-ColorsGraph::ColorsGraph(const std::string &name, sf::Font *font, GeneGraphAnalyser *dataAnalyser) : Graph(name, font),dataAnalyser(dataAnalyser), mode("POPULATION") {
+ColorsGraph::ColorsGraph(const std::string &name, float xRatio, float yRatio, float widthRatio, float heightRatio, GeneGraphAnalyser *dataAnalyser) : Graph(name, xRatio, yRatio, widthRatio, heightRatio),dataAnalyser(dataAnalyser), mode("POPULATION") {
     texture = sf::Texture();
     texture.create(0, 0);
 

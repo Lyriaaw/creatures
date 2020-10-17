@@ -25,7 +25,7 @@ private:
     std::string mode;
 
 public:
-    ColorsGraph(const std::string &name, sf::Font *font, GeneGraphAnalyser *dataAnalyser);
+    ColorsGraph(const std::string &name, float xRatio, float yRatio, float widthRatio, float heightRatio, GeneGraphAnalyser *dataAnalyser);
 
     void draw(sf::RenderWindow *window);
 

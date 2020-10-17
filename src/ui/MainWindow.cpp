@@ -150,9 +150,9 @@ void MainWindow::loadScreens() {
     screens.emplace_back(worldView);
 
 
-//    StatisticsScreen * statisticsScreen = new StatisticsScreen(farmUi);
-//    statisticsScreen->init();
-//    screens.emplace_back(statisticsScreen);
+    StatisticsScreen * statisticsScreen = new StatisticsScreen(farmUi);
+    statisticsScreen->init();
+    screens.emplace_back(statisticsScreen);
 
     MinimapsScreen * minimapsScreen = new MinimapsScreen(farmUi);
     minimapsScreen->init();
