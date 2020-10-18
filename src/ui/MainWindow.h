@@ -59,7 +59,9 @@ private:
 
     sf::Text generalInformationLabel;
     sf::Text speedInformationLabel;
+    sf::Text timeInformationLabel;
 
+    std::chrono::system_clock::time_point tickFarmStarted;
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
     double fps;

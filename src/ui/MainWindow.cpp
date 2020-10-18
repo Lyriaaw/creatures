@@ -35,6 +35,7 @@ using namespace std;
 
 MainWindow::MainWindow(): leftMouseButtonDown(false), rightMouseButtonDown(false) {
     tickStart = std::chrono::system_clock::now();
+    tickFarmStarted = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 }
 
@@ -60,19 +61,28 @@ void MainWindow::loadUI() {
     sf::Color textColor = sf::Color(200, 200, 200, 255);
     double positionY = 3;
 
-    double positionX = window->getSize().x * 0.88;
+    double positionX = window->getSize().x - (3 * 200);
     generalInformationLabel.setFont(*GlobalFont::MainFont);
     generalInformationLabel.setString("Loading");
     generalInformationLabel.setCharacterSize(15);
     generalInformationLabel.setFillColor(textColor);
     generalInformationLabel.setPosition(positionX, positionY);
 
-    positionX = window->getSize().x * 0.94;
+    positionX = window->getSize().x - (2 * 200);
     speedInformationLabel.setFont(*GlobalFont::MainFont);
     speedInformationLabel.setString("Loading");
     speedInformationLabel.setCharacterSize(15);
     speedInformationLabel.setFillColor(textColor);
     speedInformationLabel.setPosition(positionX, positionY);
+
+    positionX = window->getSize().x - (1 * 200);
+    timeInformationLabel.setFont(*GlobalFont::MainFont);
+    timeInformationLabel.setString("Loading");
+    timeInformationLabel.setCharacterSize(15);
+    timeInformationLabel.setFillColor(textColor);
+    timeInformationLabel.setPosition(positionX, positionY);
+
+
 }
 
 
@@ -273,26 +283,62 @@ void MainWindow::updateInformationLabel() {
     std::stringstream speedStream;
     speedStream << std::fixed << std::setprecision(2);
 
+    speedStream <<  "Creatures: " << farm->getDataAnalyser().getPopulation()->getLastValue();
+    speedStream <<  std::endl;
+
+
     speedStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue();
     speedStream << " (" << farm->getDataAnalyser().getTickPerSecond()->getLastValue() << ")";
-
-    speedStream << std::endl;
-
-    speedStream << "FPS: " << fps;
     speedStream << std::endl;
 
     speedInformationLabel.setString(speedStream.str());
 
 
 
+
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = now - tickFarmStarted;
+
+    int seconds = elapsed_time.count();
+
+
+
+
+    int hours = seconds / 3600;
+    seconds -= hours * 3600;
+
+    int minutes = seconds / 60;
+    seconds -= minutes * 60;
+
     std::stringstream informationStream;
+    informationStream << std::fixed << std::setprecision(2);
+
     informationStream << "Tick: " << farm->getDataAnalyser().getPopulation()->getCount();
     informationStream << std::endl;
 
-    informationStream << "Creatures: " << farm->getDataAnalyser().getPopulation()->getLastValue();
+    informationStream << "Uptime: ";
+    informationStream << hours << "h " << minutes << "m " << seconds << "s ";
     informationStream << std::endl;
 
     generalInformationLabel.setString(informationStream.str());
+
+
+
+
+    std::stringstream timeInformationStream;
+    timeInformationStream << std::fixed << std::setprecision(2);
+
+    timeInformationStream << "FPS: " << fps;
+    timeInformationStream << std::endl;
+
+    timeInformationLabel.setString(timeInformationStream.str());
+
+
+//    timeInformationStream << "Creatures: " << farm->getDataAnalyser().getPopulation()->getLastValue();
+//    timeInformationStream << std::endl;
+
+
+
 }
 
 
@@ -313,6 +359,7 @@ void MainWindow::draw() {
 
     window->draw(generalInformationLabel);
     window->draw(speedInformationLabel);
+    window->draw(timeInformationLabel);
 
 
 
