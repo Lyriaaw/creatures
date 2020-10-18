@@ -273,7 +273,9 @@ void MainWindow::updateInformationLabel() {
     std::stringstream speedStream;
     speedStream << std::fixed << std::setprecision(2);
 
-    speedStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getLastValue();
+    speedStream << "TPS: " << farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue();
+    speedStream << " (" << farm->getDataAnalyser().getTickPerSecond()->getLastValue() << ")";
+
     speedStream << std::endl;
 
     speedStream << "FPS: " << fps;

@@ -277,11 +277,11 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life, std::vector<Evolution *> childGenome) {
     std::vector<Evolution *> newEvolutions;
 
-    if (rand() % 10 != 0) {
+    if (rand() % MUTATION_RATIO != 0) {
         return newEvolutions;
     }
 
-//    std::cout << "New evolution " << std::endl;
+    std::cout << "New evolution " << std::endl;
 
     return generateNeuronEvolution(life, childGenome);
 }

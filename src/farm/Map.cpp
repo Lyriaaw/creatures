@@ -238,7 +238,7 @@ void Map::processClimate() {
                 continue;
             }
 
-            float heatToGroundRatio = 0.01f;
+            float heatToGroundRatio = 0.01f * VEGETALISATION_RATE;
             float currentTileHeat = currentTile->getHeat();
 
             currentTile->addHeat(- 1 * currentTileHeat * heatToGroundRatio);

@@ -43,24 +43,24 @@ void ActionsMinimap::draw(sf::RenderWindow *window) {
 
 sf::Color ActionsMinimap::getColorFromActionName(ActionDTO action) {
     if (action.getType() == "EAT_LIFE") {
-        return sf::Color(255, 0, 0);
+        return sf::Color(128, 0, 0);
     }
     if (action.getType() == "EAT_ENTITY") {
-        return sf::Color(0, 128, 0);
+        return sf::Color(0, 64, 0);
     }
 
     if (action.getType() == "BITE_LIFE") {
-        return sf::Color(128, 128, 0);
+        return sf::Color(64, 64, 0);
     }
     if (action.getType() == "BITE_ENTITY") {
-        return sf::Color(58, 0, 94);
+        return sf::Color(29, 0, 47);
     }
 
 //    if (action.getType() == "POOP") {
 //        return sf::Color(120, 148, 0);
 //    }
     if (action.getType() == "MATE") {
-        return sf::Color(255, 0, 174);
+        return sf::Color(255, 0, 255);
     }
 
 

@@ -644,12 +644,13 @@ void Farm::handleDecay() {
         Point tileCoordinate = position.getTileCoordinates();
         Tile * tile = map->getTileAt(tileCoordinate.getX(), tileCoordinate.getY());
 
-        if (entity->getMass() < 10) {
+        if (entity->getMass() < 100) {
             tile->addGround(entity->getMass());
             entity->setMass(0.0);
         } else {
-            tile->addGround(2.0);
-            entity->removeMass(2.0);
+            double transferedMass = 2.0 * VEGETALISATION_RATE;
+            tile->addGround(transferedMass);
+            entity->removeMass(transferedMass);
         }
 
     }
@@ -659,9 +660,15 @@ void Farm::handleDecay() {
 
 void Farm::vegetalisation() {
     std::lock_guard<std::mutex> guard(add_mutex);
-
-
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    if (VEGETALISATION_RATE != 1 && tickCount % VEGETALISATION_RATE != 0) {
+        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time = end - start;
+        dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
+        removeDeletedEntities();
+        return;
+    }
 
     map->processClimate();
     handleDecay();

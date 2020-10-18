@@ -321,13 +321,13 @@ void LifeScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
 
     farmUi->mouseMoved(mouseWorldCoordinates, camera);
 
-    std::vector<std::string> events = farmUi->getFarm()->getNursery()->getEvolutionLibrary().getEvents();
-
-    std::cout << "Evolution library events: " << std::endl;
-    for (auto const string: events) {
-        std::cout << string << std::endl;
-    }
-    std::cout << std::endl;
+//    std::vector<std::string> events = farmUi->getFarm()->getNursery()->getEvolutionLibrary().getEvents();
+//
+//    std::cout << "Evolution library events: " << std::endl;
+//    for (auto const string: events) {
+//        std::cout << string << std::endl;
+//    }
+//    std::cout << std::endl;
 }
 
 void LifeScreen::mouseMoved(int x, int y, int previousX, int previousY) {

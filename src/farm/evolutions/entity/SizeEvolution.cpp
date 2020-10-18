@@ -9,7 +9,7 @@ SizeEvolution::SizeEvolution(): Evolution() {
 }
 
 void SizeEvolution::generateFromRandom(Life * life) {
-    this->size = ((rand() % 1000) / 100.f) + 5;
+    this->size = ((rand() % 500) / 100.f) + 5;
 }
 
 void SizeEvolution::perform(Life * life) {
