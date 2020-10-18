@@ -83,42 +83,27 @@ void FarmUI::addEntities(std::vector<Entity *> addedToFarm) {
 
 
 void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
-    for (int it = 0; it < deletedFromFarm.size(); it++) {
-        Life * lifeToDelete = deletedFromFarm.at(it);
+    std::vector<LifeUI *> newLifeUis;
+    for (int it = 0; it < lifeUIs.size(); it++) {
+        LifeUI * currentLifeUi = lifeUIs.at(it);
 
-        int index = -1;
-        for (int jt = 0; jt < lifeUIs.size(); jt++) {
-            LifeUI * currentLife = lifeUIs.at(jt);
-
-            if (currentLife->getLife()->getEntity()->getId() == lifeToDelete->getEntity()->getId()) {
-                index = jt;
-            }
+        if (currentLifeUi->getLife()->isAlive()) {
+            newLifeUis.emplace_back(currentLifeUi);
         }
-
-        if (index != -1) {
-            lifeUIs.erase(lifeUIs.begin() + index);
-        }
-
     }
+    lifeUIs = newLifeUis;
 }
 
 void FarmUI::clearDeletedEntities(std::vector<Entity *> deletedFromFarm) {
-    for (int it = 0; it < deletedFromFarm.size(); it++) {
-        Entity * entityToDelete = deletedFromFarm.at(it);
+    std::vector<EntityUI *> newEntityUis;
+    for (int it = 0; it < entityUIs.size(); it++) {
+        EntityUI * currentEntityUI = entityUIs.at(it);
 
-        int index = -1;
-        for (int jt = 0; jt < entityUIs.size(); jt++) {
-            EntityUI * currentEntity = entityUIs.at(jt);
-
-            if (currentEntity->getEntity()->getId() == entityToDelete->getId()) {
-                index = jt;
-            }
-        }
-
-        if (index != -1) {
-            entityUIs.erase(entityUIs.begin() + index);
+        if (currentEntityUI->getEntity()->isExists()) {
+            newEntityUis.emplace_back(currentEntityUI);
         }
     }
+    entityUIs = newEntityUis;
 }
 
 
@@ -408,5 +393,11 @@ void FarmUI::setCurrentMinimap(Minimap *currentMinimap) {
     FarmUI::currentMinimap = currentMinimap;
 }
 
+const std::vector<LifeUI *> &FarmUI::getLifeUIs() const {
+    return lifeUIs;
+}
 
+const std::vector<EntityUI *> &FarmUI::getEntityUIs() const {
+    return entityUIs;
+}
 

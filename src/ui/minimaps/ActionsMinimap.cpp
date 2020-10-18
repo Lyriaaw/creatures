@@ -46,14 +46,14 @@ sf::Color ActionsMinimap::getColorFromActionName(ActionDTO action) {
         return sf::Color(128, 0, 0);
     }
     if (action.getType() == "EAT_ENTITY") {
-        return sf::Color(0, 64, 0);
+        return sf::Color(0, 128, 0);
     }
 
     if (action.getType() == "BITE_LIFE") {
-        return sf::Color(64, 64, 0);
+        return sf::Color(128, 128, 0);
     }
     if (action.getType() == "BITE_ENTITY") {
-        return sf::Color(29, 0, 47);
+        return sf::Color(58, 0, 94);
     }
 
 //    if (action.getType() == "POOP") {
@@ -84,7 +84,7 @@ void ActionsMinimap::processRed() {
 
             float availableColor = r[it][jt] / 15;
 
-            if (availableColor <= 10) {
+            if (availableColor <= 1) {
                 continue;
             }
 
@@ -93,6 +93,11 @@ void ActionsMinimap::processRed() {
                     if (it + x < 0 || it + x >= TILE_COUNT_WIDTH ||jt + y < 0 || jt + y >= TILE_COUNT_HEIGHT) {
                         continue;
                     }
+
+
+//                    if (newColor[it + x][jt + y] > newColor[it][jt]) {
+//                        continue;
+//                    }
 
                     newColor[it + x][jt + y] += availableColor;
                     newColor[it][jt] -= availableColor;
@@ -106,14 +111,14 @@ void ActionsMinimap::processRed() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newColor[it][jt] -= std::min(1.0, newColor[it][jt]);
+            newColor[it][jt] -= std::max(0.005 * newColor[it][jt], std::min(0.3, newColor[it][jt]));
         }
     }
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            r[it][jt] = newColor[it][jt];
+            r[it][jt] = std::min(newColor[it][jt], 255.0);
         }
     }
 }
@@ -135,7 +140,7 @@ void ActionsMinimap::processGreen() {
 
             float availableColor = g[it][jt] / 15;
 
-            if (availableColor <= 10) {
+            if (availableColor <= 1) {
                 continue;
             }
 
@@ -144,6 +149,11 @@ void ActionsMinimap::processGreen() {
                     if (it + x < 0 || it + x >= TILE_COUNT_WIDTH ||jt + y < 0 || jt + y >= TILE_COUNT_HEIGHT) {
                         continue;
                     }
+
+
+//                    if (newColor[it + x][jt + y] > newColor[it][jt]) {
+//                        continue;
+//                    }
 
                     newColor[it + x][jt + y] += availableColor;
                     newColor[it][jt] -= availableColor;
@@ -157,14 +167,14 @@ void ActionsMinimap::processGreen() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newColor[it][jt] -= std::min(1.0, newColor[it][jt]);
+            newColor[it][jt] -= std::max(0.005 * newColor[it][jt], std::min(0.3, newColor[it][jt]));
         }
     }
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            g[it][jt] = newColor[it][jt];
+            g[it][jt] = std::min(newColor[it][jt], 255.0);
         }
     }
 }
@@ -186,7 +196,7 @@ void ActionsMinimap::processBlue() {
 
             float availableColor = b[it][jt] / 15;
 
-            if (availableColor <= 10) {
+            if (availableColor <= 1) {
                 continue;
             }
 
@@ -195,6 +205,10 @@ void ActionsMinimap::processBlue() {
                     if (it + x < 0 || it + x >= TILE_COUNT_WIDTH ||jt + y < 0 || jt + y >= TILE_COUNT_HEIGHT) {
                         continue;
                     }
+
+//                    if (newColor[it + x][jt + y] > newColor[it][jt]) {
+//                        continue;
+//                    }
 
                     newColor[it + x][jt + y] += availableColor;
                     newColor[it][jt] -= availableColor;
@@ -208,14 +222,14 @@ void ActionsMinimap::processBlue() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newColor[it][jt] -= std::min(1.0, newColor[it][jt]);
+            newColor[it][jt] -= std::max(0.005 * newColor[it][jt], std::min(0.3, newColor[it][jt]));
         }
     }
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            b[it][jt] = newColor[it][jt];
+            b[it][jt] = std::min(newColor[it][jt], 255.0);
         }
     }
 }

@@ -25,9 +25,11 @@ void EntityUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEn
         return;
     }
 
-
-
     float screenSize = (this->entity->getSize()) * camera->getZoom();
+
+    if (screenSize < 1) {
+        return;
+    }
 
     // Colored body
 

@@ -467,6 +467,10 @@ void MainWindow::handleMouseReleased(sf::Mouse::Button button) {
         for (int it = 0; it < uiComponents.size(); it++) {
             uiComponents.at(it)->mouseClicked(mouseX, mouseY);
         }
+
+        if (currentScreen->getId() == 1) {
+            std::cout << "LifesUIs: " << farmUi->getLifeUIs().size() << " ( " << farmUi->getFarm()->getLifes().size() << " ) " << " | EntityUis: " << farmUi->getEntityUIs().size() << " ( " << farmUi->getFarm()->getEntities().size() << " ) " << std::endl;
+        }
     }
 
 }

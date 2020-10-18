@@ -663,10 +663,10 @@ void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     if (VEGETALISATION_RATE != 1 && tickCount % VEGETALISATION_RATE != 0) {
+        removeDeletedEntities();
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time = end - start;
         dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
-        removeDeletedEntities();
         return;
     }
 

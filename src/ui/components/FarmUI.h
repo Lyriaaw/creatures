@@ -77,6 +77,10 @@ public:
     void selectedCreatureChange(std::string type);
 
     void setCurrentMinimap(Minimap *currentMinimap);
+
+    const std::vector<LifeUI *> &getLifeUIs() const;
+
+    const std::vector<EntityUI *> &getEntityUIs() const;
 };
 
 
