@@ -75,6 +75,8 @@ public:
     void processClick(float screenX, float screenY, Camera * camera);
 
     void selectedCreatureChange(std::string type);
+
+    void setCurrentMinimap(Minimap *currentMinimap);
 };
 
 

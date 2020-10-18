@@ -3,6 +3,7 @@
 //
 
 #include "WorldScreen.h"
+#include "../elements/ViewSettings.h"
 
 
 WorldScreen::WorldScreen(FarmUI *farmUi) : Screen(farmUi) {
@@ -15,6 +16,13 @@ int WorldScreen::getId() {
 void WorldScreen::init() {
     loadCamera();
     farmUi->setPositions(camera);
+
+    ViewSettings * viewSetting = new ViewSettings(0.89, 0.1, 0.1, 0.8);
+    viewSetting->setChangeCurrentMinimap([&](Minimap * minimap) {
+        std::cout << "Helo ?" << std::endl;
+       farmUi->setCurrentMinimap(minimap);
+    });
+    uiComponents.emplace_back(viewSetting);
 }
 
 
@@ -44,9 +52,8 @@ void WorldScreen::onWindowResize(int width, int height) {
 }
 
 void WorldScreen::draw(sf::RenderWindow *window) {
-    Screen::draw(window);
-
     farmUi->draw(window, camera, farmUi->getSelectedLife());
+    Screen::draw(window);
 }
 
 void WorldScreen::mouseMoved(int x, int y, int previousX, int previousY) {

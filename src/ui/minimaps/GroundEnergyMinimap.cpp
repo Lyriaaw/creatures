@@ -44,6 +44,13 @@ void GroundEnergyMinimap::generateValues(Farm * farm) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             values[it][jt] = farm->getMap()->getTileAt(it, jt)->getGround() / 10000.f;
             colors[it][jt] = farm->getMap()->getTileAt(it, jt)->getColor();
+
+            float height = values[it][jt];
+
+            RGBColor rectangleColor = RGBColor(0.28f, 1.f, height);
+
+            sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+            colorGrid[it][jt] = pixelColor;
         }
     }
 }

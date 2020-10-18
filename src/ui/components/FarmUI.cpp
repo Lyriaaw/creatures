@@ -404,5 +404,9 @@ void FarmUI::selectedCreatureChange(std::string type) {
     selectedLifeChanged();
 }
 
+void FarmUI::setCurrentMinimap(Minimap *currentMinimap) {
+    FarmUI::currentMinimap = currentMinimap;
+}
+
 
 

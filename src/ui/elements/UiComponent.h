@@ -6,7 +6,7 @@
 #define CREATURES_UICOMPONENT_H
 
 
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics.hpp>
 
 class UiComponent {
 protected:
@@ -17,10 +17,12 @@ protected:
 
 public:
     UiComponent(double xRatio, double yRatio, double widthRatio, double heightRatio);
-    void onWindowResized(double windowWidth, double windowHeight);
 
-    void mouseMoved(int mouseX, int mouseY, int previousX, int previousY);
-    void mouseClicked(int mouseX, int mouseY);
+    virtual void onWindowResized(double windowWidth, double windowHeight);
+
+    virtual void mouseMoved(int mouseX, int mouseY, int previousX, int previousY);
+
+    virtual void mouseClicked(int mouseX, int mouseY);
 
 
     virtual void mouseHovering(int mouseX, int mouseY) = 0;
