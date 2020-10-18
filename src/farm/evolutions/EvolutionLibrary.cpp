@@ -44,3 +44,11 @@ void EvolutionLibrary::addEvolution(Evolution * evolution) {
     }
 
 }
+
+void EvolutionLibrary::recordEvent(std::string event) {
+    events.emplace_back(event);
+}
+
+const std::vector<std::string> &EvolutionLibrary::getEvents() const {
+    return events;
+}

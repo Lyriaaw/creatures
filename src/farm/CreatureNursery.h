@@ -38,6 +38,8 @@ public:
     std::vector<Evolution *>
     generateNeuronEvolutionFromLinkEvolution(Neuron *inputNeuron, Neuron *outputNeuron,
                                              LinkEvolution *linkEvolution, Life * life);
+
+    std::vector<Evolution *> generateLinkEvolution(Neuron *inputNeuron, Neuron *outputNeuron, Life *life);
 };
 
 

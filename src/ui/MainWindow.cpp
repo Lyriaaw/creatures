@@ -222,6 +222,11 @@ std::thread MainWindow::runFarmLoop() {
     auto f = [](Farm *threadedFarm, bool *running, bool *paused){
         while (*running) {
             threadedFarm->Tick(*paused);
+
+            if (*paused) {
+                usleep(1000000);
+            }
+
         }
     };
 

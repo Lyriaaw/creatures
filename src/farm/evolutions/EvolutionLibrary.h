@@ -22,6 +22,11 @@ public:
     const std::map<int, Evolution *> &getAllEvolutions() const;
     void addEvolution(Evolution *evolution);
 
+    void recordEvent(std::string event);
+
+    const std::vector<std::string> &getEvents() const;
+
+
 private:
     std::vector<int> creatureIndexes;
     std::vector<std::vector<Evolution *>> genomes;
@@ -29,6 +34,8 @@ private:
     std::map<int, Evolution *> allEvolutions;
 
     int currentEvolutionNumber;
+
+    std::vector<std::string> events;
 
 };
 

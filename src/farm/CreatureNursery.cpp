@@ -281,7 +281,7 @@ std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life
         return newEvolutions;
     }
 
-    std::cout << "New evolution " << std::endl;
+//    std::cout << "New evolution " << std::endl;
 
     return generateNeuronEvolution(life, childGenome);
 }
@@ -334,41 +334,56 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolution(Life * life, s
         if (foundEvolution->isEnabled()) {
             return generateNeuronEvolutionFromLinkEvolution(leftNeuron, rightNeuron, foundEvolution, life);
         } else {
+            evolutionLibrary.recordEvent(std::to_string(leftNeuron->getGenerationNumber()) + " => " + std::to_string(rightNeuron->getGenerationNumber()) + " : Already a disabled evolution here");
             return newEvolutions;
         }
 
     } else {
-        LinkEvolution * linkEvolution = new LinkEvolution();
-        linkEvolution->generateGenerationNumber();
-        linkEvolution->generateFromNeurons(life, leftNeuron, rightNeuron);
-
-        std::map<int, Evolution *> allEvolutions = evolutionLibrary.getAllEvolutions();
-
-        bool found = false;
-        for (auto const& row: allEvolutions) {
-            if (row.second->getName() != "Link") {
-                continue;
-            }
-
-            LinkEvolution * currentExistingLinkEvolution = (LinkEvolution *) row.second;
-
-            if (currentExistingLinkEvolution->getInputGenerationNumber() == linkEvolution->getInputGenerationNumber()
-                && currentExistingLinkEvolution->getOutputGenerationNumber() == linkEvolution->getOutputGenerationNumber()) {
-                found = true;
-                linkEvolution->setGenerationNumber(currentExistingLinkEvolution->getGenerationNumber());
-            }
-        }
-
-        linkEvolution->perform(life);
-        newEvolutions.emplace_back(linkEvolution);
-
-        if (!found) {
-            evolutionLibrary.addEvolution(linkEvolution);
-        }
+        evolutionLibrary.recordEvent(std::to_string(leftNeuron->getGenerationNumber()) + " => " + std::to_string(rightNeuron->getGenerationNumber()) + " : New link evolution");
+        return generateLinkEvolution(leftNeuron, rightNeuron, life);
     }
 
     return newEvolutions;
 }
+
+std::vector<Evolution *> CreatureNursery::generateLinkEvolution(Neuron * inputNeuron, Neuron * outputNeuron, Life * life) {
+    std::vector<Evolution *> newEvolutions;
+
+    LinkEvolution * linkEvolution = new LinkEvolution();
+    linkEvolution->generateGenerationNumber();
+    linkEvolution->generateFromNeurons(life, inputNeuron, outputNeuron);
+
+    std::map<int, Evolution *> allEvolutions = evolutionLibrary.getAllEvolutions();
+
+    bool found = false;
+    for (auto const& row: allEvolutions) {
+        if (row.second->getName() != "Link") {
+            continue;
+        }
+
+        LinkEvolution * currentExistingLinkEvolution = (LinkEvolution *) row.second;
+
+        if (currentExistingLinkEvolution->getInputGenerationNumber() == linkEvolution->getInputGenerationNumber()
+            && currentExistingLinkEvolution->getOutputGenerationNumber() == linkEvolution->getOutputGenerationNumber()) {
+            found = true;
+            linkEvolution->setGenerationNumber(currentExistingLinkEvolution->getGenerationNumber());
+        }
+    }
+
+    linkEvolution->perform(life);
+    newEvolutions.emplace_back(linkEvolution);
+
+    if (!found) {
+        evolutionLibrary.recordEvent("  - Created new evolution");
+        evolutionLibrary.addEvolution(linkEvolution);
+    } else {
+        evolutionLibrary.recordEvent("  - Link evolution already exists in the library => " + std::to_string(linkEvolution->getGenerationNumber()));
+    }
+
+    return newEvolutions;
+
+}
+
 
 std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvolution(Neuron * inputNeuron, Neuron * outputNeuron, LinkEvolution * linkEvolution, Life * life) {
     std::vector<Evolution *> newEvolutions;
@@ -377,9 +392,16 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
     float neuronY = (inputNeuron->getY() + outputNeuron->getY()) / 2.f;
 
 
+
+
+
     NeuronEvolution * neuronEvolution = new NeuronEvolution();
     neuronEvolution->generateGenerationNumber();
     neuronEvolution->generateFromXandY(neuronX, neuronY);
+
+    evolutionLibrary.recordEvent(std::to_string(inputNeuron->getGenerationNumber()) + " => " + std::to_string(outputNeuron->getGenerationNumber()) + " : New neuron");
+    evolutionLibrary.recordEvent("  - Initial generation number: " + std::to_string(neuronEvolution->getGenerationNumber()));
+    evolutionLibrary.recordEvent("  - X: " + std::to_string(neuronX) + " Y: " + std::to_string(neuronY));
 
     Neuron * selectedNeuron = nullptr;
     bool found = false;
@@ -392,6 +414,7 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
         if (absX < 10 && absY < 10) {
             selectedNeuron = currentNeuron;
             found = true;
+            evolutionLibrary.recordEvent("  - Found another neuron in the brain already: " + std::to_string(currentNeuron->getGenerationNumber()) + " (" + std::to_string(neuronX) + " , " + std::to_string(neuronY) + ")");
         }
     }
 
@@ -414,6 +437,7 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
                 neuronEvolution->setGenerationNumber(currentNeuronEvolution->getGenerationNumber());
                 neuronEvolution->generateFromXandY(currentNeuronEvolution->getX(), currentNeuronEvolution->getY());
                 isNew = false;
+                evolutionLibrary.recordEvent("  - FFound another at the same place in the library: " + std::to_string(currentNeuronEvolution->getGenerationNumber()) + " (" + std::to_string(neuronEvolution->getX()) + " , " + std::to_string(neuronEvolution->getY()) + ")");
             }
         }
     }
@@ -424,6 +448,7 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
         neuronEvolution->perform(life);
         newEvolutions.emplace_back(neuronEvolution);
         if (isNew) {
+            evolutionLibrary.recordEvent("  - No neuron found already. Will be added in the evolution library");
             evolutionLibrary.addEvolution(neuronEvolution);
         }
         selectedNeuron = neuronEvolution->getNeuron();
@@ -435,24 +460,24 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
         return newEvolutions;
     }
 
-    LinkEvolution * outputLinkEvolution = new LinkEvolution();
-    outputLinkEvolution->generateGenerationNumber();
-    outputLinkEvolution->generateFromNeurons(life, selectedNeuron, outputNeuron);
-    outputLinkEvolution->setWeight(linkEvolution->getWeight());
-    outputLinkEvolution->perform(life);
-    newEvolutions.emplace_back(outputLinkEvolution);
-    evolutionLibrary.addEvolution(outputLinkEvolution);
 
-    LinkEvolution * inputLinkEvolution = new LinkEvolution();
-    inputLinkEvolution->generateGenerationNumber();
-    inputLinkEvolution->generateFromNeurons(life, inputNeuron, selectedNeuron);
-    inputLinkEvolution->setWeight(1);
-    inputLinkEvolution->perform(life);
-    newEvolutions.emplace_back(inputLinkEvolution);
-    evolutionLibrary.addEvolution(inputLinkEvolution);
+    std::vector<Evolution *> outputLinkEvolutions = generateLinkEvolution(selectedNeuron, outputNeuron, life);
+    newEvolutions.insert(newEvolutions.end(), outputLinkEvolutions.begin(), outputLinkEvolutions.end());
+    evolutionLibrary.recordEvent("  - Connected to right neuron: " + std::to_string(outputNeuron->getGenerationNumber()));
+
+
+
+    std::vector<Evolution *> inputLinkEvolutions = generateLinkEvolution(inputNeuron, selectedNeuron, life);
+    newEvolutions.insert(newEvolutions.end(), inputLinkEvolutions.begin(), inputLinkEvolutions.end());
+    evolutionLibrary.recordEvent("  - Connected to right neuron: " + std::to_string(inputNeuron->getGenerationNumber()));
+
+
+    evolutionLibrary.recordEvent("  - Connected to left neuron: " + std::to_string(inputNeuron->getGenerationNumber()));
 
     life->getBrain()->removeLink(inputNeuron->getGenerationNumber(), outputNeuron->getGenerationNumber());
     linkEvolution->disable();
+    evolutionLibrary.recordEvent("  - Removed link between and disabling evolution between " + std::to_string(inputNeuron->getGenerationNumber()) + " and " + std::to_string(outputNeuron->getGenerationNumber()));
+
 
     return newEvolutions;
 }

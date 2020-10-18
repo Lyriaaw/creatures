@@ -84,9 +84,15 @@ Evolution * LinkEvolution::generateFromCastedMate(LinkEvolution * mate) {
     childSensorEvolution->inputGenerationNumber = inputGenerationNumber;
     childSensorEvolution->outputGenerationNumber = outputGenerationNumber;
 
-    if (mate == nullptr || !isEnabled()) {
+    if (mate == nullptr || !isEnabled() || !mate->enabled) {
         childSensorEvolution->weight = this->weight;
-        childSensorEvolution->enabled = isEnabled();
+
+
+        bool shouldDisableBecauseOfMate = mate != nullptr && !mate->isEnabled();
+        childSensorEvolution->enabled = isEnabled() && !shouldDisableBecauseOfMate;
+
+
+
         return childSensorEvolution;
     }
 

@@ -9,6 +9,14 @@ ActionsMinimap::ActionsMinimap(): Minimap() {}
 ActionsMinimap::ActionsMinimap(double pixelSize, double positionX, double positionY)
         : Minimap(pixelSize, positionX, positionY) {
 
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            r[it][jt] = 0;
+            g[it][jt] = 0;
+            b[it][jt] = 0;
+        }
+    }
 }
 
 
