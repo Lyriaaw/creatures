@@ -19,7 +19,6 @@ void WorldScreen::init() {
 
     ViewSettings * viewSetting = new ViewSettings(0.89, 0.1, 0.1, 0.8);
     viewSetting->setChangeCurrentMinimap([&](Minimap * minimap) {
-        std::cout << "Helo ?" << std::endl;
        farmUi->setCurrentMinimap(minimap);
     });
     uiComponents.emplace_back(viewSetting);

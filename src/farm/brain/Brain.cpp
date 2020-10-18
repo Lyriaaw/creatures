@@ -33,6 +33,25 @@ void Brain::addLink(Link *link){
     this->links.push_back(link);
 }
 
+void Brain::removeLink(int inputGenerationNumber, int outputGenerationNumber) {
+
+    int foundIndex = -1;
+    for (int it = 0; it < links.size(); it++) {
+        Link * currentLink = links.at(it);
+
+        if (currentLink->getInput()->getGenerationNumber() == inputGenerationNumber && currentLink->getOutput()->getGenerationNumber() == outputGenerationNumber) {
+            foundIndex = it;
+        }
+    }
+
+    if (foundIndex == -1) {
+        std::cout << "Error while removing link. Link not found" << std::endl;
+        return;
+    }
+
+    links.erase(links.begin() + foundIndex);
+}
+
 void Brain::generateLinkGrid(){
 
     for (int lineNumberIndex = 0; lineNumberIndex < linesNumber.size(); lineNumberIndex++) {

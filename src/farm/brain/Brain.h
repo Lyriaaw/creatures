@@ -32,6 +32,7 @@ public:
     const std::vector<int> &getLinesNumber() const;
 
     void generateLinkGrid();
+    void removeLink(int inputGenerationNumber, int outputGenerationNumber);
 
 
 private:

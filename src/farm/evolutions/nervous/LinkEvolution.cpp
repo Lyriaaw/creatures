@@ -2,6 +2,7 @@
 // Created by Amalric Lombard de Buffières on 8/3/20.
 //
 
+#include <map>
 #include "LinkEvolution.h"
 LinkEvolution::LinkEvolution(): Evolution() {
 
@@ -16,9 +17,20 @@ void LinkEvolution::generateFromNeurons(Life * life, Neuron * input, Neuron * ou
     weight = ((rand() % 200) / 100.f) - 1.f;
 }
 
+void LinkEvolution::setWeight(float weight) {
+    LinkEvolution::weight = weight;
+}
+
+float LinkEvolution::getWeight() const {
+    return weight;
+}
 
 
 void LinkEvolution::perform(Life * life) {
+
+    if (!enabled) {
+        return;
+    }
 
     Neuron * inputNeuron = nullptr;
     Neuron * outputNeuron = nullptr;
@@ -53,6 +65,7 @@ std::string LinkEvolution::describe() {
 Evolution * LinkEvolution::generateWithMate(Evolution * mate) {
     LinkEvolution * mateSensorEvolution(nullptr);
 
+
     if (mate == nullptr) {
 //        std::cout << "NULL POINTER OF MATE LINK: " << generationNumber << std::endl;
     } else {
@@ -71,8 +84,9 @@ Evolution * LinkEvolution::generateFromCastedMate(LinkEvolution * mate) {
     childSensorEvolution->inputGenerationNumber = inputGenerationNumber;
     childSensorEvolution->outputGenerationNumber = outputGenerationNumber;
 
-    if (mate == nullptr) {
+    if (mate == nullptr || !isEnabled()) {
         childSensorEvolution->weight = this->weight;
+        childSensorEvolution->enabled = isEnabled();
         return childSensorEvolution;
     }
 
@@ -96,6 +110,16 @@ Evolution * LinkEvolution::generateFromCastedMate(LinkEvolution * mate) {
 }
 
 
+
+
 std::string LinkEvolution::getName() {
     return "Link";
+}
+
+int LinkEvolution::getInputGenerationNumber() const {
+    return inputGenerationNumber;
+}
+
+int LinkEvolution::getOutputGenerationNumber() const {
+    return outputGenerationNumber;
 }

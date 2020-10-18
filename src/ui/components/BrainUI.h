@@ -23,6 +23,11 @@ private:
 
     float x, y, width, height, windowWidth, windowHeight;
 
+    Neuron * hoveredNeuron;
+
+
+    float networkWidth, networkHeight, margin, circleRadius, networkWidthRatio, networkHeightRatio;
+
 
 public:
     BrainUI(Brain *brain, float x, float y, float width, float height, sf::Font * font, float windowWidth, float windowHeight);
@@ -32,6 +37,13 @@ public:
 
     bool mouseClicked(int x, int y);
 
+    bool mouseMoved(int mouseX, int mouseY);
+
+    void calculatePlacementValues();
+
+    void initializeLinks();
+
+    void initializeNeurons();
 };
 
 

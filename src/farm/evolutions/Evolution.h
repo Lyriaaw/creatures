@@ -17,6 +17,8 @@ protected:
     InputNeuron * inputNeuron;
     std::vector<OutputNeuron *> outputNeurons;
 
+    bool enabled;
+
 public:
     static int nextEvolutionNumber;
 
@@ -41,6 +43,12 @@ public:
     InputNeuron *getInputNeuron() const;
 
     const std::vector<OutputNeuron *> &getOutputNeurons() const;
+
+    void disable();
+
+    bool isEnabled() const;
+
+
 };
 
 

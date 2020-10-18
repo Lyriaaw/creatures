@@ -6,7 +6,7 @@
 
 int Evolution::nextEvolutionNumber = 1;
 
-Evolution::Evolution() {
+Evolution::Evolution(): enabled(true) {
 
 }
 
@@ -32,4 +32,12 @@ InputNeuron *Evolution::getInputNeuron() const {
 
 const std::vector<OutputNeuron *> &Evolution::getOutputNeurons() const {
     return outputNeurons;
+}
+
+void Evolution::disable() {
+    this->enabled = false;
+}
+
+bool Evolution::isEnabled() const {
+    return enabled;
 }

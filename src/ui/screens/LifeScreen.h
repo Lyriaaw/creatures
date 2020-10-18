@@ -82,6 +82,8 @@ public:
     void drawGraphs(sf::RenderWindow *pWindow);
 
     void mouseScrolled(float delta, int mouseX, int mouseY);
+
+    void mouseMoved(int x, int y, int previousX, int previousY) override;
 };
 
 

@@ -834,7 +834,7 @@ void Farm::statistics() {
         totalCreaturesMass += currentLife->getEntity()->getMass();
         totalCreaturesWasted += currentLife->getEnergyCenter()->getWastedEnergy();
 
-        totalInputNeurons += currentLife->getBrain()->getInputNeurons().size();
+        totalInputNeurons += currentLife->getBrain()->getNeurons().size();
         totalOutputNeurons += currentLife->getBrain()->getOutputNeurons().size();
         totalLinks += currentLife->getBrain()->getLinks().size();
     }

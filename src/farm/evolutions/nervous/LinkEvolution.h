@@ -7,6 +7,7 @@
 
 
 #include "../Evolution.h"
+#include <map>
 
 class LinkEvolution: public Evolution {
 private:
@@ -23,6 +24,15 @@ public:
 
     void generateFromNeurons(Life * life, Neuron * input, Neuron * output);
 
+    int getInputGenerationNumber() const;
+
+    int getOutputGenerationNumber() const;
+
+    void setWeight(float weight);
+
+    float getWeight() const;
+
+    void changeEvolutionNumberIfAlreadyExists(std::map<int, Evolution *> currentWholeGenome);
 };
 
 

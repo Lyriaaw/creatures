@@ -271,7 +271,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
 
     Point worldCoordinates = Point(hoveredTile.getX() * TILE_SIZE, hoveredTile.getY() * TILE_SIZE);
 
-    if (camera->shouldDisplayPoint(camera->getScreenCoordinates(worldCoordinates))) {
+    if (camera->shouldDisplayPoint(camera->getScreenCoordinates(worldCoordinates)) && camera->isShowGrid()) {
         window->draw(hoveredTileInfos);
     }
 

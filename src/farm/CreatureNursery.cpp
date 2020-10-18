@@ -10,6 +10,7 @@
 #include "evolutions/nervous/DistanceBarSensorEvolution.h"
 #include "evolutions/inputs/sensors/MassSensorEvolution.h"
 #include "evolutions/musclesEvolutions/MemoryEvolution.h"
+#include "evolutions/nervous/NeuronEvolution.h"
 
 using namespace std;
 
@@ -261,7 +262,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     }
 
 
-    std::vector<Evolution *> randomEvolutions = generateNewRandomEvolution(life);
+    std::vector<Evolution *> randomEvolutions = generateNewRandomEvolution(life, childGenome);
     if (!randomEvolutions.empty()) {
         childGenome.insert(childGenome.end(), randomEvolutions.begin(), randomEvolutions.end());
     }
@@ -273,37 +274,209 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     return life;
 }
 
-std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life) {
+std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life, std::vector<Evolution *> childGenome) {
     std::vector<Evolution *> newEvolutions;
 
-    if (rand() % MUTATION_RATIO != 0) {
+    if (rand() % 10 != 0) {
         return newEvolutions;
     }
 
     std::cout << "New evolution " << std::endl;
 
+    return generateNeuronEvolution(life, childGenome);
+}
 
-    HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
-    sensorEvol->generateGenerationNumber();
-    sensorEvol->generateFromRandom(life);
-    sensorEvol->perform(life);
-    newEvolutions.emplace_back(sensorEvol);
-    evolutionLibrary.addEvolution(sensorEvol);
+std::vector<Evolution *> CreatureNursery::generateNeuronEvolution(Life * life, std::vector<Evolution *> childGenome) {
+    std::vector<Evolution *> newEvolutions;
 
-    for (int jt = 0; jt < life->getBrain()->getOutputNeurons().size(); jt++) {
+    int neuronsSize = life->getBrain()->getNeurons().size();
 
+    Neuron * firstNeuron = life->getBrain()->getNeurons().at(rand() % neuronsSize);
+    Neuron * secondNeuron = nullptr;
+    bool correctPick = false;
+
+    while(!correctPick) {
+        secondNeuron = life->getBrain()->getNeurons().at(rand() % neuronsSize);
+
+        correctPick = firstNeuron->getGenerationNumber() != secondNeuron->getGenerationNumber() && firstNeuron->getX() != secondNeuron->getX();
+    }
+
+    Neuron * leftNeuron = nullptr;
+    Neuron * rightNeuron = nullptr;
+    if (firstNeuron->getX() > secondNeuron->getX()) {
+        rightNeuron = firstNeuron;
+        leftNeuron = secondNeuron;
+    } else {
+        rightNeuron = secondNeuron;
+        leftNeuron = firstNeuron;
+    }
+
+
+    LinkEvolution * foundEvolution = nullptr;
+
+    for (int it = 0; it < childGenome.size(); it++) {
+        if (childGenome.at(it)->getName() != "Link") {
+            continue;
+        }
+
+        LinkEvolution * currentEvolution = (LinkEvolution *) childGenome.at(it);
+
+        bool sameInput = currentEvolution->getInputGenerationNumber() == leftNeuron->getGenerationNumber();
+        bool sameOutput = currentEvolution->getOutputGenerationNumber() == rightNeuron->getGenerationNumber();
+
+        if (sameInput && sameOutput) {
+            foundEvolution = currentEvolution;
+        }
+
+    }
+
+    if (foundEvolution) {
+        if (foundEvolution->isEnabled()) {
+            return generateNeuronEvolutionFromLinkEvolution(leftNeuron, rightNeuron, foundEvolution, life);
+        } else {
+            return newEvolutions;
+        }
+
+    } else {
         LinkEvolution * linkEvolution = new LinkEvolution();
         linkEvolution->generateGenerationNumber();
-        linkEvolution->generateFromNeurons(life, sensorEvol->getInputNeuron(), life->getBrain()->getOutputNeurons().at(jt));
+        linkEvolution->generateFromNeurons(life, leftNeuron, rightNeuron);
+
+        std::map<int, Evolution *> allEvolutions = evolutionLibrary.getAllEvolutions();
+
+        bool found = false;
+        for (auto const& row: allEvolutions) {
+            if (row.second->getName() != "Link") {
+                continue;
+            }
+
+            LinkEvolution * currentExistingLinkEvolution = (LinkEvolution *) row.second;
+
+            if (currentExistingLinkEvolution->getInputGenerationNumber() == linkEvolution->getInputGenerationNumber()
+                && currentExistingLinkEvolution->getOutputGenerationNumber() == linkEvolution->getOutputGenerationNumber()) {
+                found = true;
+                linkEvolution->setGenerationNumber(currentExistingLinkEvolution->getGenerationNumber());
+            }
+        }
+
         linkEvolution->perform(life);
         newEvolutions.emplace_back(linkEvolution);
-        evolutionLibrary.addEvolution(linkEvolution);
 
+        if (!found) {
+            evolutionLibrary.addEvolution(linkEvolution);
+        }
     }
 
     return newEvolutions;
 }
 
+std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvolution(Neuron * inputNeuron, Neuron * outputNeuron, LinkEvolution * linkEvolution, Life * life) {
+    std::vector<Evolution *> newEvolutions;
+
+    float neuronX = (inputNeuron->getX() + outputNeuron->getX()) / 2.f;
+    float neuronY = (inputNeuron->getY() + outputNeuron->getY()) / 2.f;
+
+
+    NeuronEvolution * neuronEvolution = new NeuronEvolution();
+    neuronEvolution->generateGenerationNumber();
+    neuronEvolution->generateFromXandY(neuronX, neuronY);
+
+    Neuron * selectedNeuron = nullptr;
+    bool found = false;
+    for (int it = 0; it < life->getBrain()->getNeurons().size(); it++) {
+        Neuron * currentNeuron = life->getBrain()->getNeurons().at(it);
+
+        float absX = abs(currentNeuron->getX() - neuronEvolution->getX());
+        float absY = abs(currentNeuron->getY() - neuronEvolution->getY());
+
+        if (absX < 10 && absY < 10) {
+            selectedNeuron = currentNeuron;
+            found = true;
+        }
+    }
+
+    bool isNew = true;
+    if (!found) {
+        std::map<int, Evolution *> allEvolutions = evolutionLibrary.getAllEvolutions();
+
+        for (auto const& currentEvolution : allEvolutions) {
+
+            if (currentEvolution.second->getName() != "Neuron") {
+                continue;
+            }
+
+            NeuronEvolution * currentNeuronEvolution = (NeuronEvolution *) currentEvolution.second;
+
+            float absX = abs(currentNeuronEvolution->getX() - neuronEvolution->getX());
+            float absY = abs(currentNeuronEvolution->getY() - neuronEvolution->getY());
+
+            if (absX < 10 && absY < 10) {
+                neuronEvolution->setGenerationNumber(currentNeuronEvolution->getGenerationNumber());
+                neuronEvolution->generateFromXandY(currentNeuronEvolution->getX(), currentNeuronEvolution->getY());
+                isNew = false;
+            }
+        }
+    }
+
+
+
+    if (!found) {
+        neuronEvolution->perform(life);
+        newEvolutions.emplace_back(neuronEvolution);
+        if (isNew) {
+            evolutionLibrary.addEvolution(neuronEvolution);
+        }
+        selectedNeuron = neuronEvolution->getNeuron();
+    }
+
+
+    if (selectedNeuron == nullptr) {
+        std::cout << "Error while selecting new neuron for link" << std::endl;
+        return newEvolutions;
+    }
+
+    LinkEvolution * outputLinkEvolution = new LinkEvolution();
+    outputLinkEvolution->generateGenerationNumber();
+    outputLinkEvolution->generateFromNeurons(life, selectedNeuron, outputNeuron);
+    outputLinkEvolution->setWeight(linkEvolution->getWeight());
+    outputLinkEvolution->perform(life);
+    newEvolutions.emplace_back(outputLinkEvolution);
+    evolutionLibrary.addEvolution(outputLinkEvolution);
+
+    LinkEvolution * inputLinkEvolution = new LinkEvolution();
+    inputLinkEvolution->generateGenerationNumber();
+    inputLinkEvolution->generateFromNeurons(life, inputNeuron, selectedNeuron);
+    inputLinkEvolution->setWeight(1);
+    inputLinkEvolution->perform(life);
+    newEvolutions.emplace_back(inputLinkEvolution);
+    evolutionLibrary.addEvolution(inputLinkEvolution);
+
+    life->getBrain()->removeLink(inputNeuron->getGenerationNumber(), outputNeuron->getGenerationNumber());
+    linkEvolution->disable();
+
+    return newEvolutions;
+}
+
+
 const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {
     return evolutionLibrary;
 }
+
+
+//HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
+//sensorEvol->generateGenerationNumber();
+//sensorEvol->generateFromRandom(life);
+//sensorEvol->perform(life);
+//newEvolutions.emplace_back(sensorEvol);
+//evolutionLibrary.addEvolution(sensorEvol);
+//
+//for (int jt = 0; jt < life->getBrain()->getOutputNeurons().size(); jt++) {
+//
+//LinkEvolution * linkEvolution = new LinkEvolution();
+//linkEvolution->generateGenerationNumber();
+//linkEvolution->generateFromNeurons(life, sensorEvol->getInputNeuron(), life->getBrain()->getOutputNeurons().at(jt));
+//linkEvolution->perform(life);
+//newEvolutions.emplace_back(linkEvolution);
+//evolutionLibrary.addEvolution(linkEvolution);
+
+//}

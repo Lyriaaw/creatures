@@ -31,7 +31,13 @@ public:
 
     const EvolutionLibrary &getEvolutionLibrary() const;
 
-    std::vector<Evolution *> generateNewRandomEvolution(Life * life);
+    std::vector<Evolution *> generateNewRandomEvolution(Life * life, std::vector<Evolution *> childGenome);
+
+    std::vector<Evolution *> generateNeuronEvolution(Life *life, std::vector<Evolution *> childGenome);
+
+    std::vector<Evolution *>
+    generateNeuronEvolutionFromLinkEvolution(Neuron *inputNeuron, Neuron *outputNeuron,
+                                             LinkEvolution *linkEvolution, Life * life);
 };
 
 

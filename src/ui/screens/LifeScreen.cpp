@@ -321,3 +321,11 @@ void LifeScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
 
     farmUi->mouseMoved(mouseWorldCoordinates, camera);
 }
+
+void LifeScreen::mouseMoved(int x, int y, int previousX, int previousY) {
+    Screen::mouseMoved(x, y, previousX, previousY);
+
+    if (brainUi != nullptr) {
+        brainUi->mouseMoved(x, y);
+    }
+}
