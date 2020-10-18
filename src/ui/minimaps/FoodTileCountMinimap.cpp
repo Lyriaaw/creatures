@@ -59,7 +59,7 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
             averageHues[it][jt] /= float(values[it][jt]);
 
             float hue = averageHues[it][jt];
-            float light = values[it][jt] / 5.f;
+            float light = values[it][jt] / 50.f;
 
             RGBColor rectangleColor = RGBColor(hue, 1.f, light);
 
