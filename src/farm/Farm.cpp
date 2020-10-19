@@ -93,6 +93,7 @@ void Farm::Tick(bool paused) {
     generateEntityGrid();
 
     multithreadBrainProcessing(paused);
+    removeDeletedEntities();
 
 
     if (!paused){
@@ -132,6 +133,10 @@ void Farm::Tick(bool paused) {
     }
 }
 
+void Farm::getLifeAt(int it) {
+
+}
+
 void Farm::multithreadBrainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
@@ -141,55 +146,49 @@ void Farm::multithreadBrainProcessing(bool paused) {
 
     for (int it = 0; it < lifes.size(); it++) {
 
-        auto f = [](Life * life, Farm * farm, bool * paused) {
+        Life * currentLife = lifes.at(it);
 
-            life->processSelectedChunks();
+//        auto f = [](Life * life, Farm * farm, bool * paused) {
 
-
-            std::vector<Entity *> accessibleEntities = farm->getAccessibleEntities(life->getSelectedChunks());
-            std::vector<Tile *> accessibleTiles = farm->getAccessibleTiles(life->getSelectedChunks());
-            life->processSensors(accessibleEntities, accessibleTiles);
+        currentLife->processSelectedChunks();
 
 
-            life->processBrain();
+            std::vector<Entity *> accessibleEntities = this->getAccessibleEntities(currentLife->getSelectedChunks());
+            std::vector<Tile *> accessibleTiles = this->getAccessibleTiles(currentLife->getSelectedChunks());
+        currentLife->processSensors(accessibleEntities, accessibleTiles);
+
+
+        currentLife->processBrain();
 
 
 
-            if (!*paused) {
-                std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
+            if (!paused) {
+                std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
 
                 if (currentCreatureActions.size() > 0) {
-                    farm->executeCreaturesActions(currentCreatureActions);
+                    this->executeCreaturesActions(currentCreatureActions);
                 }
 //                farm->addActions(currentCreatureActions);
             }
 
 
-        };
+//        };
 
-        Life *currentLife = lifes.at(it);
-
-        int index = it;
-        chunkThreads[index] = std::thread(f, currentLife, this, &paused);
+//        Life *currentLife = lifes.at(it);
+//
+//        int index = it;
+//        chunkThreads[index] = std::thread(f, currentLife, this, &paused);
     }
 
-    for (int it = 0; it < lifes.size(); it++) {
-        while (!std_mutex.try_lock()) {
-            usleep(10000);
-        }
-        std::cout << "Life : " << it << std::endl;
-        std_mutex.unlock();
-        chunkThreads[it].join();
-        while (!std_mutex.try_lock()) {
-            usleep(10000);
-        }
-        std::cout << "Life : " << it << " Finished ->  " << lifes.size() << std::endl;
-        std_mutex.unlock();
-    }
+//    int count = 0;
+//    for (int it = 0; it < lifes.size(); it++) {
+//        chunkThreads[it].join();
+//        count++;
+//    }
 
-    std::cout << "###############" << std::endl;
-    std::cout << "Finished" << std::endl;
-    std::cout << "###############" << std::endl;
+//    std::cout << "###############" << std::endl;
+//    std::cout << "Finished: " << count << std::endl;
+//    std::cout << "###############" << std::endl;
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -294,14 +293,14 @@ void Farm::moveCreatures() {
 }
 
 void Farm::addEntitiesToFarm(std::vector<Entity *> addedEntities) {
-    std::lock_guard<std::mutex> guard(add_mutex);
+    std::lock_guard<std::mutex> guard(entities_mutex);
     entities.insert(entities.end(), addedEntities.begin(), addedEntities.end());
     entityAdded.insert(entityAdded.end(), addedEntities.begin(), addedEntities.end());
 }
 
 void Farm::addLifesToFarm(Life * newLife) {
-    std::lock_guard<std::mutex> guard(add_mutex);
-    lifes.emplace_back(newLife);
+    std::lock_guard<std::mutex> guard(lifes_mutex);
+    lifes.emplace_back(newLife); // THIS LINE CRASHES EVERYTHING
     lifesAdded.emplace_back(newLife);
 }
 
@@ -309,6 +308,7 @@ void Farm::addLifesToFarm(Life * newLife) {
 
 void Farm::executeCreaturesActions(std::vector<ActionDTO>  givenActions) {
 //    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
 
     int naturalMatingCount = 0;
     for (int it = 0; it < givenActions.size(); it++) {
@@ -323,14 +323,13 @@ void Farm::executeCreaturesActions(std::vector<ActionDTO>  givenActions) {
         while (!std_mutex.try_lock()) {
             usleep(10000);
         }
-        std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << std::endl;
         std_mutex.unlock();
         if (actionDto.getType() == "POOP") {
+            return;
             handlePoop(performer);
             while (!std_mutex.try_lock()) {
                 usleep(10000);
             }
-            std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << " done " <<  std::endl;
             std_mutex.unlock();
             continue;
         }
@@ -341,7 +340,6 @@ void Farm::executeCreaturesActions(std::vector<ActionDTO>  givenActions) {
             while (!std_mutex.try_lock()) {
                 usleep(10000);
             }
-            std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << " not done " <<  std::endl;
             std_mutex.unlock();
             continue;
         }
@@ -364,10 +362,8 @@ void Farm::executeCreaturesActions(std::vector<ActionDTO>  givenActions) {
         while (!std_mutex.try_lock()) {
             usleep(10000);
         }
-        std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << " done " <<  std::endl;
         std_mutex.unlock();
     }
-    removeDeletedEntities();
 
 //    actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
@@ -588,6 +584,7 @@ bool Farm::handleMating(Life * father, int entityId) {
         return false;
     }
 
+
     father->getEntity()->lockInteraction();
     foundLife->getEntity()->lockInteraction();
 
@@ -648,6 +645,8 @@ bool Farm::handleMating(Life * father, int entityId) {
         return true;
     }
 
+
+
     father->getEntity()->unlockInteraction();
     foundLife->getEntity()->unlockInteraction();
 
@@ -671,7 +670,7 @@ bool Farm::handleMating(Life * father, int entityId) {
 
 
 void Farm::populationControl() {
-    std::lock_guard<std::mutex> guard(add_mutex);
+    std::lock_guard<std::mutex> guard(lifes_mutex);
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
@@ -716,8 +715,7 @@ void Farm::populationControl() {
         totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyCenter()->getAvailableEnergy();
 
 
-        lifes.emplace_back(child);
-        lifesAdded.emplace_back(child);
+        addLifesToFarm(child);
     }
 
     map->removeEnergyFromGround(totalEnergyRemoved);
@@ -751,7 +749,7 @@ void Farm::handleDecay() {
 }
 
 void Farm::vegetalisation() {
-    std::lock_guard<std::mutex> guard(add_mutex);
+    std::lock_guard<std::mutex> guard(entities_mutex);
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     if (VEGETALISATION_RATE != 1 && tickCount % VEGETALISATION_RATE != 0) {
@@ -1036,7 +1034,8 @@ void Farm::generateEntityGrid() {
 }
 
 void Farm::removeDeletedEntities() {
-    std::lock_guard<std::mutex> guard(delete_mutex);
+    std::lock_guard<std::mutex> guard2(lifes_mutex);
+
 
     std::vector<Life *> newLifes;
     for (int it = 0; it < lifes.size(); it++) {
@@ -1056,14 +1055,15 @@ void Farm::removeDeletedEntities() {
 
     std::vector<Entity *> newEntities;
     for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->lockInteraction();
-        if (entities.at(it)->isExists()) {
-            newEntities.emplace_back(entities.at(it));
+        Entity * currentEntity = entities.at(it);
+        currentEntity->lockInteraction();
+        if (currentEntity->isExists()) {
+            newEntities.emplace_back(currentEntity);
         } else {
-            entityToDelete.emplace_back(entities.at(it));
+            entityToDelete.emplace_back(currentEntity);
         }
 
-        entities.at(it)->unlockInteraction();
+        currentEntity->unlockInteraction();
     }
 
     entities.clear();
@@ -1136,6 +1136,8 @@ void Farm::sortCreatures() {
 
 
 Life * Farm::getLifeFromId(int id) {
+    std::lock_guard<std::mutex> guard3(lifes_mutex);
+
     for (int it = 0; it < this->lifes.size(); it++) {
         if (this->lifes.at(it)->getEntity()->getId() == id) {
             return this->lifes.at(it);
@@ -1146,6 +1148,9 @@ Life * Farm::getLifeFromId(int id) {
 }
 
 Entity * Farm::getEntityFromId(int id) {
+    std::lock_guard<std::mutex> guard3(entities_mutex);
+    std::lock_guard<std::mutex> guard2(lifes_mutex);
+
     for (int it = 0; it < this->lifes.size(); it++) {
         if (this->lifes.at(it)->getEntity()->getId() == id) {
             return this->lifes.at(it)->getEntity();
@@ -1243,7 +1248,9 @@ Map *Farm::getMap() const {
     return map;
 }
 
-const vector<Life *> &Farm::getLifes() const {
+vector<Life *> &Farm::getLifes() {
+    std::lock_guard<std::mutex> guard3(lifes_mutex);
+
     return lifes;
 }
 
@@ -1269,27 +1276,27 @@ const vector<Entity *> &Farm::getEntityToDelete() const {
 }
 
 vector<Entity *> Farm::getAndClearEntitiesToDelete() {
-    std::lock_guard<std::mutex> guard(delete_mutex);
+//    std::lock_guard<std::mutex> guard(entities_mutex);
 
     vector<Entity *> currentEntitiesToDelete;
-    currentEntitiesToDelete.insert(currentEntitiesToDelete.begin(), entityToDelete.begin(), entityToDelete.end());
-    entityToDelete.clear();
+//    currentEntitiesToDelete.insert(currentEntitiesToDelete.begin(), entityToDelete.begin(), entityToDelete.end());
+//    entityToDelete.clear();
 
     return currentEntitiesToDelete;
 }
 
 vector<Life *> Farm::getAndClearLifesToDelete() {
-    std::lock_guard<std::mutex> guard(delete_mutex);
+//    std::lock_guard<std::mutex> guard(lifes_mutex);
 
     vector<Life *> currentLifesToDelete;
-    currentLifesToDelete.insert(currentLifesToDelete.begin(), lifesToDelete.begin(), lifesToDelete.end());
-    lifesToDelete.clear();
+//    currentLifesToDelete.insert(currentLifesToDelete.begin(), lifesToDelete.begin(), lifesToDelete.end());
+//    lifesToDelete.clear();
 
     return currentLifesToDelete;
 }
 
 vector<Entity *> Farm::getAndClearEntitiesToAdd() {
-    std::lock_guard<std::mutex> guard(add_mutex);
+    std::lock_guard<std::mutex> guard(entities_mutex);
 
     vector<Entity *> currentEntitiesToAdd;
     currentEntitiesToAdd.insert(currentEntitiesToAdd.begin(), entityAdded.begin(), entityAdded.end());
@@ -1299,7 +1306,7 @@ vector<Entity *> Farm::getAndClearEntitiesToAdd() {
 }
 
 vector<Life *> Farm::getAndClearLifesToAdd() {
-    std::lock_guard<std::mutex> guard(add_mutex);
+    std::lock_guard<std::mutex> guard(lifes_mutex);
 
     vector<Life *> currentLifesToAdd;
     currentLifesToAdd.insert(currentLifesToAdd.begin(), lifesAdded.begin(), lifesAdded.end());

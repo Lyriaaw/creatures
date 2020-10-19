@@ -53,6 +53,9 @@ private:
     std::mutex actions_mutex;
     std::mutex executed_actions_mutex;
 
+    std::mutex entities_mutex;
+    std::mutex lifes_mutex;
+
     std::mutex add_mutex;
     std::mutex delete_mutex;
     std::mutex std_mutex;
@@ -84,7 +87,7 @@ public:
     Entity * getEntityFromId(int id);
     Life * getLifeFromId(int id);
 
-    const std::vector<Life *> &getLifes() const;
+    std::vector<Life *> &getLifes();
 
     const std::vector<Entity *> &getEntities() const;
 
@@ -156,6 +159,8 @@ public:
     void addEntitiesToFarm(std::vector<Entity *> addedEntities);
 
     void addLifesToFarm(Life * newLife);
+
+    void getLifeAt(int it);
 };
 
 
