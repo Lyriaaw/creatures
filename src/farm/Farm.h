@@ -55,6 +55,7 @@ private:
 
     std::mutex add_mutex;
     std::mutex delete_mutex;
+    std::mutex std_mutex;
 
 
 public:
@@ -67,7 +68,7 @@ public:
     void brainProcessing();
     void moveCreatures();
 
-    void executeCreaturesActions();
+    void executeCreaturesActions(std::vector<ActionDTO>  givenActions);
     bool handleMating(Life * father, int entityId);
 
     void populationControl();

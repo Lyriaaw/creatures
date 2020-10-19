@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <unistd.h>
 
 
 using namespace std;
@@ -94,8 +95,7 @@ void Farm::Tick(bool paused) {
     multithreadBrainProcessing(paused);
 
 
-    if (!paused) {
-        executeCreaturesActions();
+    if (!paused){
         vegetalisation();
         populationControl();
     }
@@ -158,7 +158,10 @@ void Farm::multithreadBrainProcessing(bool paused) {
             if (!*paused) {
                 std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
 
-                farm->addActions(currentCreatureActions);
+                if (currentCreatureActions.size() > 0) {
+                    farm->executeCreaturesActions(currentCreatureActions);
+                }
+//                farm->addActions(currentCreatureActions);
             }
 
 
@@ -171,9 +174,22 @@ void Farm::multithreadBrainProcessing(bool paused) {
     }
 
     for (int it = 0; it < lifes.size(); it++) {
+        while (!std_mutex.try_lock()) {
+            usleep(10000);
+        }
+        std::cout << "Life : " << it << std::endl;
+        std_mutex.unlock();
         chunkThreads[it].join();
+        while (!std_mutex.try_lock()) {
+            usleep(10000);
+        }
+        std::cout << "Life : " << it << " Finished ->  " << lifes.size() << std::endl;
+        std_mutex.unlock();
     }
 
+    std::cout << "###############" << std::endl;
+    std::cout << "Finished" << std::endl;
+    std::cout << "###############" << std::endl;
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -291,23 +307,42 @@ void Farm::addLifesToFarm(Life * newLife) {
 
 
 
-void Farm::executeCreaturesActions() {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+void Farm::executeCreaturesActions(std::vector<ActionDTO>  givenActions) {
+//    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     int naturalMatingCount = 0;
-    for (int it = 0; it < actions.size(); it++) {
-        ActionDTO actionDto = actions.at(it);
+    for (int it = 0; it < givenActions.size(); it++) {
+        ActionDTO actionDto = givenActions.at(it);
 
         Life * performer = getLifeFromId(actionDto.getPerformerId());
 
+        if (performer == nullptr) {
+            continue;
+        }
+
+        while (!std_mutex.try_lock()) {
+            usleep(10000);
+        }
+        std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << std::endl;
+        std_mutex.unlock();
         if (actionDto.getType() == "POOP") {
             handlePoop(performer);
+            while (!std_mutex.try_lock()) {
+                usleep(10000);
+            }
+            std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << " done " <<  std::endl;
+            std_mutex.unlock();
             continue;
         }
 
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
         if (subject->isExists() <= 0 || performer->isAlive() <= 0) {
+            while (!std_mutex.try_lock()) {
+                usleep(10000);
+            }
+            std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << " not done " <<  std::endl;
+            std_mutex.unlock();
             continue;
         }
 
@@ -326,15 +361,20 @@ void Farm::executeCreaturesActions() {
         if (actionDto.getType() == "BITE") {
             handleBiting(performer, subject);
         }
+        while (!std_mutex.try_lock()) {
+            usleep(10000);
+        }
+        std::cout << givenActions.at(it).getPerformerId() << " -> " << givenActions.at(it).getType() << " done " <<  std::endl;
+        std_mutex.unlock();
     }
     removeDeletedEntities();
 
-    actions.clear();
+//    actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
+//    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_time = end - start;
+//    dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
 }
 
 void Farm::handleEating(Life * performer, Entity * subject) {
@@ -946,7 +986,7 @@ void Farm::statistics() {
     totalTime += dataAnalyser.getBrainProcessingTime()->getLastValue();
     totalTime += dataAnalyser.getBrainOutputsTime()->getLastValue();
     totalTime += dataAnalyser.getPrepareActionsTime()->getLastValue();
-    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
+//    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
     totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
     totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
     totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
@@ -1000,12 +1040,15 @@ void Farm::removeDeletedEntities() {
 
     std::vector<Life *> newLifes;
     for (int it = 0; it < lifes.size(); it++) {
+        lifes.at(it)->getEntity()->lockInteraction();
 
         if (lifes.at(it)->isAlive()) {
             newLifes.emplace_back(lifes.at(it));
         } else {
             lifesToDelete.emplace_back(lifes.at(it));
         }
+
+        lifes.at(it)->getEntity()->unlockInteraction();
     }
 
     lifes.clear();
@@ -1013,12 +1056,14 @@ void Farm::removeDeletedEntities() {
 
     std::vector<Entity *> newEntities;
     for (int it = 0; it < entities.size(); it++) {
-
+        entities.at(it)->lockInteraction();
         if (entities.at(it)->isExists()) {
             newEntities.emplace_back(entities.at(it));
         } else {
             entityToDelete.emplace_back(entities.at(it));
         }
+
+        entities.at(it)->unlockInteraction();
     }
 
     entities.clear();

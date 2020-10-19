@@ -49,7 +49,7 @@ void StatisticsScreen::loadGraphs() {
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBrainProcessingTime(), 2, 255, 65, 255);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMoveCreaturesTime(), 2, 255, 128, 128);
-    timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getExecuteActionsTime(), 2, 128, 128, 255);
+//    timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getExecuteActionsTime(), 2, 128, 128, 255);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPopulationControlTime(), 2, 0, 0, 195);
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
