@@ -17,6 +17,8 @@ float Tile::getHeat() const {
 }
 
 void Tile::setHeat(float heat) {
+    std::lock_guard<std::mutex> guard(heatMutex);
+
     Tile::heat = heat;
 }
 
@@ -25,19 +27,24 @@ float Tile::getGround() const {
 }
 
 void Tile::setGround(float ground) {
+    std::lock_guard<std::mutex> guard(groundMutex);
+
     Tile::ground = ground;
 }
 
 void Tile::removeGround(float groundToRemove) {
+    std::lock_guard<std::mutex> guard(groundMutex);
     Tile::ground -= groundToRemove;
 }
 
 
 void Tile::addGround(float value) {
+    std::lock_guard<std::mutex> guard(groundMutex);
     ground += value;
 }
 
 void Tile::addHeat(float value) {
+    std::lock_guard<std::mutex> guard(heatMutex);
     heat += value;
 }
 

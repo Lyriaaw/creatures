@@ -151,6 +151,10 @@ public:
     std::vector<ActionDTO> getAndClearExecutedActions();
 
     void selectedCreatureChange(std::string type);
+
+    void addEntitiesToFarm(std::vector<Entity *> addedEntities);
+
+    void addLifesToFarm(Life * newLife);
 };
 
 

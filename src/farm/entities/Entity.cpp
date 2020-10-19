@@ -4,10 +4,11 @@
 
 #include "Entity.h"
 #include <iostream>
+#include <unistd.h>
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), mass(0.0), age(0) {
+Entity::Entity(Point position): position(position), mass(0.0), age(0), locked(true) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -118,4 +119,17 @@ void Entity::aTickHavePassed(){
 
 void Entity::setBrightness(float brightness) {
     Entity::brightness = brightness;
+}
+
+
+void Entity::lockInteraction() {
+    while (!interaction_lock.try_lock()) {
+        usleep(10000);
+    }
+    locked = true;
+}
+
+void Entity::unlockInteraction() {
+    locked = false;
+    interaction_lock.unlock();
 }

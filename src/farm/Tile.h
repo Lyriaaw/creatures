@@ -6,12 +6,18 @@
 #define CREATURES_TILE_H
 
 
+#include <mutex>
+
 class Tile {
 private:
     float color;
     float height;
     float heat;
     float ground;
+
+    std::mutex heatMutex;
+    std::mutex groundMutex;
+
 
 public:
 

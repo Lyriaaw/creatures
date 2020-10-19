@@ -55,6 +55,9 @@ public:
 
     void setBrightness(float brightness);
 
+    void lockInteraction();
+
+    void unlockInteraction();
 
 protected:
     static int GLOBAL_INDEX;
@@ -74,6 +77,10 @@ protected:
     bool exists;
 
     int age;
+
+    std::mutex interaction_lock;
+    bool locked;
+
 
 };
 

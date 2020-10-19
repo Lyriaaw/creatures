@@ -277,11 +277,21 @@ void Farm::moveCreatures() {
     dataAnalyser.getMoveCreaturesTime()->addValue(elapsed_time.count());
 }
 
+void Farm::addEntitiesToFarm(std::vector<Entity *> addedEntities) {
+    std::lock_guard<std::mutex> guard(add_mutex);
+    entities.insert(entities.end(), addedEntities.begin(), addedEntities.end());
+    entityAdded.insert(entityAdded.end(), addedEntities.begin(), addedEntities.end());
+}
+
+void Farm::addLifesToFarm(Life * newLife) {
+    std::lock_guard<std::mutex> guard(add_mutex);
+    lifes.emplace_back(newLife);
+    lifesAdded.emplace_back(newLife);
+}
+
 
 
 void Farm::executeCreaturesActions() {
-    std::lock_guard<std::mutex> guard(add_mutex);
-
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     int naturalMatingCount = 0;
@@ -328,6 +338,17 @@ void Farm::executeCreaturesActions() {
 }
 
 void Farm::handleEating(Life * performer, Entity * subject) {
+
+    subject->lockInteraction();
+    performer->getEntity()->lockInteraction();
+
+    if (!performer->isAlive() || !subject->isExists()) {
+        subject->unlockInteraction();
+        performer->getEntity()->unlockInteraction();
+        return;
+    }
+
+
     double wastedEnergy = performer->addEnergy(subject->getMass());
     subject->setMass(0.0);
 
@@ -348,6 +369,10 @@ void Farm::handleEating(Life * performer, Entity * subject) {
 
         checkAndHandleLifeDying(foundLife);
 
+
+        subject->unlockInteraction();
+        performer->getEntity()->unlockInteraction();
+
         std::lock_guard<std::mutex> guard(executed_actions_mutex);
         ActionDTO executedAction = ActionDTO(0, 0, "EAT_LIFE");
         executedAction.setTilePosition(tilePoint);
@@ -362,6 +387,8 @@ void Farm::handleEating(Life * performer, Entity * subject) {
     executedAction.setTick(tickCount);
     executedActions.emplace_back(executedAction);
 
+    subject->unlockInteraction();
+    performer->getEntity()->unlockInteraction();
 
 }
 
@@ -369,7 +396,6 @@ void Farm::checkAndHandleLifeDying(Life * life) {
     if (life->getEnergyCenter()->getAvailableEnergy() <= 0) {
         Point performerPoint = life->getEntity()->getPosition();
         Point tilePoint = performerPoint.getTileCoordinates();
-        Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
         generateEntities(performerPoint, life->getEntity()->getColor(), 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
         generateEntities(performerPoint, 0.04f, 0.2f, (0.1 * life->getEntity()->getSize() * MASS_TO_SIZE_RATIO), life->getEnergyCenter()->getWastedEnergy(), life->getEntity()->getSize());
@@ -381,6 +407,9 @@ void Farm::checkAndHandleLifeDying(Life * life) {
 }
 
 void Farm::handleBiting(Life * performer, Entity * subject) {
+
+    subject->lockInteraction();
+    performer->getEntity()->lockInteraction();
 
     double mouthSize = performer->getEntity()->getSize() / 3.0;
 
@@ -396,6 +425,8 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
         tile->addHeat(takenEnergy);
 
         checkAndHandleLifeDying(foundLife);
+        subject->unlockInteraction();
+        performer->getEntity()->unlockInteraction();
 
         std::lock_guard<std::mutex> guard(executed_actions_mutex);
         ActionDTO executedAction = ActionDTO(0, 0, "BITE_LIFE");
@@ -413,6 +444,7 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
     int x = dist(mt);
     int y = dist(mt);
 
+    std::vector<Entity *> spawnedEntities;
     for (int it = 0; it < 2; it++) {
         Point position(subject->getPosition().getX() + x, subject->getPosition().getY() + y);
 
@@ -435,12 +467,15 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
         bitenEntity->setBrightness(subject->getBrightness());
         bitenEntity->setMass(subject->getMass() / 2.0);
 
-        entities.emplace_back(bitenEntity);
-        entityAdded.emplace_back(bitenEntity);
+        spawnedEntities.emplace_back(bitenEntity);
     }
+    addEntitiesToFarm(spawnedEntities);
 
     subject->setMass(0.0);
 
+
+    subject->unlockInteraction();
+    performer->getEntity()->unlockInteraction();
 
     std::lock_guard<std::mutex> guard(executed_actions_mutex);
     ActionDTO executedAction = ActionDTO(0, 0, "BITE_ENTITY");
@@ -450,6 +485,7 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
 }
 
 void Farm::generateEntities(Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
+    std::vector<Entity *> newEntities;
     do {
         double newEntityEnergy = std::min(totalEnergy, maxSize);
 
@@ -478,10 +514,10 @@ void Farm::generateEntities(Point position, float color, float brightness, doubl
         poop->setColor(color);
         poop->setBrightness(brightness);
         poop->setMass(newEntityEnergy);
-        entities.emplace_back(poop);
-        entityAdded.emplace_back(poop);
+        newEntities.emplace_back(poop);
 
     } while (totalEnergy > 0.0);
+    addEntitiesToFarm(newEntities);
 }
 
 void Farm::handlePoop(Life * subject) {
@@ -512,11 +548,22 @@ bool Farm::handleMating(Life * father, int entityId) {
         return false;
     }
 
+    father->getEntity()->lockInteraction();
+    foundLife->getEntity()->lockInteraction();
+
+    if (!father->isAlive() || !foundLife->isAlive()) {
+        father->getEntity()->unlockInteraction();
+        foundLife->getEntity()->unlockInteraction();
+        return false;
+    }
+
 
     bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 3.f && father->getEntity()->getAge() > 10;
     bool motherCanReproduce = foundLife->getEntity()->getMass() > foundLife->getEnergyCenter()->getMaxMass() / 3.f && foundLife->getEntity()->getAge() > 10;
 
     if (!fatherCanReproduce || !motherCanReproduce) {
+        father->getEntity()->unlockInteraction();
+        foundLife->getEntity()->unlockInteraction();
         return false;
     }
 //
@@ -547,8 +594,10 @@ bool Farm::handleMating(Life * father, int entityId) {
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEntity()->setMass(totalGivenEnergy / 2.0);
         child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
-        lifesAdded.emplace_back(child);
+        addLifesToFarm(child);
+
+        father->getEntity()->unlockInteraction();
+        foundLife->getEntity()->unlockInteraction();
 
 
         std::lock_guard<std::mutex> guard(executed_actions_mutex);
@@ -559,6 +608,8 @@ bool Farm::handleMating(Life * father, int entityId) {
         return true;
     }
 
+    father->getEntity()->unlockInteraction();
+    foundLife->getEntity()->unlockInteraction();
 
 
     map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
@@ -569,6 +620,7 @@ bool Farm::handleMating(Life * father, int entityId) {
 //        std::cout << "New Child " << std::endl;
 //
 //    }
+
 
 
 
