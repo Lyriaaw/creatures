@@ -18,6 +18,13 @@ public:
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(HueBarSensorEvolution * mate);
     std::string getName() override;
+
+    void setSensorLength(float sensorLength);
+
+    void setSensorRotation(float sensorRotation);
+
+    void setSensorColor(float sensorColor);
+
 private:
     float sensorLength;
     float sensorRotation;

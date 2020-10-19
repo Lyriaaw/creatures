@@ -91,3 +91,11 @@ Evolution * DistanceBarSensorEvolution::generateFromCastedMate(DistanceBarSensor
 std::string DistanceBarSensorEvolution::getName() {
     return "Distance bar sensor";
 }
+
+void DistanceBarSensorEvolution::setSensorLength(float sensorLength) {
+    DistanceBarSensorEvolution::sensorLength = sensorLength;
+}
+
+void DistanceBarSensorEvolution::setSensorRotation(float sensorRotation) {
+    DistanceBarSensorEvolution::sensorRotation = sensorRotation;
+}

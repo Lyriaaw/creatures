@@ -136,3 +136,15 @@ Evolution * HueBarSensorEvolution::generateFromCastedMate(HueBarSensorEvolution 
 std::string HueBarSensorEvolution::getName() {
     return "Hue bar sensor";
 }
+
+void HueBarSensorEvolution::setSensorLength(float sensorLength) {
+    HueBarSensorEvolution::sensorLength = sensorLength;
+}
+
+void HueBarSensorEvolution::setSensorRotation(float sensorRotation) {
+    HueBarSensorEvolution::sensorRotation = sensorRotation;
+}
+
+void HueBarSensorEvolution::setSensorColor(float sensorColor) {
+    HueBarSensorEvolution::sensorColor = sensorColor;
+}

@@ -76,27 +76,36 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
 
 
-
-
-    for (int it = 0; it < 2; it++) {
-        HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
-        sensorEvol->setGenerationNumber(it + 10);
-        sensorEvol->generateFromRandom(life);
-        sensorEvol->perform(life);
-        creatureGenome.emplace_back(sensorEvol);
-        evolutionLibrary.addEvolution(sensorEvol);
-    }
+    double distanceRotations[] = {0.0, -0.25, 0.25, 1.0};
 
     for (int it = 0; it < 4; it++) {
 
         DistanceBarSensorEvolution * sensorEvol = new DistanceBarSensorEvolution();
-        sensorEvol->setGenerationNumber(it + 20);
+        sensorEvol->setGenerationNumber(it + 10);
         sensorEvol->generateFromRandom(life);
+        sensorEvol->setSensorLength(5);
+        sensorEvol->setSensorRotation(distanceRotations[it]);
         sensorEvol->perform(life);
         creatureGenome.emplace_back(sensorEvol);
         evolutionLibrary.addEvolution(sensorEvol);
 
     }
+
+    double colorRotations[] = {0.0, 1.0};
+
+    for (int it = 0; it < 2; it++) {
+        HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
+        sensorEvol->setGenerationNumber(it + 20);
+        sensorEvol->generateFromRandom(life);
+        sensorEvol->setSensorLength(4);
+        sensorEvol->setSensorRotation(colorRotations[it]);
+
+        sensorEvol->perform(life);
+        creatureGenome.emplace_back(sensorEvol);
+        evolutionLibrary.addEvolution(sensorEvol);
+    }
+
+
 
 
 
