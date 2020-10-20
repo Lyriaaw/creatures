@@ -87,6 +87,8 @@ public:
     void mouseMoved(int x, int y, int previousX, int previousY) override;
 
     void initGraphControlCenter();
+
+    void handleKeyboardEvents(sf::Event::KeyEvent event);
 };
 
 

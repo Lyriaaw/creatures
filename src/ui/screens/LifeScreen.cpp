@@ -374,3 +374,13 @@ void LifeScreen::mouseMoved(int x, int y, int previousX, int previousY) {
         brainUi->mouseMoved(x, y);
     }
 }
+
+
+void LifeScreen::handleKeyboardEvents(sf::Event::KeyEvent event) {
+    switch (event.code) {
+        case sf::Keyboard::Key::Num3:
+            this->camera->switchGrid();
+            break;
+    }
+}
+

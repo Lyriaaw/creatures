@@ -44,3 +44,6 @@ void Screen::updateSelectedCreature() {
 
 }
 
+void Screen::handleKeyboardEvents(sf::Event::KeyEvent event) {
+
+}

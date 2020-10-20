@@ -5,6 +5,7 @@
 #ifndef CREATURES_SCREEN_H
 #define CREATURES_SCREEN_H
 
+#include <SFML/Window.hpp>
 
 #include <SFML/Graphics.hpp>
 #include "../components/Camera.h"
@@ -45,6 +46,8 @@ public:
     void setMouseButtons(bool left, bool right);
 
     virtual void mouseScrolled(float delta, int mouseX, int mouseY);
+
+    virtual void handleKeyboardEvents(sf::Event::KeyEvent event);
 };
 
 

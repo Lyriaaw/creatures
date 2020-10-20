@@ -32,6 +32,8 @@ public:
 
     void mouseScrolled(float delta, int mouseX, int mouseY) override;
 
+    void handleKeyboardEvents(sf::Event::KeyEvent event) override;
+
 };
 
 

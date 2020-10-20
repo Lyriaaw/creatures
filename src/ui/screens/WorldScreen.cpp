@@ -86,8 +86,6 @@ void WorldScreen::mouseClicked(int x, int y) {
     Screen::mouseClicked(x, y);
 
     farmUi->processClick(float(x), float(y), camera);
-
-
 }
 
 void WorldScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
@@ -118,5 +116,13 @@ void WorldScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
 
 
     farmUi->mouseMoved(mouseWorldCoordinates, camera);
+}
+
+void WorldScreen::handleKeyboardEvents(sf::Event::KeyEvent event) {
+    switch (event.code) {
+        case sf::Keyboard::Key::Num3:
+            this->camera->switchGrid();
+            break;
+    }
 }
 

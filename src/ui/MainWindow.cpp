@@ -499,6 +499,8 @@ void MainWindow::openScreen(int id) {
 }
 
 void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
+    currentScreen->handleKeyboardEvents(event);
+
     switch (event.code) {
         case Keyboard::Key::Space:
             this->paused = !this->paused;
