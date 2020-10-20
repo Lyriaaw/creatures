@@ -185,7 +185,17 @@ void Graph::getMinAndMaxValues() {
         }
     }
 
-    tickWidthRatio = width / float(lines.at(0).getItem()->getCount());
+    int itemCount = lines.at(0).getItem()->getCount();
+
+    if (graphControlCenter->getMode() == "last") {
+        itemCount = graphControlCenter->getLastTickFrame();
+    } else if (graphControlCenter->getMode() == "fixed") {
+        itemCount = graphControlCenter->getToTick() - graphControlCenter->getFromTick();
+    }
+
+
+
+    tickWidthRatio = width / float(itemCount);
 
     tickHeightRatio = 1;
 
@@ -200,14 +210,33 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
         return;
     }
 
-    int currentLineItemCount = line.getItem()->getCount();
+    int itemCount = line.getItem()->getCount();
 
-    sf::VertexArray lineVertexes = sf::VertexArray(sf::LineStrip, currentLineItemCount);
+    int currentItemcount = itemCount;
+    if (graphControlCenter->getMode() == "last") {
+        currentItemcount = graphControlCenter->getLastTickFrame();
+    } else if (graphControlCenter->getMode() == "fixed") {
+        currentItemcount = graphControlCenter->getToTick() - graphControlCenter->getFromTick();
+    }
+
+    sf::VertexArray lineVertexes = sf::VertexArray(sf::LineStrip, currentItemcount);
     sf::Color lineColor = sf::Color(line.getRed(), line.getGreen(), line.getBlue(), 255);
 
-    for (int it = 0; it < currentLineItemCount; it++) {
+
+
+    for (int it = 0; it < currentItemcount; it++) {
+        int currentTick = it;
+
+        if (graphControlCenter->getMode() == "last") {
+            currentTick = itemCount - graphControlCenter->getLastTickFrame() + it;
+        } else if (graphControlCenter->getMode() == "fixed") {
+            currentTick = graphControlCenter->getFromTick() + it;
+        }
+
+
+        double currentValue = line.getValueForTick(currentTick);
         double calculatedX = x + (it * tickWidthRatio);
-        double calculatedY = (y + height) - ((line.getValueForTick(it) - min) * tickHeightRatio);
+        double calculatedY = (y + height) - ((currentValue - min) * tickHeightRatio);
 
         lineVertexes[it].position = sf::Vector2f(calculatedX, calculatedY);
         lineVertexes[it].color = lineColor;
@@ -287,6 +316,10 @@ void Graph::resized() {
 
 void Graph::mouseEnter() {
 
+}
+
+void Graph::setGraphControlCenter(GraphControlCenter *graphControlCenter) {
+    Graph::graphControlCenter = graphControlCenter;
 }
 
 

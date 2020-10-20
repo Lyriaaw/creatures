@@ -286,7 +286,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life, std::vector<Evolution *> childGenome) {
     std::vector<Evolution *> newEvolutions;
 
-    if (rand() % MUTATION_RATIO != 0) {
+    if (rand() % 100 != 0) {
         return newEvolutions;
     }
 

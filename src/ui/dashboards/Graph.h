@@ -14,6 +14,7 @@
 #include "../elements/UiLabel.h"
 #include "../elements/UiBackground.h"
 #include "../elements/UiButton.h"
+#include "GraphControlCenter.h"
 
 class Graph: public UiComponent {
 protected:
@@ -44,6 +45,8 @@ protected:
 
     UiBackground * hoveredValuesBackground;
     UiBackground * hoveredTickMarker;
+
+    GraphControlCenter * graphControlCenter;
 
 
 public:
@@ -84,6 +87,8 @@ public:
     void mouseLeave() override;
 
     void updateHoveredTickInformation();
+
+    void setGraphControlCenter(GraphControlCenter *graphControlCenter);
 };
 
 

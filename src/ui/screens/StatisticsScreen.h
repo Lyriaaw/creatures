@@ -20,6 +20,8 @@ private:
 
     Graph * currentGraph;
 
+    GraphControlCenter * graphControlCenter;
+
 
 public:
     StatisticsScreen(FarmUI * farmUi);
@@ -43,6 +45,7 @@ public:
 
     void clickedOnButton(int id);
 
+    void loadGraphControlsButtons();
 };
 
 

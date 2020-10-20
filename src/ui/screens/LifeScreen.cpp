@@ -47,6 +47,41 @@ void LifeScreen::init() {
     creatureAgeText->setText("Creature age ...");
     creatureAgeText->setFillColor(textColor);
 
+    initGraphControlCenter();
+
+}
+
+void LifeScreen::initGraphControlCenter() {
+    graphControlCenter = new GraphControlCenter();
+
+    double currentXRatio = 0.7;
+    double currentYRatio = 0.04;
+    double currentWidthRatio = 0.29;
+    double currentHeightRatio = 0.05;
+
+    UiBackground * uiBackground = new UiBackground(currentXRatio, currentYRatio, currentWidthRatio, currentHeightRatio);
+    uiBackground->setFillColor(sf::Color(128, 128, 128));
+    uiComponents.emplace_back(uiBackground);
+
+    UiButton * allButton = new UiButton(1, "all", currentXRatio + 0.01, currentYRatio + 0.01, 0.025, 0.025);
+    allButton->setOnClick([&](int id) {
+        graphControlCenter->setAll();
+    });
+    uiComponents.emplace_back(allButton);
+
+    UiButton * last100TicksButton = new UiButton(1, "-100", currentXRatio + 0.02 + 0.025, currentYRatio + 0.01, 0.025, 0.025);
+    last100TicksButton->setOnClick([&](int id) {
+        graphControlCenter->setLastTimeFrame(100);
+    });
+    uiComponents.emplace_back(last100TicksButton);
+
+    UiButton * last1000TicksButton = new UiButton(1, "-1000", currentXRatio + 0.03 + 0.05, currentYRatio + 0.01, 0.025, 0.025);
+    last1000TicksButton->setOnClick([&](int id) {
+        graphControlCenter->setLastTimeFrame(1000);
+    });
+    uiComponents.emplace_back(last1000TicksButton);
+
+
 }
 
 
@@ -221,6 +256,7 @@ void LifeScreen::loadSelectedGraphs() {
 
     bioGraph = new Graph("Bio", 0.55f, 0.41f, 0.4f, 0.2f);
     bioGraph->windowResized(windowWidth, windowHeight);
+    bioGraph->setGraphControlCenter(graphControlCenter);
 
     energy = new DataItem("energy", true);
     mass = new DataItem("mass", true);
@@ -239,6 +275,7 @@ void LifeScreen::loadSelectedGraphs() {
 
     outputNeuronsGraph = new Graph("Output Neurons", 0.55f, 0.1f, 0.4f, 0.2f);
     outputNeuronsGraph->windowResized(windowWidth, windowHeight);
+    outputNeuronsGraph->setGraphControlCenter(graphControlCenter);
 
 
     movement = new DataItem("movement", true);

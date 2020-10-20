@@ -15,7 +15,10 @@ int StatisticsScreen::getId() {
 }
 
 void StatisticsScreen::loadGraphs() {
+    graphControlCenter = new GraphControlCenter();
+
     Graph * populationGraph = new Graph("Population", 0.f, 0.1f, 1.f, 0.8f);
+    populationGraph->setGraphControlCenter(graphControlCenter);
 
     populationGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPopulation(), 1, 255, 0, 0);
     populationGraph->addLine(farmUi->getFarm()->getDataAnalyser().getNaturalMatings(), 1, 0, 0, 255);
@@ -26,17 +29,19 @@ void StatisticsScreen::loadGraphs() {
 
 
     Graph * scoreGraph = new Graph("Score", 0.f, 0.1f, 1.f, 0.8f);
+    scoreGraph->setGraphControlCenter(graphControlCenter);
 
     scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAverageScore(), 1, 255, 0, 0);
-    scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMedianScore(), 1, 100, 100, 255);
-    scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getFirstQuartileScore(), 1, 0, 128, 0);
-    scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getLastQuartileScore(), 1, 0, 128, 0);
+    scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMedianScore(), 1, 0, 0, 255);
+    scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getFirstQuartileScore(), 1, 0, 255, 0);
+    scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getLastQuartileScore(), 1, 0, 255, 0);
     scoreGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBestScore(), 0, 255, 255, 255);
 
     scoreGraph->windowResized(windowWidth, windowHeight);
 
 
     Graph * timeGraph = new Graph("Time", 0.f, 0.1f, 1.f, 0.8f);
+    timeGraph->setGraphControlCenter(graphControlCenter);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTickTime(), 2, 255, 255, 255);
 
@@ -79,6 +84,7 @@ void StatisticsScreen::loadGraphs() {
 
 
     Graph * energyGraph = new Graph("Energies", 0.f, 0.1f, 1.f, 0.8f);
+    energyGraph->setGraphControlCenter(graphControlCenter);
 
     energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTotalEnergy(), 1, 0, 0, 255);
     energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAvailableEnergy(), 1, 100, 100, 255);
@@ -98,6 +104,7 @@ void StatisticsScreen::loadGraphs() {
 
 
     Graph * brainsGraph = new Graph("Brains", 0.f, 0.1f, 1.f, 0.8f);
+    brainsGraph->setGraphControlCenter(graphControlCenter);
 
     brainsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAverageInputNeurons(), 1, 0, 255, 0);
     brainsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAverageOutputNeurons(), 1, 0, 0, 255);
@@ -137,10 +144,59 @@ void StatisticsScreen::loadButtons(sf::Font *font) {
     }
 }
 
+void StatisticsScreen::loadGraphControlsButtons() {
+    double currentXRatio = 0.7;
+    double currentYRatio = 0.04;
+    double currentWidthRatio = 0.29;
+    double currentHeightRatio = 0.05;
+
+    UiBackground * uiBackground = new UiBackground(currentXRatio, currentYRatio, currentWidthRatio, currentHeightRatio);
+    uiBackground->setFillColor(sf::Color(128, 128, 128));
+    uiComponents.emplace_back(uiBackground);
+
+    UiButton * allButton = new UiButton(1, "all", currentXRatio + 0.01, currentYRatio + 0.01, 0.025, 0.025);
+    allButton->setOnClick([&](int id) {
+        graphControlCenter->setAll();
+    });
+    uiComponents.emplace_back(allButton);
+
+    UiButton * last100TicksButton = new UiButton(1, "-100", currentXRatio + 0.02 + 0.025, currentYRatio + 0.01, 0.025, 0.025);
+    last100TicksButton->setOnClick([&](int id) {
+        graphControlCenter->setLastTimeFrame(100);
+    });
+    uiComponents.emplace_back(last100TicksButton);
+
+    UiButton * last1000TicksButton = new UiButton(1, "-1000", currentXRatio + 0.03 + 0.05, currentYRatio + 0.01, 0.025, 0.025);
+    last1000TicksButton->setOnClick([&](int id) {
+        graphControlCenter->setLastTimeFrame(1000);
+    });
+    uiComponents.emplace_back(last1000TicksButton);
+
+    UiButton * last10000TicksButton = new UiButton(1, "-10000", currentXRatio + 0.04 + 0.075, currentYRatio + 0.01, 0.025, 0.025);
+    last10000TicksButton->setOnClick([&](int id) {
+        graphControlCenter->setLastTimeFrame(10000);
+    });
+    uiComponents.emplace_back(last10000TicksButton);
+
+    UiButton * last100000TicksButton = new UiButton(1, "-100000", currentXRatio + 0.05 + 0.1, currentYRatio + 0.01, 0.025, 0.025);
+    last100000TicksButton->setOnClick([&](int id) {
+        graphControlCenter->setLastTimeFrame(100000);
+    });
+    uiComponents.emplace_back(last100000TicksButton);
+
+
+
+
+
+
+
+}
+
 
 void StatisticsScreen::init() {
     loadGraphs();
     loadButtons(font);
+    loadGraphControlsButtons();
 }
 
 
@@ -183,6 +239,10 @@ void StatisticsScreen::mouseMoved(int x, int y, int previousX, int previousY) {
 
 void StatisticsScreen::mouseClicked(int x, int y) {
     Screen::mouseClicked(x, y);
+
+    for (int it = 0; it < uiComponents.size(); it++) {
+        uiComponents.at(it)->mouseClicked(x, y);
+    }
 
     currentGraph->mouseClicked(x, y);
 

@@ -48,6 +48,7 @@ private:
     DataItem * wasted;
     DataItem * maxEnergy;
 
+    GraphControlCenter * graphControlCenter;
 
 
 
@@ -84,6 +85,8 @@ public:
     void mouseScrolled(float delta, int mouseX, int mouseY);
 
     void mouseMoved(int x, int y, int previousX, int previousY) override;
+
+    void initGraphControlCenter();
 };
 
 
