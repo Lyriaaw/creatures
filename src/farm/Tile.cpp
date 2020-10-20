@@ -74,9 +74,10 @@ void Tile::removePhermoneQuantity(float quantityRemoved) {
     pheromoneQuantity -= std::min(quantityRemoved, pheromoneQuantity);
 }
 void Tile::decayPheromone() {
-    pheromoneQuantity -= 0.1 * pheromoneQuantity;
+    pheromoneQuantity -= 0.05 * pheromoneQuantity;
 
     if (pheromoneQuantity < 1.0) {
         pheromoneQuantity = 0;
+        pheromoneColor = 0;
     }
 }

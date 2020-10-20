@@ -8,6 +8,7 @@
 
 #include "../../entities/Entity.h"
 #include "../../brain/neurons/InputNeuron.h"
+#include "../../Tile.h"
 
 class Sensor {
 protected:
@@ -24,7 +25,7 @@ public:
     virtual std::string getName() = 0;
 
 
-    virtual void fetchSensorValue(std::vector<Entity *> accessibleEntities) = 0;
+    virtual void fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> accessibleTiles) = 0;
     virtual void findSelectedChunks() = 0;
     void clearSelectedChunks();
 

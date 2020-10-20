@@ -147,7 +147,7 @@ void Farm::multithreadBrainProcessing(bool paused) {
 
 
             std::vector<Entity *> accessibleEntities = farm->getAccessibleEntities(life->getSelectedChunks());
-            std::vector<Tile *> accessibleTiles = farm->getAccessibleTiles(life->getSelectedChunks());
+            std::vector<Tile *> accessibleTiles = farm->getAccessibleTiles(life, life->getSelectedChunks());
             life->processSensors(accessibleEntities, accessibleTiles);
 
 
@@ -208,7 +208,7 @@ void Farm::brainProcessing() {
         Life *currentLife = lifes.at(it);
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
-        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife->getSelectedChunks());
+        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife, currentLife->getSelectedChunks());
         currentLife->processSensors(accessibleEntities, accessibleTiles);
     }
     std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
@@ -677,6 +677,13 @@ void Farm::vegetalisation() {
     std::lock_guard<std::mutex> guard(add_mutex);
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+            currentTile->decayPheromone();
+        }
+    }
+
     if (VEGETALISATION_RATE != 1 && tickCount % VEGETALISATION_RATE != 0) {
         removeDeletedEntities();
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -747,8 +754,6 @@ void Farm::vegetalisation() {
             }
 
             currentTile->addGround(-1 * totalEnergyAdded);
-
-            currentTile->decayPheromone();
         }
     }
 
@@ -1001,8 +1006,13 @@ std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChu
     return accessibleEntities;
 
 }
-std::vector<Tile *> Farm::getAccessibleTiles(std::vector<Point> selectedChunks) {
+std::vector<Tile *> Farm::getAccessibleTiles(Life * life, std::vector<Point> selectedChunks) {
     std::vector<Tile *> accessibleTiles;
+
+    Point performerPoint = life->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+    accessibleTiles.emplace_back(map->getTileAt(tilePoint.getX(), tilePoint.getY()));
+
     for (int jt = 0; jt < selectedChunks.size(); jt++) {
         Point currentTilePoint = selectedChunks.at(jt);
 

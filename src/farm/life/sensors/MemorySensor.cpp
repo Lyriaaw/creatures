@@ -10,7 +10,7 @@ std::string MemorySensor::getName() {
     return "Energy Sensor";
 }
 
-void MemorySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
+void MemorySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> accessibleTiles) {
     value = memoryMuscle->getValue();
 }
 

@@ -18,7 +18,7 @@ public:
 
     std::string getName() override;
 
-    void fetchSensorValue(std::vector<Entity *> accessibleEntities) override;
+    void fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> accessibleTiles) override;
 
     void findSelectedChunks() override;
 };

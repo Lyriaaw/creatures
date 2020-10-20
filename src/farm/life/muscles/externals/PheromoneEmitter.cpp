@@ -8,7 +8,7 @@ std::vector<ActionDTO> PheromoneEmitter::prepareActionDTO(std::vector<Entity *> 
 
     energyConsumption += abs(this->neurons.at(0)->getValue() * 10);
 
-    if (this->neurons.at(0)->getValue() < 0.9f) {
+    if (this->neurons.at(0)->getValue() < 0.95f) {
         return actions;
     }
 

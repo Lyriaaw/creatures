@@ -8,7 +8,7 @@ std::string SelfEnergySensor::getName() {
     return "Energy Sensor";
 }
 
-void SelfEnergySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
+void SelfEnergySensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> accessibleTiles) {
     this->value = this->energyCenter->getAvailableEnergy() / this->energyCenter->getMaxMass();
 }
 

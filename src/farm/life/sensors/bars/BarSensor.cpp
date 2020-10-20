@@ -65,7 +65,7 @@ void BarSensor::findSelectedChunks() {
 }
 
 
-void BarSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities) {
+void BarSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities, std::vector<Tile *> accessibleTiles) {
 
     float currentRotation = (rotation + this->entity->getRotation()) * float(M_PI);
 

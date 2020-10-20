@@ -12,6 +12,7 @@
 #include "evolutions/musclesEvolutions/MemoryEvolution.h"
 #include "evolutions/musclesEvolutions/PheromoneEmitterEvolution.h"
 #include "evolutions/nervous/NeuronEvolution.h"
+#include "evolutions/inputs/sensors/PheromoneSensorEvolution.h"
 
 using namespace std;
 
@@ -76,27 +77,11 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     evolutionLibrary.addEvolution(massSensorEvolution);
 
 
-
-    double distanceRotations[] = {0.0, -0.25, 0.25, 1.0};
-
-    for (int it = 0; it < 4; it++) {
-
-        DistanceBarSensorEvolution * sensorEvol = new DistanceBarSensorEvolution();
-        sensorEvol->setGenerationNumber(it + 10);
-        sensorEvol->generateFromRandom(life);
-        sensorEvol->setSensorLength(5);
-        sensorEvol->setSensorRotation(distanceRotations[it]);
-        sensorEvol->perform(life);
-        creatureGenome.emplace_back(sensorEvol);
-        evolutionLibrary.addEvolution(sensorEvol);
-
-    }
-
     double colorRotations[] = {0.0, 1.0};
 
     for (int it = 0; it < 2; it++) {
         HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
-        sensorEvol->setGenerationNumber(it + 20);
+        sensorEvol->setGenerationNumber(it + 10);
         sensorEvol->generateFromRandom(life);
         sensorEvol->setSensorLength(4);
         sensorEvol->setSensorRotation(colorRotations[it]);
@@ -106,64 +91,103 @@ Life * CreatureNursery::generateCreatureFromRandom() {
         evolutionLibrary.addEvolution(sensorEvol);
     }
 
+    double distanceRotations[] = {0.0, -0.25, 0.25, 1.0};
+
+    for (int it = 0; it < 4; it++) {
+
+        DistanceBarSensorEvolution * sensorEvol = new DistanceBarSensorEvolution();
+        sensorEvol->setGenerationNumber(it + 20);
+        sensorEvol->generateFromRandom(life);
+        sensorEvol->setSensorLength(5);
+        sensorEvol->setSensorRotation(distanceRotations[it]);
+        sensorEvol->perform(life);
+        creatureGenome.emplace_back(sensorEvol);
+        evolutionLibrary.addEvolution(sensorEvol);
+
+    }
+
+
+
+    PheromoneSensorEvolution * pheromoneSensorEvolution = new PheromoneSensorEvolution();
+    pheromoneSensorEvolution->setGenerationNumber(30);
+    pheromoneSensorEvolution->generateFromRandom(life);
+    pheromoneSensorEvolution->perform(life);
+    creatureGenome.emplace_back(pheromoneSensorEvolution);
+    evolutionLibrary.addEvolution(pheromoneSensorEvolution);
+
+    PheromoneSensorEvolution * pheromoneSensorEvolution2 = new PheromoneSensorEvolution();
+    pheromoneSensorEvolution2->setGenerationNumber(31);
+    pheromoneSensorEvolution2->generateFromRandom(life);
+    pheromoneSensorEvolution2->perform(life);
+    creatureGenome.emplace_back(pheromoneSensorEvolution2);
+    evolutionLibrary.addEvolution(pheromoneSensorEvolution2);
+//
+//    PheromoneSensorEvolution * pheromoneSensorEvolution3 = new PheromoneSensorEvolution();
+//    pheromoneSensorEvolution3->setGenerationNumber(32);
+//    pheromoneSensorEvolution3->generateFromRandom(life);
+//    pheromoneSensorEvolution3->perform(life);
+//    creatureGenome.emplace_back(pheromoneSensorEvolution3);
+//    evolutionLibrary.addEvolution(pheromoneSensorEvolution3);
+
+
 
 
 
 
     SpeedEvolution * speedEvolution = new SpeedEvolution();
-    speedEvolution->setGenerationNumber(30);
+    speedEvolution->setGenerationNumber(40);
     speedEvolution->perform(life);
     creatureGenome.emplace_back(speedEvolution);
     evolutionLibrary.addEvolution(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
-    rotationEvolution->setGenerationNumber(31);
+    rotationEvolution->setGenerationNumber(41);
     rotationEvolution->perform(life);
     creatureGenome.emplace_back(rotationEvolution);
     evolutionLibrary.addEvolution(rotationEvolution);
 
     MouthEvolution * mouthEvolution = new MouthEvolution();
-    mouthEvolution->setGenerationNumber(32);
+    mouthEvolution->setGenerationNumber(42);
     mouthEvolution->generateFromRandom(life);
     mouthEvolution->perform(life);
     creatureGenome.emplace_back(mouthEvolution);
     evolutionLibrary.addEvolution(mouthEvolution);
 
     GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
-    genitalsEvolution->setGenerationNumber(33);
+    genitalsEvolution->setGenerationNumber(43);
     genitalsEvolution->generateFromRandom(life);
     genitalsEvolution->perform(life);
     creatureGenome.emplace_back(genitalsEvolution);
     evolutionLibrary.addEvolution(genitalsEvolution);
 
-    MemoryEvolution * memoryEvolution = new MemoryEvolution();
-    memoryEvolution->setGenerationNumber(35);
-    memoryEvolution->generateFromRandom(life);
-    memoryEvolution->perform(life);
-    creatureGenome.emplace_back(memoryEvolution);
-    evolutionLibrary.addEvolution(memoryEvolution);
 
     PheromoneEmitterEvolution * pheromoneEmitterEvolution = new PheromoneEmitterEvolution();
-    pheromoneEmitterEvolution->setGenerationNumber(36);
+    pheromoneEmitterEvolution->setGenerationNumber(45);
     pheromoneEmitterEvolution->generateFromRandom(life);
     pheromoneEmitterEvolution->perform(life);
     creatureGenome.emplace_back(pheromoneEmitterEvolution);
     evolutionLibrary.addEvolution(pheromoneEmitterEvolution);
 
     PheromoneEmitterEvolution * pheromoneEmitterEvolution2 = new PheromoneEmitterEvolution();
-    pheromoneEmitterEvolution2->setGenerationNumber(37);
+    pheromoneEmitterEvolution2->setGenerationNumber(46);
     pheromoneEmitterEvolution2->generateFromRandom(life);
     pheromoneEmitterEvolution2->perform(life);
     creatureGenome.emplace_back(pheromoneEmitterEvolution2);
     evolutionLibrary.addEvolution(pheromoneEmitterEvolution2);
 
+    MemoryEvolution * memoryEvolution = new MemoryEvolution();
+    memoryEvolution->setGenerationNumber(50);
+    memoryEvolution->generateFromRandom(life);
+    memoryEvolution->perform(life);
+    creatureGenome.emplace_back(memoryEvolution);
+    evolutionLibrary.addEvolution(memoryEvolution);
 
 
 
 
 
 
-    int generationNumberIndex(50);
+    int generationNumberIndex(100);
     for (int it = 0; it < brain->getInputNeurons().size(); it++) {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
@@ -305,7 +329,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 std::vector<Evolution *> CreatureNursery::generateNewRandomEvolution(Life * life, std::vector<Evolution *> childGenome) {
     std::vector<Evolution *> newEvolutions;
 
-    if (rand() % 100 != 0) {
+    if (rand() % MUTATION_RATIO != 0) {
         return newEvolutions;
     }
 

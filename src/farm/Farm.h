@@ -100,7 +100,7 @@ public:
     void addLife(Life * life);
 
     std::vector<Entity *> getAccessibleEntities(std::vector<Point> selectedChunks);
-    std::vector<Tile *> getAccessibleTiles(std::vector<Point> selectedChunks);
+    std::vector<Tile *> getAccessibleTiles(Life * life, std::vector<Point> selectedChunks);
 
     const std::vector<Life *> &getLifesAdded() const;
     const std::vector<Entity *> &getEntityAdded() const;
