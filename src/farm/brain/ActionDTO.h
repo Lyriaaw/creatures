@@ -19,6 +19,8 @@ private:
     Point tilePosition;
     int tick;
 
+    double pheromoneEmissionColor;
+
 public:
     ActionDTO(int performerId, int subjectId, const std::string &type);
 
@@ -35,6 +37,10 @@ public:
     int getTick() const;
 
     void setTick(int tick);
+
+    double getPheromoneEmissionColor() const;
+
+    void setPheromoneEmissionColor(double pheromoneEmissionColor);
 };
 
 

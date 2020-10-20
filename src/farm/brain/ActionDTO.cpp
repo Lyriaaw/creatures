@@ -34,3 +34,11 @@ int ActionDTO::getTick() const {
 void ActionDTO::setTick(int tick) {
     ActionDTO::tick = tick;
 }
+
+double ActionDTO::getPheromoneEmissionColor() const {
+    return pheromoneEmissionColor;
+}
+
+void ActionDTO::setPheromoneEmissionColor(double pheromoneEmissionColor) {
+    ActionDTO::pheromoneEmissionColor = pheromoneEmissionColor;
+}

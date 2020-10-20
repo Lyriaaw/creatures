@@ -10,6 +10,7 @@
 #include "evolutions/nervous/DistanceBarSensorEvolution.h"
 #include "evolutions/inputs/sensors/MassSensorEvolution.h"
 #include "evolutions/musclesEvolutions/MemoryEvolution.h"
+#include "evolutions/musclesEvolutions/PheromoneEmitterEvolution.h"
 #include "evolutions/nervous/NeuronEvolution.h"
 
 using namespace std;
@@ -141,6 +142,15 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     memoryEvolution->perform(life);
     creatureGenome.emplace_back(memoryEvolution);
     evolutionLibrary.addEvolution(memoryEvolution);
+
+    PheromoneEmitterEvolution * pheromoneEmitterEvolution = new PheromoneEmitterEvolution();
+    pheromoneEmitterEvolution->setGenerationNumber(36);
+    pheromoneEmitterEvolution->generateFromRandom(life);
+    pheromoneEmitterEvolution->perform(life);
+    creatureGenome.emplace_back(pheromoneEmitterEvolution);
+    evolutionLibrary.addEvolution(pheromoneEmitterEvolution);
+
+
 
 
 

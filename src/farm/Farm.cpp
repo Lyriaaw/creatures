@@ -295,6 +295,13 @@ void Farm::executeCreaturesActions() {
             continue;
         }
 
+        if (actionDto.getType() == "EMIT_PHEROMONE") {
+//            handlePoop(performer);
+            continue;
+        }
+
+
+
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
         if (subject->isExists() <= 0 || performer->isAlive() <= 0) {
