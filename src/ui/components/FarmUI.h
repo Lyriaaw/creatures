@@ -25,6 +25,7 @@ private:
     std::vector<EntityUI *> entityUIs;
 
     sf::VertexArray tilesVertexArray;
+    sf::VertexArray pheromoneTilesVertexArray;
 
     Point hoveredTile;
     sf::Text hoveredTileInfos;
@@ -35,6 +36,7 @@ private:
     std::function<void()> selectedLifeChanged;
 
     Minimap * currentMinimap;
+    Minimap * pheromoneMinimap;
 
 public:
 

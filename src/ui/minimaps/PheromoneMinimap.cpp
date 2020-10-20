@@ -35,9 +35,9 @@ void PheromoneMinimap::generateValues(Farm *farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * tile = farm->getMap()->getTileAt(it, jt);
-            RGBColor rectangleColor = RGBColor(tile->getPheromoneColor(), 1.f, tile->getPheromoneQuantity() / 500.0);
+            RGBColor rectangleColor = RGBColor(tile->getPheromoneColor(), 1.f, 0.5);
 
-            sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
+            sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), (tile->getPheromoneQuantity() / 500.0) * 255);
 
             colorGrid[it][jt] = pixelColor;
         }

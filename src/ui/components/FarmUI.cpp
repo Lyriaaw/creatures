@@ -18,7 +18,8 @@ FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)), selectedLife
     loadTexts();
     loadFarm();
 
-    currentMinimap = new PheromoneMinimap();
+    currentMinimap = new WorldMinimap();
+    pheromoneMinimap = new PheromoneMinimap();
 }
 
 
@@ -36,6 +37,7 @@ void FarmUI::loadFarm() {
 
 void FarmUI::loadMap() {
     tilesVertexArray = sf::VertexArray(sf::Quads, TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT * 4);
+    pheromoneTilesVertexArray = sf::VertexArray(sf::Quads, TILE_COUNT_WIDTH * TILE_COUNT_HEIGHT * 4);
 }
 
 void FarmUI::loadLifes() {
@@ -168,6 +170,7 @@ void FarmUI::setPositions(Camera *camera) {
 
     Map *map = farm->getMap();
     currentMinimap->generateValues(farm);
+    pheromoneMinimap->generateValues(farm);
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
@@ -189,6 +192,14 @@ void FarmUI::setPositions(Camera *camera) {
                 tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(-10, -10);
                 tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(-10, -10);
                 tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(-10, -10);
+
+
+                pheromoneTilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(-10, -10);
+                pheromoneTilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(-10, -10);
+                pheromoneTilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(-10, -10);
+                pheromoneTilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(-10, -10);
+
+
                 continue;
             }
 
@@ -205,6 +216,12 @@ void FarmUI::setPositions(Camera *camera) {
                     std::max(double(point.getX()), double(camera->getTopLeft().getX())),
                     std::max(double(point.getY()), double(camera->getTopLeft().getY())));
 
+            pheromoneTilesVertexArray[vertexArrayIndex + 0].position = sf::Vector2f(
+                    std::max(double(point.getX()), double(camera->getTopLeft().getX())),
+                    std::max(double(point.getY()), double(camera->getTopLeft().getY())));
+
+
+
 
             double currentX = point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio;
             double currentY = point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio;
@@ -212,15 +229,33 @@ void FarmUI::setPositions(Camera *camera) {
                     std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
                     std::max(double(point.getY()), double(camera->getTopLeft().getY())));
 
+            pheromoneTilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
+                    std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
+                    std::max(double(point.getY()), double(camera->getTopLeft().getY())));
+
+
+
 
             tilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
                     std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
                     std::min(double(currentY), double(camera->getTopLeft().getY()) + double(camera->getHeight())));
 
+            pheromoneTilesVertexArray[vertexArrayIndex + 2].position = sf::Vector2f(
+                    std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
+                    std::min(double(currentY), double(camera->getTopLeft().getY()) + double(camera->getHeight())));
+
+
+
 
             tilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
                     std::max(double(point.getX()), double(camera->getTopLeft().getX())),
                     std::min(double(currentY), double(camera->getTopLeft().getY()) + double(camera->getHeight())));
+
+            pheromoneTilesVertexArray[vertexArrayIndex + 3].position = sf::Vector2f(
+                    std::max(double(point.getX()), double(camera->getTopLeft().getX())),
+                    std::min(double(currentY), double(camera->getTopLeft().getY()) + double(camera->getHeight())));
+
+
 
 
 
@@ -230,6 +265,14 @@ void FarmUI::setPositions(Camera *camera) {
             tilesVertexArray[vertexArrayIndex + 1].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 2].color = tileColor;
             tilesVertexArray[vertexArrayIndex + 3].color = tileColor;
+
+            sf::Color pheromoneColor = pheromoneMinimap->getColorAt(it, jt);
+            pheromoneTilesVertexArray[vertexArrayIndex + 0].color = pheromoneColor;
+            pheromoneTilesVertexArray[vertexArrayIndex + 1].color = pheromoneColor;
+            pheromoneTilesVertexArray[vertexArrayIndex + 2].color = pheromoneColor;
+            pheromoneTilesVertexArray[vertexArrayIndex + 3].color = pheromoneColor;
+
+
 
 
         }
@@ -251,6 +294,11 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
     setPositions(camera);
 
     window->draw(tilesVertexArray);
+
+    if (currentMinimap->getName() == "World") {
+        window->draw(pheromoneTilesVertexArray);
+    }
+
     for (int it = 0; it < currentEntities.size(); it++) {
         currentEntities.at(it)->draw(window, camera, selected);
     }
