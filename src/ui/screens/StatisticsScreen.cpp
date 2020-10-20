@@ -64,18 +64,20 @@ void StatisticsScreen::loadGraphs() {
 
 
 
-//    Graph * brainTimeGraph = new Graph("Brain times", 0.f, 0.1f, 1.f, 0.8f);
-//
-//    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getChunkSelection(), 2, 255, 255, 255);
-//
-//    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getSensorProcessing(), 2, 0, 0, 0);
-//
-//    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBrainProcessing(), 2, 0, 0, 255);
-//
-//    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getExternalActions(), 2, 128, 255, 128);
-//    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getZero(), 2, 0, 0, 0);
-//
-//    brainTimeGraph->windowResized(windowWidth, windowHeight);
+    Graph * brainTimeGraph = new Graph("Brain times", 0.f, 0.1f, 1.f, 0.8f);
+    brainTimeGraph->setGraphControlCenter(graphControlCenter);
+
+    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getChunkSelection(), 2, 255, 255, 255);
+
+    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAccessibleEntities(), 2, 128, 0, 0);
+    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getSensorProcessing(), 2, 0, 0, 0);
+
+    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBrainProcessing(), 2, 0, 0, 255);
+
+    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getExternalActions(), 2, 128, 255, 128);
+    brainTimeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getZero(), 2, 0, 0, 0);
+
+    brainTimeGraph->windowResized(windowWidth, windowHeight);
 
 
 
@@ -123,6 +125,7 @@ void StatisticsScreen::loadGraphs() {
     graphs.emplace_back(timeGraph);
     graphs.emplace_back(energyGraph);
     graphs.emplace_back(brainsGraph);
+    graphs.emplace_back(brainTimeGraph);
 }
 
 void StatisticsScreen::loadButtons(sf::Font *font) {

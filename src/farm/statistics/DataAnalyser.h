@@ -36,6 +36,7 @@ private:
     DataItem * sensorProcessing;
     DataItem * brainProcessing;
     DataItem * externalActions;
+    DataItem * accessibleEntities;
 
     DataItem * totalTime;
 
@@ -144,6 +145,8 @@ public:
     DataItem *getAverageOutputNeurons() const;
 
     DataItem *getAverageLinks() const;
+
+    DataItem *getAccessibleEntities() const;
 };
 
 

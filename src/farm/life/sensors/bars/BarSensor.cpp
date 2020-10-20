@@ -114,6 +114,10 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, d
             continue;
         }
 
+        if (entitiesDistance > currentDistance) {
+            continue;
+        }
+
 
 
         // Check if the entity is between the two ends of the sensor

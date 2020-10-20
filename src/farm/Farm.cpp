@@ -137,23 +137,45 @@ void Farm::multithreadBrainProcessing(bool paused) {
 
     std::thread chunkThreads[lifes.size()];
 
-
+    double chunks(0.0);
+    double sensors(0.0);
+    double brains(0.0);
+    double actions(0.0);
+    double accessibleEntitiesTime(0.0);
 
     for (int it = 0; it < lifes.size(); it++) {
 
-        auto f = [](Life * life, Farm * farm, bool * paused) {
+        auto f = [](Life * life, Farm * farm, bool * paused, double *chunks,double *sensors, double *brains, double *actions, double *accessibleEntitiesTime) {
 
+            std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
             life->processSelectedChunks();
+            std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
+            *chunks += elapsed_timeChunk.count();
 
 
+            std::chrono::system_clock::time_point accessibleEntitiesStart = std::chrono::system_clock::now();
             std::vector<Entity *> accessibleEntities = farm->getAccessibleEntities(life->getSelectedChunks());
             std::vector<Tile *> accessibleTiles = farm->getAccessibleTiles(life, life->getSelectedChunks());
+            std::chrono::system_clock::time_point accessibleEntitiesEnd = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_timeEntities = accessibleEntitiesEnd - accessibleEntitiesStart;
+            *accessibleEntitiesTime += elapsed_timeEntities.count();
+
+
+            std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
             life->processSensors(accessibleEntities, accessibleTiles);
+            std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
+            *sensors += elapsed_timeSensor.count();
 
 
+            std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
             life->processBrain();
+            std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
+            *brains += elapsed_timeBrain.count();
 
-
+            std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
 
             if (!*paused) {
                 std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
@@ -161,13 +183,17 @@ void Farm::multithreadBrainProcessing(bool paused) {
                 farm->addActions(currentCreatureActions);
             }
 
+            std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
+            *actions += elapsed_timeActions.count();
+
 
         };
 
         Life *currentLife = lifes.at(it);
 
         int index = it;
-        chunkThreads[index] = std::thread(f, currentLife, this, &paused);
+        chunkThreads[index] = std::thread(f, currentLife, this, &paused, &chunks, &sensors, &brains, &actions, &accessibleEntitiesTime);
     }
 
     for (int it = 0; it < lifes.size(); it++) {
@@ -179,6 +205,15 @@ void Farm::multithreadBrainProcessing(bool paused) {
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
+
+    dataAnalyser.getChunkSelection()->addValue(chunks);
+    dataAnalyser.getSensorProcessing()->addValue(sensors);
+    dataAnalyser.getBrainProcessing()->addValue(brains);
+    dataAnalyser.getExternalActions()->addValue(actions);
+    dataAnalyser.getAccessibleEntities()->addValue(accessibleEntitiesTime);
+
+
+
 }
 
 void Farm::addActions(std::vector<ActionDTO> givenActions) {
@@ -188,7 +223,7 @@ void Farm::addActions(std::vector<ActionDTO> givenActions) {
 
 
 
-void Farm::brainProcessing() {
+void Farm::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 
@@ -229,6 +264,18 @@ void Farm::brainProcessing() {
     std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
     dataAnalyser.getBrainProcessing()->addValue(elapsed_timeBrain.count());
 
+
+    if (paused) {
+        std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
+        std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
+        dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
+
+        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time = end - start;
+        dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
+        return;
+    }
 
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {

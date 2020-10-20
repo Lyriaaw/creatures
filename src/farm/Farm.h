@@ -64,7 +64,7 @@ public:
 
     void sortCreatures();
 
-    void brainProcessing();
+    void brainProcessing(bool paused);
     void moveCreatures();
 
     void executeCreaturesActions();

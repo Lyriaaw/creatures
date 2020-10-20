@@ -46,6 +46,7 @@ DataAnalyser::DataAnalyser() {
     sensorProcessing = new DataItem("sensorProcessing", true);
     brainProcessing = new DataItem("brainProcessing", true);
     externalActions = new DataItem("externalActions", true);
+    accessibleEntities = new DataItem("accessibleEntities", true);
 
     zero = new DataItem("zero", true);
 
@@ -214,5 +215,9 @@ DataItem *DataAnalyser::getAverageOutputNeurons() const {
 
 DataItem *DataAnalyser::getAverageLinks() const {
     return averageLinks;
+}
+
+DataItem *DataAnalyser::getAccessibleEntities() const {
+    return accessibleEntities;
 }
 
