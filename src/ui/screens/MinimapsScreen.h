@@ -13,6 +13,7 @@
 #include "../minimaps/HeatEnergyMinimap.h"
 #include "../minimaps/GroundEnergyMinimap.h"
 #include "../minimaps/ActionsMinimap.h"
+#include "../minimaps/PheromoneMinimap.h"
 
 class MinimapsScreen: public Screen {
 private:
@@ -25,6 +26,7 @@ private:
     HeatEnergyMinimap * heatMinimap;
     GroundEnergyMinimap * groundMinimap;
     ActionsMinimap * actionsMinimap;
+    PheromoneMinimap * pheromoneMinimap;
 
     sf::RectangleShape background;
 

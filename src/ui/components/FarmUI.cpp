@@ -12,12 +12,13 @@
 #include "../minimaps/ActionsMinimap.h"
 #include "../minimaps/CreatureTileCountMinimap.h"
 #include "../minimaps/FoodTileCountMinimap.h"
+#include "../minimaps/PheromoneMinimap.h"
 
 FarmUI::FarmUI(Farm *farm): farm(farm), hoveredTile(Point(-1, -1)), selectedLife(nullptr) {
     loadTexts();
     loadFarm();
 
-    currentMinimap = new WorldMinimap();
+    currentMinimap = new PheromoneMinimap();
 }
 
 
@@ -124,10 +125,14 @@ void FarmUI::generateTileInfoText() {
     float currentHeat = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getHeat();
     float currentGround = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getGround();
     float currentColor = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getColor();
+    float currentPhColor = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getPheromoneColor();
+    float correntPhQuantity = farm->getMap()->getTileAt(currentHoveredTile.getX(), currentHoveredTile.getY())->getPheromoneQuantity();
     tileInfo = tileInfo + "Height: " + std::to_string(currentHeight) + "\n";
     tileInfo = tileInfo + "Color: " + std::to_string(currentColor) + "\n";
     tileInfo = tileInfo + "Heat: " + std::to_string(currentHeat) + "\n";
     tileInfo = tileInfo + "Ground: " + std::to_string(currentGround) + "\n";
+    tileInfo = tileInfo + "Ph Color: " + std::to_string(currentPhColor) + "\n";
+    tileInfo = tileInfo + "Ph Quant: " + std::to_string(correntPhQuantity) + "\n";
 
 
 

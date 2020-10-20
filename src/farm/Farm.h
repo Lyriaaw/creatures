@@ -151,6 +151,8 @@ public:
     std::vector<ActionDTO> getAndClearExecutedActions();
 
     void selectedCreatureChange(std::string type);
+
+    void handlePheromoneEmission(Life *performer, ActionDTO action);
 };
 
 

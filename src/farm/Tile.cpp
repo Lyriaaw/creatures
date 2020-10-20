@@ -2,6 +2,7 @@
 // Created by Amalric Lombard de Buffières on 8/9/20.
 //
 
+#include <algorithm>
 #include "Tile.h"
 
 float Tile::getHeight() const {
@@ -45,7 +46,7 @@ void Tile::addHeight(float value) {
     height += value;
 }
 
-Tile::Tile(float height, float color, float heat, float ground) : height(height), color(color), heat(heat), ground(ground) {}
+Tile::Tile(float height, float color, float heat, float ground) : height(height), color(color), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0) {}
 
 float Tile::getColor() const {
     return color;
@@ -53,4 +54,29 @@ float Tile::getColor() const {
 
 void Tile::setColor(float color) {
     Tile::color = color;
+}
+
+float Tile::getPheromoneColor() const {
+    return pheromoneColor;
+}
+
+float Tile::getPheromoneQuantity() const {
+    return pheromoneQuantity;
+}
+
+void Tile::addPheromone(float newColor, float newQuantity) {
+    pheromoneColor = ((pheromoneColor * pheromoneQuantity) + (newColor * newQuantity)) / (pheromoneQuantity + newQuantity);
+
+    pheromoneQuantity += newQuantity;
+}
+
+void Tile::removePhermoneQuantity(float quantityRemoved) {
+    pheromoneQuantity -= std::min(quantityRemoved, pheromoneQuantity);
+}
+void Tile::decayPheromone() {
+    pheromoneQuantity -= 0.1 * pheromoneQuantity;
+
+    if (pheromoneQuantity < 1.0) {
+        pheromoneQuantity = 0;
+    }
 }

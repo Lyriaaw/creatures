@@ -13,6 +13,9 @@ private:
     float heat;
     float ground;
 
+    float pheromoneColor;
+    float pheromoneQuantity;
+
 public:
 
     Tile(float height, float color, float heat, float ground);
@@ -38,6 +41,16 @@ public:
     float getColor() const;
 
     void setColor(float color);
+
+    float getPheromoneColor() const;
+
+    float getPheromoneQuantity() const;
+
+
+    void addPheromone(float color, float quantity);
+    void decayPheromone();
+
+    void removePhermoneQuantity(float quantityRemoved);
 };
 
 

@@ -28,11 +28,17 @@ void MinimapsScreen::init() {
     heatMinimap = new HeatEnergyMinimap();
     placeMinimap(0, 1, heatMinimap);
 
+    actionsMinimap = new ActionsMinimap();
+    placeMinimap(1, 1, actionsMinimap);
+
     groundMinimap = new GroundEnergyMinimap();
     placeMinimap(2, 1, groundMinimap);
 
-    actionsMinimap = new ActionsMinimap();
-    placeMinimap(1, 1, actionsMinimap);
+
+    pheromoneMinimap = new PheromoneMinimap();
+    placeMinimap(0, 2, pheromoneMinimap);
+
+
 
 
 
@@ -75,6 +81,7 @@ void MinimapsScreen::draw(sf::RenderWindow *window) {
     heatMinimap->generateValues(farmUi->getFarm());
     groundMinimap->generateValues(farmUi->getFarm());
     actionsMinimap->generateValues(farmUi->getFarm());
+    pheromoneMinimap->generateValues(farmUi->getFarm());
     window->draw(background);
     drawMinimaps(window);
 }

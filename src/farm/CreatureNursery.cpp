@@ -150,6 +150,15 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     creatureGenome.emplace_back(pheromoneEmitterEvolution);
     evolutionLibrary.addEvolution(pheromoneEmitterEvolution);
 
+    PheromoneEmitterEvolution * pheromoneEmitterEvolution2 = new PheromoneEmitterEvolution();
+    pheromoneEmitterEvolution2->setGenerationNumber(37);
+    pheromoneEmitterEvolution2->generateFromRandom(life);
+    pheromoneEmitterEvolution2->perform(life);
+    creatureGenome.emplace_back(pheromoneEmitterEvolution2);
+    evolutionLibrary.addEvolution(pheromoneEmitterEvolution2);
+
+
+
 
 
 

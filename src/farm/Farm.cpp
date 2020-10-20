@@ -297,6 +297,7 @@ void Farm::executeCreaturesActions() {
 
         if (actionDto.getType() == "EMIT_PHEROMONE") {
 //            handlePoop(performer);
+            handlePheromoneEmission(performer, actionDto);
             continue;
         }
 
@@ -332,6 +333,13 @@ void Farm::executeCreaturesActions() {
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getExecuteActionsTime()->addValue(elapsed_time.count());
+}
+
+void Farm::handlePheromoneEmission(Life * performer, ActionDTO action) {
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+
+    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addPheromone(action.getPheromoneEmissionColor(), performer->getEntity()->getSize());
 }
 
 void Farm::handleEating(Life * performer, Entity * subject) {
@@ -740,6 +748,7 @@ void Farm::vegetalisation() {
 
             currentTile->addGround(-1 * totalEnergyAdded);
 
+            currentTile->decayPheromone();
         }
     }
 

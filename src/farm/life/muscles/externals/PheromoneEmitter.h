@@ -17,6 +17,8 @@ public:
     std::vector<ActionDTO> prepareActionDTO(std::vector<Entity *> accessibleEntities) override;
 
     std::string getName() override;
+
+    void setColor(double color);
 };
 
 

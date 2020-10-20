@@ -17,7 +17,8 @@ void PheromoneEmitterEvolution::generateFromRandom(Life * life) {
 
 
 void PheromoneEmitterEvolution::perform(Life * life) {
-    ExternalMuscle * pheromoneEmitter = new PheromoneEmitter(0.0, life->getEntity());
+    PheromoneEmitter * pheromoneEmitter = new PheromoneEmitter(0.0, life->getEntity());
+    pheromoneEmitter->setColor(color);
 
     OutputNeuron * outputNeuron = new OutputNeuron();
     outputNeuron->setName("Pheromone emitter");

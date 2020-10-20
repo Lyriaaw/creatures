@@ -27,3 +27,7 @@ PheromoneEmitter::PheromoneEmitter(float rotation, Entity *entity) : ExternalMus
 std::string PheromoneEmitter::getName() {
     return "MOUTH";
 }
+
+void PheromoneEmitter::setColor(double color) {
+    PheromoneEmitter::color = color;
+}
