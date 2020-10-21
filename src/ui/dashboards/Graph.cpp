@@ -137,6 +137,12 @@ void Graph::setLegendsButtonColors() {
 void Graph::updateHoveredTickInformation() {
     hoveredTick = lastMouseX / tickWidthRatio;
 
+    if (graphControlCenter->getMode() == "last") {
+        hoveredTick = lines.at(0).getItem()->getCount() - graphControlCenter->getLastTickFrame() + hoveredTick;
+    } else if (graphControlCenter->getMode() == "fixed") {
+        hoveredTick = graphControlCenter->getFromTick() + hoveredTick;
+    }
+
     for (int it = 0; it < hoveredInfoValues.size(); it++) {
         if (it == 0) {
             hoveredInfoValues.at(it)->setText("Tick: " + std::to_string(hoveredTick));

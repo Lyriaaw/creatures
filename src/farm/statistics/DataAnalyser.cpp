@@ -62,6 +62,12 @@ DataAnalyser::DataAnalyser() {
         runnersPopulation.emplace_back(new DataItem("Runner " + std::to_string(it + 1), true));
     }
 
+    poopCount = new DataItem("poopCount", true);
+    pheromoneCount = new DataItem("pheromoneCount", true);
+    eatCount = new DataItem("eatCount", true);
+    mateSuccessCount = new DataItem("mateSuccessCount", true);
+    mateFailureCount = new DataItem("mateFailureCount", true);
+    biteCount = new DataItem("biteCount", true);
 }
 
 
@@ -231,3 +237,26 @@ const std::vector<DataItem *> &DataAnalyser::getRunnersPopulation() const {
     return runnersPopulation;
 }
 
+DataItem *DataAnalyser::getPoopCount() const {
+    return poopCount;
+}
+
+DataItem *DataAnalyser::getPheromoneCount() const {
+    return pheromoneCount;
+}
+
+DataItem *DataAnalyser::getEatCount() const {
+    return eatCount;
+}
+
+DataItem *DataAnalyser::getBiteCount() const {
+    return biteCount;
+}
+
+DataItem *DataAnalyser::getMateFailureCount() const {
+    return mateFailureCount;
+}
+
+DataItem *DataAnalyser::getMateSuccessCount() const {
+    return mateSuccessCount;
+}

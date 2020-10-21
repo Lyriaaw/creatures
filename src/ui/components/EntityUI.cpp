@@ -39,7 +39,8 @@ void EntityUI::draw(sf::RenderWindow *window, Camera *camera, Life *selectedLife
 
     bool isSelected = false;
     if (selectedLife != nullptr) {
-        for (auto const& currentAccessibleEntity : selectedLife->getCurrentAccessibleEntities()) {
+        Life * currentSelectedLife = selectedLife;
+        for (auto const& currentAccessibleEntity : currentSelectedLife->getCurrentAccessibleEntities()) {
             if (currentAccessibleEntity->getId() == entity->getId()) {
                 isSelected = true;
             }

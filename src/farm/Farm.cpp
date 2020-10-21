@@ -308,6 +308,15 @@ void Farm::executeCreaturesActions() {
         lifesRunners.at(it)->clearActions();
     }
 
+    int poopCount = 0;
+    int pheromoneCount = 0;
+    int eatCount = 0;
+    int mateFailureCount = 0;
+    int mateSuccessCount = 0;
+    int biteCount = 0;
+
+
+
     int naturalMatingCount = 0;
     for (int it = 0; it < actions.size(); it++) {
         ActionDTO actionDto = actions.at(it);
@@ -316,12 +325,14 @@ void Farm::executeCreaturesActions() {
 
         if (actionDto.getType() == "POOP") {
             handlePoop(performer);
+            poopCount++;
             continue;
         }
 
         if (actionDto.getType() == "EMIT_PHEROMONE") {
 //            handlePoop(performer);
             handlePheromoneEmission(performer, actionDto);
+            pheromoneCount++;
             continue;
         }
 
@@ -335,18 +346,24 @@ void Farm::executeCreaturesActions() {
 
         if (actionDto.getType() == "EAT") {
             handleEating(performer, subject);
+            eatCount++;
         }
 
         if (actionDto.getType() == "MATE") {
             bool success = handleMating(performer, subject->getId());
 
-            if (success)
+            if (success) {
                 naturalMatingCount++;
+                mateSuccessCount++;
+            } else {
+                mateFailureCount++;
+            }
 
         }
 
         if (actionDto.getType() == "BITE") {
             handleBiting(performer, subject);
+            biteCount++;
         }
     }
     removeDeletedEntities();
@@ -354,6 +371,13 @@ void Farm::executeCreaturesActions() {
 
     actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
+
+    dataAnalyser.getPoopCount()->addValue(poopCount);
+    dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
+    dataAnalyser.getEatCount()->addValue(eatCount);
+    dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
+    dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
+    dataAnalyser.getBiteCount()->addValue(biteCount);
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;

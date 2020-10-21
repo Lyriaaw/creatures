@@ -115,6 +115,8 @@ void StatisticsScreen::loadGraphs() {
     brainsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getZero(), 1, 0, 0, 0);
 
 
+
+
     brainsGraph->windowResized(windowWidth, windowHeight);
 
     Graph * runnersPopulationGraph = new Graph("Runners population", 0.f, 0.1f, 1.f, 0.8f);
@@ -132,6 +134,16 @@ void StatisticsScreen::loadGraphs() {
 
 
 
+    Graph * actionsGraph = new Graph("Actions", 0.f, 0.1f, 1.f, 0.8f);
+    actionsGraph->setGraphControlCenter(graphControlCenter);
+
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMateSuccessCount(), 1, 255, 0, 255);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMateFailureCount(), 1, 64, 0, 64);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getEatCount(), 1, 0, 255, 0);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBiteCount(), 1, 128, 0, 0);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPoopCount(), 1, 64, 0, 0);
+
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPheromoneCount(), 1, 0, 0, 128);
 
 
 
@@ -143,6 +155,7 @@ void StatisticsScreen::loadGraphs() {
     graphs.emplace_back(brainsGraph);
     graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(runnersPopulationGraph);
+    graphs.emplace_back(actionsGraph);
 }
 
 void StatisticsScreen::loadButtons(sf::Font *font) {

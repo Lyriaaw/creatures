@@ -70,6 +70,13 @@ private:
     std::vector<DataItem *> runnersPopulation;
 
 
+    DataItem * poopCount;
+    DataItem * pheromoneCount;
+    DataItem * eatCount;
+    DataItem * mateFailureCount;
+    DataItem * mateSuccessCount;
+    DataItem * biteCount;
+
 
 public:
     DataAnalyser();
@@ -153,6 +160,20 @@ public:
     DataItem *getAccessibleEntities() const;
 
     const std::vector<DataItem *> &getRunnersPopulation() const;
+
+    DataItem *getPoopCount() const;
+
+    DataItem *getPheromoneCount() const;
+
+    DataItem *getEatCount() const;
+
+    DataItem *getMateCount() const;
+
+    DataItem *getBiteCount() const;
+
+    DataItem *getMateFailureCount() const;
+
+    DataItem *getMateSuccessCount() const;
 };
 
 
