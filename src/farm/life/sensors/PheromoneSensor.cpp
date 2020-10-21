@@ -30,7 +30,7 @@ void PheromoneSensor::fetchSensorValue(std::vector<Entity *> accessibleEntities,
 void PheromoneSensor::findSelectedChunks() {
     Point entityPoint = this->entity->getPosition();
     Point currentTileCoordinates = entityPoint.getTileCoordinates();
-
+    selectedChunks.clear();
     selectedChunks.emplace_back(currentTileCoordinates.getX(), currentTileCoordinates.getY());
 }
 

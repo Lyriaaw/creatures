@@ -158,7 +158,21 @@ void FarmUI::update() {
 }
 
 sf::Color FarmUI::getColorForTile(int x, int y, Camera * camera, Map *map) {
-    return currentMinimap->getColorAt(x, y);
+    sf::Color color = currentMinimap->getColorAt(x, y);
+
+    if (selectedLife == nullptr) {
+        return color;
+    }
+
+
+    for (auto const& currentAccessibleTile : selectedLife->getCurrentAccessibleTiles()) {
+        if (currentAccessibleTile->getCoordinates().getX() == x && currentAccessibleTile->getCoordinates().getY() == y) {
+            return color;
+        }
+    }
+
+    return {color.r, color.g, color.b, 200};
+
 }
 
 void FarmUI::setPositions(Camera *camera) {
@@ -300,7 +314,7 @@ void FarmUI::draw(sf::RenderWindow *window, Camera *camera, Life * selectedEntit
     }
 
     for (int it = 0; it < currentEntities.size(); it++) {
-        currentEntities.at(it)->draw(window, camera, selected);
+        currentEntities.at(it)->draw(window, camera, selectedEntity);
     }
 
     for (int it = 0; it < currentLifes.size(); it++) {

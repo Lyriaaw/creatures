@@ -724,12 +724,14 @@ void Farm::vegetalisation() {
     std::lock_guard<std::mutex> guard(add_mutex);
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = map->getTileAt(it, jt);
             currentTile->decayPheromone();
         }
     }
+
 
     if (VEGETALISATION_RATE != 1 && tickCount % VEGETALISATION_RATE != 0) {
         removeDeletedEntities();

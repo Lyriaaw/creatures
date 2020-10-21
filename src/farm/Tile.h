@@ -6,8 +6,12 @@
 #define CREATURES_TILE_H
 
 
+#include "../utils/Point.h"
+
 class Tile {
 private:
+    Point coordinates;
+
     float color;
     float height;
     float heat;
@@ -18,7 +22,7 @@ private:
 
 public:
 
-    Tile(float height, float color, float heat, float ground);
+    Tile(Point coordinates, float height, float color, float heat, float ground);
 
     float getHeight() const;
 
@@ -51,6 +55,8 @@ public:
     void decayPheromone();
 
     void removePhermoneQuantity(float quantityRemoved);
+
+    const Point &getCoordinates() const;
 };
 
 

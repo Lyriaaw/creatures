@@ -19,6 +19,9 @@ class Life {
 private:
     Entity * entity;
 
+    std::vector<Entity *> currentAccessibleEntities;
+    std::vector<Tile *> currentAccessibleTiles;
+
     std::vector<Sensor *> sensors;
 
     std::vector<InternalMuscle *> internalMuscles;
@@ -68,6 +71,10 @@ public:
     double addEnergy(double energyToAdd);
 
     bool isAlive();
+
+    const std::vector<Entity *> &getCurrentAccessibleEntities() const;
+
+    const std::vector<Tile *> &getCurrentAccessibleTiles() const;
 };
 
 

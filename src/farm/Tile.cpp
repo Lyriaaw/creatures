@@ -46,7 +46,7 @@ void Tile::addHeight(float value) {
     height += value;
 }
 
-Tile::Tile(float height, float color, float heat, float ground) : height(height), color(color), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0) {}
+Tile::Tile(Point coordinates, float height, float color, float heat, float ground) : coordinates(coordinates), height(height), color(color), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0) {}
 
 float Tile::getColor() const {
     return color;
@@ -74,10 +74,18 @@ void Tile::removePhermoneQuantity(float quantityRemoved) {
     pheromoneQuantity -= std::min(quantityRemoved, pheromoneQuantity);
 }
 void Tile::decayPheromone() {
+    if (pheromoneQuantity == 0) {
+        return;
+    }
+
     pheromoneQuantity -= 0.05 * pheromoneQuantity;
 
     if (pheromoneQuantity < 1.0) {
         pheromoneQuantity = 0;
         pheromoneColor = 0;
     }
+}
+
+const Point &Tile::getCoordinates() const {
+    return coordinates;
 }

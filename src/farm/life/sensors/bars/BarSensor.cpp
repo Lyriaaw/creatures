@@ -106,6 +106,21 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, d
             continue;
         }
 
+        Point position = currentAccessibleEntity->getPosition();
+        Point tilePosition = position.getTileCoordinates();
+
+        bool inSelectedChunks = false;
+        for (int it = 0; it < selectedChunks.size(); it++) {
+            if (selectedChunks.at(it).getX() == tilePosition.getX() && selectedChunks.at(it).getY() == tilePosition.getY()) {
+                inSelectedChunks = true;
+                it = selectedChunks.size();
+            }
+        }
+
+        if (!inSelectedChunks) {
+            continue;
+        }
+
         double entitiesDistance = sqrt(
                 pow(this->entity->getPosition().getX() - currentAccessibleEntity->getPosition().getX(), 2) +
                 pow(this->entity->getPosition().getY() - currentAccessibleEntity->getPosition().getY(), 2));

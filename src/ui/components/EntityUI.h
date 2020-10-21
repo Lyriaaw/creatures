@@ -7,6 +7,7 @@
 
 
 #include "../../farm/entities/Entity.h"
+#include "../../farm/life/Life.h"
 #include <SFML/Graphics.hpp>
 
 
@@ -24,7 +25,7 @@ protected:
 public:
     EntityUI(Entity *entity, sf::Font * font);
 
-    void draw(sf::RenderWindow *window, Camera *camera, Entity * selectedEntity);
+    void draw(sf::RenderWindow *window, Camera *camera, Life * selectedLife);
 
     Entity *getEntity() const;
 

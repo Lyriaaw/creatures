@@ -7,6 +7,9 @@
 #include "muscles/internals/Movement.h"
 
 void Life::processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
+    this->currentAccessibleEntities = availableEntities;
+    this->currentAccessibleTiles = availableTiles;
+
     for (int it = 0; it < sensors.size(); it++) {
         sensors.at(it)->fetchSensorValue(availableEntities, availableTiles);
         sensors.at(it)->passValueToNeuron();
@@ -208,4 +211,13 @@ double Life::addEnergy(double energyToAdd) {
 
 bool Life::isAlive() {
     return energyCenter->getAvailableEnergy() > 0 && entity->isExists();
+}
+
+
+const std::vector<Entity *> &Life::getCurrentAccessibleEntities() const {
+    return currentAccessibleEntities;
+}
+
+const std::vector<Tile *> &Life::getCurrentAccessibleTiles() const {
+    return currentAccessibleTiles;
 }

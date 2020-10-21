@@ -5,6 +5,7 @@
 #include "EntityUI.h"
 #include "../colors/ColorUtils.h"
 #include "../colors/RGBColor.h"
+#include "../../farm/life/Life.h"
 
 
 Entity *EntityUI::getEntity() const {
@@ -18,7 +19,7 @@ EntityUI::EntityUI(Entity *entity, sf::Font *font): entity(entity), font(font) {
     this->color = sf::Color(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
 }
 
-void EntityUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEntity) {
+void EntityUI::draw(sf::RenderWindow *window, Camera *camera, Life *selectedLife) {
     Point screenPoint = camera->getScreenCoordinates(this->entity->getPosition());
 
     if (!camera->shouldDisplayPoint(screenPoint)) {
@@ -36,8 +37,16 @@ void EntityUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEn
     vertexArray[0] = sf::Vector2f(screenPoint.getX(), screenPoint.getY());
     vertexArray[0].color = this->color;
 
+    bool isSelected = false;
+    if (selectedLife != nullptr) {
+        for (auto const& currentAccessibleEntity : selectedLife->getCurrentAccessibleEntities()) {
+            if (currentAccessibleEntity->getId() == entity->getId()) {
+                isSelected = true;
+            }
+        }
+    }
 
-    bool isSelected = selectedEntity == this->entity;
+
 
     for (int it = 1; it <= 14; it++) {
         double angle = (it * (2 * M_PI ) / 13.0);

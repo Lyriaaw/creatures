@@ -59,8 +59,9 @@ void Map::generateRandomTerrain() {
 
 
 
+            Point coordinates = Point(it, jt);
 
-            Tile * currentTile = new Tile(height, color, 0.0, 1500.0);
+            Tile * currentTile = new Tile(coordinates, height, color, 0.0, 1500.0);
 
             line.emplace_back(currentTile);
         }
