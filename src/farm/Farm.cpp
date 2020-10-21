@@ -112,7 +112,7 @@ void Farm::Tick(bool paused) {
 
     generateEntityGrid();
 
-    multithreadBrainProcessing(paused);
+    multithreadBrainProcessing(&paused);
 
 
     if (!paused) {
@@ -153,7 +153,7 @@ void Farm::Tick(bool paused) {
     }
 }
 
-void Farm::multithreadBrainProcessing(bool paused) {
+void Farm::multithreadBrainProcessing(bool *paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 
@@ -163,15 +163,27 @@ void Farm::multithreadBrainProcessing(bool paused) {
     double actions(0.0);
     double accessibleEntitiesTime(0.0);
 
+    std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
-        lifesRunners.at(it)->brainProcessing(paused);
+        auto f = [](LifesRunner * currentLifeRunner, Farm * farm, bool * paused) {
+            currentLifeRunner->brainProcessing(*paused);
+        };
 
+        int index = it;
+        chunkThreads[index] = std::thread(f, lifesRunners.at(it), this, paused);
+    }
+
+
+
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        chunkThreads[it].join();
         chunks += lifesRunners.at(it)->getDataAnalyser().getChunkSelection()->getLastValue();
         sensors += lifesRunners.at(it)->getDataAnalyser().getSensorProcessing()->getLastValue();
         brains += lifesRunners.at(it)->getDataAnalyser().getBrainProcessing()->getLastValue();
         actions += lifesRunners.at(it)->getDataAnalyser().getExternalActions()->getLastValue();
         accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
     }
+
 
 
 
@@ -914,6 +926,10 @@ void Farm::statistics() {
 //        std::cout << "ERROR : Lost total energy : " << dataAnalyser.getTotalEnergy()->getSecondToLastValue() - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
 //    }
 
+    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
+        dataAnalyser.getRunnersPopulation().at(it)->addValue(lifesRunners.at(it)->getLifeCount());
+    }
+
 
 
     double totalTime = 0.0;
@@ -938,6 +954,8 @@ void Farm::statistics() {
     dataAnalyser.getTotalTime()->addValue(totalTime);
 
     dataAnalyser.getZero()->addValue(0);
+
+
 }
 
 void Farm::generateEntityGrid() {

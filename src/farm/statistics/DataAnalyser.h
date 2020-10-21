@@ -67,6 +67,10 @@ private:
     DataItem * averageOutputNeurons;
     DataItem * averageLinks;
 
+    std::vector<DataItem *> runnersPopulation;
+
+
+
 public:
     DataAnalyser();
 
@@ -147,6 +151,8 @@ public:
     DataItem *getAverageLinks() const;
 
     DataItem *getAccessibleEntities() const;
+
+    const std::vector<DataItem *> &getRunnersPopulation() const;
 };
 
 

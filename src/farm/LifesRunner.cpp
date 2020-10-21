@@ -20,6 +20,7 @@ int LifesRunner::getLifeCount() {
 void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    actions.clear();
 
     std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {

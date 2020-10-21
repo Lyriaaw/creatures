@@ -4,6 +4,7 @@
 
 #include <string>
 #include "DataAnalyser.h"
+#include "../../World.h"
 
 DataAnalyser::DataAnalyser() {
 
@@ -55,6 +56,11 @@ DataAnalyser::DataAnalyser() {
     averageInputNeurons = new DataItem("averageInputNeurons", true);
     averageOutputNeurons = new DataItem("averageOutputNeurons", true);
     averageLinks = new DataItem("averageLinks", true);
+
+
+    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
+        runnersPopulation.emplace_back(new DataItem("Runner " + std::to_string(it + 1), true));
+    }
 
 }
 
@@ -219,5 +225,9 @@ DataItem *DataAnalyser::getAverageLinks() const {
 
 DataItem *DataAnalyser::getAccessibleEntities() const {
     return accessibleEntities;
+}
+
+const std::vector<DataItem *> &DataAnalyser::getRunnersPopulation() const {
+    return runnersPopulation;
 }
 
