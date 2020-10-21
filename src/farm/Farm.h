@@ -15,13 +15,16 @@
 #include "CreatureNursery.h"
 #include "statistics/DataAnalyser.h"
 #include "life/Life.h"
+#include "LifesRunner.h"
 #include <thread>
 
 class Farm {
 private:
+
+    std::vector<LifesRunner *> lifesRunners;
+
     std::vector<Life *> sorted;
 
-    std::vector<Life *> lifes;
     std::vector<Entity *> entities;
 
     Map * map;
@@ -30,7 +33,6 @@ private:
 
     CreatureNursery * nursery;
 
-    std::vector<ActionDTO> actions;
     std::vector<ActionDTO> executedActions;
 
     double availableEnergy;
@@ -83,7 +85,7 @@ public:
     Entity * getEntityFromId(int id);
     Life * getLifeFromId(int id);
 
-    const std::vector<Life *> &getLifes() const;
+    std::vector<Life *> getLifes();
 
     const std::vector<Entity *> &getEntities() const;
 
@@ -153,6 +155,12 @@ public:
     void selectedCreatureChange(std::string type);
 
     void handlePheromoneEmission(Life *performer, ActionDTO action);
+
+    void initLifesRunners();
+
+    LifesRunner * getLessLoadedRunner();
+
+    void removeDeadLifes();
 };
 
 

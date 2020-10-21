@@ -16,6 +16,26 @@ Farm::Farm(){
     tickEnd = std::chrono::system_clock::now();
 }
 
+void Farm::initLifesRunners() {
+    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
+        LifesRunner * lifesRunner = new LifesRunner();
+        lifesRunner->setGenerateEntities([&](Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
+            this->generateEntities(position, color, brightness, maxSize, totalEnergy, spreadingRatio);
+        });
+
+        lifesRunner->setGetAccessibleEntities([&](std::vector<Point> selectedChunks) {
+           return getAccessibleEntities(selectedChunks);
+        });
+
+        lifesRunner->setGetAccessibleTiles([&](Life * life, std::vector<Point> selectedChunks) {
+           return getAccessibleTiles(life, selectedChunks);
+        });
+
+        lifesRunner->setMap(map);
+
+        lifesRunners.emplace_back(lifesRunner);
+    }
+}
 
 void Farm::InitFromRandom() {
     random_device rd;
@@ -40,6 +60,7 @@ void Farm::InitFromRandom() {
 
     entityGrid = testEntites;
 
+    initLifesRunners();
     std::uniform_real_distribution<float> distMovement(-1, 1);
     nursery = new CreatureNursery();
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
@@ -49,7 +70,7 @@ void Farm::InitFromRandom() {
         initialLife->getEntity()->setMass(creatureEnergy);
         initialLife->getEnergyCenter()->setAvailableEnergy(creatureEnergy);
 
-        lifes.push_back(initialLife);
+        lifesRunners.at(it % CONCURRENT_LIFE_RUNNER)->addLife(initialLife);
     }
 
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
@@ -135,7 +156,6 @@ void Farm::Tick(bool paused) {
 void Farm::multithreadBrainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    std::thread chunkThreads[lifes.size()];
 
     double chunks(0.0);
     double sensors(0.0);
@@ -143,61 +163,14 @@ void Farm::multithreadBrainProcessing(bool paused) {
     double actions(0.0);
     double accessibleEntitiesTime(0.0);
 
-    for (int it = 0; it < lifes.size(); it++) {
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        lifesRunners.at(it)->brainProcessing(paused);
 
-        auto f = [](Life * life, Farm * farm, bool * paused, double *chunks,double *sensors, double *brains, double *actions, double *accessibleEntitiesTime) {
-
-            std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
-            life->processSelectedChunks();
-            std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
-            *chunks += elapsed_timeChunk.count();
-
-
-            std::chrono::system_clock::time_point accessibleEntitiesStart = std::chrono::system_clock::now();
-            std::vector<Entity *> accessibleEntities = farm->getAccessibleEntities(life->getSelectedChunks());
-            std::vector<Tile *> accessibleTiles = farm->getAccessibleTiles(life, life->getSelectedChunks());
-            std::chrono::system_clock::time_point accessibleEntitiesEnd = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_timeEntities = accessibleEntitiesEnd - accessibleEntitiesStart;
-            *accessibleEntitiesTime += elapsed_timeEntities.count();
-
-
-            std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
-            life->processSensors(accessibleEntities, accessibleTiles);
-            std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
-            *sensors += elapsed_timeSensor.count();
-
-
-            std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
-            life->processBrain();
-            std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
-            *brains += elapsed_timeBrain.count();
-
-            std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
-
-            if (!*paused) {
-                std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
-
-                farm->addActions(currentCreatureActions);
-            }
-
-            std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
-            *actions += elapsed_timeActions.count();
-
-
-        };
-
-        Life *currentLife = lifes.at(it);
-
-        int index = it;
-        chunkThreads[index] = std::thread(f, currentLife, this, &paused, &chunks, &sensors, &brains, &actions, &accessibleEntitiesTime);
-    }
-
-    for (int it = 0; it < lifes.size(); it++) {
-        chunkThreads[it].join();
+        chunks += lifesRunners.at(it)->getDataAnalyser().getChunkSelection()->getLastValue();
+        sensors += lifesRunners.at(it)->getDataAnalyser().getSensorProcessing()->getLastValue();
+        brains += lifesRunners.at(it)->getDataAnalyser().getBrainProcessing()->getLastValue();
+        actions += lifesRunners.at(it)->getDataAnalyser().getExternalActions()->getLastValue();
+        accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
     }
 
 
@@ -216,85 +189,80 @@ void Farm::multithreadBrainProcessing(bool paused) {
 
 }
 
-void Farm::addActions(std::vector<ActionDTO> givenActions) {
-    std::lock_guard<std::mutex> guard(actions_mutex);
-    actions.insert(actions.end(), givenActions.begin(), givenActions.end());
-}
-
 
 
 void Farm::brainProcessing(bool paused) {
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-
-    std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-        currentLife->processSelectedChunks();
-    }
-    std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
-    dataAnalyser.getChunkSelection()->addValue(elapsed_timeChunk.count());
-
-
-
-    std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
-        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife, currentLife->getSelectedChunks());
-        currentLife->processSensors(accessibleEntities, accessibleTiles);
-    }
-    std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
-    dataAnalyser.getSensorProcessing()->addValue(elapsed_timeSensor.count());
-
-
-
-
-    std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
-
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-
-        currentLife->processBrain();
-    }
-    std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
-    dataAnalyser.getBrainProcessing()->addValue(elapsed_timeBrain.count());
-
-
-    if (paused) {
-        std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
-        std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
-        dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
-
-        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time = end - start;
-        dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
-        return;
-    }
-
-    std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
-
-        std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
-        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
-    }
-    std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
-    dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
-
-
-
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
+//    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+//
+//
+//    std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
+//    for (int it = 0; it < lifes.size(); it++) {
+//        Life *currentLife = lifes.at(it);
+//        currentLife->processSelectedChunks();
+//    }
+//    std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_timeChunk = chunkProcessingEnd - chunkProcessingStart;
+//    dataAnalyser.getChunkSelection()->addValue(elapsed_timeChunk.count());
+//
+//
+//
+//    std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
+//    for (int it = 0; it < lifes.size(); it++) {
+//        Life *currentLife = lifes.at(it);
+//
+//        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
+//        std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife, currentLife->getSelectedChunks());
+//        currentLife->processSensors(accessibleEntities, accessibleTiles);
+//    }
+//    std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
+//    dataAnalyser.getSensorProcessing()->addValue(elapsed_timeSensor.count());
+//
+//
+//
+//
+//    std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
+//
+//    for (int it = 0; it < lifes.size(); it++) {
+//        Life *currentLife = lifes.at(it);
+//
+//        currentLife->processBrain();
+//    }
+//    std::chrono::system_clock::time_point brainProcessingEnd = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_timeBrain = brainProcessingEnd - brainProcessingStart;
+//    dataAnalyser.getBrainProcessing()->addValue(elapsed_timeBrain.count());
+//
+//
+//    if (paused) {
+//        std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
+//        std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
+//        std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
+//        dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
+//
+//        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+//        std::chrono::duration<double> elapsed_time = end - start;
+//        dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
+//        return;
+//    }
+//
+//    std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
+//    for (int it = 0; it < lifes.size(); it++) {
+//        Life *currentLife = lifes.at(it);
+//
+//        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
+//
+//        std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
+//        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+//    }
+//    std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
+//    dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
+//
+//
+//
+//    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_time = end - start;
+//    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
 }
 
 
@@ -303,21 +271,11 @@ void Farm::moveCreatures() {
 
     std::vector<Entity* > newEntities;
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
-        Point entityPoint = currentLife->getEntity()->getPosition();
-        Point tilePoint = entityPoint.getTileCoordinates();
-
-        std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
-        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
-
-        double releasedHeat = currentLife->giveawayEnergy();
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
-
-        checkAndHandleLifeDying(currentLife);
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        lifesRunners.at(it)->moveCreatures();
     }
 
-    removeDeletedEntities();
+    removeDeadLifes();
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -330,6 +288,13 @@ void Farm::executeCreaturesActions() {
     std::lock_guard<std::mutex> guard(add_mutex);
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    std::vector<ActionDTO> actions;
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        std::vector<ActionDTO> runnerActions = lifesRunners.at(it)->getActions();
+        actions.insert(actions.end(), runnerActions.begin(), runnerActions.end());
+        lifesRunners.at(it)->clearActions();
+    }
 
     int naturalMatingCount = 0;
     for (int it = 0; it < actions.size(); it++) {
@@ -373,6 +338,7 @@ void Farm::executeCreaturesActions() {
         }
     }
     removeDeletedEntities();
+    removeDeadLifes();
 
     actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
@@ -427,20 +393,7 @@ void Farm::handleEating(Life * performer, Entity * subject) {
 
 }
 
-void Farm::checkAndHandleLifeDying(Life * life) {
-    if (life->getEnergyCenter()->getAvailableEnergy() <= 0) {
-        Point performerPoint = life->getEntity()->getPosition();
-        Point tilePoint = performerPoint.getTileCoordinates();
-        Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
-        generateEntities(performerPoint, life->getEntity()->getColor(), 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
-        generateEntities(performerPoint, 0.04f, 0.2f, (0.1 * life->getEntity()->getSize() * MASS_TO_SIZE_RATIO), life->getEnergyCenter()->getWastedEnergy(), life->getEntity()->getSize());
-
-
-        life->getEntity()->setMass(0.0);
-        life->getEnergyCenter()->setWastedEnergy(0.0);
-    }
-}
 
 void Farm::handleBiting(Life * performer, Entity * subject) {
 
@@ -609,7 +562,7 @@ bool Farm::handleMating(Life * father, int entityId) {
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEntity()->setMass(totalGivenEnergy / 2.0);
         child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
-        lifes.emplace_back(child);
+        getLessLoadedRunner()->addLife(child);
         lifesAdded.emplace_back(child);
 
 
@@ -645,7 +598,9 @@ void Farm::populationControl() {
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    if (this->lifes.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
+    std::vector<Life *> lifes = getLifes();
+
+    if (lifes.size() > int(INITIAL_CREATURE_COUNT / 2) - (INITIAL_CREATURE_COUNT * 0.05)) {
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_time = end - start;
         dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
@@ -662,7 +617,7 @@ void Farm::populationControl() {
     std::vector<Life *> sortedConnectors = getScoreSortedCreatures();
     int selectedParentCount = sortedConnectors.size() / 2;
 
-    int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - this->lifes.size();
+    int newConnectorNeeded = int(INITIAL_CREATURE_COUNT / 2) + (INITIAL_CREATURE_COUNT * 0.05) - lifes.size();
 
     float totalEnergyRemoved = 0.f;
     for (int it = 0; it < newConnectorNeeded; it++) {
@@ -685,8 +640,8 @@ void Farm::populationControl() {
 
         totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyCenter()->getAvailableEnergy();
 
+        getLessLoadedRunner()->addLife(child);
 
-        lifes.emplace_back(child);
         lifesAdded.emplace_back(child);
     }
 
@@ -821,6 +776,7 @@ void Farm::vegetalisation() {
 void Farm::aTickHavePassed() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    std::vector<Life *> lifes = getLifes();
     for (int it = 0; it < lifes.size(); it++) {
         lifes.at(it)->getEntity()->aTickHavePassed();
     }
@@ -838,7 +794,7 @@ void Farm::aTickHavePassed() {
 void Farm::analyseColors() {
     std::vector<double> sortResult;
 
-    std::vector<Life *> tmpLifes = this->lifes;
+    std::vector<Life *> tmpLifes = getLifes();
 
     while (!tmpLifes.empty()) {
 
@@ -905,6 +861,7 @@ void Farm::statistics() {
     double totalCreaturesWasted = 0.f;
     double totalFoodsEnergy = 0.f;
 
+    std::vector<Life *> lifes = getLifes();
     for (int it = 0; it < lifes.size(); it++) {
         Life * currentLife = lifes.at(it);
         totalCreaturesEnergy += currentLife->getEnergyCenter()->getAvailableEnergy();
@@ -986,6 +943,8 @@ void Farm::statistics() {
 void Farm::generateEntityGrid() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    std::vector<Life *> lifes = getLifes();
+
     for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
             entityGrid.at(it).at(jt).clear();
@@ -1013,21 +972,13 @@ void Farm::generateEntityGrid() {
     dataAnalyser.getEntityGridTime()->addValue(elapsed_time.count());
 }
 
+void Farm::removeDeadLifes() {
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        lifesRunners.at(it)->removeDeadLifes();
+    }
+}
 void Farm::removeDeletedEntities() {
     std::lock_guard<std::mutex> guard(delete_mutex);
-
-    std::vector<Life *> newLifes;
-    for (int it = 0; it < lifes.size(); it++) {
-
-        if (lifes.at(it)->isAlive()) {
-            newLifes.emplace_back(lifes.at(it));
-        } else {
-            lifesToDelete.emplace_back(lifes.at(it));
-        }
-    }
-
-    lifes.clear();
-    lifes = newLifes;
 
     std::vector<Entity *> newEntities;
     for (int it = 0; it < entities.size(); it++) {
@@ -1081,7 +1032,7 @@ void Farm::sortCreatures() {
 
     std::vector<Life *> sortResult;
 
-    std::vector<Life *> tmpLifes = this->lifes;
+    std::vector<Life *> tmpLifes = getLifes();
 
     while (!tmpLifes.empty()) {
 
@@ -1114,9 +1065,10 @@ void Farm::sortCreatures() {
 
 
 Life * Farm::getLifeFromId(int id) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it);
+    std::vector<Life *> lifes = getLifes();
+    for (int it = 0; it < lifes.size(); it++) {
+        if (lifes.at(it)->getEntity()->getId() == id) {
+            return lifes.at(it);
         }
     }
 
@@ -1124,10 +1076,9 @@ Life * Farm::getLifeFromId(int id) {
 }
 
 Entity * Farm::getEntityFromId(int id) {
-    for (int it = 0; it < this->lifes.size(); it++) {
-        if (this->lifes.at(it)->getEntity()->getId() == id) {
-            return this->lifes.at(it)->getEntity();
-        }
+    Life * foundLife = getLifeFromId(id);
+    if (foundLife != nullptr) {
+        return foundLife->getEntity();
     }
 
     for (int it = 0; it < this->entities.size(); it++) {
@@ -1154,9 +1105,6 @@ CreatureNursery *Farm::getNursery() const {
 }
 
 
-void Farm::addLife(Life * life) {
-    this->lifes.push_back(life);
-}
 
 
 void Farm::clearAddedLifes() {
@@ -1221,7 +1169,12 @@ Map *Farm::getMap() const {
     return map;
 }
 
-const vector<Life *> &Farm::getLifes() const {
+vector<Life *> Farm::getLifes() {
+    std::vector<Life *> lifes;
+    for (auto const& lifesRunner: lifesRunners) {
+        std::vector<Life *> returnedLifes = lifesRunner->getLifes();
+        lifes.insert(lifes.end(), returnedLifes.begin(), returnedLifes.end());
+    }
     return lifes;
 }
 
@@ -1303,5 +1256,28 @@ int Farm::getTickCount() const {
     return tickCount;
 }
 
+LifesRunner * Farm::getLessLoadedRunner() {
+    LifesRunner * smallestLifeRunner = lifesRunners.at(0);
+    int min = smallestLifeRunner->getLifeCount();
+
+    for (auto const& currentRunner: lifesRunners) {
+        if (currentRunner->getLifeCount() < min) {
+            smallestLifeRunner = currentRunner;
+            min = currentRunner->getLifeCount();
+        }
+    }
+    return smallestLifeRunner;
+}
+
+void Farm::checkAndHandleLifeDying(Life * life) {
+    if (life->getEnergyCenter()->getAvailableEnergy() <= 0) {
+        Point performerPoint = life->getEntity()->getPosition();
+
+        generateEntities(performerPoint, life->getEntity()->getColor(), 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
+        generateEntities(performerPoint, 0.04f, 0.2f, (0.1 * life->getEntity()->getSize() * MASS_TO_SIZE_RATIO), life->getEnergyCenter()->getWastedEnergy(), life->getEntity()->getSize());
 
 
+        life->getEntity()->setMass(0.0);
+        life->getEnergyCenter()->setWastedEnergy(0.0);
+    }
+}
