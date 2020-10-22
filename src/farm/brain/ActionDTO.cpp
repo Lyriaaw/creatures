@@ -42,3 +42,7 @@ double ActionDTO::getPheromoneEmissionColor() const {
 void ActionDTO::setPheromoneEmissionColor(double pheromoneEmissionColor) {
     ActionDTO::pheromoneEmissionColor = pheromoneEmissionColor;
 }
+
+void ActionDTO::setType(const std::string &type) {
+    ActionDTO::type = type;
+}

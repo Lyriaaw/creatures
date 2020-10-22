@@ -31,6 +31,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
     Entity * entity = new Entity(Point(x, y));
     entity->setBrightness(0.5f);
+    entity->setIsLife(true);
     Brain * brain = new Brain();
     EnergyCenter * energyCenter = new EnergyCenter(entity);
 
@@ -298,6 +299,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     Entity * childEntity = new Entity(childSpawn);
     childEntity->setRotation(((std::rand() % 2000) / 1000.f) - 1.f);
     childEntity->setBrightness(0.5);
+    childEntity->setIsLife(true);
 
     Brain * childBrain = new Brain();
 

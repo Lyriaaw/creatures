@@ -73,9 +73,11 @@ private:
     DataItem * poopCount;
     DataItem * pheromoneCount;
     DataItem * eatCount;
+    DataItem * eatLifeCount;
     DataItem * mateFailureCount;
     DataItem * mateSuccessCount;
     DataItem * biteCount;
+    DataItem * biteLifeCount;
 
 
 public:
@@ -174,6 +176,10 @@ public:
     DataItem *getMateFailureCount() const;
 
     DataItem *getMateSuccessCount() const;
+
+    DataItem *getBiteLifeCount() const;
+
+    DataItem *getEatLifeCount() const;
 };
 
 

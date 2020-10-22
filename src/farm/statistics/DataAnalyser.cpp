@@ -65,9 +65,11 @@ DataAnalyser::DataAnalyser() {
     poopCount = new DataItem("poopCount", true);
     pheromoneCount = new DataItem("pheromoneCount", true);
     eatCount = new DataItem("eatCount", true);
+    eatLifeCount = new DataItem("eatLifeCount", true);
     mateSuccessCount = new DataItem("mateSuccessCount", true);
     mateFailureCount = new DataItem("mateFailureCount", true);
     biteCount = new DataItem("biteCount", true);
+    biteLifeCount = new DataItem("biteLifeCount", true);
 }
 
 
@@ -259,4 +261,12 @@ DataItem *DataAnalyser::getMateFailureCount() const {
 
 DataItem *DataAnalyser::getMateSuccessCount() const {
     return mateSuccessCount;
+}
+
+DataItem *DataAnalyser::getBiteLifeCount() const {
+    return biteLifeCount;
+}
+
+DataItem *DataAnalyser::getEatLifeCount() const {
+    return eatLifeCount;
 }

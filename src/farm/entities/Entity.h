@@ -55,6 +55,10 @@ public:
 
     void setBrightness(float brightness);
 
+    bool isLife() const;
+
+    void setIsLife(bool isLife);
+
 
 protected:
     static int GLOBAL_INDEX;
@@ -74,6 +78,8 @@ protected:
     bool exists;
 
     int age;
+
+    bool isALife;
 
 };
 

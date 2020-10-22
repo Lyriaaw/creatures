@@ -7,7 +7,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), mass(0.0), age(0) {
+Entity::Entity(Point position): position(position), mass(0.0), age(0), isALife(false) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;
@@ -118,4 +118,12 @@ void Entity::aTickHavePassed(){
 
 void Entity::setBrightness(float brightness) {
     Entity::brightness = brightness;
+}
+
+bool Entity::isLife() const {
+    return isALife;
+}
+
+void Entity::setIsLife(bool isLife) {
+    Entity::isALife = isLife;
 }

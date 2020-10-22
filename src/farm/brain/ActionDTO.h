@@ -41,6 +41,8 @@ public:
     double getPheromoneEmissionColor() const;
 
     void setPheromoneEmissionColor(double pheromoneEmissionColor);
+
+    void setType(const std::string &type);
 };
 
 

@@ -322,9 +322,11 @@ void Farm::executeCreaturesActions() {
     int poopCount = 0;
     int pheromoneCount = 0;
     int eatCount = 0;
+    int eatLifeCount = 0;
     int mateFailureCount = 0;
     int mateSuccessCount = 0;
     int biteCount = 0;
+    int biteLifeCount = 0;
 
 
 
@@ -333,12 +335,6 @@ void Farm::executeCreaturesActions() {
         ActionDTO actionDto = actions.at(it);
 
         Life * performer = getLifeFromId(actionDto.getPerformerId());
-
-        if (actionDto.getType() == "POOP") {
-            handlePoop(performer);
-            poopCount++;
-            continue;
-        }
 
         if (actionDto.getType() == "EMIT_PHEROMONE") {
 //            handlePoop(performer);
@@ -355,10 +351,17 @@ void Farm::executeCreaturesActions() {
             continue;
         }
 
-        if (actionDto.getType() == "EAT") {
+        if (actionDto.getType() == "EAT_ENTITY") {
             handleEating(performer, subject);
             eatCount++;
         }
+
+        if (actionDto.getType() == "EAT_LIFE") {
+            handleEating(performer, subject);
+            eatLifeCount++;
+        }
+
+
 
         if (actionDto.getType() == "MATE") {
             bool success = handleMating(performer, subject->getId());
@@ -372,10 +375,17 @@ void Farm::executeCreaturesActions() {
 
         }
 
-        if (actionDto.getType() == "BITE") {
+        if (actionDto.getType() == "BITE_ENTITY") {
             handleBiting(performer, subject);
             biteCount++;
         }
+
+        if (actionDto.getType() == "BITE_LIFE") {
+            handleBiting(performer, subject);
+            biteLifeCount++;
+        }
+
+
     }
     removeDeletedEntities();
     removeDeadLifes();
@@ -388,6 +398,8 @@ void Farm::executeCreaturesActions() {
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
     dataAnalyser.getBiteCount()->addValue(biteCount);
+    dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
+    dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
