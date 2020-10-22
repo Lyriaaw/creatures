@@ -17,6 +17,7 @@ class Map {
 private:
     std::vector<std::vector<Tile *>> tiles;
 
+    int tick;
 
     std::function<void(std::vector<Entity *> entities)> recordAddedEntitiesToFarm;
 
@@ -29,7 +30,7 @@ public:
     void initRandomMap();
     void generateRandomTerrain();
     void processClimate();
-    void processGroundChanges();
+    void vegetalisation();
     void prepareTiles();
 
     void removeEnergyFromGround(double amount);
@@ -38,7 +39,6 @@ public:
 
     void setTiles(const std::vector<std::vector<Tile *>> &tiles);
 
-    void vegetalisation();
 
     void setRecordAddedEntitiesToFarm(const std::function<void(std::vector<Entity *>)> &recordAddedEntitiesToFarm);
 };

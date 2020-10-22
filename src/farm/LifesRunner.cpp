@@ -25,6 +25,9 @@ void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
+        if (!currentLife->isAlive()) {
+            continue;
+        }
         currentLife->processSelectedChunks();
     }
     std::chrono::system_clock::time_point chunkProcessingEnd = std::chrono::system_clock::now();
@@ -36,6 +39,9 @@ void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
+        if (!currentLife->isAlive()) {
+            continue;
+        }
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
         std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife, currentLife->getSelectedChunks());
@@ -52,6 +58,9 @@ void LifesRunner::brainProcessing(bool paused) {
 
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
+        if (!currentLife->isAlive()) {
+            continue;
+        }
 
         currentLife->processBrain();
     }
@@ -78,6 +87,9 @@ void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
+        if (!currentLife->isAlive()) {
+            continue;
+        }
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
 

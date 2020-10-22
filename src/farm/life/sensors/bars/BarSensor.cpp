@@ -106,6 +106,10 @@ void BarSensor::getSensorValueFromSensorEquation(float sensorX, float sensorY, d
             continue;
         }
 
+        if (currentAccessibleEntity->getMass() == 0) {
+            continue;
+        }
+
         Point position = currentAccessibleEntity->getPosition();
         Point tilePosition = position.getTileCoordinates();
 

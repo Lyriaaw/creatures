@@ -138,12 +138,6 @@ void Map::prepareTiles() {
 //    }
 }
 
-
-void Map::processGroundChanges(){
-
-}
-
-
 void Map::removeEnergyFromGround(double energyToRemove) {
 
     double totalGround = 0.0;

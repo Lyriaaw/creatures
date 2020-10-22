@@ -179,6 +179,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
         auto f = [](LifesRunner * currentLifeRunner, Farm * farm, bool * paused) {
+            currentLifeRunner->moveCreatures();
             currentLifeRunner->brainProcessing(*paused);
         };
 
@@ -298,13 +299,6 @@ void Farm::brainProcessing(bool paused) {
 void Farm::moveCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    std::vector<Entity* > newEntities;
-
-    for (int it = 0; it < lifesRunners.size(); it++) {
-        lifesRunners.at(it)->moveCreatures();
-    }
-
-    removeDeadLifes();
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -353,7 +347,19 @@ void Farm::executeCreaturesActions() {
             biteLifeCount++;
         }
 
-        Entity * subject = getEntityFromId(actionDto.getSubjectId());
+        if (actionDto.getType() == "MATE") {
+            bool success = handleMating(performer, actionDto.getSubjectId());
+
+            if (success) {
+                naturalMatingCount++;
+                mateSuccessCount++;
+            } else {
+                mateFailureCount++;
+            }
+
+        }
+
+        Entity * subject = actionDto.getSubject();
 
         if (subject == nullptr) {
             continue;
@@ -375,17 +381,7 @@ void Farm::executeCreaturesActions() {
 
 
 
-        if (actionDto.getType() == "MATE") {
-            bool success = handleMating(performer, subject->getId());
 
-            if (success) {
-                naturalMatingCount++;
-                mateSuccessCount++;
-            } else {
-                mateFailureCount++;
-            }
-
-        }
 
         if (actionDto.getType() == "BITE_ENTITY") {
             handleBiting(performer, subject);
@@ -475,10 +471,10 @@ void Farm::handleBitingLife(Life * performer, ActionDTO action) {
 
         checkAndHandleLifeDying(foundLife);
 
-        std::lock_guard<std::mutex> guard(executed_actions_mutex);
         ActionDTO executedAction = ActionDTO(0, 0, "BITE_LIFE");
         executedAction.setTilePosition(tilePoint);
         executedAction.setTick(tickCount);
+        std::lock_guard<std::mutex> guard(executed_actions_mutex);
         executedActions.emplace_back(executedAction);
         return;
     }
@@ -774,15 +770,6 @@ void Farm::aTickHavePassed() {
         lifes.at(it)->getEntity()->aTickHavePassed();
     }
 
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            Tile * currentTile = map->getTileAt(it, jt);
-            std::vector<Entity *> entities = currentTile->getEntities();
-            for (int it = 0; it < entities.size(); it++) {
-                entities.at(it)->aTickHavePassed();
-            }
-        }
-    }
 
     tickCount++;
 

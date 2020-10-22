@@ -8,11 +8,13 @@
 
 #include <string>
 #include "../../utils/Point.h"
+#include "../entities/Entity.h"
 
 class ActionDTO {
 private:
     int performerId;
     int subjectId;
+    Entity * subject;
 
     std::string type;
 
@@ -43,6 +45,10 @@ public:
     void setPheromoneEmissionColor(double pheromoneEmissionColor);
 
     void setType(const std::string &type);
+
+    Entity *getSubject() const;
+
+    void setSubject(Entity *subject);
 };
 
 

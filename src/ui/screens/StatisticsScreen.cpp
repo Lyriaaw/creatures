@@ -45,6 +45,7 @@ void StatisticsScreen::loadGraphs() {
     timeGraph->setGraphControlCenter(graphControlCenter);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTickTime(), 2, 255, 255, 255);
+    timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTotalTime(), 2, 0, 0, 0);
 
@@ -58,7 +59,6 @@ void StatisticsScreen::loadGraphs() {
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getExecuteActionsTime(), 2, 128, 128, 255);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPopulationControlTime(), 2, 0, 0, 195);
-    timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getStatisticsTime(), 2, 255, 15, 15);
 
     timeGraph->windowResized(windowWidth, windowHeight);
