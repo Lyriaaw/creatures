@@ -63,8 +63,8 @@ public:
     void addEntity(Entity * entity);
     void addLifes(std::vector<Life *> addedToFarm);
     void addEntities(std::vector<Entity *> addedToFarm);
-    void clearDeletedLifes(std::vector<Life *> deletedFromFarm);
-    void clearDeletedEntities(std::vector<Entity *> deletedFromFarm);
+    void clearDeletedLifes();
+    void clearDeletedEntities();
 
     Life *getSelectedLife() const;
 

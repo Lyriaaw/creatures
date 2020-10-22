@@ -50,8 +50,9 @@ void FarmUI::loadLifes() {
 }
 
 void FarmUI::loadEntities() {
-    for (int it = 0; it < farm->getEntities().size(); it++) {
-        Entity * currentEntity = farm->getEntities().at(it);
+    std::vector<Entity *> entities = farm->getEntities();
+    for (int it = 0; it < entities.size(); it++) {
+        Entity * currentEntity = entities.at(it);
 
         EntityUI * ui = new EntityUI(currentEntity, GlobalFont::MainFont);
         entityUIs.emplace_back(ui);
@@ -85,7 +86,7 @@ void FarmUI::addEntities(std::vector<Entity *> addedToFarm) {
 }
 
 
-void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
+void FarmUI::clearDeletedLifes() {
     std::vector<LifeUI *> newLifeUis;
     for (int it = 0; it < lifeUIs.size(); it++) {
         LifeUI * currentLifeUi = lifeUIs.at(it);
@@ -97,7 +98,7 @@ void FarmUI::clearDeletedLifes(std::vector<Life *> deletedFromFarm) {
     lifeUIs = newLifeUis;
 }
 
-void FarmUI::clearDeletedEntities(std::vector<Entity *> deletedFromFarm) {
+void FarmUI::clearDeletedEntities() {
     std::vector<EntityUI *> newEntityUis;
     for (int it = 0; it < entityUIs.size(); it++) {
         EntityUI * currentEntityUI = entityUIs.at(it);
@@ -146,9 +147,9 @@ void FarmUI::generateTileInfoText() {
 void FarmUI::update() {
     // TODO OPTI Clear to_delete
 
-    clearDeletedEntities(farm->getAndClearEntitiesToDelete());
+    clearDeletedEntities();
 
-    clearDeletedLifes(farm->getAndClearLifesToDelete());
+    clearDeletedLifes();
 
     addLifes(farm->getAndClearLifesToAdd());
 

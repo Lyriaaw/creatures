@@ -25,8 +25,6 @@ private:
 
     std::vector<Life *> sorted;
 
-    std::vector<Entity *> entities;
-
     Map * map;
 
     std::vector<std::vector<std::vector<Entity *>>> entityGrid;
@@ -87,7 +85,7 @@ public:
 
     std::vector<Life *> getLifes();
 
-    const std::vector<Entity *> &getEntities() const;
+    std::vector<Entity *> getEntities();
 
     static std::string getHumanReadableEnergy(float givenEnergy) ;
 
@@ -143,9 +141,6 @@ public:
 
     void analyseColors();
 
-    std::vector<Entity *> getAndClearEntitiesToDelete();
-    std::vector<Life *> getAndClearLifesToDelete();
-
     std::vector<Entity *> getAndClearEntitiesToAdd();
 
     std::vector<Life *> getAndClearLifesToAdd();
@@ -165,6 +160,8 @@ public:
     void recordExecutedAction(ActionDTO action);
 
     void handleBitingLife(Life * performer, ActionDTO action);
+
+    void addEntityToFarm(Entity *entity);
 };
 
 

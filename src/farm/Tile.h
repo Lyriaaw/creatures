@@ -7,6 +7,7 @@
 
 
 #include "../utils/Point.h"
+#include "entities/Entity.h"
 
 class Tile {
 private:
@@ -19,6 +20,12 @@ private:
 
     float pheromoneColor;
     float pheromoneQuantity;
+
+    std::mutex entities_mutex;
+    std::vector<Entity *> entities;
+
+    std::mutex ground_mutex;
+    std::mutex heat_mutex;
 
 public:
 
@@ -57,6 +64,15 @@ public:
     void removePhermoneQuantity(float quantityRemoved);
 
     const Point &getCoordinates() const;
+
+
+    void addEntity(Entity *entity);
+
+    std::vector<Entity *> getEntities();
+
+    void handleEntityDecay();
+
+    void removeDeletedEntities();
 };
 
 

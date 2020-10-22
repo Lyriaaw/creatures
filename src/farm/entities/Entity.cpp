@@ -138,3 +138,7 @@ void Entity::tryLockInteraction() {
 void Entity::unlockInteraction() {
     interaction_mutex.unlock();
 }
+
+Point Entity::getTileCoordinates() {
+    return position.getTileCoordinates();
+}

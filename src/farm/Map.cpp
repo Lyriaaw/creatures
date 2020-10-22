@@ -259,6 +259,8 @@ void Map::processClimate() {
 
 
 
+
+
 Tile * Map::getTileAt(int tileX, int tileY) {
     while (!mapMutex.try_lock()) {
         usleep(10);

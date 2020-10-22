@@ -3,6 +3,7 @@
 //
 
 #include <algorithm>
+#include <iostream>
 #include "Tile.h"
 
 float Tile::getHeight() const {
@@ -18,6 +19,7 @@ float Tile::getHeat() const {
 }
 
 void Tile::setHeat(float heat) {
+    std::lock_guard<std::mutex> guard(heat_mutex);
     Tile::heat = heat;
 }
 
@@ -26,19 +28,27 @@ float Tile::getGround() const {
 }
 
 void Tile::setGround(float ground) {
+    std::lock_guard<std::mutex> guard(ground_mutex);
+
     Tile::ground = ground;
 }
 
 void Tile::removeGround(float groundToRemove) {
+    std::lock_guard<std::mutex> guard(ground_mutex);
+
     Tile::ground -= groundToRemove;
 }
 
 
 void Tile::addGround(float value) {
+    std::lock_guard<std::mutex> guard(ground_mutex);
+
     ground += value;
 }
 
 void Tile::addHeat(float value) {
+    std::lock_guard<std::mutex> guard(heat_mutex);
+
     heat += value;
 }
 
@@ -89,3 +99,43 @@ void Tile::decayPheromone() {
 const Point &Tile::getCoordinates() const {
     return coordinates;
 }
+
+void Tile::addEntity(Entity * entity) {
+    std::lock_guard<std::mutex> guard(entities_mutex);
+    entities.emplace_back(entity);
+}
+
+std::vector<Entity *> Tile::getEntities() {
+    return entities;
+}
+
+void Tile::handleEntityDecay() {
+    for (auto const& entity: entities) {
+        entity->tryLockInteraction();
+
+        if (entity->getMass() < 100) {
+            addGround(entity->getMass());
+            entity->setMass(0);
+        } else {
+            addGround(2.0);
+            entity->removeMass(2.0);
+        }
+        entity->unlockInteraction();
+    }
+}
+
+void Tile::removeDeletedEntities() {
+    std::lock_guard<std::mutex> guard(entities_mutex);
+
+    std::vector<Entity *> newEntities;
+    for (int it = 0; it < entities.size(); it++) {
+
+        if (entities.at(it)->isExists()) {
+            newEntities.emplace_back(entities.at(it));
+        }
+    }
+
+    entities.clear();
+    entities = newEntities;
+}
+

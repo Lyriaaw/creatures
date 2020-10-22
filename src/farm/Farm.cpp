@@ -53,9 +53,9 @@ void Farm::InitFromRandom() {
 
     std::vector<std::vector<std::vector<Entity *>>> testEntites;
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         std::vector<std::vector<Entity *>> line;
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             std::vector<Entity *> currentChunk;
             line.push_back(currentChunk);
         }
@@ -95,7 +95,7 @@ void Farm::InitFromRandom() {
         entity->setColor(0.28f);
         entity->setBrightness(0.3f);
 
-        entities.push_back(entity);
+        addEntityToFarm(entity);
     }
 
     availableEnergy = 0.f;
@@ -108,7 +108,6 @@ void Farm::InitFromRandom() {
 void Farm::Tick(bool paused) {
 
 
-
     if (!paused) {
         for (auto const& runner : lifesRunners) {
             runner->setTick(tickCount);
@@ -117,6 +116,7 @@ void Farm::Tick(bool paused) {
 
         moveCreatures();
     }
+
 
 
     generateEntityGrid();
@@ -390,7 +390,6 @@ void Farm::executeCreaturesActions() {
 
 
     }
-    removeDeletedEntities();
     removeDeadLifes();
 
     actions.clear();
@@ -464,7 +463,7 @@ void Farm::handleBitingLife(Life * performer, ActionDTO action) {
     if (foundLife != nullptr) {
         Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
-        double takenEnergy = std::min(mouthSize * 50.0, foundLife->getEnergyCenter()->getAvailableEnergy());
+        double takenEnergy = std::min(mouthSize * 10.0, foundLife->getEnergyCenter()->getAvailableEnergy());
         foundLife->getEnergyCenter()->removeAvailableEnergy(takenEnergy);
         tile->addHeat(takenEnergy);
 
@@ -516,7 +515,7 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
         bitenEntity->setBrightness(subject->getBrightness());
         bitenEntity->setMass(subject->getMass() / 2.0);
 
-        entities.emplace_back(bitenEntity);
+        addEntityToFarm(bitenEntity);
         entityAdded.emplace_back(bitenEntity);
     }
 
@@ -562,6 +561,7 @@ void Farm::generateEntities(Point position, float color, float brightness, doubl
         poop->setBrightness(brightness);
         poop->setMass(newEntityEnergy);
 
+        addEntityToFarm(poop);
         generatedEntities.emplace_back(poop);
 
     } while (totalEnergy > 0.0);
@@ -570,10 +570,14 @@ void Farm::generateEntities(Point position, float color, float brightness, doubl
     if (generatedEntities.empty()) {
         return;
     }
-    std::lock_guard<std::mutex> guard(add_mutex);
-    entities.insert(entities.end(), generatedEntities.begin(), generatedEntities.end());
-    entityAdded.insert(entityAdded.end(), generatedEntities.begin(), generatedEntities.end());
 
+    std::lock_guard<std::mutex> guard(add_mutex);
+    entityAdded.insert(entityAdded.end(), generatedEntities.begin(), generatedEntities.end());
+}
+
+void Farm::addEntityToFarm(Entity * entity) {
+    Point entityCoordinates = entity->getTileCoordinates();
+    map->getTileAt(entityCoordinates.getX(), entityCoordinates.getY())->addEntity(entity);
 }
 
 void Farm::handlePoop(Life * subject) {
@@ -739,49 +743,21 @@ void Farm::populationControl() {
 }
 
 void Farm::handleDecay() {
-    for (int it = 0; it < entities.size(); it++) {
-        Entity * entity = entities.at(it);
-        Point position = entity->getPosition();
-        Point tileCoordinate = position.getTileCoordinates();
-        Tile * tile = map->getTileAt(tileCoordinate.getX(), tileCoordinate.getY());
-
-        if (entity->getMass() < 100) {
-            tile->addGround(entity->getMass());
-            entity->setMass(0.0);
-        } else {
-            double transferedMass = 2.0 * VEGETALISATION_RATE;
-            tile->addGround(transferedMass);
-            entity->removeMass(transferedMass);
-        }
-
-    }
-
-    removeDeletedEntities();
-}
-
-void Farm::vegetalisation() {
-    std::lock_guard<std::mutex> guard(add_mutex);
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = map->getTileAt(it, jt);
+            currentTile->handleEntityDecay();
             currentTile->decayPheromone();
+            currentTile->removeDeletedEntities();
         }
     }
 
+}
 
-    if (VEGETALISATION_RATE != 1 && tickCount % VEGETALISATION_RATE != 0) {
-        removeDeletedEntities();
-        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time = end - start;
-        dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
-        return;
-    }
-
-    map->processClimate();
+void Farm::vegetalisation() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     handleDecay();
+    map->processClimate();
 
     random_device rd;
     mt19937 mt(rd());
@@ -789,6 +765,7 @@ void Farm::vegetalisation() {
     uniform_real_distribution<double> distHeight(-10, TILE_SIZE + 10);
 
 
+    std::vector<Entity *> addedEntities;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = map->getTileAt(it, jt);
@@ -837,19 +814,17 @@ void Farm::vegetalisation() {
                 totalEnergyAdded += entity->getMass();
 
 
-                entities.emplace_back(entity);
-                entityAdded.emplace_back(entity);
+                addEntityToFarm(entity);
+                addedEntities.emplace_back(entity);
             }
 
             currentTile->addGround(-1 * totalEnergyAdded);
         }
     }
 
+    std::lock_guard<std::mutex> guard(add_mutex);
 
-
-
-
-
+    entityAdded.insert(entityAdded.end(), addedEntities.begin(), addedEntities.end());
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -864,9 +839,17 @@ void Farm::aTickHavePassed() {
     for (int it = 0; it < lifes.size(); it++) {
         lifes.at(it)->getEntity()->aTickHavePassed();
     }
-    for (int it = 0; it < entities.size(); it++) {
-        entities.at(it)->aTickHavePassed();
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+            std::vector<Entity *> entities = currentTile->getEntities();
+            for (int it = 0; it < entities.size(); it++) {
+                entities.at(it)->aTickHavePassed();
+            }
+        }
     }
+
     tickCount++;
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -957,6 +940,8 @@ void Farm::statistics() {
         totalLinks += currentLife->getBrain()->getLinks().size();
     }
 
+    std::vector<Entity *> entities = getEntities();
+
     for (int it = 0; it < entities.size(); it++) {
         Entity * entity = entities.at(it);
         totalFoodsEnergy += entity->getMass();
@@ -1035,8 +1020,9 @@ void Farm::generateEntityGrid() {
 
     std::vector<Life *> lifes = getLifes();
 
-    for (int it = 0; it < CHUNK_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < CHUNK_COUNT_HEIGHT; jt++) {
+    std::vector<std::vector<Entity *>> lifeEntityGrid;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             entityGrid.at(it).at(jt).clear();
         }
     }
@@ -1050,12 +1036,6 @@ void Farm::generateEntityGrid() {
         }
     }
 
-    for (int it = 0; it < entities.size(); it++) {
-        Point simpleCoordinates = entities.at(it)->getSimpleCoordinates();
-        entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(entities.at(it));
-    }
-
-
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -1067,31 +1047,18 @@ void Farm::removeDeadLifes() {
         lifesRunners.at(it)->removeDeadLifes();
     }
 }
-void Farm::removeDeletedEntities() {
-    std::lock_guard<std::mutex> guard(delete_mutex);
 
-    std::vector<Entity *> newEntities;
-    for (int it = 0; it < entities.size(); it++) {
-
-        if (entities.at(it)->isExists()) {
-            newEntities.emplace_back(entities.at(it));
-        } else {
-            entityToDelete.emplace_back(entities.at(it));
-        }
-    }
-
-    entities.clear();
-    entities = newEntities;
-}
 
 std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChunks) {
     std::vector<Entity *> accessibleEntities;
     for (int jt = 0; jt < selectedChunks.size(); jt++) {
         Point currentChunk = selectedChunks.at(jt);
 
-        std::vector<Entity *> chunkEntities = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+        std::vector<Entity *> tileEntities = map->getTileAt(currentChunk.getX(), currentChunk.getY())->getEntities();
+        std::vector<Entity *> tileLifeEntity = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
 
-        accessibleEntities.insert(accessibleEntities.end(), chunkEntities.begin(), chunkEntities.end());
+        accessibleEntities.insert(accessibleEntities.end(), tileEntities.begin(), tileEntities.end());
+        accessibleEntities.insert(accessibleEntities.end(), tileLifeEntity.begin(), tileLifeEntity.end());
     }
     return accessibleEntities;
 
@@ -1171,9 +1138,11 @@ Entity * Farm::getEntityFromId(int id) {
         return foundLife->getEntity();
     }
 
-    for (int it = 0; it < this->entities.size(); it++) {
-        if (this->entities.at(it)->getId() == id) {
-            return this->entities.at(it);
+    std::vector<Entity *> allEntities = getEntities();
+
+    for (int it = 0; it < allEntities.size(); it++) {
+        if (allEntities.at(it)->getId() == id) {
+            return allEntities.at(it);
         }
     }
 
@@ -1251,9 +1220,6 @@ void Farm::setDataAnalyser(const DataAnalyser &dataAnalyser) {
     Farm::dataAnalyser = dataAnalyser;
 }
 
-const vector<std::vector<std::vector<Entity *>>> &Farm::getEntityGrid() const {
-    return entityGrid;
-}
 
 Map *Farm::getMap() const {
     return map;
@@ -1268,8 +1234,21 @@ vector<Life *> Farm::getLifes() {
     return lifes;
 }
 
-const vector<Entity *> &Farm::getEntities() const {
-    return entities;
+vector<Entity *> Farm::getEntities() {
+    std::vector<Entity *> allEntities;
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            std::vector<Entity *> tileEntities = map->getTileAt(it, jt)->getEntities();
+            if (tileEntities.size() == 0){
+                continue;
+            }
+
+            allEntities.insert(allEntities.end(), tileEntities.begin(), tileEntities.end());
+        }
+    }
+
+    return allEntities;
 }
 
 const vector<Life *> &Farm::getLifesAdded() const {
@@ -1289,25 +1268,7 @@ const vector<Entity *> &Farm::getEntityToDelete() const {
     return entityToDelete;
 }
 
-vector<Entity *> Farm::getAndClearEntitiesToDelete() {
-    std::lock_guard<std::mutex> guard(delete_mutex);
 
-    vector<Entity *> currentEntitiesToDelete;
-    currentEntitiesToDelete.insert(currentEntitiesToDelete.begin(), entityToDelete.begin(), entityToDelete.end());
-    entityToDelete.clear();
-
-    return currentEntitiesToDelete;
-}
-
-vector<Life *> Farm::getAndClearLifesToDelete() {
-    std::lock_guard<std::mutex> guard(delete_mutex);
-
-    vector<Life *> currentLifesToDelete;
-    currentLifesToDelete.insert(currentLifesToDelete.begin(), lifesToDelete.begin(), lifesToDelete.end());
-    lifesToDelete.clear();
-
-    return currentLifesToDelete;
-}
 
 vector<Entity *> Farm::getAndClearEntitiesToAdd() {
     std::lock_guard<std::mutex> guard(add_mutex);

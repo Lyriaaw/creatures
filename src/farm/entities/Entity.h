@@ -12,6 +12,32 @@
 
 
 class Entity {
+protected:
+    static int GLOBAL_INDEX;
+
+    int id;
+
+    Point position;
+
+    float rotation;
+    float speed;
+
+    float color;
+    float brightness;
+
+    double mass;
+
+    bool exists;
+
+    int age;
+
+    bool isALife;
+
+    std::mutex interaction_mutex;
+
+
+
+
 public:
     Entity(Point position);
 
@@ -63,28 +89,9 @@ public:
 
     void tryLockInteraction();
 
-protected:
-    static int GLOBAL_INDEX;
+    Point getTileCoordinates();
 
-    int id;
 
-    Point position;
-
-    float rotation;
-    float speed;
-
-    float color;
-    float brightness;
-
-    double mass;
-
-    bool exists;
-
-    int age;
-
-    bool isALife;
-
-    std::mutex interaction_mutex;
 
 
 };
