@@ -126,8 +126,6 @@ public:
 
     void addActions(std::vector<ActionDTO> actions);
 
-    void handleDecay();
-
     void handlePoop(Life *subject);
 
     void handleBiting(Life *performer, Entity *subject);
@@ -162,6 +160,8 @@ public:
     void handleBitingLife(Life * performer, ActionDTO action);
 
     void addEntityToFarm(Entity *entity);
+
+    void addedEntitiesToFarm(std::vector<Entity *> entities);
 };
 
 

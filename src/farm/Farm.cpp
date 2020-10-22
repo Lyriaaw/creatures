@@ -48,6 +48,9 @@ void Farm::InitFromRandom() {
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
     map = new Map();
+    map->setRecordAddedEntitiesToFarm([&](std::vector<Entity *> entities) {
+        this->addedEntitiesToFarm(entities);
+    });
     map->initRandomMap();
 
 
@@ -126,7 +129,6 @@ void Farm::Tick(bool paused) {
 
     if (!paused) {
         executeCreaturesActions();
-        vegetalisation();
         populationControl();
     }
 
@@ -352,6 +354,10 @@ void Farm::executeCreaturesActions() {
         }
 
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
+
+        if (subject == nullptr) {
+            continue;
+        }
 
         if (subject->isExists() <= 0 || performer->isAlive() <= 0) {
             continue;
@@ -580,6 +586,11 @@ void Farm::addEntityToFarm(Entity * entity) {
     map->getTileAt(entityCoordinates.getX(), entityCoordinates.getY())->addEntity(entity);
 }
 
+void Farm::addedEntitiesToFarm(std::vector<Entity *> entities) {
+    std::lock_guard<std::mutex> guard(add_mutex);
+    entityAdded.insert(entityAdded.end(), entities.begin(), entities.end());
+}
+
 void Farm::handlePoop(Life * subject) {
     if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
         return;
@@ -742,89 +753,12 @@ void Farm::populationControl() {
     dataAnalyser.getPopulationControlTime()->addValue(elapsed_time.count());
 }
 
-void Farm::handleDecay() {
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            Tile * currentTile = map->getTileAt(it, jt);
-            currentTile->handleEntityDecay();
-            currentTile->decayPheromone();
-            currentTile->removeDeletedEntities();
-        }
-    }
 
-}
 
 void Farm::vegetalisation() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-    handleDecay();
+
     map->processClimate();
-
-    random_device rd;
-    mt19937 mt(rd());
-    uniform_real_distribution<double> distWidth(-10, TILE_SIZE + 10);
-    uniform_real_distribution<double> distHeight(-10, TILE_SIZE + 10);
-
-
-    std::vector<Entity *> addedEntities;
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            Tile * currentTile = map->getTileAt(it, jt);
-
-            float tileX = it * TILE_SIZE;
-            float tileY = jt * TILE_SIZE;
-
-            float tileAvailableEnergy = currentTile->getGround();
-
-
-            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
-            float totalEnergyAdded = 0.f;
-
-//            if (tileAvailableEnergy > 1950) {
-//                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
-//            }
-
-            for (int it = 0; it < foodToGenerate; it++) {
-                int x = distWidth(mt);
-                int y = distHeight(mt);
-
-                Point point(tileX + x, tileY + y);
-
-                if (point.getX() >= FARM_WIDTH) {
-                    point.setX(FARM_WIDTH - 1);
-                }
-                if (point.getY() >= FARM_HEIGHT) {
-                    point.setY(FARM_HEIGHT - 1);
-                }
-                if (point.getX() < 0) {
-                    point.setX(0);
-                }
-                if (point.getY() < 0) {
-                    point.setY(0);
-                }
-
-
-                //        float foodSize = ((rand() % 300) / 100.f) + 2;
-                float foodSize = 2;
-
-                Entity * entity = new Entity(point);
-                entity->setMass(2 * MASS_TO_SIZE_RATIO);
-                entity->setColor(0.28f);
-                entity->setBrightness(0.3f);
-
-                totalEnergyAdded += entity->getMass();
-
-
-                addEntityToFarm(entity);
-                addedEntities.emplace_back(entity);
-            }
-
-            currentTile->addGround(-1 * totalEnergyAdded);
-        }
-    }
-
-    std::lock_guard<std::mutex> guard(add_mutex);
-
-    entityAdded.insert(entityAdded.end(), addedEntities.begin(), addedEntities.end());
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -997,7 +931,7 @@ void Farm::statistics() {
     totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
     totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
     totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
-    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
+//    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
     totalTime += dataAnalyser.getCreatureSortingTime()->getLastValue();
     totalTime += dataAnalyser.getATickHavePassedTime()->getLastValue();
 
@@ -1149,10 +1083,6 @@ Entity * Farm::getEntityFromId(int id) {
 
     return nullptr;
 }
-
-
-
-
 
 
 
@@ -1332,3 +1262,4 @@ void Farm::checkAndHandleLifeDying(Life * life) {
         life->getEnergyCenter()->setWastedEnergy(0.0);
     }
 }
+

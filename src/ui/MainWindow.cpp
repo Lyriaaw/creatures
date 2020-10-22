@@ -219,11 +219,13 @@ void MainWindow::start() {
 
     running = true;
     std::thread farmThread = runFarmLoop();
+    std::thread farmVegetalisationThread = runFarmVegetalisationLoop();
     std::thread farmUiThread = runFarmUiUpdate();
 
     runLoop();
     farmThread.join();
     farmUiThread.join();
+    farmVegetalisationThread.join();
 }
 
 
@@ -237,6 +239,7 @@ std::thread MainWindow::runFarmLoop() {
                 usleep(1000000);
             }
 
+
         }
     };
 
@@ -244,6 +247,30 @@ std::thread MainWindow::runFarmLoop() {
 
     return farmThread;
 }
+
+std::thread MainWindow::runFarmVegetalisationLoop() {
+    auto f = [](Farm *threadedFarm, bool *running, bool *paused){
+        while (*running) {
+            threadedFarm->vegetalisation();
+
+            if (*paused) {
+                usleep(1000000);
+            }
+
+            usleep(10000);
+
+
+        }
+    };
+
+    std::thread farmThread(f, farm, &running, &paused);
+
+    return farmThread;
+}
+
+
+
+
 std::thread MainWindow::runFarmUiUpdate() {
     auto f = [](FarmUI *threadedFarmUI, bool *running, bool *paused){
         while (*running) {

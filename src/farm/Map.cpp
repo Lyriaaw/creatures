@@ -176,8 +176,14 @@ void Map::processClimate() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newGround[it][jt] = getTileAt(it, jt)->getGround();
-            newHeats[it][jt] = getTileAt(it, jt)->getHeat();
+            Tile * currentTile = getTileAt(it, jt);
+            currentTile->handleEntityDecay();
+            currentTile->decayPheromone();
+            currentTile->removeDeletedEntities();
+
+            currentTile->lockHeatAndGround();
+            newGround[it][jt] = currentTile->getGround();
+            newHeats[it][jt] = currentTile->getHeat();
 
         }
     }
@@ -232,23 +238,98 @@ void Map::processClimate() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
-            currentTile->setGround(newGround[it][jt]);
-            currentTile->setHeat(newHeats[it][jt]);
+            currentTile->lockOwnerSetGround(newGround[it][jt]);
+            currentTile->lockOwnerSetHeat(newHeats[it][jt]);
 
             if (currentTile->getHeat() <= 0) {
+                currentTile->unlockHeatAndGround();
+
                 continue;
             }
 
             float heatToGroundRatio = 0.01f * VEGETALISATION_RATE;
             float currentTileHeat = currentTile->getHeat();
 
-            currentTile->addHeat(- 1 * currentTileHeat * heatToGroundRatio);
-            currentTile->addGround(currentTileHeat * heatToGroundRatio);
+            currentTile->lockOwnerAddHeat(- 1 * currentTileHeat * heatToGroundRatio);
+            currentTile->lockOwnerAddGround(currentTileHeat * heatToGroundRatio);
 
+            currentTile->unlockHeatAndGround();
 
         }
     }
 
+    vegetalisation();
+}
+
+void Map::vegetalisation() {
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> distWidth(-10, TILE_SIZE + 10);
+    uniform_real_distribution<double> distHeight(-10, TILE_SIZE + 10);
+
+    std::vector<Entity *> addedEntities;
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = getTileAt(it, jt);
+
+            float tileX = it * TILE_SIZE;
+            float tileY = jt * TILE_SIZE;
+
+
+            currentTile->lockGround();
+            float tileAvailableEnergy = currentTile->getGround();
+
+
+            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
+            float totalEnergyAdded = 0.f;
+
+//            if (tileAvailableEnergy > 1950) {
+//                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
+//            }
+
+            for (int it = 0; it < foodToGenerate; it++) {
+                int x = distWidth(mt);
+                int y = distHeight(mt);
+
+                Point point(tileX + x, tileY + y);
+
+                if (point.getX() >= FARM_WIDTH) {
+                    point.setX(FARM_WIDTH - 1);
+                }
+                if (point.getY() >= FARM_HEIGHT) {
+                    point.setY(FARM_HEIGHT - 1);
+                }
+                if (point.getX() < 0) {
+                    point.setX(0);
+                }
+                if (point.getY() < 0) {
+                    point.setY(0);
+                }
+
+
+
+                //        float foodSize = ((rand() % 300) / 100.f) + 2;
+                float foodSize = 2;
+
+                Entity * entity = new Entity(point);
+                entity->setMass(2 * MASS_TO_SIZE_RATIO);
+                entity->setColor(0.28f);
+                entity->setBrightness(0.3f);
+
+                totalEnergyAdded += entity->getMass();
+
+                Point tilePosition = entity->getTileCoordinates();
+                getTileAt(tilePosition.getX(), tilePosition.getY())->addEntity(entity);
+                addedEntities.emplace_back(entity);
+            }
+
+            currentTile->lockOwnerAddGround(-1 * totalEnergyAdded);
+            currentTile->unlockGround();
+        }
+    }
+
+
+    recordAddedEntitiesToFarm(addedEntities);
 }
 
 
@@ -285,5 +366,9 @@ Map::Map() {
 
 void Map::setTiles(const vector<std::vector<Tile *>> &tiles) {
     Map::tiles = tiles;
+}
+
+void Map::setRecordAddedEntitiesToFarm(const function<void(std::vector<Entity *>)> &recordAddedEntitiesToFarm) {
+    Map::recordAddedEntitiesToFarm = recordAddedEntitiesToFarm;
 }
 

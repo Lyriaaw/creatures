@@ -18,6 +18,8 @@ private:
     std::vector<std::vector<Tile *>> tiles;
 
 
+    std::function<void(std::vector<Entity *> entities)> recordAddedEntitiesToFarm;
+
 public:
 
 
@@ -36,6 +38,9 @@ public:
 
     void setTiles(const std::vector<std::vector<Tile *>> &tiles);
 
+    void vegetalisation();
+
+    void setRecordAddedEntitiesToFarm(const std::function<void(std::vector<Entity *>)> &recordAddedEntitiesToFarm);
 };
 
 

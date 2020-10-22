@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <unistd.h>
 #include "Tile.h"
 
 float Tile::getHeight() const {
@@ -23,15 +24,26 @@ void Tile::setHeat(float heat) {
     Tile::heat = heat;
 }
 
+void Tile::lockOwnerSetHeat(float heat) {
+    Tile::heat = heat;
+}
+
+
+
 float Tile::getGround() const {
     return ground;
 }
 
 void Tile::setGround(float ground) {
     std::lock_guard<std::mutex> guard(ground_mutex);
-
     Tile::ground = ground;
 }
+
+void Tile::lockOwnerSetGround(float ground) {
+    Tile::ground = ground;
+}
+
+
 
 void Tile::removeGround(float groundToRemove) {
     std::lock_guard<std::mutex> guard(ground_mutex);
@@ -42,15 +54,23 @@ void Tile::removeGround(float groundToRemove) {
 
 void Tile::addGround(float value) {
     std::lock_guard<std::mutex> guard(ground_mutex);
-
     ground += value;
 }
 
+void Tile::lockOwnerAddGround(float value) {
+    ground += value;
+}
+
+
+
 void Tile::addHeat(float value) {
     std::lock_guard<std::mutex> guard(heat_mutex);
-
     heat += value;
 }
+void Tile::lockOwnerAddHeat(float value) {
+    heat += value;
+}
+
 
 void Tile::addHeight(float value) {
     height += value;
@@ -139,3 +159,30 @@ void Tile::removeDeletedEntities() {
     entities = newEntities;
 }
 
+
+void Tile::lockHeatAndGround() {
+    while (!ground_mutex.try_lock()) {
+        usleep(10000);
+    }
+    while (!heat_mutex.try_lock()) {
+        usleep(10000);
+    }
+
+}
+
+void Tile::unlockHeatAndGround() {
+    ground_mutex.unlock();
+    heat_mutex.unlock();
+}
+
+
+
+void Tile::lockGround() {
+    while (!ground_mutex.try_lock()) {
+        usleep(10000);
+    }
+}
+
+void Tile::unlockGround() {
+    ground_mutex.unlock();
+}

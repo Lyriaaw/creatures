@@ -73,6 +73,22 @@ public:
     void handleEntityDecay();
 
     void removeDeletedEntities();
+
+    void lockHeatAndGround();
+
+    void unlockHeatAndGround();
+
+    void lockOwnerSetHeat(float heat);
+
+    void lockOwnerSetGround(float ground);
+
+    void lockOwnerAddGround(float value);
+
+    void lockOwnerAddHeat(float value);
+
+    void lockGround();
+
+    void unlockGround();
 };
 
 

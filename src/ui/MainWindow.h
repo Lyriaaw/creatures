@@ -86,6 +86,8 @@ private:
     void updateSelectedCreature();
 
     std::thread runFarmUiUpdate();
+
+    std::thread runFarmVegetalisationLoop();
 };
 
 
