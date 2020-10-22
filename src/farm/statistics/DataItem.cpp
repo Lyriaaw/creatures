@@ -79,6 +79,10 @@ double DataItem::getAveragedLastValue() {
 
 
 double DataItem::getValueForTick(int tick) {
+    if (values.size() == 0) {
+        return 0;
+    }
+
     if (values.size() - 1 < tick) {
         tick = values.size() - 1;
     }

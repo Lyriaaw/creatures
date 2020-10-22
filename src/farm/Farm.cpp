@@ -47,7 +47,7 @@ void Farm::InitFromRandom() {
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
 
-    map = new Map();
+    map = new Map(farmControl);
     map->setRecordAddedEntitiesToFarm([&](std::vector<Entity *> entities) {
         this->addedEntitiesToFarm(entities);
     });

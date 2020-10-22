@@ -9,14 +9,18 @@
 #include <vector>
 #include "../World.h"
 #include "Tile.h"
+#include "FarmControl.h"
 #include <shared_mutex>
 #include <iostream>
 
 
 class Map {
 private:
+    FarmControl * farmControl;
+
     std::vector<std::vector<Tile *>> tiles;
 
+    double speedCorrectionRatio;
     int tick;
 
     std::function<void(std::vector<Entity *> entities)> recordAddedEntitiesToFarm;
@@ -25,7 +29,7 @@ public:
 
 
 
-    Map();
+    Map(FarmControl * farmControl);
 
     void initRandomMap();
     void generateRandomTerrain();
@@ -41,6 +45,11 @@ public:
 
 
     void setRecordAddedEntitiesToFarm(const std::function<void(std::vector<Entity *>)> &recordAddedEntitiesToFarm);
+
+    int getTick() const;
+    void setTick(int tick);
+
+    void setSpeedCorrectionRatio(double speedCorrectionRatio);
 };
 
 

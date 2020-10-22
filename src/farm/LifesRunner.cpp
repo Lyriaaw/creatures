@@ -251,6 +251,18 @@ void LifesRunner::handleEating(Life * performer, Entity * subject) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 void LifesRunner::setGenerateEntities(
         const std::function<void(Point, float, float, double, double, double)> &generateEntities) {
     LifesRunner::generateEntities = generateEntities;

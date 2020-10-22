@@ -233,13 +233,13 @@ void MainWindow::start() {
 std::thread MainWindow::runFarmLoop() {
     auto f = [](Farm *threadedFarm, bool *running, bool *paused){
         while (*running) {
-            threadedFarm->Tick(*paused);
-
             if (*paused) {
                 usleep(1000000);
+                continue;
             }
 
 
+            threadedFarm->Tick(*paused);
         }
     };
 
@@ -251,11 +251,12 @@ std::thread MainWindow::runFarmLoop() {
 std::thread MainWindow::runFarmVegetalisationLoop() {
     auto f = [](Farm *threadedFarm, bool *running, bool *paused){
         while (*running) {
-            threadedFarm->vegetalisation();
-
             if (*paused) {
                 usleep(1000000);
+                continue;
             }
+            threadedFarm->vegetalisation();
+
 
             usleep(10000);
 

@@ -134,10 +134,10 @@ void Tile::handleEntityDecay() {
         entity->tryLockInteraction();
 
         if (entity->getMass() < 100) {
-            addGround(entity->getMass());
+            lockOwnerAddGround(entity->getMass());
             entity->setMass(0);
         } else {
-            addGround(2.0);
+            lockOwnerAddGround(2.0);
             entity->removeMass(2.0);
         }
         entity->unlockInteraction();

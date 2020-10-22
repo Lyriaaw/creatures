@@ -21,6 +21,8 @@
 class Farm {
 private:
 
+    FarmControl * farmControl;
+
     std::vector<LifesRunner *> lifesRunners;
 
     std::vector<Life *> sorted;

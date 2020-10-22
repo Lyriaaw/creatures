@@ -171,11 +171,11 @@ void Map::processClimate() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
-            currentTile->handleEntityDecay();
             currentTile->decayPheromone();
             currentTile->removeDeletedEntities();
 
             currentTile->lockHeatAndGround();
+            currentTile->handleEntityDecay();
             newGround[it][jt] = currentTile->getGround();
             newHeats[it][jt] = currentTile->getHeat();
 
@@ -354,7 +354,7 @@ Tile * Map::getTileAt(int tileX, int tileY) {
 }
 
 
-Map::Map() {
+Map::Map(FarmControl * farmControl): farmControl(farmControl) {
     prepareTiles();
 }
 
@@ -366,3 +366,14 @@ void Map::setRecordAddedEntitiesToFarm(const function<void(std::vector<Entity *>
     Map::recordAddedEntitiesToFarm = recordAddedEntitiesToFarm;
 }
 
+int Map::getTick() const {
+    return tick;
+}
+
+void Map::setTick(int tick) {
+    Map::tick = tick;
+}
+
+void Map::setSpeedCorrectionRatio(double speedCorrectionRatio) {
+    Map::speedCorrectionRatio = speedCorrectionRatio;
+}
