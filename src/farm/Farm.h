@@ -161,6 +161,8 @@ public:
     LifesRunner * getLessLoadedRunner();
 
     void removeDeadLifes();
+
+    void recordExecutedAction(ActionDTO action);
 };
 
 

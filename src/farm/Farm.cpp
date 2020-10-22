@@ -31,6 +31,10 @@ void Farm::initLifesRunners() {
            return getAccessibleTiles(life, selectedChunks);
         });
 
+        lifesRunner->setRecordExecutedAction([&](ActionDTO action) {
+           this->recordExecutedAction(action);
+        });
+
         lifesRunner->setMap(map);
 
         lifesRunners.emplace_back(lifesRunner);
@@ -106,6 +110,11 @@ void Farm::Tick(bool paused) {
 
 
     if (!paused) {
+        for (auto const& runner : lifesRunners) {
+            runner->setTick(tickCount);
+        }
+
+
         moveCreatures();
     }
 
@@ -162,6 +171,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double brains(0.0);
     double actions(0.0);
     double accessibleEntitiesTime(0.0);
+    double poopCount(0.0);
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -181,6 +191,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         sensors += lifesRunners.at(it)->getDataAnalyser().getSensorProcessing()->getLastValue();
         brains += lifesRunners.at(it)->getDataAnalyser().getBrainProcessing()->getLastValue();
         actions += lifesRunners.at(it)->getDataAnalyser().getExternalActions()->getLastValue();
+        poopCount += lifesRunners.at(it)->getDataAnalyser().getPoopCount()->getLastValue();
         accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
     }
 
@@ -196,6 +207,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getBrainProcessing()->addValue(brains);
     dataAnalyser.getExternalActions()->addValue(actions);
     dataAnalyser.getAccessibleEntities()->addValue(accessibleEntitiesTime);
+    dataAnalyser.getPoopCount()->addValue(poopCount);
 
 
 
@@ -297,7 +309,6 @@ void Farm::moveCreatures() {
 
 
 void Farm::executeCreaturesActions() {
-    std::lock_guard<std::mutex> guard(add_mutex);
 
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
@@ -372,7 +383,6 @@ void Farm::executeCreaturesActions() {
     actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 
-    dataAnalyser.getPoopCount()->addValue(poopCount);
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
     dataAnalyser.getEatCount()->addValue(eatCount);
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
@@ -501,6 +511,8 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
 }
 
 void Farm::generateEntities(Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
+    std::vector<Entity *> generatedEntities;
+
     do {
         double newEntityEnergy = std::min(totalEnergy, maxSize);
 
@@ -529,16 +541,26 @@ void Farm::generateEntities(Point position, float color, float brightness, doubl
         poop->setColor(color);
         poop->setBrightness(brightness);
         poop->setMass(newEntityEnergy);
-        entities.emplace_back(poop);
-        entityAdded.emplace_back(poop);
+
+        generatedEntities.emplace_back(poop);
 
     } while (totalEnergy > 0.0);
+
+
+    if (generatedEntities.empty()) {
+        return;
+    }
+    std::lock_guard<std::mutex> guard(add_mutex);
+    entities.insert(entities.end(), generatedEntities.begin(), generatedEntities.end());
+    entityAdded.insert(entityAdded.end(), generatedEntities.begin(), generatedEntities.end());
+
 }
 
 void Farm::handlePoop(Life * subject) {
     if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
         return;
     }
+    std::cout << "Old poop" << std::endl;
 
     Point position = subject->getEntity()->getPosition();
 
@@ -554,6 +576,12 @@ void Farm::handlePoop(Life * subject) {
     ActionDTO executedAction = ActionDTO(0, 0, "POOP");
     executedAction.setTilePosition(position.getTileCoordinates());
     executedActions.emplace_back(executedAction);
+}
+
+void Farm::recordExecutedAction(ActionDTO action) {
+    std::lock_guard<std::mutex> guard(executed_actions_mutex);
+    executedActions.emplace_back(action);
+
 }
 
 

@@ -22,10 +22,14 @@ private:
     std::function<void(Point, float, float, double, double, double)> generateEntities;
     std::function<std::vector<Entity *>(std::vector<Point> selectedChunks)> getAccessibleEntities;
     std::function<std::vector<Tile *>(Life * life, std::vector<Point> selectedChunks)> getAccessibleTiles;
+    std::function<void(ActionDTO)> recordExecutedAction;
+
 
     std::vector<ActionDTO> actions;
 
     Map * map;
+
+    int tick;
 
 public:
     LifesRunner();
@@ -50,6 +54,8 @@ public:
     void
     setGetAccessibleTiles(const std::function<std::vector<Tile *>(Life *, std::vector<Point>)> &getAccessibleTiles);
 
+    void setRecordExecutedAction(const std::function<void(ActionDTO)> &recordExecutedAction);
+
     const std::vector<ActionDTO> &getActions() const;
 
     void clearActions();
@@ -59,6 +65,12 @@ public:
     const std::vector<Life *> &getLifes() const;
 
     const DataAnalyser &getDataAnalyser() const;
+
+    void handlePoop(Life *subject);
+
+    int getTick() const;
+
+    void setTick(int tick);
 };
 
 

@@ -73,6 +73,7 @@ void LifesRunner::brainProcessing(bool paused) {
         return;
     }
 
+    int poopCount = 0;
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
@@ -80,12 +81,28 @@ void LifesRunner::brainProcessing(bool paused) {
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
 
         std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
-        actions.insert(actions.end(), currentCreatureActions.begin(), currentCreatureActions.end());
+
+        std::vector<ActionDTO> remainingActions;
+
+        for (auto const& action : currentCreatureActions) {
+            if (action.getType() == "POOP") {
+                poopCount++;
+                handlePoop(currentLife);
+                continue;
+            }
+
+            remainingActions.emplace_back(action);
+        }
+
+
+
+        actions.insert(actions.end(), remainingActions.begin(), remainingActions.end());
     }
     std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
     dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
 
+    dataAnalyser.getPoopCount()->addValue(poopCount);
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -149,6 +166,40 @@ void LifesRunner::checkAndHandleLifeDying(Life * life) {
     }
 }
 
+void LifesRunner::handlePoop(Life * subject) {
+    if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
+        return;
+    }
+
+    Point position = subject->getEntity()->getPosition();
+
+    double maxPoopSize = 5;
+
+    double poopedEnergy = subject->getEnergyCenter()->getWastedEnergy();
+    generateEntities(position, 0.04f, 0.2f, (0.1 * subject->getEntity()->getSize() * MASS_TO_SIZE_RATIO), poopedEnergy, subject->getEntity()->getSize());
+
+
+    subject->getEnergyCenter()->setWastedEnergy(0.0);
+
+    ActionDTO executedAction = ActionDTO(0, 0, "POOP");
+    executedAction.setTilePosition(position.getTileCoordinates());
+    recordExecutedAction(executedAction);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void LifesRunner::setGenerateEntities(
         const std::function<void(Point, float, float, double, double, double)> &generateEntities) {
     LifesRunner::generateEntities = generateEntities;
@@ -182,4 +233,16 @@ const std::vector<Life *> &LifesRunner::getLifes() const {
 
 const DataAnalyser &LifesRunner::getDataAnalyser() const {
     return dataAnalyser;
+}
+
+void LifesRunner::setRecordExecutedAction(const std::function<void(ActionDTO)> &recordExecutedAction) {
+    LifesRunner::recordExecutedAction = recordExecutedAction;
+}
+
+int LifesRunner::getTick() const {
+    return tick;
+}
+
+void LifesRunner::setTick(int tick) {
+    LifesRunner::tick = tick;
 }
