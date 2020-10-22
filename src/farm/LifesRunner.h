@@ -71,6 +71,8 @@ public:
     int getTick() const;
 
     void setTick(int tick);
+
+    void handleEating(Life *performer, Entity *subject);
 };
 
 

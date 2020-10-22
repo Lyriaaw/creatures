@@ -138,18 +138,18 @@ void StatisticsScreen::loadGraphs() {
     actionsGraph->setGraphControlCenter(graphControlCenter);
 
 
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMateSuccessCount(), 1, 0, 0, 255);
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMateFailureCount(), 1, 64, 0, 128);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMateSuccessCount(), 2, 0, 0, 255);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getMateFailureCount(), 2, 64, 0, 128);
 
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getEatLifeCount(), 1, 0, 255, 0);
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getEatCount(), 1, 0, 128, 0);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getEatLifeCount(), 2, 0, 255, 0);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getEatCount(), 2, 0, 128, 0);
 
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBiteLifeCount(), 1, 255, 0, 0);
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBiteCount(), 1, 128, 0, 0);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBiteLifeCount(), 2, 255, 0, 0);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getBiteCount(), 2, 128, 0, 0);
 
 
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPheromoneCount(), 1, 128, 0, 128);
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPoopCount(), 1, 64, 0, 64);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPheromoneCount(), 2, 128, 0, 128);
+    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPoopCount(), 2, 64, 0, 64);
 
 
 

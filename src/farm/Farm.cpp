@@ -172,6 +172,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double actions(0.0);
     double accessibleEntitiesTime(0.0);
     double poopCount(0.0);
+    double eatCount(0.0);
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -193,6 +194,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         actions += lifesRunners.at(it)->getDataAnalyser().getExternalActions()->getLastValue();
         poopCount += lifesRunners.at(it)->getDataAnalyser().getPoopCount()->getLastValue();
         accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
+        eatCount += lifesRunners.at(it)->getDataAnalyser().getEatCount()->getLastValue();
     }
 
 
@@ -208,6 +210,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getExternalActions()->addValue(actions);
     dataAnalyser.getAccessibleEntities()->addValue(accessibleEntitiesTime);
     dataAnalyser.getPoopCount()->addValue(poopCount);
+    dataAnalyser.getEatCount()->addValue(eatCount);
 
 
 
@@ -343,7 +346,10 @@ void Farm::executeCreaturesActions() {
             continue;
         }
 
-
+        if (actionDto.getType() == "BITE_LIFE") {
+            handleBitingLife(performer, actionDto);
+            biteLifeCount++;
+        }
 
         Entity * subject = getEntityFromId(actionDto.getSubjectId());
 
@@ -380,10 +386,7 @@ void Farm::executeCreaturesActions() {
             biteCount++;
         }
 
-        if (actionDto.getType() == "BITE_LIFE") {
-            handleBiting(performer, subject);
-            biteLifeCount++;
-        }
+
 
 
     }
@@ -394,7 +397,6 @@ void Farm::executeCreaturesActions() {
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
-    dataAnalyser.getEatCount()->addValue(eatCount);
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
     dataAnalyser.getBiteCount()->addValue(biteCount);
@@ -451,20 +453,18 @@ void Farm::handleEating(Life * performer, Entity * subject) {
 
 }
 
-
-
-void Farm::handleBiting(Life * performer, Entity * subject) {
+void Farm::handleBitingLife(Life * performer, ActionDTO action) {
 
     double mouthSize = performer->getEntity()->getSize() / 3.0;
 
     Point performerPoint = performer->getEntity()->getPosition();
     Point tilePoint = performerPoint.getTileCoordinates();
 
-    Life * foundLife = getLifeFromId(subject->getId());
+    Life * foundLife = getLifeFromId(action.getSubjectId());
     if (foundLife != nullptr) {
         Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
-        double takenEnergy = std::min(mouthSize * 10.0, foundLife->getEnergyCenter()->getAvailableEnergy());
+        double takenEnergy = std::min(mouthSize * 50.0, foundLife->getEnergyCenter()->getAvailableEnergy());
         foundLife->getEnergyCenter()->removeAvailableEnergy(takenEnergy);
         tile->addHeat(takenEnergy);
 
@@ -479,6 +479,14 @@ void Farm::handleBiting(Life * performer, Entity * subject) {
     }
 
 
+}
+
+void Farm::handleBiting(Life * performer, Entity * subject) {
+
+    double mouthSize = performer->getEntity()->getSize() / 3.0;
+
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
 
     random_device rd;
     mt19937 mt(rd());

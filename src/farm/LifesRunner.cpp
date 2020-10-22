@@ -74,6 +74,7 @@ void LifesRunner::brainProcessing(bool paused) {
     }
 
     int poopCount = 0;
+    int eatCount = 0;
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
@@ -91,6 +92,21 @@ void LifesRunner::brainProcessing(bool paused) {
                 continue;
             }
 
+            if (action.getType() == "EAT_ENTITY") {
+
+                for (int jt = 0; jt < accessibleEntities.size(); jt++) {
+                    if (accessibleEntities.at(jt)->getId() == action.getSubjectId()) {
+                        eatCount++;
+                        handleEating(currentLife, accessibleEntities.at(jt));
+                        jt = accessibleEntities.size();
+                    }
+                }
+
+                continue;
+            }
+
+
+
             remainingActions.emplace_back(action);
         }
 
@@ -103,6 +119,7 @@ void LifesRunner::brainProcessing(bool paused) {
     dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
 
     dataAnalyser.getPoopCount()->addValue(poopCount);
+    dataAnalyser.getEatCount()->addValue(eatCount);
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -187,6 +204,28 @@ void LifesRunner::handlePoop(Life * subject) {
 }
 
 
+void LifesRunner::handleEating(Life * performer, Entity * subject) {
+
+    subject->tryLockInteraction();
+
+    if (subject->getMass() == 0) {
+        subject->unlockInteraction();
+        return;
+    }
+
+    performer->addEnergy(subject->getMass());
+    subject->setMass(0.0);
+
+    subject->unlockInteraction();
+
+
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+    ActionDTO executedAction = ActionDTO(0, 0, "EAT_ENTITY");
+    executedAction.setTilePosition(tilePoint);
+    recordExecutedAction(executedAction);
+
+}
 
 
 

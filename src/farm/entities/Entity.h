@@ -59,6 +59,9 @@ public:
 
     void setIsLife(bool isLife);
 
+    void unlockInteraction();
+
+    void tryLockInteraction();
 
 protected:
     static int GLOBAL_INDEX;
@@ -80,6 +83,9 @@ protected:
     int age;
 
     bool isALife;
+
+    std::mutex interaction_mutex;
+
 
 };
 

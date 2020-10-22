@@ -4,6 +4,7 @@
 
 #include "Entity.h"
 #include <iostream>
+#include <unistd.h>
 
 int Entity::GLOBAL_INDEX = 1;
 
@@ -126,4 +127,14 @@ bool Entity::isLife() const {
 
 void Entity::setIsLife(bool isLife) {
     Entity::isALife = isLife;
+}
+
+void Entity::tryLockInteraction() {
+    while (!interaction_mutex.try_lock()) {
+        usleep(10000);
+    }
+}
+
+void Entity::unlockInteraction() {
+    interaction_mutex.unlock();
 }

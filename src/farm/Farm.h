@@ -163,6 +163,8 @@ public:
     void removeDeadLifes();
 
     void recordExecutedAction(ActionDTO action);
+
+    void handleBitingLife(Life * performer, ActionDTO action);
 };
 
 

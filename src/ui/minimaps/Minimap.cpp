@@ -110,7 +110,7 @@ void WorldMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
         rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
     }
 
-    sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 128);
+    sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
 
     int vertexArrayIndex = (tileX * TILE_COUNT_HEIGHT) + tileY;
