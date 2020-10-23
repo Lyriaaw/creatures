@@ -15,8 +15,7 @@ private:
 
     float color;
     float height;
-    float heat;
-    float ground;
+
 
     float pheromoneColor;
     float pheromoneQuantity;
@@ -24,8 +23,17 @@ private:
     std::mutex entities_mutex;
     std::vector<Entity *> entities;
 
+    float heat;
+    float ground;
     std::mutex ground_mutex;
     std::mutex heat_mutex;
+
+
+
+    float tmp_heat;
+    float tmp_ground;
+    std::mutex tmp_ground_mutex;
+    std::mutex tmp_heat_mutex;
 
 public:
 
@@ -89,6 +97,14 @@ public:
     void lockGround();
 
     void unlockGround();
+
+    void addTmpHeat(float value);
+
+    float getTmpHeat() const;
+
+    void setTmoHeat(float heat);
+
+    float getAndClearTmpHeat();
 };
 
 

@@ -10,10 +10,14 @@
 #include <iostream>
 #include <zconf.h>
 #include <random>
+#import <thread>
+
 
 using namespace std;
 
 std::mutex mapMutex;
+
+Map::Map(): tick(0), speedCorrectionRatio(1.0) {}
 
 void Map::generateRandomTerrain() {
     float seed = rand() % 1000000;
@@ -124,7 +128,6 @@ void Map::generateRandomTerrain() {
     }
 }
 
-
 void Map::initRandomMap() {
 
     generateRandomTerrain();
@@ -138,6 +141,26 @@ void Map::prepareTiles() {
 //    }
 }
 
+void Map::handleThread() {
+    auto f = [&](){
+        while (farmControl->isRunning()) {
+
+            if (farmControl->isPaused()) {
+                usleep(100000);
+                continue;
+            }
+
+            processClimate();
+
+
+            usleep(10000 + std::max(-100000, int((10000 * speedCorrectionRatio))));
+        }
+    };
+
+    std::thread vegetalisationThread(f);
+    vegetalisationThread.detach();
+}
+
 void Map::removeEnergyFromGround(double energyToRemove) {
 
     double totalGround = 0.0;
@@ -145,6 +168,7 @@ void Map::removeEnergyFromGround(double energyToRemove) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
+            currentTile->lockGround();
             totalGround += currentTile->getGround();
         }
     }
@@ -155,6 +179,7 @@ void Map::removeEnergyFromGround(double energyToRemove) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * tile = getTileAt(it, jt);
             double ratio = tile->getGround() / totalGround;
+            tile->unlockGround();
             tile->removeGround(ratio * energyToRemove);
             removedEnergy += ratio * energyToRemove;
         }
@@ -165,6 +190,9 @@ void Map::removeEnergyFromGround(double energyToRemove) {
 
 
 void Map::processClimate() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+
     float newGround[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
     float newHeats[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
 
@@ -226,9 +254,6 @@ void Map::processClimate() {
     }
 
 
-
-
-
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
@@ -247,12 +272,22 @@ void Map::processClimate() {
             currentTile->lockOwnerAddHeat(- 1 * currentTileHeat * heatToGroundRatio);
             currentTile->lockOwnerAddGround(currentTileHeat * heatToGroundRatio);
 
+
+            currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
+
             currentTile->unlockHeatAndGround();
 
         }
     }
 
     vegetalisation();
+
+
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
+    tick++;
 }
 
 void Map::vegetalisation() {
@@ -376,4 +411,8 @@ void Map::setTick(int tick) {
 
 void Map::setSpeedCorrectionRatio(double speedCorrectionRatio) {
     Map::speedCorrectionRatio = speedCorrectionRatio;
+}
+
+const DataAnalyser &Map::getDataAnalyser() const {
+    return dataAnalyser;
 }

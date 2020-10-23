@@ -12,6 +12,8 @@
 using namespace std;
 
 Farm::Farm(){
+    farmControl = new FarmControl();
+
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 }
@@ -144,6 +146,11 @@ void Farm::Tick(bool paused) {
 
 
 
+    if (map->getTick() != 0) {
+        double mapTickDifference = map->getTick() - tickCount;
+        map->setSpeedCorrectionRatio(mapTickDifference);
+    }
+
 
     tickEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
@@ -179,7 +186,6 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
         auto f = [](LifesRunner * currentLifeRunner, Farm * farm, bool * paused) {
-            currentLifeRunner->moveCreatures();
             currentLifeRunner->brainProcessing(*paused);
         };
 
@@ -299,6 +305,22 @@ void Farm::brainProcessing(bool paused) {
 void Farm::moveCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+
+    std::thread chunkThreads[lifesRunners.size()];
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        auto f = [](LifesRunner * currentLifeRunner, Farm * farm) {
+            currentLifeRunner->moveCreatures();
+        };
+
+        int index = it;
+        chunkThreads[index] = std::thread(f, lifesRunners.at(it), this);
+    }
+
+
+
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        chunkThreads[it].join();
+    }
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -1250,3 +1272,10 @@ void Farm::checkAndHandleLifeDying(Life * life) {
     }
 }
 
+FarmControl *Farm::getFarmControl() const {
+    return farmControl;
+}
+
+void Farm::setFarmControl(FarmControl *farmControl) {
+    Farm::farmControl = farmControl;
+}

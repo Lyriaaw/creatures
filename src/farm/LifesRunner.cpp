@@ -143,16 +143,15 @@ void LifesRunner::moveCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     std::vector<Entity* > newEntities;
-
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
-        Point entityPoint = currentLife->getEntity()->getPosition();
-        Point tilePoint = entityPoint.getTileCoordinates();
+        Point tilePoint = currentLife->getEntity()->getTileCoordinates();
 
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
-        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
+//        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
 
         double releasedHeat = currentLife->giveawayEnergy();
+
         map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
 
         checkAndHandleLifeDying(currentLife);

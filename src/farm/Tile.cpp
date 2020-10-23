@@ -67,6 +67,31 @@ void Tile::addHeat(float value) {
     std::lock_guard<std::mutex> guard(heat_mutex);
     heat += value;
 }
+
+void Tile::addTmpHeat(float value) {
+    std::lock_guard<std::mutex> guard(tmp_heat_mutex);
+    tmp_heat += value;
+}
+float Tile::getTmpHeat() const {
+    return tmp_heat;
+}
+float Tile::getAndClearTmpHeat() {
+    std::lock_guard<std::mutex> guard(tmp_heat_mutex);
+
+    double currentValue = tmp_heat;
+    tmp_heat = 0;
+
+    return tmp_heat;
+}
+
+void Tile::setTmoHeat(float heat) {
+    std::lock_guard<std::mutex> guard(tmp_heat_mutex);
+    Tile::tmp_heat = heat;
+}
+
+
+
+
 void Tile::lockOwnerAddHeat(float value) {
     heat += value;
 }

@@ -44,7 +44,7 @@ void StatisticsScreen::loadGraphs() {
     Graph * timeGraph = new Graph("Time", 0.f, 0.1f, 1.f, 0.8f);
     timeGraph->setGraphControlCenter(graphControlCenter);
 
-    timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
+    timeGraph->addLine(farmUi->getFarm()->getMap()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTickTime(), 2, 255, 255, 255);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTotalTime(), 2, 0, 0, 0);
@@ -149,19 +149,19 @@ void StatisticsScreen::loadGraphs() {
 
 
     actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPheromoneCount(), 2, 128, 0, 128);
-    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPoopCount(), 2, 64, 0, 64);
+//    actionsGraph->addLine(farmUi->getFarm()->getDataAnalyser().getPoopCount(), 2, 64, 0, 64);
 
 
 
 
     graphs.emplace_back(populationGraph);
     graphs.emplace_back(scoreGraph);
+    graphs.emplace_back(actionsGraph);
     graphs.emplace_back(timeGraph);
+    graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(energyGraph);
     graphs.emplace_back(brainsGraph);
-    graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(runnersPopulationGraph);
-    graphs.emplace_back(actionsGraph);
 }
 
 void StatisticsScreen::loadButtons(sf::Font *font) {

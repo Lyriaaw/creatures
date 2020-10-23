@@ -219,21 +219,21 @@ void MainWindow::start() {
 
     running = true;
     std::thread farmThread = runFarmLoop();
-    std::thread farmVegetalisationThread = runFarmVegetalisationLoop();
     std::thread farmUiThread = runFarmUiUpdate();
+
+    farm->getMap()->handleThread();
 
     runLoop();
     farmThread.join();
     farmUiThread.join();
-    farmVegetalisationThread.join();
 }
 
 
 
 std::thread MainWindow::runFarmLoop() {
     auto f = [](Farm *threadedFarm, bool *running, bool *paused){
-        while (*running) {
-            if (*paused) {
+        while (threadedFarm->getFarmControl()->isRunning()) {
+            if (threadedFarm->getFarmControl()->isPaused()) {
                 usleep(1000000);
                 continue;
             }
@@ -250,8 +250,8 @@ std::thread MainWindow::runFarmLoop() {
 
 std::thread MainWindow::runFarmVegetalisationLoop() {
     auto f = [](Farm *threadedFarm, bool *running, bool *paused){
-        while (*running) {
-            if (*paused) {
+        while (threadedFarm->getFarmControl()->isRunning()) {
+            if (threadedFarm->getFarmControl()->isPaused()) {
                 usleep(1000000);
                 continue;
             }
@@ -274,7 +274,7 @@ std::thread MainWindow::runFarmVegetalisationLoop() {
 
 std::thread MainWindow::runFarmUiUpdate() {
     auto f = [](FarmUI *threadedFarmUI, bool *running, bool *paused){
-        while (*running) {
+        while (threadedFarmUI->getFarm()->getFarmControl()->isRunning()) {
             threadedFarmUI->update();
         }
     };
@@ -531,7 +531,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 
     switch (event.code) {
         case Keyboard::Key::Space:
-            this->paused = !this->paused;
+            this->farm->getFarmControl()->setPaused(!this->farm->getFarmControl()->isPaused());
             break;
         case Keyboard::Key::Num3:
 //            this->mainCamera->switchGrid();

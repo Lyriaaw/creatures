@@ -10,6 +10,7 @@
 #include "../World.h"
 #include "Tile.h"
 #include "FarmControl.h"
+#include "statistics/DataAnalyser.h"
 #include <shared_mutex>
 #include <iostream>
 
@@ -25,11 +26,15 @@ private:
 
     std::function<void(std::vector<Entity *> entities)> recordAddedEntitiesToFarm;
 
+    DataAnalyser dataAnalyser;
+
 public:
 
 
 
     Map(FarmControl * farmControl);
+
+    Map();
 
     void initRandomMap();
     void generateRandomTerrain();
@@ -50,6 +55,10 @@ public:
     void setTick(int tick);
 
     void setSpeedCorrectionRatio(double speedCorrectionRatio);
+
+    void handleThread();
+
+    const DataAnalyser &getDataAnalyser() const;
 };
 
 

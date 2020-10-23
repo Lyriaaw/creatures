@@ -164,6 +164,10 @@ public:
     void addEntityToFarm(Entity *entity);
 
     void addedEntitiesToFarm(std::vector<Entity *> entities);
+
+    FarmControl *getFarmControl() const;
+
+    void setFarmControl(FarmControl *farmControl);
 };
 
 

@@ -174,7 +174,7 @@ void Graph::windowResized(float windowWidth, float windowHeight) {
 }
 
 void Graph::getMinAndMaxValues() {
-    min = 10000000.0;
+    min = 100000000000.0;
     max = -10000000.0;
 
     for (int it = 0; it < lines.size(); it++) {
@@ -191,6 +191,7 @@ void Graph::getMinAndMaxValues() {
         }
     }
 
+//    int itemCount = std::max(lines.at(0).getItem()->getCount(), lines.at(1).getItem()->getCount());
     int itemCount = lines.at(0).getItem()->getCount();
 
     if (graphControlCenter->getMode() == "last") {
@@ -217,6 +218,8 @@ void Graph::drawStat(sf::RenderWindow *window, DataItemConnector line) {
     }
 
     int itemCount = line.getItem()->getCount();
+//    int itemCount = std::max(lines.at(0).getItem()->getCount(), lines.at(1).getItem()->getCount());
+
 
     int currentItemcount = itemCount;
     if (graphControlCenter->getMode() == "last") {
