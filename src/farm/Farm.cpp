@@ -817,16 +817,8 @@ void Farm::handleNoStatistics() {
     dataAnalyser.getAverageOutputNeurons()->addValue(dataAnalyser.getAverageOutputNeurons()->getLastValue());
     dataAnalyser.getAverageLinks()->addValue(dataAnalyser.getAverageLinks()->getLastValue());
     dataAnalyser.getTotalEnergy()->addValue(dataAnalyser.getTotalEnergy()->getLastValue());
-    dataAnalyser.getEntityGridTime()->addValue(dataAnalyser.getEntityGridTime()->getLastValue());
-    dataAnalyser.getBrainProcessingTime()->addValue(dataAnalyser.getBrainProcessingTime()->getLastValue());
     dataAnalyser.getBrainOutputsTime()->addValue(dataAnalyser.getBrainOutputsTime()->getLastValue());
     dataAnalyser.getPrepareActionsTime()->addValue(dataAnalyser.getPrepareActionsTime()->getLastValue());
-    dataAnalyser.getExecuteActionsTime()->addValue(dataAnalyser.getExecuteActionsTime()->getLastValue());
-    dataAnalyser.getMoveCreaturesTime()->addValue(dataAnalyser.getMoveCreaturesTime()->getLastValue());
-    dataAnalyser.getPopulationControlTime()->addValue(dataAnalyser.getPopulationControlTime()->getLastValue());
-    dataAnalyser.getVegetalisationTime()->addValue(dataAnalyser.getVegetalisationTime()->getLastValue());
-    dataAnalyser.getCreatureSortingTime()->addValue(dataAnalyser.getCreatureSortingTime()->getLastValue());
-    dataAnalyser.getATickHavePassedTime()->addValue(dataAnalyser.getATickHavePassedTime()->getLastValue());
     dataAnalyser.getZero()->addValue(dataAnalyser.getZero()->getLastValue());
 
 

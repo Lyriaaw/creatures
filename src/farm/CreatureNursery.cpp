@@ -272,11 +272,12 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
         }
     }
 
-    float delta = (((rand() % 400) / 100.f) - 2.f) * father->getEntity()->getSize();
+    float deltaX = (((rand() % 400) / 100.f) - 2.f) * father->getEntity()->getSize();
+    float deltaY = (((rand() % 400) / 100.f) - 2.f) * father->getEntity()->getSize();
 
     Point childSpawn = {
-    father->getEntity()->getPosition().getX() + delta,
-    father->getEntity()->getPosition().getY() + delta,
+    father->getEntity()->getPosition().getX() + deltaX,
+    father->getEntity()->getPosition().getY() + deltaY,
     };
 
     if (childSpawn.getX() < 0) {
