@@ -135,7 +135,7 @@ bool Entity::tryLockInteraction() {
 
 
         int millisecondToSleep = std::pow(2, trials);
-        std::cout << "Unable to lock interaction. Reying in " << millisecondToSleep << "ms" << std::endl;
+//        std::cout << "Unable to lock interaction. Reying in " << millisecondToSleep << "ms" << std::endl;
         usleep(millisecondToSleep * 1000);
         if (trials == 2) {
             return false;

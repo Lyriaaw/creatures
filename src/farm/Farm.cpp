@@ -189,6 +189,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double biteCount(0.0);
     double pheromoneCount(0.0);
     double biteLifeCount(0.0);
+    double eatLifeCount(0.0);
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -214,6 +215,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         biteCount += lifesRunners.at(it)->getDataAnalyser().getBiteCount()->getLastValue();
         pheromoneCount += lifesRunners.at(it)->getDataAnalyser().getPheromoneCount()->getLastValue();
         biteLifeCount += lifesRunners.at(it)->getDataAnalyser().getBiteLifeCount()->getLastValue();
+        eatLifeCount += lifesRunners.at(it)->getDataAnalyser().getEatLifeCount()->getLastValue();
     }
 
 
@@ -233,6 +235,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getBiteCount()->addValue(biteCount);
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
     dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
+    dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
 }
 
 
@@ -380,22 +383,6 @@ void Farm::executeCreaturesActions() {
 
         }
 
-        Entity * subject = actionDto.getSubject();
-
-        if (subject == nullptr) {
-            continue;
-        }
-
-        if (subject->isExists() <= 0 || performer->isAlive() <= 0) {
-            continue;
-        }
-
-        if (actionDto.getType() == "EAT_LIFE") {
-            handleEating(performer, subject);
-            eatLifeCount++;
-        }
-
-
     }
     removeDeadLifes();
 
@@ -404,7 +391,6 @@ void Farm::executeCreaturesActions() {
 
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
-    dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
