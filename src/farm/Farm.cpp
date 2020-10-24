@@ -387,26 +387,6 @@ void Farm::executeCreaturesActions() {
 
 
 
-    int naturalMatingCount = 0;
-    for (int it = 0; it < actions.size(); it++) {
-        ActionDTO actionDto = actions.at(it);
-
-        Life * performer = getLifeFromId(actionDto.getPerformerId());
-
-
-        if (actionDto.getType() == "MATE") {
-            bool success = handleMating(performer, actionDto.getSubjectId());
-
-            if (success) {
-                naturalMatingCount++;
-                mateSuccessCount++;
-            } else {
-                mateFailureCount++;
-            }
-
-        }
-
-    }
     removeDeadLifes();
 
     actions.clear();
@@ -619,7 +599,6 @@ void Farm::handlePoop(Life * subject) {
 void Farm::recordExecutedAction(ActionDTO action) {
     std::lock_guard<std::mutex> guard(executed_actions_mutex);
     executedActions.emplace_back(action);
-
 }
 
 

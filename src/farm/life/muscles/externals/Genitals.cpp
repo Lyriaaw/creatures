@@ -47,7 +47,7 @@ std::vector<ActionDTO> Genitals::prepareActionDTO(std::vector<Entity *> accessib
         return actions;
     }
 
-    if (smallestDistance <= closestEntity->getSize()) {
+    if (smallestDistance <= closestEntity->getSize() && closestEntity->isLife()) {
         ActionDTO action = ActionDTO(entity->getId(), closestEntity->getId(), "MATE");
         actions.emplace_back(action);
     }

@@ -94,6 +94,10 @@ public:
     void setAddLifeToFarm(const std::function<void(Life *)> &addLifeToFarm);
 
     void setCreatureNursery(CreatureNursery *creatureNursery);
+
+    void executeCreatureActions(Life *life);
+
+    void recordMatingFailure(Life *performer);
 };
 
 

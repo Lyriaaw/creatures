@@ -44,8 +44,8 @@ void StatisticsScreen::loadGraphs() {
     Graph * timeGraph = new Graph("Time", 0.f, 0.1f, 1.f, 0.8f);
     timeGraph->setGraphControlCenter(graphControlCenter);
 
-    timeGraph->addLine(farmUi->getFarm()->getMap()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTickTime(), 2, 255, 255, 255);
+    timeGraph->addLine(farmUi->getFarm()->getMap()->getDataAnalyser().getVegetalisationTime(), 2, 0, 0, 65);
 
     timeGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTotalTime(), 2, 0, 0, 0);
 
