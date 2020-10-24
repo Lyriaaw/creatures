@@ -78,10 +78,10 @@ float Tile::getTmpHeat() const {
 float Tile::getAndClearTmpHeat() {
     std::lock_guard<std::mutex> guard(tmp_heat_mutex);
 
-    double currentValue = tmp_heat;
+    float currentValue = tmp_heat;
     tmp_heat = 0;
 
-    return tmp_heat;
+    return currentValue;
 }
 
 void Tile::setTmoHeat(float heat) {
@@ -101,7 +101,7 @@ void Tile::addHeight(float value) {
     height += value;
 }
 
-Tile::Tile(Point coordinates, float height, float color, float heat, float ground) : coordinates(coordinates), height(height), color(color), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0) {}
+Tile::Tile(Point coordinates, float height, float color, float heat, float ground) : coordinates(coordinates), height(height), color(color), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0), tmp_heat(0) {}
 
 float Tile::getColor() const {
     return color;
@@ -133,7 +133,7 @@ void Tile::decayPheromone() {
         return;
     }
 
-    pheromoneQuantity -= 0.05 * pheromoneQuantity;
+    pheromoneQuantity -= (0.05 * pheromoneQuantity) * VEGETALISATION_RATE;
 
     if (pheromoneQuantity < 1.0) {
         pheromoneQuantity = 0;
@@ -162,8 +162,8 @@ void Tile::handleEntityDecay() {
             lockOwnerAddGround(entity->getMass());
             entity->setMass(0);
         } else {
-            lockOwnerAddGround(2.0);
-            entity->removeMass(2.0);
+            lockOwnerAddGround(2.0 * VEGETALISATION_RATE);
+            entity->removeMass(2.0 * VEGETALISATION_RATE);
         }
         entity->unlockInteraction();
     }

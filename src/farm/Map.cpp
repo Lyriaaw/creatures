@@ -152,8 +152,7 @@ void Map::handleThread() {
 
             processClimate();
 
-
-            usleep(10000 + std::max(-100000, int((10000 * speedCorrectionRatio))));
+            usleep(std::max(int(10000 + std::max(-100000, int((10000 * speedCorrectionRatio)))), 0));
         }
     };
 
@@ -191,6 +190,15 @@ void Map::removeEnergyFromGround(double energyToRemove) {
 
 void Map::processClimate() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    if (tick % VEGETALISATION_RATE != 0) {
+        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_time = end - start;
+        dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
+        tick++;
+
+        return;
+    }
 
 
     float newGround[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];

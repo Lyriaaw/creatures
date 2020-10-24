@@ -152,7 +152,7 @@ void LifesRunner::moveCreatures() {
 
         double releasedHeat = currentLife->giveawayEnergy();
 
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addHeat(releasedHeat);
+        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpHeat(releasedHeat);
 
         checkAndHandleLifeDying(currentLife);
     }
