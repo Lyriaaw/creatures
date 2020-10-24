@@ -10,6 +10,7 @@
 #include "life/Life.h"
 #include "statistics/DataAnalyser.h"
 #include "Map.h"
+#include "CreatureNursery.h"
 
 class LifesRunner {
 private:
@@ -24,6 +25,9 @@ private:
     std::function<std::vector<Tile *>(Life * life, std::vector<Point> selectedChunks)> getAccessibleTiles;
     std::function<void(ActionDTO)> recordExecutedAction;
     std::function<Life * (int id)> getLifeFromId;
+    std::function<void(Life *)> addLifeToFarm;
+
+    CreatureNursery * creatureNursery;
 
 
     std::vector<ActionDTO> actions;
@@ -84,6 +88,12 @@ public:
     void handleBitingLife(Life *performer, ActionDTO action);
 
     void handleEatLife(Life *performer, ActionDTO action);
+
+    bool handleMating(Life *father, ActionDTO action);
+
+    void setAddLifeToFarm(const std::function<void(Life *)> &addLifeToFarm);
+
+    void setCreatureNursery(CreatureNursery *creatureNursery);
 };
 
 

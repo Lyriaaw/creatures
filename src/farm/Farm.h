@@ -170,6 +170,8 @@ public:
     void setFarmControl(FarmControl *farmControl);
 
     void handleNoStatistics();
+
+    void addLifeToFarm(Life *life);
 };
 
 

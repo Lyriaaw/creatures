@@ -13,6 +13,8 @@ using namespace std;
 
 Farm::Farm(){
     farmControl = new FarmControl();
+    nursery = new CreatureNursery();
+
 
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
@@ -41,7 +43,12 @@ void Farm::initLifesRunners() {
            return this->getLifeFromId(id);
         });
 
+        lifesRunner->setAddLifeToFarm([&](Life * life) {
+            this->addLifeToFarm(life);
+        });
+
         lifesRunner->setMap(map);
+        lifesRunner->setCreatureNursery(nursery);
 
         lifesRunners.emplace_back(lifesRunner);
     }
@@ -75,7 +82,6 @@ void Farm::InitFromRandom() {
 
     initLifesRunners();
     std::uniform_real_distribution<float> distMovement(-1, 1);
-    nursery = new CreatureNursery();
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
         Life * initialLife = nursery->generateCreatureFromRandom();
 
@@ -111,6 +117,14 @@ void Farm::InitFromRandom() {
     tickCount = 0;
 
     sortCreatures();
+}
+
+void Farm::addLifeToFarm(Life * life) {
+    getLessLoadedRunner()->addLife(life);
+
+    std::lock_guard<std::mutex> guard(add_mutex);
+    lifesAdded.emplace_back(life);
+
 }
 
 
@@ -190,6 +204,9 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double pheromoneCount(0.0);
     double biteLifeCount(0.0);
     double eatLifeCount(0.0);
+    int mateFailureCount = 0;
+    int mateSuccessCount = 0;
+    int naturalMatingCount = 0;
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -216,6 +233,9 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         pheromoneCount += lifesRunners.at(it)->getDataAnalyser().getPheromoneCount()->getLastValue();
         biteLifeCount += lifesRunners.at(it)->getDataAnalyser().getBiteLifeCount()->getLastValue();
         eatLifeCount += lifesRunners.at(it)->getDataAnalyser().getEatLifeCount()->getLastValue();
+        mateFailureCount += lifesRunners.at(it)->getDataAnalyser().getMateFailureCount()->getLastValue();
+        mateSuccessCount += lifesRunners.at(it)->getDataAnalyser().getMateSuccessCount()->getLastValue();
+        naturalMatingCount += lifesRunners.at(it)->getDataAnalyser().getNaturalMatings()->getLastValue();
     }
 
 
@@ -236,6 +256,9 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
     dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
     dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
+    dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
+    dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
+    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 }
 
 
@@ -387,10 +410,6 @@ void Farm::executeCreaturesActions() {
     removeDeadLifes();
 
     actions.clear();
-    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
-
-    dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
-    dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
@@ -711,8 +730,8 @@ void Farm::populationControl() {
         Life * mother = sortedConnectors.at(motherIndex);
 
         Life * child = this->nursery->Mate(father, mother);
-        child->getEntity()->setMass(child->getEnergyCenter()->getMaxMass() / 4.f);
-        child->getEnergyCenter()->setAvailableEnergy(child->getEnergyCenter()->getMaxMass() / 4.f);
+        child->getEntity()->setMass(child->getEnergyCenter()->getMaxMass() / 3.01f);
+        child->getEnergyCenter()->setAvailableEnergy(child->getEnergyCenter()->getMaxMass() / 3.01f);
         Entity * childCreature = child->getEntity();
 
 //        float childSpawnX = distWidth(mt);

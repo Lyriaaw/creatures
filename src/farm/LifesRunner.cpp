@@ -88,6 +88,10 @@ void LifesRunner::brainProcessing(bool paused) {
     int pheromoneCount = 0;
     int biteLifeCount = 0;
     int eatLifeCount = 0;
+    int mateFailureCount = 0;
+    int mateSuccessCount = 0;
+    int naturalMatingCount = 0;
+
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
@@ -163,6 +167,19 @@ void LifesRunner::brainProcessing(bool paused) {
 
             }
 
+            if (action.getType() == "MATE") {
+                bool success = handleMating(currentLife, action);
+
+                if (success) {
+                    naturalMatingCount++;
+                    mateSuccessCount++;
+                } else {
+                    mateFailureCount++;
+                }
+
+                continue;
+            }
+
 
 
             remainingActions.emplace_back(action);
@@ -182,6 +199,10 @@ void LifesRunner::brainProcessing(bool paused) {
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
     dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
     dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
+
+    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
+    dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
+    dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -435,6 +456,83 @@ void LifesRunner::handleEatLife(Life * performer, ActionDTO action) {
 }
 
 
+bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
+    if (!performer->getEntity()->tryLockInteraction()) {
+        return false;
+    }
+
+    Life * foundLife = getLifeFromId(action.getSubjectId());
+    if (foundLife == nullptr) {
+        performer->getEntity()->unlockInteraction();
+        return false;
+    }
+
+    if (!foundLife->getEntity()->tryLockInteraction()) {
+        performer->getEntity()->unlockInteraction();
+        return false;
+    }
+
+
+
+    bool fatherCanReproduce = performer->getEntity()->getMass() > performer->getEnergyCenter()->getMaxMass() / 3.f && performer->getEntity()->getAge() > 10;
+    bool motherCanReproduce = foundLife->getEntity()->getMass() > foundLife->getEnergyCenter()->getMaxMass() / 3.f && foundLife->getEntity()->getAge() > 10;
+
+    if (!fatherCanReproduce || !motherCanReproduce) {
+        performer->getEntity()->unlockInteraction();
+        foundLife->getEntity()->unlockInteraction();
+        return false;
+    }
+//
+    Life * child = this->creatureNursery->Mate(performer, foundLife);
+
+    double givenEnergyToChildGoal = child->getEnergyCenter()->getMaxMass() / 2.f;
+
+    double givenFatherEnergy = std::min(performer->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
+    double givenMotherEnergy = std::min(foundLife->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
+
+    double actualGivenFatherEnergy = performer->getEntity()->removeMass(givenFatherEnergy);
+    double actualGivenMotherEnergy = foundLife->getEntity()->removeMass(givenMotherEnergy);
+
+    if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
+        std::cout << "Wrong energy given" << std::endl;
+    }
+
+
+    double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
+
+    checkAndHandleLifeDying(performer);
+    checkAndHandleLifeDying(foundLife);
+
+    performer->getEntity()->unlockInteraction();
+    foundLife->getEntity()->unlockInteraction();
+
+    Point childCoordinate = child->getEntity()->getPosition();
+    Point tileChildPosition = childCoordinate.getTileCoordinates();
+
+    if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
+        child->getEntity()->setMass(totalGivenEnergy / 2.0);
+        child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
+        addLifeToFarm(child);
+
+
+        ActionDTO executedAction = ActionDTO(0, 0, "MATE");
+        executedAction.setTilePosition(tileChildPosition);
+        executedAction.setTick(tick);
+        recordExecutedAction(executedAction);
+
+        return true;
+    }
+
+
+
+    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+
+
+
+
+
+    return false;
+}
 
 
 
@@ -501,4 +599,12 @@ void LifesRunner::setTick(int tick) {
 
 void LifesRunner::setGetLifeFromId(const std::function<Life *(int)> &getLifeFromId) {
     LifesRunner::getLifeFromId = getLifeFromId;
+}
+
+void LifesRunner::setAddLifeToFarm(const std::function<void(Life *)> &addLifeToFarm) {
+    LifesRunner::addLifeToFarm = addLifeToFarm;
+}
+
+void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
+    LifesRunner::creatureNursery = creatureNursery;
 }
