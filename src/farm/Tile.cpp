@@ -151,7 +151,9 @@ void Tile::addEntity(Entity * entity) {
 }
 
 std::vector<Entity *> Tile::getEntities() {
-    return entities;
+    std::lock_guard<std::mutex> guard(entities_mutex);
+    std::vector<Entity *> givenEntities = entities;
+    return givenEntities;
 }
 
 void Tile::handleEntityDecay() {
