@@ -85,6 +85,7 @@ void LifesRunner::brainProcessing(bool paused) {
     int poopCount = 0;
     int eatCount = 0;
     int biteCount = 0;
+    int pheromoneCount = 0;
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
@@ -139,6 +140,12 @@ void LifesRunner::brainProcessing(bool paused) {
                 continue;
             }
 
+            if (action.getType() == "EMIT_PHEROMONE") {
+//            handlePoop(performer);
+                handlePheromoneEmission(currentLife, action);
+                pheromoneCount++;
+                continue;
+            }
 
 
 
@@ -157,6 +164,7 @@ void LifesRunner::brainProcessing(bool paused) {
     dataAnalyser.getPoopCount()->addValue(poopCount);
     dataAnalyser.getEatCount()->addValue(eatCount);
     dataAnalyser.getBiteCount()->addValue(biteCount);
+    dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -290,7 +298,12 @@ void LifesRunner::handleBiting(Life * performer, Entity * subject) {
     recordExecutedAction(executedAction);
 }
 
+void LifesRunner::handlePheromoneEmission(Life * performer, ActionDTO action) {
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
 
+    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addPheromone(action.getPheromoneEmissionColor(), performer->getEntity()->getSize());
+}
 
 
 

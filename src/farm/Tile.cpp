@@ -120,6 +120,8 @@ float Tile::getPheromoneQuantity() const {
 }
 
 void Tile::addPheromone(float newColor, float newQuantity) {
+    std::lock_guard<std::mutex> guard(pheromone_mutex);
+
     pheromoneColor = ((pheromoneColor * pheromoneQuantity) + (newColor * newQuantity)) / (pheromoneQuantity + newQuantity);
 
     pheromoneQuantity += newQuantity;

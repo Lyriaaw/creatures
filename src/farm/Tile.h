@@ -19,6 +19,8 @@ private:
 
     float pheromoneColor;
     float pheromoneQuantity;
+    std::mutex pheromone_mutex;
+
 
     std::mutex entities_mutex;
     std::vector<Entity *> entities;

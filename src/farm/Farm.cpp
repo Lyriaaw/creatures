@@ -183,6 +183,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double poopCount(0.0);
     double eatCount(0.0);
     double biteCount(0.0);
+    double pheromoneCount(0.0);
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -206,6 +207,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
         eatCount += lifesRunners.at(it)->getDataAnalyser().getEatCount()->getLastValue();
         biteCount += lifesRunners.at(it)->getDataAnalyser().getBiteCount()->getLastValue();
+        pheromoneCount += lifesRunners.at(it)->getDataAnalyser().getPheromoneCount()->getLastValue();
     }
 
 
@@ -223,6 +225,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getPoopCount()->addValue(poopCount);
     dataAnalyser.getEatCount()->addValue(eatCount);
     dataAnalyser.getBiteCount()->addValue(biteCount);
+    dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
 
 
 
@@ -360,12 +363,6 @@ void Farm::executeCreaturesActions() {
 
         Life * performer = getLifeFromId(actionDto.getPerformerId());
 
-        if (actionDto.getType() == "EMIT_PHEROMONE") {
-//            handlePoop(performer);
-            handlePheromoneEmission(performer, actionDto);
-            pheromoneCount++;
-            continue;
-        }
 
         if (actionDto.getType() == "BITE_LIFE") {
             handleBitingLife(performer, actionDto);
@@ -415,7 +412,6 @@ void Farm::executeCreaturesActions() {
     actions.clear();
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
 
-    dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
     dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);

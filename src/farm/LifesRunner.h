@@ -75,6 +75,8 @@ public:
     void handleEating(Life *performer, Entity *subject);
 
     void handleBiting(Life *performer, Entity *subject);
+
+    void handlePheromoneEmission(Life *performer, ActionDTO action);
 };
 
 
