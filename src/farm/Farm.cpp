@@ -37,6 +37,10 @@ void Farm::initLifesRunners() {
            this->recordExecutedAction(action);
         });
 
+        lifesRunner->setGetLifeFromId([&](int id) {
+           return this->getLifeFromId(id);
+        });
+
         lifesRunner->setMap(map);
 
         lifesRunners.emplace_back(lifesRunner);
@@ -184,6 +188,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double eatCount(0.0);
     double biteCount(0.0);
     double pheromoneCount(0.0);
+    double biteLifeCount(0.0);
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -208,6 +213,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         eatCount += lifesRunners.at(it)->getDataAnalyser().getEatCount()->getLastValue();
         biteCount += lifesRunners.at(it)->getDataAnalyser().getBiteCount()->getLastValue();
         pheromoneCount += lifesRunners.at(it)->getDataAnalyser().getPheromoneCount()->getLastValue();
+        biteLifeCount += lifesRunners.at(it)->getDataAnalyser().getBiteLifeCount()->getLastValue();
     }
 
 
@@ -226,9 +232,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getEatCount()->addValue(eatCount);
     dataAnalyser.getBiteCount()->addValue(biteCount);
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
-
-
-
+    dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
 }
 
 
@@ -364,11 +368,6 @@ void Farm::executeCreaturesActions() {
         Life * performer = getLifeFromId(actionDto.getPerformerId());
 
 
-        if (actionDto.getType() == "BITE_LIFE") {
-            handleBitingLife(performer, actionDto);
-            biteLifeCount++;
-        }
-
         if (actionDto.getType() == "MATE") {
             bool success = handleMating(performer, actionDto.getSubjectId());
 
@@ -397,15 +396,6 @@ void Farm::executeCreaturesActions() {
         }
 
 
-
-        if (actionDto.getType() == "BITE_ENTITY") {
-            handleBiting(performer, subject);
-            biteCount++;
-        }
-
-
-
-
     }
     removeDeadLifes();
 
@@ -414,7 +404,6 @@ void Farm::executeCreaturesActions() {
 
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
-    dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
     dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -550,8 +539,8 @@ void Farm::generateEntities(Point position, float color, float brightness, doubl
     do {
         double newEntityEnergy = std::min(totalEnergy, maxSize);
 
-        float xRatio = ((rand() % 100) / 100.0f) * spreadingRatio;
-        float yRatio = ((rand() % 100) / 100.0f) * spreadingRatio;
+        float xRatio = (((rand() % 200) / 100.0f) * spreadingRatio) - spreadingRatio;
+        float yRatio = (((rand() % 200) / 100.0f) * spreadingRatio) - spreadingRatio;
 
         Point entityPosition = Point(position.getX() + xRatio, position.getY() + yRatio);
         if (entityPosition.getX() >= FARM_WIDTH) {

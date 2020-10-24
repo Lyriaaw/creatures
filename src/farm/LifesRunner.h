@@ -23,6 +23,7 @@ private:
     std::function<std::vector<Entity *>(std::vector<Point> selectedChunks)> getAccessibleEntities;
     std::function<std::vector<Tile *>(Life * life, std::vector<Point> selectedChunks)> getAccessibleTiles;
     std::function<void(ActionDTO)> recordExecutedAction;
+    std::function<Life * (int id)> getLifeFromId;
 
 
     std::vector<ActionDTO> actions;
@@ -56,6 +57,8 @@ public:
 
     void setRecordExecutedAction(const std::function<void(ActionDTO)> &recordExecutedAction);
 
+    void setGetLifeFromId(const std::function<Life *(int)> &getLifeFromId);
+
     const std::vector<ActionDTO> &getActions() const;
 
     void clearActions();
@@ -77,6 +80,8 @@ public:
     void handleBiting(Life *performer, Entity *subject);
 
     void handlePheromoneEmission(Life *performer, ActionDTO action);
+
+    void handleBitingLife(Life *performer, ActionDTO action);
 };
 
 

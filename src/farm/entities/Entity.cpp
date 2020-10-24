@@ -133,15 +133,14 @@ bool Entity::tryLockInteraction() {
     int trials(0);
     while (!interaction_mutex.try_lock()) {
 
-        trials++;
 
-        int millisecondToSleep = (10 * trials);
+        int millisecondToSleep = std::pow(2, trials);
         std::cout << "Unable to lock interaction. Reying in " << millisecondToSleep << "ms" << std::endl;
         usleep(millisecondToSleep * 1000);
-
-        if (trials == 10) {
+        if (trials == 2) {
             return false;
         }
+        trials++;
     }
 
     return true;

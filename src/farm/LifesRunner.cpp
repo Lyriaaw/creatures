@@ -86,6 +86,7 @@ void LifesRunner::brainProcessing(bool paused) {
     int eatCount = 0;
     int biteCount = 0;
     int pheromoneCount = 0;
+    int biteLifeCount = 0;
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
@@ -147,6 +148,14 @@ void LifesRunner::brainProcessing(bool paused) {
                 continue;
             }
 
+            if (action.getType() == "BITE_LIFE") {
+                handleBitingLife(currentLife, action);
+                biteLifeCount++;
+                continue;
+            }
+
+
+
 
 
 
@@ -165,6 +174,7 @@ void LifesRunner::brainProcessing(bool paused) {
     dataAnalyser.getEatCount()->addValue(eatCount);
     dataAnalyser.getBiteCount()->addValue(biteCount);
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
+    dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -229,7 +239,12 @@ void LifesRunner::checkAndHandleLifeDying(Life * life) {
 }
 
 void LifesRunner::handlePoop(Life * subject) {
+    if (!subject->getEntity()->tryLockInteraction()) {
+        return;
+    }
+
     if (subject->getEnergyCenter()->getWastedEnergy() == 0) {
+        subject->getEntity()->unlockInteraction();
         return;
     }
 
@@ -246,16 +261,22 @@ void LifesRunner::handlePoop(Life * subject) {
     ActionDTO executedAction = ActionDTO(0, 0, "POOP");
     executedAction.setTilePosition(position.getTileCoordinates());
     recordExecutedAction(executedAction);
+    subject->getEntity()->unlockInteraction();
 }
 
 
 void LifesRunner::handleEating(Life * performer, Entity * subject) {
+    if (!performer->getEntity()->tryLockInteraction()) {
+        return;
+    }
 
     if (!subject->tryLockInteraction()) {
+        performer->getEntity()->unlockInteraction();
         return;
     }
 
     if (subject->getMass() == 0) {
+        performer->getEntity()->unlockInteraction();
         subject->unlockInteraction();
         return;
     }
@@ -264,6 +285,7 @@ void LifesRunner::handleEating(Life * performer, Entity * subject) {
     subject->setMass(0.0);
 
     subject->unlockInteraction();
+    performer->getEntity()->unlockInteraction();
 
 
     Point performerPoint = performer->getEntity()->getPosition();
@@ -272,23 +294,28 @@ void LifesRunner::handleEating(Life * performer, Entity * subject) {
     executedAction.setTilePosition(tilePoint);
     recordExecutedAction(executedAction);
 
+
 }
 
 void LifesRunner::handleBiting(Life * performer, Entity * subject) {
+    if (!performer->getEntity()->tryLockInteraction()) {
+        return;
+    }
 
-    double mouthSize = performer->getEntity()->getSize() / 3.0;
 
     Point performerPoint = performer->getEntity()->getPosition();
     Point tilePoint = performerPoint.getTileCoordinates();
 
     if (!subject->tryLockInteraction()) {
+        performer->getEntity()->unlockInteraction();
         return;
     }
 
-    generateEntities(subject->getPosition(), subject->getColor(), subject->getBrightness(), (subject->getSize() * MASS_TO_SIZE_RATIO) / 2.0, subject->getMass(), subject->getSize() * 4);
+    generateEntities(subject->getPosition(), subject->getColor(), subject->getBrightness(), (subject->getSize() * MASS_TO_SIZE_RATIO) / 2.0, subject->getMass(), subject->getSize());
     subject->setMass(0.0);
 
     subject->unlockInteraction();
+    performer->getEntity()->unlockInteraction();
 
 
 
@@ -296,16 +323,60 @@ void LifesRunner::handleBiting(Life * performer, Entity * subject) {
     executedAction.setTilePosition(tilePoint);
     executedAction.setTick(tick);
     recordExecutedAction(executedAction);
+
 }
 
 void LifesRunner::handlePheromoneEmission(Life * performer, ActionDTO action) {
+    if (!performer->getEntity()->tryLockInteraction()) {
+        return;
+    }
+
     Point performerPoint = performer->getEntity()->getPosition();
     Point tilePoint = performerPoint.getTileCoordinates();
 
     map->getTileAt(tilePoint.getX(), tilePoint.getY())->addPheromone(action.getPheromoneEmissionColor(), performer->getEntity()->getSize());
+
+    performer->getEntity()->unlockInteraction();
 }
 
+void LifesRunner::handleBitingLife(Life * performer, ActionDTO action) {
+    if (!performer->getEntity()->tryLockInteraction()) {
+        return;
+    }
 
+    Life * foundLife = getLifeFromId(action.getSubjectId());
+    if (foundLife == nullptr) {
+        performer->getEntity()->unlockInteraction();
+        return;
+    }
+
+    if (!foundLife->getEntity()->tryLockInteraction()) {
+        performer->getEntity()->unlockInteraction();
+        return;
+    }
+
+
+    double mouthSize = performer->getEntity()->getSize() / 3.0;
+
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+    Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
+
+    double takenEnergy = std::min(mouthSize * 10.0, foundLife->getEnergyCenter()->getAvailableEnergy());
+    foundLife->getEnergyCenter()->removeAvailableEnergy(takenEnergy);
+    tile->addTmpHeat(takenEnergy);
+
+    checkAndHandleLifeDying(foundLife);
+    performer->getEntity()->unlockInteraction();
+    foundLife->getEntity()->unlockInteraction();
+
+    ActionDTO executedAction = ActionDTO(0, 0, "BITE_LIFE");
+    executedAction.setTilePosition(tilePoint);
+    executedAction.setTick(tick);
+    recordExecutedAction(executedAction);
+
+
+}
 
 
 
@@ -370,4 +441,8 @@ int LifesRunner::getTick() const {
 
 void LifesRunner::setTick(int tick) {
     LifesRunner::tick = tick;
+}
+
+void LifesRunner::setGetLifeFromId(const std::function<Life *(int)> &getLifeFromId) {
+    LifesRunner::getLifeFromId = getLifeFromId;
 }
