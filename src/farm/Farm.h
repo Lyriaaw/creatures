@@ -168,6 +168,8 @@ public:
     FarmControl *getFarmControl() const;
 
     void setFarmControl(FarmControl *farmControl);
+
+    void handleNoStatistics();
 };
 
 

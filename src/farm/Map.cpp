@@ -212,6 +212,8 @@ void Map::processClimate() {
 
             currentTile->lockHeatAndGround();
             currentTile->handleEntityDecay();
+            currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
+
             newGround[it][jt] = currentTile->getGround();
             newHeats[it][jt] = currentTile->getHeat();
 
@@ -279,9 +281,6 @@ void Map::processClimate() {
 
             currentTile->lockOwnerAddHeat(- 1 * currentTileHeat * heatToGroundRatio);
             currentTile->lockOwnerAddGround(currentTileHeat * heatToGroundRatio);
-
-
-            currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
 
             currentTile->unlockHeatAndGround();
 

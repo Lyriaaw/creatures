@@ -193,7 +193,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
         for (int jt = 0; jt < brain->getOutputNeurons().size(); jt++) {
 
             LinkEvolution * linkEvolution = new LinkEvolution();
-            linkEvolution->setGenerationNumber(generationNumberIndex + (jt * 10) + it);
+            linkEvolution->setGenerationNumber(generationNumberIndex + (jt * 100) + it);
             linkEvolution->generateFromNeurons(life, brain->getInputNeurons().at(it), brain->getOutputNeurons().at(jt));
             linkEvolution->perform(life);
             creatureGenome.emplace_back(linkEvolution);

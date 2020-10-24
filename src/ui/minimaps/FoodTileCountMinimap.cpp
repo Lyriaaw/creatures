@@ -43,19 +43,31 @@ void FoodTileCountMinimap::generateValues(Farm * farm) {
         }
     }
 
-    std::vector<Entity *> currentEntities = farm->getEntities();
-
-    for (int it = 0; it < currentEntities.size(); it++) {
-        Point point = currentEntities.at(it)->getPosition();
-        Point tilePosition = point.getTileCoordinates();
-
-        values[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getSize();
-        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getColor() * currentEntities.at(it)->getSize();
-    }
+//    std::vector<Entity *> currentEntities = farm->getEntities();
+//
+//    for (int it = 0; it < currentEntities.size(); it++) {
+//        Point point = currentEntities.at(it)->getPosition();
+//        Point tilePosition = point.getTileCoordinates();
+//
+//        values[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getSize();
+//        averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getColor() * currentEntities.at(it)->getSize();
+//    }
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+
+            std::vector<Entity *> currentEntities = farm->getMap()->getTileAt(it, jt)->getEntities();
+
+            for (int it = 0; it < currentEntities.size(); it++) {
+                Point point = currentEntities.at(it)->getPosition();
+                Point tilePosition = point.getTileCoordinates();
+
+                values[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getSize();
+                averageHues[int(tilePosition.getX())][int(tilePosition.getY())] += currentEntities.at(it)->getColor() * currentEntities.at(it)->getSize();
+            }
+
+
             averageHues[it][jt] /= float(values[it][jt]);
 
             float hue = averageHues[it][jt];

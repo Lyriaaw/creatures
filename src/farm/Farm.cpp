@@ -322,6 +322,8 @@ void Farm::moveCreatures() {
         chunkThreads[it].join();
     }
 
+    removeDeadLifes();
+
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getMoveCreaturesTime()->addValue(elapsed_time.count());
@@ -489,7 +491,7 @@ void Farm::handleBitingLife(Life * performer, ActionDTO action) {
 
         double takenEnergy = std::min(mouthSize * 10.0, foundLife->getEnergyCenter()->getAvailableEnergy());
         foundLife->getEnergyCenter()->removeAvailableEnergy(takenEnergy);
-        tile->addHeat(takenEnergy);
+        tile->addTmpHeat(takenEnergy);
 
         checkAndHandleLifeDying(foundLife);
 
@@ -829,8 +831,78 @@ void Farm::analyseColors() {
     dataAnalyser.getColors()->addTick(sortResult);
 }
 
+
+
+void Farm::handleNoStatistics() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    dataAnalyser.getPopulation()->addValue(dataAnalyser.getPopulation()->getLastValue());
+    dataAnalyser.getAverageScore()->addValue(dataAnalyser.getAverageScore()->getLastValue());
+    dataAnalyser.getBestScore()->addValue(dataAnalyser.getBestScore()->getLastValue());
+    dataAnalyser.getFirstQuartileScore()->addValue(dataAnalyser.getFirstQuartileScore()->getLastValue());
+    dataAnalyser.getMedianScore()->addValue(dataAnalyser.getMedianScore()->getLastValue());
+    dataAnalyser.getLastQuartileScore()->addValue(dataAnalyser.getLastQuartileScore()->getLastValue());
+    dataAnalyser.getAvailableEnergy()->addValue(dataAnalyser.getAvailableEnergy()->getLastValue());
+    dataAnalyser.getFoodEnergy()->addValue(dataAnalyser.getFoodEnergy()->getLastValue());
+    dataAnalyser.getCreaturesEnergy()->addValue(dataAnalyser.getCreaturesEnergy()->getLastValue());
+    dataAnalyser.getCreaturesMass()->addValue(dataAnalyser.getCreaturesMass()->getLastValue());
+    dataAnalyser.getCreaturesWastedEnergy()->addValue(dataAnalyser.getCreaturesWastedEnergy()->getLastValue());
+    dataAnalyser.getHeatEnergy()->addValue(dataAnalyser.getHeatEnergy()->getLastValue());
+    dataAnalyser.getGroundEnergy()->addValue(dataAnalyser.getGroundEnergy()->getLastValue());
+    dataAnalyser.getAverageInputNeurons()->addValue(dataAnalyser.getAverageInputNeurons()->getLastValue());
+    dataAnalyser.getAverageOutputNeurons()->addValue(dataAnalyser.getAverageOutputNeurons()->getLastValue());
+    dataAnalyser.getAverageLinks()->addValue(dataAnalyser.getAverageLinks()->getLastValue());
+    dataAnalyser.getTotalEnergy()->addValue(dataAnalyser.getTotalEnergy()->getLastValue());
+    dataAnalyser.getEntityGridTime()->addValue(dataAnalyser.getEntityGridTime()->getLastValue());
+    dataAnalyser.getBrainProcessingTime()->addValue(dataAnalyser.getBrainProcessingTime()->getLastValue());
+    dataAnalyser.getBrainOutputsTime()->addValue(dataAnalyser.getBrainOutputsTime()->getLastValue());
+    dataAnalyser.getPrepareActionsTime()->addValue(dataAnalyser.getPrepareActionsTime()->getLastValue());
+    dataAnalyser.getExecuteActionsTime()->addValue(dataAnalyser.getExecuteActionsTime()->getLastValue());
+    dataAnalyser.getMoveCreaturesTime()->addValue(dataAnalyser.getMoveCreaturesTime()->getLastValue());
+    dataAnalyser.getPopulationControlTime()->addValue(dataAnalyser.getPopulationControlTime()->getLastValue());
+    dataAnalyser.getVegetalisationTime()->addValue(dataAnalyser.getVegetalisationTime()->getLastValue());
+    dataAnalyser.getCreatureSortingTime()->addValue(dataAnalyser.getCreatureSortingTime()->getLastValue());
+    dataAnalyser.getATickHavePassedTime()->addValue(dataAnalyser.getATickHavePassedTime()->getLastValue());
+    dataAnalyser.getZero()->addValue(dataAnalyser.getZero()->getLastValue());
+
+
+
+
+    for (auto const& runner : dataAnalyser.getRunnersPopulation()) {
+        runner->addValue(runner->getLastValue());
+    }
+
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    double statisticsTime = elapsed_time.count();
+    dataAnalyser.getStatisticsTime()->addValue(statisticsTime);
+
+    double totalTime = 0.0;
+    totalTime += dataAnalyser.getEntityGridTime()->getLastValue();
+    totalTime += dataAnalyser.getBrainProcessingTime()->getLastValue();
+    totalTime += dataAnalyser.getBrainOutputsTime()->getLastValue();
+    totalTime += dataAnalyser.getPrepareActionsTime()->getLastValue();
+    totalTime += dataAnalyser.getExecuteActionsTime()->getLastValue();
+    totalTime += dataAnalyser.getMoveCreaturesTime()->getLastValue();
+    totalTime += dataAnalyser.getPopulationControlTime()->getLastValue();
+//    totalTime += dataAnalyser.getVegetalisationTime()->getLastValue();
+    totalTime += dataAnalyser.getCreatureSortingTime()->getLastValue();
+    totalTime += dataAnalyser.getATickHavePassedTime()->getLastValue();
+
+    totalTime += statisticsTime;
+    dataAnalyser.getTotalTime()->addValue(totalTime);
+}
+
+
 void Farm::statistics() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    if (tickCount % STATISTICS_RATE != 0 && tickCount != 1) {
+        handleNoStatistics();
+
+        return;
+    }
 
     analyseColors();
 
@@ -883,25 +955,27 @@ void Farm::statistics() {
         totalLinks += currentLife->getBrain()->getLinks().size();
     }
 
-    std::vector<Entity *> entities = getEntities();
-
-    for (int it = 0; it < entities.size(); it++) {
-        Entity * entity = entities.at(it);
-        totalFoodsEnergy += entity->getMass();
-    }
-
 
     double totalHeat = 0.0;
+    double totalTmpHeat = 0.0;
     double totalGround = 0.0;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             totalHeat += map->getTileAt(it, jt)->getHeat();
             totalGround += map->getTileAt(it, jt)->getGround();
+            totalTmpHeat += map->getTileAt(it, jt)->getTmpHeat();
+
+            std::vector<Entity *> entities = map->getTileAt(it, jt)->getEntities();
+
+            for (int it = 0; it < entities.size(); it++) {
+                Entity * entity = entities.at(it);
+                totalFoodsEnergy += entity->getMass();
+            }
         }
     }
 
 
-    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy + totalCreaturesMass + totalCreaturesWasted + totalHeat + totalGround;
+    int totalEnergy = availableEnergy + totalFoodsEnergy + totalCreaturesEnergy + totalCreaturesMass + totalCreaturesWasted + totalHeat + totalGround + totalTmpHeat;
     dataAnalyser.getTotalEnergy()->addValue(totalEnergy);
     dataAnalyser.getAvailableEnergy()->addValue(availableEnergy);
     dataAnalyser.getFoodEnergy()->addValue(totalFoodsEnergy);
