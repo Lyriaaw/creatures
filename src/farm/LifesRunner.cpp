@@ -84,6 +84,7 @@ void LifesRunner::brainProcessing(bool paused) {
 
     int poopCount = 0;
     int eatCount = 0;
+    int biteCount = 0;
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
     for (int it = 0; it < lifes.size(); it++) {
         Life *currentLife = lifes.at(it);
@@ -125,6 +126,21 @@ void LifesRunner::brainProcessing(bool paused) {
                 continue;
             }
 
+            if (action.getType() == "BITE_ENTITY") {
+
+                for (int jt = 0; jt < accessibleEntities.size(); jt++) {
+                    if (accessibleEntities.at(jt)->getId() == action.getSubjectId()) {
+                        biteCount++;
+                        handleBiting(currentLife, accessibleEntities.at(jt));
+                        jt = accessibleEntities.size();
+                    }
+                }
+
+                continue;
+            }
+
+
+
 
 
             remainingActions.emplace_back(action);
@@ -140,6 +156,7 @@ void LifesRunner::brainProcessing(bool paused) {
 
     dataAnalyser.getPoopCount()->addValue(poopCount);
     dataAnalyser.getEatCount()->addValue(eatCount);
+    dataAnalyser.getBiteCount()->addValue(biteCount);
 
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
@@ -226,7 +243,9 @@ void LifesRunner::handlePoop(Life * subject) {
 
 void LifesRunner::handleEating(Life * performer, Entity * subject) {
 
-    subject->tryLockInteraction();
+    if (!subject->tryLockInteraction()) {
+        return;
+    }
 
     if (subject->getMass() == 0) {
         subject->unlockInteraction();
@@ -247,7 +266,29 @@ void LifesRunner::handleEating(Life * performer, Entity * subject) {
 
 }
 
+void LifesRunner::handleBiting(Life * performer, Entity * subject) {
 
+    double mouthSize = performer->getEntity()->getSize() / 3.0;
+
+    Point performerPoint = performer->getEntity()->getPosition();
+    Point tilePoint = performerPoint.getTileCoordinates();
+
+    if (!subject->tryLockInteraction()) {
+        return;
+    }
+
+    generateEntities(subject->getPosition(), subject->getColor(), subject->getBrightness(), (subject->getSize() * MASS_TO_SIZE_RATIO) / 2.0, subject->getMass(), subject->getSize() * 4);
+    subject->setMass(0.0);
+
+    subject->unlockInteraction();
+
+
+
+    ActionDTO executedAction = ActionDTO(0, 0, "BITE_ENTITY");
+    executedAction.setTilePosition(tilePoint);
+    executedAction.setTick(tick);
+    recordExecutedAction(executedAction);
+}
 
 
 

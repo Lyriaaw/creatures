@@ -182,6 +182,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     double accessibleEntitiesTime(0.0);
     double poopCount(0.0);
     double eatCount(0.0);
+    double biteCount(0.0);
 
     std::thread chunkThreads[lifesRunners.size()];
     for (int it = 0; it < lifesRunners.size(); it++) {
@@ -204,6 +205,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         poopCount += lifesRunners.at(it)->getDataAnalyser().getPoopCount()->getLastValue();
         accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
         eatCount += lifesRunners.at(it)->getDataAnalyser().getEatCount()->getLastValue();
+        biteCount += lifesRunners.at(it)->getDataAnalyser().getBiteCount()->getLastValue();
     }
 
 
@@ -220,6 +222,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
     dataAnalyser.getAccessibleEntities()->addValue(accessibleEntitiesTime);
     dataAnalyser.getPoopCount()->addValue(poopCount);
     dataAnalyser.getEatCount()->addValue(eatCount);
+    dataAnalyser.getBiteCount()->addValue(biteCount);
 
 
 
@@ -391,17 +394,10 @@ void Farm::executeCreaturesActions() {
             continue;
         }
 
-        if (actionDto.getType() == "EAT_ENTITY") {
-            handleEating(performer, subject);
-            eatCount++;
-        }
-
         if (actionDto.getType() == "EAT_LIFE") {
             handleEating(performer, subject);
             eatLifeCount++;
         }
-
-
 
 
 
@@ -422,7 +418,6 @@ void Farm::executeCreaturesActions() {
     dataAnalyser.getPheromoneCount()->addValue(pheromoneCount);
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
-    dataAnalyser.getBiteCount()->addValue(biteCount);
     dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
     dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
 

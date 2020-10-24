@@ -73,6 +73,8 @@ public:
     void setTick(int tick);
 
     void handleEating(Life *performer, Entity *subject);
+
+    void handleBiting(Life *performer, Entity *subject);
 };
 
 

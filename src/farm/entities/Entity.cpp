@@ -129,10 +129,22 @@ void Entity::setIsLife(bool isLife) {
     Entity::isALife = isLife;
 }
 
-void Entity::tryLockInteraction() {
+bool Entity::tryLockInteraction() {
+    int trials(0);
     while (!interaction_mutex.try_lock()) {
-        usleep(10000);
+
+        trials++;
+
+        int millisecondToSleep = (10 * trials);
+        std::cout << "Unable to lock interaction. Reying in " << millisecondToSleep << "ms" << std::endl;
+        usleep(millisecondToSleep * 1000);
+
+        if (trials == 10) {
+            return false;
+        }
     }
+
+    return true;
 }
 
 void Entity::unlockInteraction() {

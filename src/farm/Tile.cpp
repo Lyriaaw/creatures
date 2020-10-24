@@ -157,8 +157,12 @@ std::vector<Entity *> Tile::getEntities() {
 }
 
 void Tile::handleEntityDecay() {
+    std::lock_guard<std::mutex> guard(entities_mutex);
     for (auto const& entity: entities) {
-        entity->tryLockInteraction();
+        if (!entity->tryLockInteraction()) {
+            std::cout << "Unable to perform decay on entity " << entity->getId() << std::endl;
+            continue;
+        }
 
         if (entity->getMass() < 100) {
             lockOwnerAddGround(entity->getMass());

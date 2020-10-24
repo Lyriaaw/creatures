@@ -87,7 +87,7 @@ public:
 
     void unlockInteraction();
 
-    void tryLockInteraction();
+    bool tryLockInteraction();
 
     Point getTileCoordinates();
 
