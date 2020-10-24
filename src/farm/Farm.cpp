@@ -322,8 +322,6 @@ void Farm::moveCreatures() {
         chunkThreads[it].join();
     }
 
-    removeDeadLifes();
-
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getMoveCreaturesTime()->addValue(elapsed_time.count());
@@ -1045,7 +1043,7 @@ void Farm::generateEntityGrid() {
     }
 
     for (int it = 0; it < lifes.size(); it++) {
-        Point simpleCoordinates = lifes.at(it)->getEntity()->getSimpleCoordinates();
+        Point simpleCoordinates = lifes.at(it)->getEntity()->getTileCoordinates();
         try {
             entityGrid.at(simpleCoordinates.getX()).at(simpleCoordinates.getY()).push_back(lifes.at(it)->getEntity());
         } catch (const std::exception&) {

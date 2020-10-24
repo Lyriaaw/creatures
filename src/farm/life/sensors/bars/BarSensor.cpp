@@ -6,7 +6,7 @@
 
 void BarSensor::findSelectedChunks() {
     Point entityPoint = this->entity->getPosition();
-    Point currentSimplePosition = entityPoint.getSimpleCoordinates();
+    Point currentSimplePosition = entityPoint.getTileCoordinates();
 
 
     this->selectedChunks.clear();
@@ -19,7 +19,7 @@ void BarSensor::findSelectedChunks() {
 
     Point sensorPosition = {sensorX, sensorY};
 
-    Point sensorSimplePosition = sensorPosition.getSimpleCoordinates();
+    Point sensorSimplePosition = sensorPosition.getTileCoordinates();
 
     int minChunkX = std::min(sensorSimplePosition.getX(), currentSimplePosition.getX()) - 1;
     int maxChunkX = std::max(sensorSimplePosition.getX(), currentSimplePosition.getX()) + 1;
@@ -27,8 +27,8 @@ void BarSensor::findSelectedChunks() {
     if (minChunkX < 0) {
         minChunkX = 0;
     }
-    if (maxChunkX >= CHUNK_COUNT_WIDTH) {
-        maxChunkX = CHUNK_COUNT_WIDTH - 1;
+    if (maxChunkX >= TILE_COUNT_WIDTH) {
+        maxChunkX = TILE_COUNT_WIDTH - 1;
     }
 
 
@@ -38,8 +38,8 @@ void BarSensor::findSelectedChunks() {
     if (minChunkY < 0) {
         minChunkY = 0;
     }
-    if (maxChunkY >= CHUNK_COUNT_HEIGHT) {
-        maxChunkY = CHUNK_COUNT_HEIGHT - 1;
+    if (maxChunkY >= TILE_COUNT_HEIGHT) {
+        maxChunkY = TILE_COUNT_HEIGHT - 1;
     }
 
 

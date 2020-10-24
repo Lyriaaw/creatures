@@ -40,12 +40,12 @@ void Muscle::findSelectedChunks() {
     float muscleY = (sin(muscleRotation) * entity->getSize()) + entity->getPosition().getY();
 
     Point musclePoint = Point(muscleX, muscleY);
-    Point chunk = musclePoint.getSimpleCoordinates();
+    Point chunk = musclePoint.getTileCoordinates();
 
 
     for (int it = -1; it <= 1; it++) {
         for (int jt = -1; jt <= 1; jt++) {
-            if (it < 0 || it >= CHUNK_COUNT_WIDTH || jt < 0 || jt >= CHUNK_COUNT_HEIGHT)
+            if (it < 0 || it >= TILE_COUNT_WIDTH || jt < 0 || jt >= TILE_COUNT_HEIGHT)
                 continue;
 
             float x = chunk.getX() + it;
@@ -55,10 +55,10 @@ void Muscle::findSelectedChunks() {
                 x = 0;
             if (y < 0)
                 y = 0;
-            if (x >= CHUNK_COUNT_WIDTH)
-                x = CHUNK_COUNT_WIDTH - 1;
-            if (y >= CHUNK_COUNT_HEIGHT)
-                y = CHUNK_COUNT_HEIGHT - 1;
+            if (x >= TILE_COUNT_WIDTH)
+                x = TILE_COUNT_WIDTH - 1;
+            if (y >= TILE_COUNT_HEIGHT)
+                y = TILE_COUNT_HEIGHT - 1;
 
             selectedChunks.emplace_back(Point(x, y));
         }

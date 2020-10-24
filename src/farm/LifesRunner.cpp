@@ -91,7 +91,15 @@ void LifesRunner::brainProcessing(bool paused) {
             continue;
         }
 
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
+        std::vector<Point> selectedTiles = currentLife->getSelectedChunks();
+
+        std::vector<Entity *> accessibleEntities;
+        try {
+            accessibleEntities = getAccessibleEntities(selectedTiles);
+        } catch (const std::exception& e) {
+            std::cout << "ERROR WHILE GET ACCESSIBLE ENTITIES" << std::endl;
+            std::cout << e.what() << std::endl;
+        }
 
         std::vector<ActionDTO> currentCreatureActions = currentLife->executeExternalActions(accessibleEntities);
 
@@ -157,6 +165,7 @@ void LifesRunner::moveCreatures() {
         checkAndHandleLifeDying(currentLife);
     }
 
+    removeDeadLifes();
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;

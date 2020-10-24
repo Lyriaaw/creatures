@@ -219,11 +219,24 @@ void FarmUI::setPositions(Camera *camera) {
             }
 
 
-            int gridRatio = 0;
+            int gridXRatio = 0;
+            int gridYRatio = 0;
 
             if (camera->isShowGrid()) {
-                gridRatio = 1;
+                gridXRatio = 1;
+                gridYRatio = 1;
+
+                if ((it + 1) % TILE_PER_CHUNK == 0) {
+                    gridXRatio = 2;
+                }
+                if ((jt + 1) % TILE_PER_CHUNK == 0) {
+                    gridYRatio = 2;
+                }
+
+
             }
+
+
 
             int vertexArrayIndex = ((it * TILE_COUNT_HEIGHT) + jt) * 4;
             Point point = camera->getScreenCoordinates({float(it) * TILE_SIZE, float(jt) * TILE_SIZE});
@@ -238,8 +251,8 @@ void FarmUI::setPositions(Camera *camera) {
 
 
 
-            double currentX = point.getX() + (TILE_SIZE * camera->getZoom()) - gridRatio;
-            double currentY = point.getY() + (TILE_SIZE * camera->getZoom()) - gridRatio;
+            double currentX = point.getX() + (TILE_SIZE * camera->getZoom()) - gridXRatio;
+            double currentY = point.getY() + (TILE_SIZE * camera->getZoom()) - gridYRatio;
             tilesVertexArray[vertexArrayIndex + 1].position = sf::Vector2f(
                     std::min(double(currentX), double(camera->getTopLeft().getX()) + double(camera->getWidth())),
                     std::max(double(point.getY()), double(camera->getTopLeft().getY())));
@@ -344,7 +357,7 @@ void FarmUI::mouseMoved(Point worldPosition, Camera * camera) {
 
     hoveredTileInfos.setPosition(screenTopLeft.getX(), screenTopLeft.getY());
     hoveredTileInfos.setFillColor(sf::Color(100, 0, 0));
-    hoveredTileInfos.setCharacterSize((5 / TILE_PER_CHUNK) * camera->getZoom());
+    hoveredTileInfos.setCharacterSize(5 * camera->getZoom());
     generateTileInfoText();
 }
 
