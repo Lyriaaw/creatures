@@ -27,16 +27,21 @@ private:
     int id;
 
     std::function<void(int id)> clientDisconnected;
+    std::function<void(int id, std::string message)> handleClientMessage;
 public:
     WebUiClient(int id);
 
-    void do_session(tcp::socket socket);
+    void initClient(tcp::socket socket);
+    void do_session();
 
     void sendMessage(std::string message);
 
     void setClientDisconnected(const std::function<void(int)> &clientDisconnected);
 
+    void setHandleClientMessage(const std::function<void(int, std::string)> &handleClientMessage);
+
     int getId() const;
+
 };
 
 

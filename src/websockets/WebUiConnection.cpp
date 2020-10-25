@@ -40,9 +40,15 @@ void WebUiConnection::threadLoop() {
                     this->clientDisconnected(id);
                 });
 
+                client->setHandleClientMessage([&](int id, std::string message) {
+                   this->handleClientMessage(id, message);
+                });
+
 
                 clients.emplace_back(client);
-                client->do_session(std::move(socket));
+                client->initClient(std::move(socket));
+                sendInitialData(client->getId());
+                client->do_session();
             };
 
             std::thread(f,std::move(socket)).detach();
@@ -75,35 +81,31 @@ void WebUiConnection::clientDisconnected(int id) {
 
 
 
+void WebUiConnection::handleClientMessage(int id, std::string message) {
+    std::lock_guard<std::mutex> guard(clients_mutex);
 
-std::string WebUiConnection::initialData() {
-    JSONCreator message;
-    message.addJSONKeyValue("farm", getFarmObject());
-    return message.getResult();
-}
+    WebUiClient * client = nullptr;
 
-std::string WebUiConnection::getFarmObject() {
-    JSONCreator farmJSON;
-    farmJSON.addIntKeyValue("tick", farm->getTickCount());
-    farmJSON.addIntKeyValue("creatures", farm->getLifes().size());
-    farmJSON.addDoubleKeyValue("tick_per_second", farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue());
+    for (int it = 0; it < clients.size(); it++) {
+        if (clients.at(it)->getId() == id) {
+            client = clients.at(it);
+            it = clients.size();
+        }
+    }
 
-    JSONCreator message;
-    message.addJSONKeyValue("farm", farmJSON.getResult());
-    return message.getResult();
-}
+    if (client == nullptr) {
+        std::cout << "Error while trying to handle client message. Id " << id << " not found" << std::endl;
+        return;
+    }
 
-std::string WebUiConnection::sendEvent(std::string type, std::string JSONBody) {
-    JSONCreator event;
-    event.addStringKeyValue("type", type);
-    event.addJSONKeyValue("body", JSONBody);
+    json j = json::parse(message);
 
+    if (j["foo"] == "bar") {
+        std::cout << "Received messsage from client id " << id << " => " << j["foo"] << std::endl;
+    } else {
+        std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
+    }
 
-
-    JSONCreator dto;
-    dto.addJSONKeyValue("event", event.getResult());
-
-    return dto.getResult();
 }
 
 
@@ -112,9 +114,62 @@ void WebUiConnection::updateClients() {
     std::lock_guard<std::mutex> guard(clients_mutex);
 
     for (auto const& client : clients) {
-        std::string messageToSend = sendEvent("farm_update", getFarmObject());
+        std::string messageToSend = sendEvent("farm_update", getFarmObject()).dump();
 
 
         client->sendMessage(messageToSend);
     }
+}
+
+void WebUiConnection::sendMessageToClient(int id, std::string message) {
+    std::lock_guard<std::mutex> guard(clients_mutex);
+
+    WebUiClient * client = nullptr;
+
+    for (int it = 0; it < clients.size(); it++) {
+        if (clients.at(it)->getId() == id) {
+            client = clients.at(it);
+            it = clients.size();
+        }
+    }
+
+    if (client == nullptr) {
+        std::cout << "Error while trying to handle client message. Id " << id << " not found" << std::endl;
+        return;
+    }
+
+
+    client->sendMessage(message);
+}
+
+
+json WebUiConnection::sendEvent(std::string type, json JSONBody) {
+    return {{
+        "event", {
+            {"type", type},
+            {"body", JSONBody}
+        }
+    }};
+}
+
+
+void WebUiConnection::sendInitialData(int id) {
+    json initialData = {{
+        {"farm", getFarmObject()},
+        {"runners", farm->getLifesRunners().size()},
+    }};
+
+
+    sendMessageToClient(id, sendEvent("initial_data", initialData).dump());
+}
+
+json WebUiConnection::getFarmObject() {
+    return {{
+        "farm", {
+            {"tick", farm->getTickCount()},
+            {"creatures", farm->getLifes().size()},
+            {"tick_per_second", farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue()},
+            {"uptime", farm->uptime()},
+        }
+    }};;
 }

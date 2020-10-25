@@ -117,6 +117,9 @@ void Farm::InitFromRandom() {
     tickCount = 0;
 
     sortCreatures();
+
+    tickFarmStarted = std::chrono::system_clock::now();
+
 }
 
 void Farm::addLifeToFarm(Life * life) {
@@ -1312,4 +1315,15 @@ void Farm::setFarmControl(FarmControl *farmControl) {
 
 void Farm::setTriggerUpdate(const function<void()> &triggerUpdate) {
     Farm::triggerUpdate = triggerUpdate;
+}
+
+double Farm::uptime() {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = now - tickFarmStarted;
+
+    return elapsed_time.count();
+}
+
+const vector<LifesRunner *> &Farm::getLifesRunners() const {
+    return lifesRunners;
 }

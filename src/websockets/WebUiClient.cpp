@@ -3,19 +3,20 @@
 //
 #include "WebUiClient.h"
 
+void WebUiClient::initClient(tcp::socket socket) {
+    std::cout << "Client connected" << std::endl;
+    ws = new websocket::stream<tcp::socket>(std::move(socket));
+    ws->set_option(websocket::stream_base::decorator(
+            [](websocket::response_type& res){
+                res.set(http::field::server,std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-sync");
+            }));
 
-void WebUiClient::do_session(tcp::socket socket){
+    ws->accept();
+}
+
+void WebUiClient::do_session(){
     try
     {
-        std::cout << "Client connected" << std::endl;
-        ws = new websocket::stream<tcp::socket>(std::move(socket));
-        ws->set_option(websocket::stream_base::decorator(
-                [](websocket::response_type& res){
-                    res.set(http::field::server,std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-sync");
-                }));
-
-        ws->accept();
-
 
         for(;;){
             beast::flat_buffer buffer;
@@ -24,9 +25,9 @@ void WebUiClient::do_session(tcp::socket socket){
 
             ws->text(ws->got_text());
 
-            buffer.consume(buffer.size());
+            handleClientMessage(id, beast::buffers_to_string(buffer.data()));
 
-            ws->write(boost::asio::buffer("hello"));
+            buffer.consume(buffer.size());
         }
     }
     catch(beast::system_error const& se)
@@ -47,7 +48,11 @@ void WebUiClient::do_session(tcp::socket socket){
 }
 
 void WebUiClient::sendMessage(std::string message) {
-    ws->write(boost::asio::buffer(message));
+    try {
+        ws->write(boost::asio::buffer(message));
+    } catch(beast::system_error const &se) {
+        std::cerr << "Error: " << se.code().message() << std::endl;
+    }
 }
 
 void WebUiClient::setClientDisconnected(const std::function<void(int)> &clientDisconnected) {
@@ -58,4 +63,8 @@ WebUiClient::WebUiClient(int id) : id(id) {}
 
 int WebUiClient::getId() const {
     return id;
+}
+
+void WebUiClient::setHandleClientMessage(const std::function<void(int, std::string)> &handleClientMessage) {
+    WebUiClient::handleClientMessage = handleClientMessage;
 }

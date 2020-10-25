@@ -16,6 +16,11 @@
 #include "../farm/Farm.h"
 #include "WebUiClient.h"
 
+#include <nlohmann/json.hpp>
+
+// for convenience
+using json = nlohmann::json;
+
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
@@ -38,15 +43,19 @@ public:
 
     void threadLoop();
 
-    std::string initialData();
-
-    std::string getFarmObject();
+    json getFarmObject();
 
     void updateClients();
 
-    std::string sendEvent(std::string type, std::string JSONBody);
+    json sendEvent(std::string type, json JSONBody);
 
     void clientDisconnected(int id);
+
+    void handleClientMessage(int id, std::string message);
+
+    void sendInitialData(int id);
+    void sendMessageToClient(int id, std::string message);
+
 };
 
 

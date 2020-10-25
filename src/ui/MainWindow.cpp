@@ -35,7 +35,6 @@ using namespace std;
 
 MainWindow::MainWindow(): leftMouseButtonDown(false), rightMouseButtonDown(false) {
     tickStart = std::chrono::system_clock::now();
-    tickFarmStarted = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 }
 
@@ -331,10 +330,8 @@ void MainWindow::updateInformationLabel() {
 
 
 
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = now - tickFarmStarted;
 
-    int seconds = elapsed_time.count();
+    int seconds = farm->uptime();
 
 
 

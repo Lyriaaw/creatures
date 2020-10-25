@@ -48,6 +48,7 @@ private:
     int tickCount;
 
     DataAnalyser dataAnalyser;
+    std::chrono::system_clock::time_point tickFarmStarted;
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
 
@@ -175,6 +176,10 @@ public:
     void addLifeToFarm(Life *life);
 
     void setTriggerUpdate(const std::function<void()> &triggerUpdate);
+
+    double uptime();
+
+    const std::vector<LifesRunner *> &getLifesRunners() const;
 };
 
 

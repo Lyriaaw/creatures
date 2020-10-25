@@ -22,5 +22,4 @@ target_link_libraries (Creatures sfml-graphics sfml-window sfml-system)
 target_include_directories(Creatures PRIVATE ${WEBSOCKET_INCLUDE_DIR})
 
 
-
 # https://medium.com/@remy.villulles/compile-and-install-sfml-2-5-1-on-macos-with-clion-and-cmake-b4e52199db1c
