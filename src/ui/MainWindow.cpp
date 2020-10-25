@@ -151,6 +151,13 @@ void MainWindow::loadFarm() {
             screens.at(it)->updateSelectedCreature();
         }
     });
+
+
+    webUiConnection = new WebUiConnection(farm);
+    farm->setTriggerUpdate([&]() {
+       webUiConnection->updateClients();
+    });
+    webUiConnection->handleTread();
 }
 
 void MainWindow::loadScreens() {

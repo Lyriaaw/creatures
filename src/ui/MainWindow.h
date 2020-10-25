@@ -12,6 +12,7 @@
 #include "components/FarmUI.h"
 #include "screens/Screen.h"
 #include "components/Button.h"
+#include "../websockets/WebUiConnection.h"
 
 
 class MainWindow {
@@ -67,6 +68,8 @@ private:
     double fps;
 
     std::vector<UiComponent *> uiComponents;
+
+    WebUiConnection * webUiConnection;
 
 
 

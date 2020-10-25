@@ -95,7 +95,7 @@ public:
 
     void setCreatureNursery(CreatureNursery *creatureNursery);
 
-    void executeCreatureActions(Life *life);
+    void executeCreatureActions();
 
     void recordMatingFailure(Life *performer);
 };

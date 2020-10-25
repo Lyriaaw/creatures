@@ -86,9 +86,7 @@ void LifesRunner::brainProcessing(bool paused) {
 
 
 
-    for (int it = 0; it < currentLifes.size(); it++) {
-        executeCreatureActions(currentLifes.at(it));
-    }
+    executeCreatureActions();
 
 
 
@@ -97,7 +95,7 @@ void LifesRunner::brainProcessing(bool paused) {
     dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
 }
 
-void LifesRunner::executeCreatureActions(Life * life) {
+void LifesRunner::executeCreatureActions() {
     std::chrono::system_clock::time_point externalActionsStart = std::chrono::system_clock::now();
 
     int poopCount = 0;
@@ -110,81 +108,87 @@ void LifesRunner::executeCreatureActions(Life * life) {
     int mateSuccessCount = 0;
     int naturalMatingCount = 0;
 
+    for (int it = 0; it < lifes.size(); it++) {
+        Life * life = lifes.at(it);
 
-    std::vector<Point> selectedTiles = life->getSelectedChunks();
-    std::vector<Entity *> accessibleEntities = getAccessibleEntities(selectedTiles);
+        std::vector<Point> selectedTiles = life->getSelectedChunks();
+        std::vector<Entity *> accessibleEntities = getAccessibleEntities(selectedTiles);
 
-    std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
+        std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
 
 
-    for (auto const& action : currentCreatureActions) {
-        if (action.getType() == "POOP") {
-            poopCount++;
-            handlePoop(life);
-            continue;
-        }
-
-        if (action.getType() == "EAT_ENTITY") {
-
-            for (int jt = 0; jt < accessibleEntities.size(); jt++) {
-                if (accessibleEntities.at(jt)->getId() == action.getSubjectId()) {
-                    eatCount++;
-                    handleEating(life, accessibleEntities.at(jt));
-                    jt = accessibleEntities.size();
-                }
+        for (auto const& action : currentCreatureActions) {
+            if (action.getType() == "POOP") {
+                poopCount++;
+                handlePoop(life);
+                continue;
             }
 
-            continue;
-        }
+            if (action.getType() == "EAT_ENTITY") {
 
-        if (action.getType() == "BITE_ENTITY") {
-
-            for (int jt = 0; jt < accessibleEntities.size(); jt++) {
-                if (accessibleEntities.at(jt)->getId() == action.getSubjectId()) {
-                    biteCount++;
-                    handleBiting(life, accessibleEntities.at(jt));
-                    jt = accessibleEntities.size();
+                for (int jt = 0; jt < accessibleEntities.size(); jt++) {
+                    if (accessibleEntities.at(jt)->getId() == action.getSubjectId()) {
+                        eatCount++;
+                        handleEating(life, accessibleEntities.at(jt));
+                        jt = accessibleEntities.size();
+                    }
                 }
+
+                continue;
             }
 
-            continue;
-        }
+            if (action.getType() == "BITE_ENTITY") {
 
-        if (action.getType() == "EMIT_PHEROMONE") {
+                for (int jt = 0; jt < accessibleEntities.size(); jt++) {
+                    if (accessibleEntities.at(jt)->getId() == action.getSubjectId()) {
+                        biteCount++;
+                        handleBiting(life, accessibleEntities.at(jt));
+                        jt = accessibleEntities.size();
+                    }
+                }
+
+                continue;
+            }
+
+            if (action.getType() == "EMIT_PHEROMONE") {
 //            handlePoop(performer);
-            handlePheromoneEmission(life, action);
-            pheromoneCount++;
-            continue;
-        }
-
-        if (action.getType() == "BITE_LIFE") {
-            handleBitingLife(life, action);
-            biteLifeCount++;
-            continue;
-        }
-
-
-        if (action.getType() == "EAT_LIFE") {
-            handleEatLife(life, action);
-            eatLifeCount++;
-            continue;
-
-        }
-
-        if (action.getType() == "MATE") {
-            bool success = handleMating(life, action);
-
-            if (success) {
-                naturalMatingCount++;
-                mateSuccessCount++;
-            } else {
-                mateFailureCount++;
+                handlePheromoneEmission(life, action);
+                pheromoneCount++;
+                continue;
             }
 
-            continue;
+            if (action.getType() == "BITE_LIFE") {
+                handleBitingLife(life, action);
+                biteLifeCount++;
+                continue;
+            }
+
+
+            if (action.getType() == "EAT_LIFE") {
+                handleEatLife(life, action);
+                eatLifeCount++;
+                continue;
+
+            }
+
+            if (action.getType() == "MATE") {
+                bool success = handleMating(life, action);
+
+                if (success) {
+                    naturalMatingCount++;
+                    mateSuccessCount++;
+                } else {
+                    mateFailureCount++;
+                }
+
+                continue;
+            }
+
         }
+
 
     }
+
 
 
     dataAnalyser.getPoopCount()->addValue(poopCount);
@@ -196,7 +200,7 @@ void LifesRunner::executeCreatureActions(Life * life) {
 
     dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
-    dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount)
+    dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
 
     std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;

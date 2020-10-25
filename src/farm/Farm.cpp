@@ -858,6 +858,8 @@ void Farm::statistics() {
         return;
     }
 
+
+
     analyseColors();
 
     std::vector<Life *> sortedLife = getScoreSortedCreatures();
@@ -983,7 +985,7 @@ void Farm::statistics() {
 
     dataAnalyser.getZero()->addValue(0);
 
-
+    triggerUpdate();
 }
 
 void Farm::generateEntityGrid() {
@@ -1306,4 +1308,8 @@ FarmControl *Farm::getFarmControl() const {
 
 void Farm::setFarmControl(FarmControl *farmControl) {
     Farm::farmControl = farmControl;
+}
+
+void Farm::setTriggerUpdate(const function<void()> &triggerUpdate) {
+    Farm::triggerUpdate = triggerUpdate;
 }

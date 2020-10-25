@@ -58,6 +58,7 @@ private:
     std::mutex add_mutex;
     std::mutex delete_mutex;
 
+    std::function<void()> triggerUpdate;
 
 public:
     Farm();
@@ -172,6 +173,8 @@ public:
     void handleNoStatistics();
 
     void addLifeToFarm(Life *life);
+
+    void setTriggerUpdate(const std::function<void()> &triggerUpdate);
 };
 
 
