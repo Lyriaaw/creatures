@@ -7,6 +7,7 @@
 
 
 #include <vector>
+#include <nlohmann/json.hpp>
 #include "life/Life.h"
 #include "statistics/DataAnalyser.h"
 #include "Map.h"
@@ -98,6 +99,8 @@ public:
     void executeCreatureActions();
 
     void recordMatingFailure(Life *performer);
+
+    nlohmann::basic_json<> asJson();
 };
 
 

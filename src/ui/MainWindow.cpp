@@ -154,8 +154,15 @@ void MainWindow::loadFarm() {
 
     webUiConnection = new WebUiConnection(farm);
     farm->setTriggerUpdate([&]() {
-       webUiConnection->updateClients();
+       webUiConnection->updateFarmClients();
     });
+
+    farm->getMap()->setTriggerUpdate([&]() {
+       webUiConnection->updateMapClients();
+    });
+
+
+
     webUiConnection->handleTread();
 }
 

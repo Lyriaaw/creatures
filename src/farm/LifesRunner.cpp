@@ -3,6 +3,7 @@
 //
 
 #include "LifesRunner.h"
+#include "../websockets/WebUiConnection.h"
 
 LifesRunner::LifesRunner() {}
 
@@ -619,4 +620,24 @@ void LifesRunner::setAddLifeToFarm(const std::function<void(Life *)> &addLifeToF
 
 void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
     LifesRunner::creatureNursery = creatureNursery;
+}
+
+
+
+
+
+
+
+json LifesRunner::asJson() {
+    json runner;
+    runner["tick"] = tick;
+    runner["creatures_count"] = this->lifes.size();
+
+    json times;
+    times["brain_processing"] = this->dataAnalyser.getBrainProcessingTime()->getAveragedLastValue();
+
+    runner["times"] = times;
+
+
+    return runner;
 }

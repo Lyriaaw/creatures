@@ -110,17 +110,6 @@ void WebUiConnection::handleClientMessage(int id, std::string message) {
 
 
 
-void WebUiConnection::updateClients() {
-    std::lock_guard<std::mutex> guard(clients_mutex);
-
-    for (auto const& client : clients) {
-        std::string messageToSend = sendEvent("farm_update", getFarmObject()).dump();
-
-
-        client->sendMessage(messageToSend);
-    }
-}
-
 void WebUiConnection::sendMessageToClient(int id, std::string message) {
     std::lock_guard<std::mutex> guard(clients_mutex);
 
@@ -154,22 +143,44 @@ json WebUiConnection::sendEvent(std::string type, json JSONBody) {
 
 
 void WebUiConnection::sendInitialData(int id) {
-    json initialData = {{
+    json initialData = {
         {"farm", getFarmObject()},
-        {"runners", farm->getLifesRunners().size()},
-    }};
+        {"runners", farm->getRunnersJSON()},
+        {"map", farm->getMap()->asJson()},
+    };
 
 
     sendMessageToClient(id, sendEvent("initial_data", initialData).dump());
 }
 
+
+
+void WebUiConnection::updateFarmClients() {
+    std::lock_guard<std::mutex> guard(clients_mutex);
+
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("farm_update", {{"farm", getFarmObject()}, {"runners", farm->getRunnersJSON()}}).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
+}
+void WebUiConnection::updateMapClients() {
+    std::lock_guard<std::mutex> guard(clients_mutex);
+
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("map_update", {{"map", farm->getMap()->asJson()}}).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
+}
+
 json WebUiConnection::getFarmObject() {
-    return {{
-        "farm", {
-            {"tick", farm->getTickCount()},
-            {"creatures", farm->getLifes().size()},
-            {"tick_per_second", farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue()},
-            {"uptime", farm->uptime()},
-        }
-    }};;
+    return {
+        {"tick", farm->getTickCount()},
+        {"creatures", farm->getLifes().size()},
+        {"tick_per_second", farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue()},
+        {"uptime", farm->uptime()},
+    };
 }

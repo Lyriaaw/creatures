@@ -1327,3 +1327,19 @@ double Farm::uptime() {
 const vector<LifesRunner *> &Farm::getLifesRunners() const {
     return lifesRunners;
 }
+
+
+
+
+nlohmann::json Farm::getRunnersJSON() {
+    nlohmann::json runners;
+
+    int runnersSize = lifesRunners.size();
+    nlohmann::json runnersList[runnersSize];
+
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        runners[it] = lifesRunners.at(it)->asJson();
+    }
+
+    return runners;
+}

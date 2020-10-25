@@ -11,6 +11,7 @@
 #include <zconf.h>
 #include <random>
 #import <thread>
+#include "../websockets/WebUiConnection.h"
 
 
 using namespace std;
@@ -197,6 +198,8 @@ void Map::processClimate() {
         dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
         tick++;
 
+        triggerUpdate();
+
         return;
     }
 
@@ -295,6 +298,9 @@ void Map::processClimate() {
     std::chrono::duration<double> elapsed_time = end - start;
     dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
     tick++;
+
+    triggerUpdate();
+
 }
 
 void Map::vegetalisation() {
@@ -422,4 +428,24 @@ void Map::setSpeedCorrectionRatio(double speedCorrectionRatio) {
 
 const DataAnalyser &Map::getDataAnalyser() const {
     return dataAnalyser;
+}
+
+
+
+
+
+json Map::asJson() {
+    json runner;
+    runner["tick"] = tick;
+
+    json times;
+    times["vegetalisation"] = this->dataAnalyser.getVegetalisationTime()->getAveragedLastValue();
+
+    runner["times"] = times;
+
+    return runner;
+}
+
+void Map::setTriggerUpdate(const function<void()> &triggerUpdate) {
+    Map::triggerUpdate = triggerUpdate;
 }

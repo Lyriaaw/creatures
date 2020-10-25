@@ -180,6 +180,8 @@ public:
     double uptime();
 
     const std::vector<LifesRunner *> &getLifesRunners() const;
+
+    nlohmann::json getRunnersJSON();
 };
 
 

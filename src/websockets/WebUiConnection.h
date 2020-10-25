@@ -45,7 +45,8 @@ public:
 
     json getFarmObject();
 
-    void updateClients();
+    void updateFarmClients();
+    void updateMapClients();
 
     json sendEvent(std::string type, json JSONBody);
 

@@ -13,6 +13,7 @@
 #include "statistics/DataAnalyser.h"
 #include <shared_mutex>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 
 class Map {
@@ -27,6 +28,9 @@ private:
     std::function<void(std::vector<Entity *> entities)> recordAddedEntitiesToFarm;
 
     DataAnalyser dataAnalyser;
+
+    std::function<void()> triggerUpdate;
+
 
 public:
 
@@ -59,6 +63,10 @@ public:
     void handleThread();
 
     const DataAnalyser &getDataAnalyser() const;
+
+    void setTriggerUpdate(const std::function<void()> &triggerUpdate);
+
+    nlohmann::basic_json<> asJson();
 };
 
 
