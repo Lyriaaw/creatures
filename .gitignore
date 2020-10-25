@@ -1,9 +1,0 @@
-src/.env
-cmake-build-debug
-.idea/
-
-libraries/
-
-build/
-
-SFML/
