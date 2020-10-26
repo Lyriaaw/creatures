@@ -246,7 +246,6 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         brains += lifesRunners.at(it)->getDataAnalyser().getBrainProcessing()->getLastValue();
         actions += lifesRunners.at(it)->getDataAnalyser().getExternalActions()->getLastValue();
         poopCount += lifesRunners.at(it)->getDataAnalyser().getPoopCount()->getLastValue();
-        accessibleEntitiesTime += lifesRunners.at(it)->getDataAnalyser().getAccessibleEntities()->getLastValue();
         eatCount += lifesRunners.at(it)->getDataAnalyser().getEatCount()->getLastValue();
         biteCount += lifesRunners.at(it)->getDataAnalyser().getBiteCount()->getLastValue();
         pheromoneCount += lifesRunners.at(it)->getDataAnalyser().getPheromoneCount()->getLastValue();

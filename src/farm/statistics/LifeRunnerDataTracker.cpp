@@ -22,7 +22,6 @@ LifeRunnerDataTracker::LifeRunnerDataTracker() {
     sensorProcessing = new DataItem("sensorProcessing", true);
     brainProcessing = new DataItem("brainProcessing", true);
     externalActions = new DataItem("externalActions", true);
-    accessibleEntities = new DataItem("accessibleEntities", true);
     moveCreatures = new DataItem("moveCreatures", true);
 }
 
@@ -72,10 +71,6 @@ DataItem *LifeRunnerDataTracker::getBrainProcessing() const {
 
 DataItem *LifeRunnerDataTracker::getExternalActions() const {
     return externalActions;
-}
-
-DataItem *LifeRunnerDataTracker::getAccessibleEntities() const {
-    return accessibleEntities;
 }
 
 DataItem *LifeRunnerDataTracker::getTickTime() const {

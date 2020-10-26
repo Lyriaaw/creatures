@@ -80,7 +80,7 @@ public:
 
     void setMap(Map *map);
 
-    const std::vector<Life *> &getLifes() const;
+    std::vector<Life *> getLifes();
 
     const LifeRunnerDataTracker &getDataAnalyser() const;
 

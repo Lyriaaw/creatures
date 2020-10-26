@@ -251,9 +251,12 @@ void LifesRunner::executeCreatureActions() {
 void LifesRunner::moveCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    std::vector<Life *> currentLifes = lifes;
+
+
     std::vector<Entity* > newEntities;
-    for (int it = 0; it < lifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Life *currentLife = currentLifes.at(it);
         Point tilePoint = currentLife->getEntity()->getTileCoordinates();
 
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
@@ -630,8 +633,10 @@ void LifesRunner::setMap(Map *map) {
     LifesRunner::map = map;
 }
 
-const std::vector<Life *> &LifesRunner::getLifes() const {
-    return lifes;
+std::vector<Life *> LifesRunner::getLifes(){
+    std::lock_guard<std::mutex> guard(lifes_mutex);
+    std::vector<Life *> tmpLifes = lifes;
+    return tmpLifes;
 }
 
 const LifeRunnerDataTracker &LifesRunner::getDataAnalyser() const {
@@ -689,7 +694,6 @@ json LifesRunner::asJson() {
     times["sensorProcessing"] = this->dataAnalyser.getSensorProcessing()->getAveragedLastValue();
     times["brainProcessing"] = this->dataAnalyser.getBrainProcessing()->getAveragedLastValue();
     times["externalActions"] = this->dataAnalyser.getExternalActions()->getAveragedLastValue();
-    times["accessibleEntities"] = this->dataAnalyser.getAccessibleEntities()->getAveragedLastValue();
     times["moveCreatures"] = this->dataAnalyser.getMoveCreatures()->getAveragedLastValue();
 
     runner["times"] = times;

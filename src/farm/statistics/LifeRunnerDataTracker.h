@@ -23,7 +23,6 @@ private:
     DataItem * sensorProcessing;
     DataItem * brainProcessing;
     DataItem * externalActions;
-    DataItem * accessibleEntities;
     DataItem * moveCreatures;
 
     DataItem * tickTime;
@@ -56,8 +55,6 @@ public:
     DataItem *getBrainProcessing() const;
 
     DataItem *getExternalActions() const;
-
-    DataItem *getAccessibleEntities() const;
 
     DataItem *getTickTime() const;
 
