@@ -5,7 +5,10 @@
 #include "LifesRunner.h"
 #include "../websockets/WebUiConnection.h"
 
-LifesRunner::LifesRunner() {}
+LifesRunner::LifesRunner(int id): id(id), tick(0) {
+    tickStart = std::chrono::system_clock::now();
+    tickEnd = std::chrono::system_clock::now();
+}
 
 void LifesRunner::addLife(Life * life) {
     std::lock_guard<std::mutex> guard(lifes_mutex);
@@ -16,6 +19,51 @@ void LifesRunner::addLife(Life * life) {
 
 int LifesRunner::getLifeCount() {
     return lifes.size();
+}
+
+void LifesRunner::handleThread() {
+    auto f = [&]() {
+        while (farmControl->isRunning()) {
+            if (!farmControl->isPaused()) {
+                moveCreatures();
+                brainProcessing(false);
+                removeDeadLifes();
+                tick++;
+
+                tickEnd = std::chrono::system_clock::now();
+                std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
+                tickStart = std::chrono::system_clock::now();
+                double tickTime = elapsed_time.count();
+
+                if (tick == 1) {
+                    dataAnalyser.getTickTime()->addValue(0);
+                } else {
+                    dataAnalyser.getTickTime()->addValue(tickTime);
+                }
+
+                dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
+
+
+            } else {
+                usleep(500000);
+            }
+
+            tickStart = std::chrono::system_clock::now();
+
+            if (tick % 20 == 0) {
+                triggerUpdate(id);
+            }
+
+            if (this->tick > medianTick) {
+                double secondToSleep = (this->dataAnalyser.getTickTime()->getLastValue() / 10.0) * double(double(tick) - double(medianTick));
+                usleep(secondToSleep * 1000000.0);
+            }
+
+        }
+    };
+
+    std::thread runnerThread(f);
+    runnerThread.detach();
 }
 
 void LifesRunner::brainProcessing(bool paused) {
@@ -77,10 +125,6 @@ void LifesRunner::brainProcessing(bool paused) {
         std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
         dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
 
-
-        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_time = end - start;
-        dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
         return;
     }
 
@@ -91,9 +135,6 @@ void LifesRunner::brainProcessing(bool paused) {
 
 
 
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getBrainProcessingTime()->addValue(elapsed_time.count());
 }
 
 void LifesRunner::executeCreatureActions() {
@@ -107,10 +148,11 @@ void LifesRunner::executeCreatureActions() {
     int eatLifeCount = 0;
     int mateFailureCount = 0;
     int mateSuccessCount = 0;
-    int naturalMatingCount = 0;
 
-    for (int it = 0; it < lifes.size(); it++) {
-        Life * life = lifes.at(it);
+    std::vector<Life *> currentLifes = lifes;
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Life * life = currentLifes.at(it);
 
         std::vector<Point> selectedTiles = life->getSelectedChunks();
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(selectedTiles);
@@ -176,7 +218,6 @@ void LifesRunner::executeCreatureActions() {
                 bool success = handleMating(life, action);
 
                 if (success) {
-                    naturalMatingCount++;
                     mateSuccessCount++;
                 } else {
                     mateFailureCount++;
@@ -199,7 +240,6 @@ void LifesRunner::executeCreatureActions() {
     dataAnalyser.getBiteLifeCount()->addValue(biteLifeCount);
     dataAnalyser.getEatLifeCount()->addValue(eatLifeCount);
 
-    dataAnalyser.getNaturalMatings()->addValue(naturalMatingCount);
     dataAnalyser.getMateFailureCount()->addValue(mateFailureCount);
     dataAnalyser.getMateSuccessCount()->addValue(mateSuccessCount);
 
@@ -230,7 +270,7 @@ void LifesRunner::moveCreatures() {
 
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = end - start;
-    dataAnalyser.getMoveCreaturesTime()->addValue(elapsed_time.count());
+    dataAnalyser.getMoveCreatures()->addValue(elapsed_time.count());
 }
 
 
@@ -594,7 +634,7 @@ const std::vector<Life *> &LifesRunner::getLifes() const {
     return lifes;
 }
 
-const DataAnalyser &LifesRunner::getDataAnalyser() const {
+const LifeRunnerDataTracker &LifesRunner::getDataAnalyser() const {
     return dataAnalyser;
 }
 
@@ -630,14 +670,50 @@ void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
 
 json LifesRunner::asJson() {
     json runner;
+    runner["id"] = id;
     runner["tick"] = tick;
     runner["creatures_count"] = this->lifes.size();
 
     json times;
-    times["brain_processing"] = this->dataAnalyser.getBrainProcessingTime()->getAveragedLastValue();
+    times["tickTime"] = this->dataAnalyser.getTickTime()->getAveragedLastValue();
+    times["tickPerSecond"] = this->dataAnalyser.getTickPerSecond()->getAveragedLastValue();
+    times["poopCount"] = this->dataAnalyser.getPoopCount()->getAveragedLastValue();
+    times["pheromoneCount"] = this->dataAnalyser.getPheromoneCount()->getAveragedLastValue();
+    times["eatCount"] = this->dataAnalyser.getEatCount()->getAveragedLastValue();
+    times["eatLifeCount"] = this->dataAnalyser.getEatLifeCount()->getAveragedLastValue();
+    times["mateSuccessCount"] = this->dataAnalyser.getMateSuccessCount()->getAveragedLastValue();
+    times["mateFailureCount"] = this->dataAnalyser.getMateFailureCount()->getAveragedLastValue();
+    times["biteCount"] = this->dataAnalyser.getBiteCount()->getAveragedLastValue();
+    times["biteLifeCount"] = this->dataAnalyser.getBiteLifeCount()->getAveragedLastValue();
+    times["chunkSelection"] = this->dataAnalyser.getChunkSelection()->getAveragedLastValue();
+    times["sensorProcessing"] = this->dataAnalyser.getSensorProcessing()->getAveragedLastValue();
+    times["brainProcessing"] = this->dataAnalyser.getBrainProcessing()->getAveragedLastValue();
+    times["externalActions"] = this->dataAnalyser.getExternalActions()->getAveragedLastValue();
+    times["accessibleEntities"] = this->dataAnalyser.getAccessibleEntities()->getAveragedLastValue();
+    times["moveCreatures"] = this->dataAnalyser.getMoveCreatures()->getAveragedLastValue();
 
     runner["times"] = times;
 
 
     return runner;
+}
+
+void LifesRunner::setFarmControl(FarmControl *farmControl) {
+    LifesRunner::farmControl = farmControl;
+}
+
+int LifesRunner::getId() const {
+    return id;
+}
+
+void LifesRunner::setId(int id) {
+    LifesRunner::id = id;
+}
+
+void LifesRunner::setTriggerUpdate(const std::function<void(int)> &triggerUpdate) {
+    LifesRunner::triggerUpdate = triggerUpdate;
+}
+
+void LifesRunner::setMedianTick(int medianTick) {
+    LifesRunner::medianTick = medianTick;
 }

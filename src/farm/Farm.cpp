@@ -22,7 +22,7 @@ Farm::Farm(){
 
 void Farm::initLifesRunners() {
     for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
-        LifesRunner * lifesRunner = new LifesRunner();
+        LifesRunner * lifesRunner = new LifesRunner(it + 1);
         lifesRunner->setGenerateEntities([&](Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
             this->generateEntities(position, color, brightness, maxSize, totalEnergy, spreadingRatio);
         });
@@ -49,6 +49,9 @@ void Farm::initLifesRunners() {
 
         lifesRunner->setMap(map);
         lifesRunner->setCreatureNursery(nursery);
+        lifesRunner->setFarmControl(farmControl);
+
+        lifesRunner->handleThread();
 
         lifesRunners.emplace_back(lifesRunner);
     }
@@ -134,28 +137,13 @@ void Farm::addLifeToFarm(Life * life) {
 void Farm::Tick(bool paused) {
 
 
-    if (!paused) {
-        for (auto const& runner : lifesRunners) {
-            runner->setTick(tickCount);
-        }
-
-
-        moveCreatures();
-    }
-
-
-
     generateEntityGrid();
 
-    multithreadBrainProcessing(&paused);
 
 
     if (!paused) {
-        executeCreaturesActions();
         populationControl();
     }
-
-
 
 
     sortCreatures();
@@ -166,9 +154,37 @@ void Farm::Tick(bool paused) {
     }
 
 
+    int runnersCount = lifesRunners.size();
+    std::vector<int> tmpRunnerTick;
+    std::vector<int> sortedRunnerTick;
+
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        tmpRunnerTick.emplace_back(lifesRunners.at(it)->getTick());
+    }
+
+    do {
+        int smallestIndex = 0;
+        int smallestTick = tmpRunnerTick.at(0);
+
+        for (int it = 0; it < tmpRunnerTick.size(); it++) {
+            if (tmpRunnerTick.at(it) < smallestTick) {
+                smallestTick = tmpRunnerTick.at(it);
+                smallestIndex = it;
+            }
+        }
+
+        sortedRunnerTick.emplace_back(smallestTick);
+        tmpRunnerTick.erase(tmpRunnerTick.begin() + smallestIndex);
+    } while (sortedRunnerTick.size() < runnersCount);
+
+    medianTick = sortedRunnerTick.at(sortedRunnerTick.size() / 2);
+    for (int it = 0; it < lifesRunners.size(); it++) {
+        lifesRunners.at(it)->setMedianTick(medianTick);
+    }
+
 
     if (map->getTick() != 0) {
-        double mapTickDifference = map->getTick() - tickCount;
+        double mapTickDifference = map->getTick() - medianTick;
         map->setSpeedCorrectionRatio(mapTickDifference);
     }
 
@@ -238,7 +254,7 @@ void Farm::multithreadBrainProcessing(bool *paused) {
         eatLifeCount += lifesRunners.at(it)->getDataAnalyser().getEatLifeCount()->getLastValue();
         mateFailureCount += lifesRunners.at(it)->getDataAnalyser().getMateFailureCount()->getLastValue();
         mateSuccessCount += lifesRunners.at(it)->getDataAnalyser().getMateSuccessCount()->getLastValue();
-        naturalMatingCount += lifesRunners.at(it)->getDataAnalyser().getNaturalMatings()->getLastValue();
+//        naturalMatingCount += lifesRunners.at(it)->getDataAnalyser().getNaturalMatings()->getLastValue();
     }
 
 
@@ -1342,4 +1358,8 @@ nlohmann::json Farm::getRunnersJSON() {
     }
 
     return runners;
+}
+
+int Farm::getMedianTick() const {
+    return medianTick;
 }

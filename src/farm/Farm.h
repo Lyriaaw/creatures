@@ -61,6 +61,8 @@ private:
 
     std::function<void()> triggerUpdate;
 
+    int medianTick;
+
 public:
     Farm();
     void InitFromRandom();
@@ -182,6 +184,8 @@ public:
     const std::vector<LifesRunner *> &getLifesRunners() const;
 
     nlohmann::json getRunnersJSON();
+
+    int getMedianTick() const;
 };
 
 

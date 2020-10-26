@@ -9,17 +9,19 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "life/Life.h"
-#include "statistics/DataAnalyser.h"
 #include "Map.h"
 #include "CreatureNursery.h"
+#include "statistics/LifeRunnerDataTracker.h"
 
 class LifesRunner {
 private:
+    int id;
+
     std::vector<Life *> lifes;
 
     std::mutex lifes_mutex;
 
-    DataAnalyser dataAnalyser;
+    LifeRunnerDataTracker dataAnalyser;
 
     std::function<void(Point, float, float, double, double, double)> generateEntities;
     std::function<std::vector<Entity *>(std::vector<Point> selectedChunks)> getAccessibleEntities;
@@ -30,6 +32,7 @@ private:
 
     CreatureNursery * creatureNursery;
 
+    FarmControl * farmControl;
 
     std::vector<ActionDTO> actions;
 
@@ -37,8 +40,15 @@ private:
 
     int tick;
 
+    std::chrono::system_clock::time_point tickStart;
+    std::chrono::system_clock::time_point tickEnd;
+
+    std::function<void(int id)> triggerUpdate;
+
+    int medianTick;
+
 public:
-    LifesRunner();
+    LifesRunner(int id);
 
     void addLife(Life *life);
 
@@ -72,7 +82,7 @@ public:
 
     const std::vector<Life *> &getLifes() const;
 
-    const DataAnalyser &getDataAnalyser() const;
+    const LifeRunnerDataTracker &getDataAnalyser() const;
 
     void handlePoop(Life *subject);
 
@@ -101,6 +111,18 @@ public:
     void recordMatingFailure(Life *performer);
 
     nlohmann::basic_json<> asJson();
+
+    void handleThread();
+
+    void setFarmControl(FarmControl *farmControl);
+
+    int getId() const;
+
+    void setId(int id);
+
+    void setTriggerUpdate(const std::function<void(int)> &triggerUpdate);
+
+    void setMedianTick(int medianTick);
 };
 
 

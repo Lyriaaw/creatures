@@ -161,6 +161,12 @@ void MainWindow::loadFarm() {
        webUiConnection->updateMapClients();
     });
 
+    for(auto const& runner : farm->getLifesRunners()) {
+        runner->setTriggerUpdate([&](int id) {
+            webUiConnection->updateRunnerClients(id);
+        });
+    }
+
 
 
     webUiConnection->handleTread();

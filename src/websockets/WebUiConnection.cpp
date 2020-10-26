@@ -176,9 +176,33 @@ void WebUiConnection::updateMapClients() {
     }
 }
 
+void WebUiConnection::updateRunnerClients(int id) {
+    LifesRunner * foundRunner = nullptr;
+
+    for (auto const& runner: farm->getLifesRunners()) {
+        if (runner->getId() == id) {
+            foundRunner = runner;
+            break;
+        }
+    }
+
+    if (foundRunner == nullptr) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(clients_mutex);
+
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("runner_update", {{"runner", foundRunner->asJson()}}).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
+}
+
 json WebUiConnection::getFarmObject() {
     return {
-        {"tick", farm->getTickCount()},
+        {"tick", farm->getMedianTick()},
         {"creatures", farm->getLifes().size()},
         {"tick_per_second", farm->getDataAnalyser().getTickPerSecond()->getAveragedLastValue()},
         {"uptime", farm->uptime()},

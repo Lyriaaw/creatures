@@ -57,6 +57,7 @@ public:
     void sendInitialData(int id);
     void sendMessageToClient(int id, std::string message);
 
+    void updateRunnerClients(int id);
 };
 
 
