@@ -158,11 +158,17 @@ std::vector<Entity *> Tile::getEntities() {
     return givenEntities;
 }
 
+std::vector<Entity *> Tile::lockOwnerGetEntities() {
+    return entities;
+}
+
+
+
 void Tile::handleEntityDecay() {
     std::lock_guard<std::mutex> guard(entities_mutex);
     for (auto const& entity: entities) {
         if (!entity->tryLockInteraction()) {
-            std::cout << "Unable to perform decay on entity " << entity->getId() << std::endl;
+//            std::cout << "Unable to perform decay on entity " << entity->getId() << std::endl;
             continue;
         }
 
@@ -200,8 +206,18 @@ void Tile::lockHeatAndGround() {
     while (!heat_mutex.try_lock()) {
         usleep(10000);
     }
-
 }
+
+void Tile::lockEntities() {
+    while (!entities_mutex.try_lock()) {
+        usleep(10000);
+    }
+}
+
+void Tile::unlockEntities() {
+    entities_mutex.unlock();
+}
+
 
 void Tile::unlockHeatAndGround() {
     ground_mutex.unlock();

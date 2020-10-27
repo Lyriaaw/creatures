@@ -100,18 +100,34 @@ void WebUiConnection::handleClientMessage(int id, std::string message) {
 
     json j = json::parse(message);
 
-    if (j["foo"] == "bar") {
-        std::cout << "Received messsage from client id " << id << " => " << j["foo"] << std::endl;
+    if (j["type"] == "request") {
+        handleClientRequest(id, j);
     } else {
         std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
     }
 
 }
 
+void WebUiConnection::handleClientRequest(int id, json request) {
+    if(request["component"] == "biomass_report") {
+        std::cout << "Computing energy report for client " << id << std::endl;
+        farm->fillEnergyDataAnalyser();
+        std::cout << "Analysed for client " << id << std::endl;
+        json report = farm->getBiomassDataTracker().getLastTickAsJson();
+
+        std::cout << "Report: " << report.dump() << std::endl;
+        sendMessageToClient(id, sendEvent("biomass_report", report).dump(), true);
+
+        std::cout << "Sent to client " << id << std::endl;
+    }
+}
 
 
-void WebUiConnection::sendMessageToClient(int id, std::string message) {
-    std::lock_guard<std::mutex> guard(clients_mutex);
+
+void WebUiConnection::sendMessageToClient(int id, std::string message, bool lockOwner) {
+    if (!lockOwner) {
+        std::lock_guard<std::mutex> guard(clients_mutex);
+    }
 
     WebUiClient * client = nullptr;
 
@@ -150,7 +166,7 @@ void WebUiConnection::sendInitialData(int id) {
     };
 
 
-    sendMessageToClient(id, sendEvent("initial_data", initialData).dump());
+    sendMessageToClient(id, sendEvent("initial_data", initialData).dump(), false);
 }
 
 

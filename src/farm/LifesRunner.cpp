@@ -50,7 +50,7 @@ void LifesRunner::handleThread() {
 
             tickStart = std::chrono::system_clock::now();
 
-            if (tick % 20 == 0) {
+            if (tick % 20 == 0 && !farmControl->isPaused()) {
                 triggerUpdate(id);
             }
 

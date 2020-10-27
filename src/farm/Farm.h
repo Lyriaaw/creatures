@@ -16,6 +16,7 @@
 #include "statistics/DataAnalyser.h"
 #include "life/Life.h"
 #include "LifesRunner.h"
+#include "statistics/BiomassDataTracker.h"
 #include <thread>
 
 class Farm {
@@ -62,6 +63,8 @@ private:
     std::function<void()> triggerUpdate;
 
     int medianTick;
+
+    BiomassDataTracker biomassDataTracker;
 
 public:
     Farm();
@@ -186,6 +189,10 @@ public:
     nlohmann::json getRunnersJSON();
 
     int getMedianTick() const;
+
+    void fillEnergyDataAnalyser();
+
+    BiomassDataTracker getBiomassDataTracker();
 };
 
 

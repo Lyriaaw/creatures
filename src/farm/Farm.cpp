@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <zconf.h>
 
 
 using namespace std;
@@ -1344,7 +1345,98 @@ const vector<LifesRunner *> &Farm::getLifesRunners() const {
 }
 
 
+void Farm::fillEnergyDataAnalyser() {
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+            currentTile->lockHeatAndGround();
+            currentTile->lockEntities();
+        }
+    }
 
+    std::cout << "Locked entities and grid" << std::endl;
+
+    std::vector<Life *> currentLifes = getLifes();
+    for (int it = 0; it < currentLifes.size(); it++) {
+        while (!currentLifes.at(it)->getEntity()->tryLockInteraction()) {
+            usleep(5000);
+        }
+    }
+
+    std::cout << "Locked lifes" << std::endl;
+
+    double heatEnergy(0.0), groundEnergy(0.0), addedHeatEnergy(0.0);
+    double entitiesMass(0.0);
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+            heatEnergy += currentTile->getHeat();
+            groundEnergy += currentTile->getGround();
+            addedHeatEnergy += currentTile->getTmpHeat();
+
+            for (auto const& entity : currentTile->lockOwnerGetEntities()) {
+                entitiesMass += entity->getMass();
+            }
+        }
+    }
+
+    std::cout << "Heat and ground" << std::endl;
+
+
+    double creaturesAvailableEnergy(0.0), creaturesMass(0.0), creaturesWasteEnergy(0.0);
+    for (auto const& life: getLifes()) {
+        creaturesAvailableEnergy += life->getEnergyCenter()->getAvailableEnergy();
+        creaturesMass += life->getEntity()->getMass();
+        creaturesWasteEnergy += life->getEnergyCenter()->getWastedEnergy();
+    }
+
+    std::cout << "Mass and energy" << std::endl;
+
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+            currentTile->unlockHeatAndGround();
+            currentTile->unlockEntities();
+        }
+    }
+
+    std::cout << "Unlocked entities and grid" << std::endl;
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        currentLifes.at(it)->getEntity()->unlockInteraction();
+    }
+
+    std::cout << "Unlocked lifes" << std::endl;
+
+    int totalEnergy = heatEnergy
+            + groundEnergy
+            + addedHeatEnergy
+            + creaturesAvailableEnergy
+            + creaturesMass
+            + creaturesWasteEnergy
+            + entitiesMass;
+
+    biomassDataTracker.getTotalEnergy()->addValue(totalEnergy);
+
+    biomassDataTracker.getHeatEnergy()->addValue(heatEnergy);
+    biomassDataTracker.getGroundEnergy()->addValue(groundEnergy);
+    biomassDataTracker.getAddedHeatEnergy()->addValue(addedHeatEnergy);
+
+    biomassDataTracker.getEntitiesMass()->addValue(entitiesMass);
+
+    biomassDataTracker.getCreaturesAvailableEnergy()->addValue(creaturesAvailableEnergy);
+    biomassDataTracker.getCreaturesMass()->addValue(creaturesMass);
+    biomassDataTracker.getCreaturesWastedEnergy()->addValue(creaturesWasteEnergy);
+
+    std::cout << "Finished" << std::endl;
+
+}
+
+BiomassDataTracker Farm::getBiomassDataTracker() {
+    return biomassDataTracker;
+}
 
 nlohmann::json Farm::getRunnersJSON() {
     nlohmann::json runners;

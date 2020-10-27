@@ -55,9 +55,12 @@ public:
     void handleClientMessage(int id, std::string message);
 
     void sendInitialData(int id);
-    void sendMessageToClient(int id, std::string message);
+    void sendMessageToClient(int id, std::string message, bool lockOwner);
 
     void updateRunnerClients(int id);
+
+    void handleClientRequest(int id, json request);
+
 };
 
 

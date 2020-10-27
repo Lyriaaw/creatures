@@ -107,6 +107,12 @@ public:
     void setTmoHeat(float heat);
 
     float getAndClearTmpHeat();
+
+    void unlockEntities();
+
+    void lockEntities();
+
+    std::vector<Entity *> lockOwnerGetEntities();
 };
 
 
