@@ -61,6 +61,7 @@ public:
 
     void handleClientRequest(int id, json request);
 
+    void handleNewMapGenerator(int id, json newGeneratorJSON);
 };
 
 

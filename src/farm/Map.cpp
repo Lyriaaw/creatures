@@ -20,32 +20,37 @@ std::mutex mapMutex;
 
 Map::Map(): tick(0), speedCorrectionRatio(1.0) {}
 
-void Map::generateRandomTerrain() {
+Map::Map(FarmControl * farmControl): farmControl(farmControl) {
+    mapGeneratorControl = new MapGeneratorControl();
     float seed = rand() % 1000000;
-    PerlinNoise perlin(seed);
-    PerlinNoise colorPerlin(seed * 3.14);
+    mapGeneratorControl->setSeed(seed);
+}
 
-    cout << "Map generated with seed " << seed << endl;
+void Map::generateRandomTerrain(bool renew) {
+    PerlinNoise perlin(mapGeneratorControl->getSeed());
+
+    cout << "Map generated with seed " << mapGeneratorControl->getSeed() << endl;
     cout << "Map Width: " << TILE_COUNT_WIDTH << " Map Height: " << TILE_COUNT_HEIGHT << endl;
 
     float min = 11111110.f;
     float max = 0.f;
 
-    float minColor = 11111110.f;
-    float maxColor = 0.f;
-
-
-
-
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         std::vector<Tile *> line;
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
 
-            float xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * 2.5;
-            float yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * 2.5;
+            float xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * mapGeneratorControl->getPositionRatio();
+            float yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * mapGeneratorControl->getPositionRatio();
 
-            float height = perlin.noise(xComponent, yComponent, 0.8);
-            float color = colorPerlin.noise(xComponent, yComponent, 0.8);
+            float height = perlin.noise(xComponent, yComponent, mapGeneratorControl->getZOrdinate());
+
+            for (int kt = 1; kt < mapGeneratorControl->getLayers(); kt++) {
+                xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * (mapGeneratorControl->getPositionRatio() * kt);
+                yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * (mapGeneratorControl->getPositionRatio() * kt);
+
+
+                height += perlin.noise(xComponent, yComponent, mapGeneratorControl->getZOrdinate() / (2.0 * kt));
+            }
 
 
             if (height < min) {
@@ -55,38 +60,31 @@ void Map::generateRandomTerrain() {
                 max = height;
             }
 
-            if (color < minColor) {
-                minColor = color;
-            }
-            if (color > maxColor) {
-                maxColor = color;
-            }
-
 
 
             Point coordinates = Point(it, jt);
 
-            Tile * currentTile = new Tile(coordinates, height, color, 0.0, 1500.0);
-
-            line.emplace_back(currentTile);
+            if (renew) {
+                tiles.at(it).at(jt)->setHeight(height);
+            } else {
+                Tile * currentTile = new Tile(coordinates, height, 0.0, 1500.0);
+                line.emplace_back(currentTile);
+            }
         }
-        tiles.emplace_back(line);
+        if (!renew) {
+            tiles.emplace_back(line);
+        }
     }
 
+//    std::cout << "Min: " << min << " Max: " << max << std::endl;
 
     float removed = ((max - min) / 2.f) + min;
-    float ratio = (1.f / (max - min)) * 2.f;
-
-    float removedColor = ((maxColor - minColor) / 2.f) + minColor;
-    float ratioColor = (1.f / (maxColor - minColor)) * 2.f;
+    float ratio = (1.f / (max - min));
 
 
 
     min = 11111110.f;
     max = 0.f;
-
-    minColor = 11111110.f;
-    maxColor = 0.f;
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
@@ -95,7 +93,7 @@ void Map::generateRandomTerrain() {
 
             currentHeight -= removed;
             currentHeight *= ratio;
-            currentHeight *= currentHeight * currentHeight;
+            currentHeight += 0.5;
 
 
             if (currentHeight < min) {
@@ -107,39 +105,16 @@ void Map::generateRandomTerrain() {
 
             getTileAt(it, jt)->setHeight(currentHeight);
 
-
-            float currentColor = getTileAt(it, jt)->getColor();
-
-            currentColor -= removedColor;
-            currentColor *= ratioColor;
-
-
-            if (currentColor < minColor) {
-                minColor = currentColor;
-            }
-            if (currentColor > maxColor) {
-                maxColor = currentColor;
-            }
-
-            getTileAt(it, jt)->setColor(abs(currentColor));
-
-
-
         }
     }
+
+    std::cout << "Min: " << min << " Max: " << max << std::endl;
+
 }
 
 void Map::initRandomMap() {
 
-    generateRandomTerrain();
-}
-
-void Map::prepareTiles() {
-//    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-//        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-//
-//        }
-//    }
+    generateRandomTerrain(false);
 }
 
 void Map::handleThread() {
@@ -402,9 +377,6 @@ Tile * Map::getTileAt(int tileX, int tileY) {
 }
 
 
-Map::Map(FarmControl * farmControl): farmControl(farmControl) {
-    prepareTiles();
-}
 
 void Map::setTiles(const vector<std::vector<Tile *>> &tiles) {
     Map::tiles = tiles;
@@ -448,4 +420,8 @@ json Map::asJson() {
 
 void Map::setTriggerUpdate(const function<void()> &triggerUpdate) {
     Map::triggerUpdate = triggerUpdate;
+}
+
+MapGeneratorControl *Map::getMapGeneratorControl() const {
+    return mapGeneratorControl;
 }

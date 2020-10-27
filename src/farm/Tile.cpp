@@ -101,15 +101,7 @@ void Tile::addHeight(float value) {
     height += value;
 }
 
-Tile::Tile(Point coordinates, float height, float color, float heat, float ground) : coordinates(coordinates), height(height), color(color), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0), tmp_heat(0) {}
-
-float Tile::getColor() const {
-    return color;
-}
-
-void Tile::setColor(float color) {
-    Tile::color = color;
-}
+Tile::Tile(Point coordinates, float height, float heat, float ground) : coordinates(coordinates), height(height), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0), tmp_heat(0) {}
 
 float Tile::getPheromoneColor() const {
     return pheromoneColor;

@@ -13,7 +13,6 @@ class Tile {
 private:
     Point coordinates;
 
-    float color;
     float height;
 
 
@@ -39,7 +38,7 @@ private:
 
 public:
 
-    Tile(Point coordinates, float height, float color, float heat, float ground);
+    Tile(Point coordinates, float height, float heat, float ground);
 
     float getHeight() const;
 
@@ -58,10 +57,6 @@ public:
     void addGround(float value);
 
     void removeGround(float groundToRemove);
-
-    float getColor() const;
-
-    void setColor(float color);
 
     float getPheromoneColor() const;
 

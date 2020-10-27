@@ -11,6 +11,7 @@
 #include "Tile.h"
 #include "FarmControl.h"
 #include "statistics/DataAnalyser.h"
+#include "MapGeneratorControl.h"
 #include <shared_mutex>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -31,6 +32,7 @@ private:
 
     std::function<void()> triggerUpdate;
 
+    MapGeneratorControl * mapGeneratorControl;
 
 public:
 
@@ -41,10 +43,9 @@ public:
     Map();
 
     void initRandomMap();
-    void generateRandomTerrain();
+    void generateRandomTerrain(bool renew);
     void processClimate();
     void vegetalisation();
-    void prepareTiles();
 
     void removeEnergyFromGround(double amount);
 
@@ -65,6 +66,8 @@ public:
     const DataAnalyser &getDataAnalyser() const;
 
     void setTriggerUpdate(const std::function<void()> &triggerUpdate);
+
+    MapGeneratorControl *getMapGeneratorControl() const;
 
     nlohmann::basic_json<> asJson();
 };

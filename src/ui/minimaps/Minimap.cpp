@@ -102,13 +102,13 @@ std::string WorldMinimap::getName() {
 
 void WorldMinimap::setPixelColor(int tileX, int tileY, Farm *farm) {
     float height = farm->getMap()->getTileAt(tileX, tileY)->getHeight();
-    RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
-    if (height < -0.05f) {
-        rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
-    }
-    if (height > 0.7f) {
-        rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
-    }
+    RGBColor rectangleColor = RGBColor(0.f, 0.f, height);
+//    if (height < -0.05f) {
+//        rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
+//    }
+//    if (height > 0.7f) {
+//        rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
+//    }
 
     sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 
@@ -133,13 +133,13 @@ void WorldMinimap::generateValues(Farm *farm) {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             float height = farm->getMap()->getTileAt(it, jt)->getHeight();
-            RGBColor rectangleColor = RGBColor(0.f, 0.f, ((height + 1) / 2));
-            if (height < -0.05f) {
-                rectangleColor = RGBColor(0.6f, 1.f, ((height + 1) / 2));
+            RGBColor rectangleColor = RGBColor(0.f, 0.f, height);
+            if (height < farm->getMap()->getMapGeneratorControl()->getWaterLevel()) {
+                rectangleColor = RGBColor(0.6f, 1.f, height);
             }
-            if (height > 0.7f) {
-                rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
-            }
+//            if (height > 0.7f) {
+//                rectangleColor = RGBColor(0.59f, 1.f, ((height + 1) / 2));
+//            }
 
             sf::Color pixelColor = sf::Color(rectangleColor.getRed(), rectangleColor.getGreen(), rectangleColor.getBlue(), 255);
 

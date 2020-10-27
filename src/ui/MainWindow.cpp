@@ -560,12 +560,9 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             farmUi->selectedCreatureChange("BEST");
             updateSelectedCreature();
             break;
-//        case Keyboard::Key::T:
-//            if (this->mainCamera == nullptr) {
-//                break;
-//            }
-//            this->mainCamera->setMapMode(0);
-//            break;
+        case Keyboard::Key::T:
+            this->farm->getMap()->generateRandomTerrain(true);
+            break;
 //        case Keyboard::Key::H:
 //            if (this->mainCamera == nullptr) {
 //                break;

@@ -102,11 +102,54 @@ void WebUiConnection::handleClientMessage(int id, std::string message) {
 
     if (j["type"] == "request") {
         handleClientRequest(id, j);
+    } else if (j["type"] == "map_generator") {
+        handleNewMapGenerator(id, j);
     } else {
         std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
     }
 
 }
+
+void WebUiConnection::handleNewMapGenerator(int id, json newGeneratorJSON) {
+    MapGeneratorControl * currentGeneratorControl = farm->getMap()->getMapGeneratorControl();
+
+    std::cout << "Raw: " << newGeneratorJSON.dump() << " - " << newGeneratorJSON["body"]["seed"].dump() << std::endl;
+
+    if (newGeneratorJSON["body"]["seed"].dump() == "null") {
+        return;
+    }
+
+    int seedInt = -1;
+    float positionRatioFloat = -1;
+    float zFloat = -1;
+    float waterLevel = -1;
+    float layers = -1;
+    try {
+        seedInt = std::stoi(newGeneratorJSON["body"]["seed"].dump());
+        positionRatioFloat = std::stof(newGeneratorJSON["body"]["positionRatio"].dump());
+        zFloat = std::stof(newGeneratorJSON["body"]["zOrdinate"].dump());
+        waterLevel = std::stof(newGeneratorJSON["body"]["waterLevel"].dump());
+        layers = std::stof(newGeneratorJSON["body"]["layers"].dump());
+    } catch (std::exception exception) {
+        return;
+    }
+
+
+
+    currentGeneratorControl->setSeed(seedInt);
+    currentGeneratorControl->setPositionRatio(positionRatioFloat);
+    currentGeneratorControl->setZOrdinate(zFloat);
+    currentGeneratorControl->setWaterLevel(waterLevel);
+    currentGeneratorControl->setLayers(layers);
+    farm->getMap()->generateRandomTerrain(true);
+
+
+    json mapGeneratorControlBody = {
+        {"mapGenerator", farm->getMap()->getMapGeneratorControl()->asJson()}
+    };
+
+    sendMessageToClient(id, sendEvent("map_generator_control_updated", mapGeneratorControlBody).dump(), true);
+};
 
 void WebUiConnection::handleClientRequest(int id, json request) {
     if(request["component"] == "biomass_report") {
@@ -163,6 +206,7 @@ void WebUiConnection::sendInitialData(int id) {
         {"farm", getFarmObject()},
         {"runners", farm->getRunnersJSON()},
         {"map", farm->getMap()->asJson()},
+        {"mapGenerator", farm->getMap()->getMapGeneratorControl()->asJson()},
     };
 
 
