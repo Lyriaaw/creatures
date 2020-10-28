@@ -45,8 +45,8 @@ void Map::generateRandomTerrain(bool renew) {
             float height = perlin.noise(xComponent, yComponent, mapGeneratorControl->getZOrdinate());
 
             for (int kt = 1; kt < mapGeneratorControl->getLayers(); kt++) {
-                xComponent = (float(it) / float(TILE_COUNT_WIDTH)) * (mapGeneratorControl->getPositionRatio() * kt);
-                yComponent = (float(jt) / float(TILE_COUNT_HEIGHT)) * (mapGeneratorControl->getPositionRatio() * kt);
+                xComponent = ((float(it) / float(TILE_COUNT_WIDTH)) + (kt * 100.0)) * (mapGeneratorControl->getPositionRatio() * kt);
+                yComponent = ((float(jt) / float(TILE_COUNT_HEIGHT)) + (kt * 100.0)) * (mapGeneratorControl->getPositionRatio() * kt);
 
 
                 height += perlin.noise(xComponent, yComponent, mapGeneratorControl->getZOrdinate() / (2.0 * kt));
@@ -154,9 +154,9 @@ void Map::removeEnergyFromGround(double energyToRemove) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * tile = getTileAt(it, jt);
             double ratio = tile->getGround() / totalGround;
-            tile->unlockGround();
-            tile->removeGround(ratio * energyToRemove);
+            tile->lockOwnerAddGround(- 1.0 * (ratio * energyToRemove));
             removedEnergy += ratio * energyToRemove;
+            tile->unlockGround();
         }
     }
 
@@ -281,8 +281,8 @@ void Map::processClimate() {
 void Map::vegetalisation() {
     random_device rd;
     mt19937 mt(rd());
-    uniform_real_distribution<double> distWidth(-10, TILE_SIZE + 10);
-    uniform_real_distribution<double> distHeight(-10, TILE_SIZE + 10);
+    uniform_real_distribution<double> distWidth(0, TILE_SIZE - 1 );
+    uniform_real_distribution<double> distHeight(0, TILE_SIZE - 1 );
 
     std::vector<Entity *> addedEntities;
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
@@ -304,7 +304,7 @@ void Map::vegetalisation() {
 //                std::cout << "Energy: " << tileAvailableEnergy << " Generate: " << foodToGenerate << std::endl;
 //            }
 
-            for (int it = 0; it < foodToGenerate; it++) {
+            for (int kt = 0; kt < foodToGenerate; kt++) {
                 int x = distWidth(mt);
                 int y = distHeight(mt);
 

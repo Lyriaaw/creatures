@@ -227,3 +227,17 @@ void Tile::lockGround() {
 void Tile::unlockGround() {
     ground_mutex.unlock();
 }
+
+void Tile::lockTmpHeatAndTmpGround() {
+    while (!tmp_ground_mutex.try_lock()) {
+        usleep(10000);
+    }
+    while (!tmp_heat_mutex.try_lock()) {
+        usleep(10000);
+    }
+}
+
+void Tile::unlockTmpHeatAndTmpGround() {
+    tmp_ground_mutex.unlock();
+    tmp_heat_mutex.unlock();
+}

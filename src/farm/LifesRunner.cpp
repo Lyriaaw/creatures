@@ -154,6 +154,10 @@ void LifesRunner::executeCreatureActions() {
     for (int it = 0; it < currentLifes.size(); it++) {
         Life * life = currentLifes.at(it);
 
+        if (life == nullptr) {
+            continue;
+        }
+
         std::vector<Point> selectedTiles = life->getSelectedChunks();
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(selectedTiles);
 
@@ -262,9 +266,13 @@ void LifesRunner::moveCreatures() {
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
 //        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
 
-        double releasedHeat = currentLife->giveawayEnergy();
+        double releasedHeat = 0.0;
+        if (tick % 10 == 0) {
+            releasedHeat = currentLife->giveawayEnergy();
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpHeat(releasedHeat);
+        }
 
-        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpHeat(releasedHeat);
+
 
         checkAndHandleLifeDying(currentLife);
     }

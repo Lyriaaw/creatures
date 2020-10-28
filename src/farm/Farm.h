@@ -61,6 +61,7 @@ private:
     std::mutex delete_mutex;
 
     std::function<void()> triggerUpdate;
+    std::function<void()> triggerBiomassReportUpdate;
 
     int medianTick;
 
@@ -181,6 +182,8 @@ public:
     void addLifeToFarm(Life *life);
 
     void setTriggerUpdate(const std::function<void()> &triggerUpdate);
+
+    void setTriggerBiomassReportUpdate(const std::function<void()> &triggerBiomassReportUpdate);
 
     double uptime();
 

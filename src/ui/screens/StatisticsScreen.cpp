@@ -89,18 +89,15 @@ void StatisticsScreen::loadGraphs() {
     Graph * energyGraph = new Graph("Energies", 0.f, 0.1f, 1.f, 0.8f);
     energyGraph->setGraphControlCenter(graphControlCenter);
 
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getTotalEnergy(), 1, 0, 0, 255);
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getAvailableEnergy(), 1, 100, 100, 255);
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getFoodEnergy(), 1, 0, 255, 0);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getTotalEnergy(), 1, 0, 0, 255);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getCreaturesAvailableEnergy(), 1, 255, 255, 0);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getCreaturesMass(), 1, 102, 0, 51);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getCreaturesWastedEnergy(), 1, 102, 51, 0);
 
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getCreaturesEnergy(), 1, 255, 255, 0);
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getCreaturesMass(), 1, 102, 0, 51);
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getCreaturesWastedEnergy(), 1, 102, 51, 0);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getEntitiesMass(), 1, 0, 255, 0);
 
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getHeatEnergy(), 1, 255, 0, 0);
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getGroundEnergy(), 1, 20, 100, 0);
-
-    energyGraph->addLine(farmUi->getFarm()->getDataAnalyser().getZero(), 2, 0, 0, 0);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getHeatEnergy(), 1, 255, 0, 0);
+    energyGraph->addLine(farmUi->getFarm()->getBiomassDataTracker().getGroundEnergy(), 1, 20, 100, 0);
 
     energyGraph->windowResized(windowWidth, windowHeight);
 

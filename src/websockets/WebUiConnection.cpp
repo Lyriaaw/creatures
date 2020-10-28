@@ -153,15 +153,9 @@ void WebUiConnection::handleNewMapGenerator(int id, json newGeneratorJSON) {
 
 void WebUiConnection::handleClientRequest(int id, json request) {
     if(request["component"] == "biomass_report") {
-        std::cout << "Computing energy report for client " << id << std::endl;
         farm->fillEnergyDataAnalyser();
-        std::cout << "Analysed for client " << id << std::endl;
         json report = farm->getBiomassDataTracker().getLastTickAsJson();
-
-        std::cout << "Report: " << report.dump() << std::endl;
         sendMessageToClient(id, sendEvent("biomass_report", report).dump(), true);
-
-        std::cout << "Sent to client " << id << std::endl;
     }
 }
 
@@ -259,6 +253,21 @@ void WebUiConnection::updateRunnerClients(int id) {
         client->sendMessage(messageToSend);
     }
 }
+
+void WebUiConnection::updateBiomassReportClients() {
+    std::lock_guard<std::mutex> guard(clients_mutex);
+
+    for (auto const& client : clients) {
+        json report = farm->getBiomassDataTracker().getLastTickAsJson();
+
+        std::string messageToSend = sendEvent("biomass_report", report).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
+}
+
+
 
 json WebUiConnection::getFarmObject() {
     return {

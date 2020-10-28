@@ -108,6 +108,10 @@ public:
     void lockEntities();
 
     std::vector<Entity *> lockOwnerGetEntities();
+
+    void lockTmpHeatAndTmpGround();
+
+    void unlockTmpHeatAndTmpGround();
 };
 
 

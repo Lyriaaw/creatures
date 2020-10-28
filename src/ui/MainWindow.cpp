@@ -157,6 +157,12 @@ void MainWindow::loadFarm() {
        webUiConnection->updateFarmClients();
     });
 
+    farm->setTriggerBiomassReportUpdate([&]() {
+       webUiConnection->updateBiomassReportClients();
+    });
+
+
+
     farm->getMap()->setTriggerUpdate([&]() {
        webUiConnection->updateMapClients();
     });

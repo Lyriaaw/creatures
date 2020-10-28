@@ -12,7 +12,7 @@
 
 using namespace std;
 
-Farm::Farm(){
+Farm::Farm(): medianTick(0){
     farmControl = new FarmControl();
     nursery = new CreatureNursery();
 
@@ -189,6 +189,11 @@ void Farm::Tick(bool paused) {
         map->setSpeedCorrectionRatio(mapTickDifference);
     }
 
+    if (tickCount % 100 == 0) {
+        fillEnergyDataAnalyser();
+        triggerBiomassReportUpdate();
+    }
+
 
     tickEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
@@ -207,6 +212,8 @@ void Farm::Tick(bool paused) {
 
         dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
     }
+
+    usleep(10000);
 }
 
 void Farm::multithreadBrainProcessing(bool *paused) {
@@ -1346,16 +1353,6 @@ const vector<LifesRunner *> &Farm::getLifesRunners() const {
 
 
 void Farm::fillEnergyDataAnalyser() {
-    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
-        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            Tile * currentTile = map->getTileAt(it, jt);
-            currentTile->lockHeatAndGround();
-            currentTile->lockEntities();
-        }
-    }
-
-    std::cout << "Locked entities and grid" << std::endl;
-
     std::vector<Life *> currentLifes = getLifes();
     for (int it = 0; it < currentLifes.size(); it++) {
         while (!currentLifes.at(it)->getEntity()->tryLockInteraction()) {
@@ -1363,7 +1360,16 @@ void Farm::fillEnergyDataAnalyser() {
         }
     }
 
-    std::cout << "Locked lifes" << std::endl;
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = map->getTileAt(it, jt);
+            currentTile->lockHeatAndGround();
+            currentTile->lockTmpHeatAndTmpGround();
+            currentTile->lockEntities();
+        }
+    }
+
 
     double heatEnergy(0.0), groundEnergy(0.0), addedHeatEnergy(0.0);
     double entitiesMass(0.0);
@@ -1381,7 +1387,6 @@ void Farm::fillEnergyDataAnalyser() {
         }
     }
 
-    std::cout << "Heat and ground" << std::endl;
 
 
     double creaturesAvailableEnergy(0.0), creaturesMass(0.0), creaturesWasteEnergy(0.0);
@@ -1391,24 +1396,22 @@ void Farm::fillEnergyDataAnalyser() {
         creaturesWasteEnergy += life->getEnergyCenter()->getWastedEnergy();
     }
 
-    std::cout << "Mass and energy" << std::endl;
 
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = map->getTileAt(it, jt);
             currentTile->unlockHeatAndGround();
+            currentTile->unlockTmpHeatAndTmpGround();
             currentTile->unlockEntities();
         }
     }
 
-    std::cout << "Unlocked entities and grid" << std::endl;
 
     for (int it = 0; it < currentLifes.size(); it++) {
         currentLifes.at(it)->getEntity()->unlockInteraction();
     }
 
-    std::cout << "Unlocked lifes" << std::endl;
 
     int totalEnergy = heatEnergy
             + groundEnergy
@@ -1429,8 +1432,6 @@ void Farm::fillEnergyDataAnalyser() {
     biomassDataTracker.getCreaturesAvailableEnergy()->addValue(creaturesAvailableEnergy);
     biomassDataTracker.getCreaturesMass()->addValue(creaturesMass);
     biomassDataTracker.getCreaturesWastedEnergy()->addValue(creaturesWasteEnergy);
-
-    std::cout << "Finished" << std::endl;
 
 }
 
@@ -1453,4 +1454,8 @@ nlohmann::json Farm::getRunnersJSON() {
 
 int Farm::getMedianTick() const {
     return medianTick;
+}
+
+void Farm::setTriggerBiomassReportUpdate(const function<void()> &triggerBiomassReportUpdate) {
+    Farm::triggerBiomassReportUpdate = triggerBiomassReportUpdate;
 }
