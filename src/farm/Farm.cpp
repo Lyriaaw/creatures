@@ -216,6 +216,10 @@ void Farm::Tick(bool paused) {
     usleep(10000);
 }
 
+void Farm::addNewRunner() {
+
+}
+
 void Farm::multithreadBrainProcessing(bool *paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 

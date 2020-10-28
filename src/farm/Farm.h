@@ -196,6 +196,8 @@ public:
     void fillEnergyDataAnalyser();
 
     BiomassDataTracker getBiomassDataTracker();
+
+    void addNewRunner();
 };
 
 

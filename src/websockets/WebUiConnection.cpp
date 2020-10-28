@@ -156,7 +156,16 @@ void WebUiConnection::handleClientRequest(int id, json request) {
         farm->fillEnergyDataAnalyser();
         json report = farm->getBiomassDataTracker().getLastTickAsJson();
         sendMessageToClient(id, sendEvent("biomass_report", report).dump(), true);
+        return;
     }
+
+    if(request["component"] == "new_runner") {
+        farm->fillEnergyDataAnalyser();
+        json report = farm->getBiomassDataTracker().getLastTickAsJson();
+        sendMessageToClient(id, sendEvent("biomass_report", report).dump(), true);
+    }
+
+
 }
 
 
