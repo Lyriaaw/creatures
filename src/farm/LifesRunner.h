@@ -18,6 +18,7 @@ private:
     int id;
 
     std::vector<Life *> lifes;
+    std::vector<int> deadLifeIds;
 
     std::mutex lifes_mutex;
 

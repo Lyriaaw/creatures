@@ -14,6 +14,7 @@
 #include "../Tile.h"
 #include "../brain/Brain.h"
 #include "EnergyCenter.h"
+#include <nlohmann/json.hpp>
 
 class Life {
 private:
@@ -75,6 +76,8 @@ public:
     const std::vector<Entity *> &getCurrentAccessibleEntities() const;
 
     const std::vector<Tile *> &getCurrentAccessibleTiles() const;
+
+    nlohmann::json asJson();
 };
 
 

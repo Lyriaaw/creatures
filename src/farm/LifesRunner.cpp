@@ -30,6 +30,11 @@ void LifesRunner::handleThread() {
                 removeDeadLifes();
                 tick++;
 
+                std::vector<Life *> currentLifes = lifes;
+                for (int it = 0; it < currentLifes.size(); it++) {
+                    currentLifes.at(it)->getEntity()->aTickHavePassed();
+                }
+
                 tickEnd = std::chrono::system_clock::now();
                 std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
                 tickStart = std::chrono::system_clock::now();
@@ -50,7 +55,7 @@ void LifesRunner::handleThread() {
 
             tickStart = std::chrono::system_clock::now();
 
-            if (tick % 20 == 0 && !farmControl->isPaused()) {
+            if (tick % 100 == 0 && !farmControl->isPaused()) {
                 triggerUpdate(id);
             }
 
@@ -293,6 +298,7 @@ std::vector<Life *> LifesRunner::removeDeadLifes() {
         if (lifes.at(it)->isAlive()) {
             newLifes.emplace_back(lifes.at(it));
         } else {
+            deadLifeIds.emplace_back(lifes.at(it)->getEntity()->getId());
             deletedLifes.emplace_back(lifes.at(it));
         }
     }
@@ -682,10 +688,7 @@ void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
 
 
 json LifesRunner::asJson() {
-    json runner;
-    runner["id"] = id;
-    runner["tick"] = tick;
-    runner["creatures_count"] = this->lifes.size();
+
 
     json times;
     times["tickTime"] = this->dataAnalyser.getTickTime()->getAveragedLastValue();
@@ -704,10 +707,33 @@ json LifesRunner::asJson() {
     times["externalActions"] = this->dataAnalyser.getExternalActions()->getAveragedLastValue();
     times["moveCreatures"] = this->dataAnalyser.getMoveCreatures()->getAveragedLastValue();
 
-    runner["times"] = times;
 
 
-    return runner;
+    std::vector<Life *> currentLifes = lifes;
+
+    nlohmann::json lifesJSON;
+
+    int runnersSize = currentLifes.size();
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        lifesJSON[it] = currentLifes.at(it)->asJson();
+    }
+
+    std::vector<int> tmpDeadLifeIds;
+    tmpDeadLifeIds.insert(tmpDeadLifeIds.end(), deadLifeIds.begin(), deadLifeIds.end());
+    deadLifeIds.clear();
+
+    nlohmann::json result = {
+        {"id", this->id},
+        {"tick", this->tick},
+        {"creatures_count", this->lifes.size()},
+        {"times", times},
+        {"lifes", lifesJSON},
+        {"deadLifes", tmpDeadLifeIds}
+    };
+
+
+    return result;
 }
 
 void LifesRunner::setFarmControl(FarmControl *farmControl) {

@@ -781,11 +781,6 @@ void Farm::vegetalisation() {
 void Farm::aTickHavePassed() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    std::vector<Life *> lifes = getLifes();
-    for (int it = 0; it < lifes.size(); it++) {
-        lifes.at(it)->getEntity()->aTickHavePassed();
-    }
-
 
     tickCount++;
 
@@ -1447,7 +1442,6 @@ nlohmann::json Farm::getRunnersJSON() {
     nlohmann::json runners;
 
     int runnersSize = lifesRunners.size();
-    nlohmann::json runnersList[runnersSize];
 
     for (int it = 0; it < lifesRunners.size(); it++) {
         runners[it] = lifesRunners.at(it)->asJson();

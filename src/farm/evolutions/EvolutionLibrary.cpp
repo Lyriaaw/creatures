@@ -20,6 +20,9 @@ std::vector<Evolution *> EvolutionLibrary::getGenomeFor(int creatureIndex) const
 
 
     std::cout << "Genome not found for index " << creatureIndex << ", this is stange" << std::endl;
+
+    std::vector<Evolution *> emptyEvolution;
+    return emptyEvolution;
 }
 
 int EvolutionLibrary::getCurrentEvolutionNumber() const {

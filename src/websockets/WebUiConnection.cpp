@@ -205,11 +205,19 @@ json WebUiConnection::sendEvent(std::string type, json JSONBody) {
 
 
 void WebUiConnection::sendInitialData(int id) {
+    nlohmann::json lifesJSON;
+    std::vector<Life *> intialLifes = farm->getLifes();
+    for (int it = 0; it < intialLifes.size(); it++) {
+        lifesJSON[it] = intialLifes.at(it)->asJson();
+    }
+
+
     json initialData = {
         {"farm", getFarmObject()},
         {"runners", farm->getRunnersJSON()},
         {"map", farm->getMap()->asJson()},
         {"mapGenerator", farm->getMap()->getMapGeneratorControl()->asJson()},
+        {"lifes", lifesJSON},
     };
 
 
@@ -222,7 +230,7 @@ void WebUiConnection::updateFarmClients() {
     std::lock_guard<std::mutex> guard(clients_mutex);
 
     for (auto const& client : clients) {
-        std::string messageToSend = sendEvent("farm_update", {{"farm", getFarmObject()}, {"runners", farm->getRunnersJSON()}}).dump();
+        std::string messageToSend = sendEvent("farm_update", {{"farm", getFarmObject()}}).dump();
 
 
         client->sendMessage(messageToSend);
