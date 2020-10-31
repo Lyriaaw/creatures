@@ -77,7 +77,9 @@ public:
 
     const std::vector<Tile *> &getCurrentAccessibleTiles() const;
 
-    nlohmann::json asJson();
+    nlohmann::json initialDataJson();
+
+    nlohmann::json updateDataJson();
 };
 
 

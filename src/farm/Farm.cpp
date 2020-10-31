@@ -129,6 +129,10 @@ void Farm::InitFromRandom() {
 void Farm::addLifeToFarm(Life * life) {
     getLessLoadedRunner()->addLife(life);
 
+    std::vector<Life *> tmp;
+    tmp.emplace_back(life);
+    triggerNewCreatures(tmp);
+
     std::lock_guard<std::mutex> guard(add_mutex);
     lifesAdded.emplace_back(life);
 
@@ -719,6 +723,7 @@ void Farm::populationControl() {
     }
 
 
+    std::vector<Life *> newLifesAfterPopulationControl;
 
     random_device rd;
     mt19937 mt(rd());
@@ -754,7 +759,10 @@ void Farm::populationControl() {
         getLessLoadedRunner()->addLife(child);
 
         lifesAdded.emplace_back(child);
+        newLifesAfterPopulationControl.emplace_back(child);
     }
+
+    triggerNewCreatures(newLifesAfterPopulationControl);
 
     map->removeEnergyFromGround(totalEnergyRemoved);
 
@@ -1456,4 +1464,8 @@ int Farm::getMedianTick() const {
 
 void Farm::setTriggerBiomassReportUpdate(const function<void()> &triggerBiomassReportUpdate) {
     Farm::triggerBiomassReportUpdate = triggerBiomassReportUpdate;
+}
+
+void Farm::setTriggerNewCreatures(const function<void(std::vector<Life *>)> &triggerNewCreatures) {
+    Farm::triggerNewCreatures = triggerNewCreatures;
 }

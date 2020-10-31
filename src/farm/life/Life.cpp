@@ -145,13 +145,21 @@ std::vector<Point> Life::getSelectedChunks() {
     return selectedChunks;
 }
 
-nlohmann::json Life::asJson() {
+nlohmann::json Life::initialDataJson() {
+    nlohmann::json life;
+
+    life["id"] = entity->getId();
+    life["hue"] = entity->getColor();
+
+    return life;
+}
+
+nlohmann::json Life::updateDataJson() {
     nlohmann::json life;
 
     life["id"] = entity->getId();
     life["age"] = entity->getAge();
     life["alive"] = isAlive();
-    life["hue"] = entity->getColor();
 
     return life;
 }

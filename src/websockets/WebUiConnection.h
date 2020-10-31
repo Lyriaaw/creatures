@@ -64,6 +64,12 @@ public:
     void handleNewMapGenerator(int id, json newGeneratorJSON);
 
     void updateBiomassReportClients();
+
+    void updateCreaturesRunnerClients(int id);
+
+    void sendInitialCreatures(int id);
+
+    void sendNewCreatures(std::vector<Life *> creatures);
 };
 
 

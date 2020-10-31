@@ -161,6 +161,10 @@ void MainWindow::loadFarm() {
        webUiConnection->updateBiomassReportClients();
     });
 
+    farm->setTriggerNewCreatures([&](std::vector<Life *> creatures) {
+       webUiConnection->sendNewCreatures(creatures);
+    });
+
 
 
     farm->getMap()->setTriggerUpdate([&]() {
@@ -171,6 +175,12 @@ void MainWindow::loadFarm() {
         runner->setTriggerUpdate([&](int id) {
             webUiConnection->updateRunnerClients(id);
         });
+
+        runner->setTriggerCreaturesUpdate([&](int id) {
+            webUiConnection->updateCreaturesRunnerClients(id);
+        });
+
+
     }
 
 

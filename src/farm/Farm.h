@@ -62,6 +62,7 @@ private:
 
     std::function<void()> triggerUpdate;
     std::function<void()> triggerBiomassReportUpdate;
+    std::function<void(std::vector<Life *> creatures)> triggerNewCreatures;
 
     int medianTick;
 
@@ -198,6 +199,8 @@ public:
     BiomassDataTracker getBiomassDataTracker();
 
     void addNewRunner();
+
+    void setTriggerNewCreatures(const std::function<void(std::vector<Life *>)> &triggerNewCreatures);
 };
 
 

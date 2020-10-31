@@ -58,6 +58,11 @@ void LifesRunner::handleThread() {
             if (tick % 100 == 0 && !farmControl->isPaused()) {
                 triggerUpdate(id);
             }
+            if (tick % 25 == 0 && !farmControl->isPaused()) {
+                triggerCreaturesUpdate(id);
+            }
+
+
 
             if (this->tick > medianTick) {
                 double secondToSleep = (this->dataAnalyser.getTickTime()->getLastValue() / 10.0) * double(double(tick) - double(medianTick));
@@ -688,8 +693,6 @@ void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
 
 
 json LifesRunner::asJson() {
-
-
     json times;
     times["tickTime"] = this->dataAnalyser.getTickTime()->getAveragedLastValue();
     times["tickPerSecond"] = this->dataAnalyser.getTickPerSecond()->getAveragedLastValue();
@@ -708,7 +711,18 @@ json LifesRunner::asJson() {
     times["moveCreatures"] = this->dataAnalyser.getMoveCreatures()->getAveragedLastValue();
 
 
+    nlohmann::json result = {
+        {"id", this->id},
+        {"tick", this->tick},
+        {"creatures_count", this->lifes.size()},
+        {"times", times},
+    };
 
+
+    return result;
+}
+
+json LifesRunner::creaturesAsJson() {
     std::vector<Life *> currentLifes = lifes;
 
     nlohmann::json lifesJSON;
@@ -716,7 +730,7 @@ json LifesRunner::asJson() {
     int runnersSize = currentLifes.size();
 
     for (int it = 0; it < currentLifes.size(); it++) {
-        lifesJSON[it] = currentLifes.at(it)->asJson();
+        lifesJSON[it] = currentLifes.at(it)->updateDataJson();
     }
 
     std::vector<int> tmpDeadLifeIds;
@@ -725,9 +739,7 @@ json LifesRunner::asJson() {
 
     nlohmann::json result = {
         {"id", this->id},
-        {"tick", this->tick},
-        {"creatures_count", this->lifes.size()},
-        {"times", times},
+        {"creatures_count", currentLifes.size()},
         {"lifes", lifesJSON},
         {"deadLifes", tmpDeadLifeIds}
     };
@@ -754,4 +766,8 @@ void LifesRunner::setTriggerUpdate(const std::function<void(int)> &triggerUpdate
 
 void LifesRunner::setMedianTick(int medianTick) {
     LifesRunner::medianTick = medianTick;
+}
+
+void LifesRunner::setTriggerCreaturesUpdate(const std::function<void(int)> &triggerCreaturesUpdate) {
+    LifesRunner::triggerCreaturesUpdate = triggerCreaturesUpdate;
 }

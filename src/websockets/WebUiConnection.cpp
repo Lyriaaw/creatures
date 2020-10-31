@@ -48,6 +48,7 @@ void WebUiConnection::threadLoop() {
                 clients.emplace_back(client);
                 client->initClient(std::move(socket));
                 sendInitialData(client->getId());
+                sendInitialCreatures(client->getId());
                 client->do_session();
             };
 
@@ -206,22 +207,52 @@ json WebUiConnection::sendEvent(std::string type, json JSONBody) {
 
 void WebUiConnection::sendInitialData(int id) {
     nlohmann::json lifesJSON;
-    std::vector<Life *> intialLifes = farm->getLifes();
-    for (int it = 0; it < intialLifes.size(); it++) {
-        lifesJSON[it] = intialLifes.at(it)->asJson();
-    }
-
 
     json initialData = {
         {"farm", getFarmObject()},
         {"runners", farm->getRunnersJSON()},
         {"map", farm->getMap()->asJson()},
         {"mapGenerator", farm->getMap()->getMapGeneratorControl()->asJson()},
-        {"lifes", lifesJSON},
     };
 
 
     sendMessageToClient(id, sendEvent("initial_data", initialData).dump(), false);
+}
+
+void WebUiConnection::sendInitialCreatures(int id) {
+    nlohmann::json lifesJSON;
+    std::vector<Life *> intialLifes = farm->getLifes();
+    for (int it = 0; it < intialLifes.size(); it++) {
+        lifesJSON[it] = intialLifes.at(it)->initialDataJson();
+    }
+
+
+    json initialData = {
+        {"lifes", lifesJSON},
+    };
+
+
+    sendMessageToClient(id, sendEvent("new_creatures", initialData).dump(), false);
+}
+
+void WebUiConnection::sendNewCreatures(std::vector<Life *> creatures) {
+    nlohmann::json lifesJSON;
+    std::vector<Life *> intialLifes = farm->getLifes();
+    for (int it = 0; it < creatures.size(); it++) {
+        lifesJSON[it] = creatures.at(it)->initialDataJson();
+    }
+
+
+    json initialData = {
+        {"lifes", lifesJSON},
+    };
+
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("new_creatures", initialData).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
 }
 
 
@@ -265,6 +296,30 @@ void WebUiConnection::updateRunnerClients(int id) {
 
     for (auto const& client : clients) {
         std::string messageToSend = sendEvent("runner_update", {{"runner", foundRunner->asJson()}}).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
+}
+
+void WebUiConnection::updateCreaturesRunnerClients(int id) {
+    LifesRunner * foundRunner = nullptr;
+
+    for (auto const& runner: farm->getLifesRunners()) {
+        if (runner->getId() == id) {
+            foundRunner = runner;
+            break;
+        }
+    }
+
+    if (foundRunner == nullptr) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(clients_mutex);
+
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("creatures_list_updates", {{"runner", foundRunner->creaturesAsJson()}}).dump();
 
 
         client->sendMessage(messageToSend);

@@ -45,6 +45,7 @@ private:
     std::chrono::system_clock::time_point tickEnd;
 
     std::function<void(int id)> triggerUpdate;
+    std::function<void(int id)> triggerCreaturesUpdate;
 
     int medianTick;
 
@@ -123,7 +124,11 @@ public:
 
     void setTriggerUpdate(const std::function<void(int)> &triggerUpdate);
 
+    void setTriggerCreaturesUpdate(const std::function<void(int)> &triggerCreaturesUpdate);
+
     void setMedianTick(int medianTick);
+
+    nlohmann::basic_json<> creaturesAsJson();
 };
 
 
