@@ -31,6 +31,10 @@ private:
     Brain * brain;
 
     EnergyCenter * energyCenter;
+
+    bool naturalMating;
+    std::vector<int> parentsIds;
+    std::vector<int> childrenIds;
 public:
     double giveawayEnergy();
 
@@ -80,6 +84,17 @@ public:
     nlohmann::json initialDataJson();
 
     nlohmann::json updateDataJson();
+
+
+    const std::vector<int> &getParentsIds() const;
+
+    const std::vector<int> &getChildrenIds() const;
+
+
+    void setNaturalMating(bool naturalMating);
+
+    void addChild(int childId);
+    void addParent(int parentId);
 };
 
 

@@ -88,6 +88,7 @@ void Farm::InitFromRandom() {
     std::uniform_real_distribution<float> distMovement(-1, 1);
     for (int it = 0; it < INITIAL_CREATURE_COUNT; it++) {
         Life * initialLife = nursery->generateCreatureFromRandom();
+        initialLife->setNaturalMating(false);
 
         float creatureEnergy = initialLife->getEnergyCenter()->getMaxMass() / 2.0;
         initialLife->getEntity()->setMass(creatureEnergy);
@@ -105,10 +106,10 @@ void Farm::InitFromRandom() {
 
 
 //        float foodSize = ((rand() % 300) / 100.f) + 2;
-        float foodSize = 2;
+        float foodSize = 1;
 
         Entity * entity = new Entity(point);
-        entity->setMass(2 * MASS_TO_SIZE_RATIO);
+        entity->setMass(foodSize * MASS_TO_SIZE_RATIO);
 
         Tile * currentTile = map->getTileAt(tilePosition.getX(), tilePosition.getY());
         entity->setColor(0.28f);
@@ -757,6 +758,14 @@ void Farm::populationControl() {
         totalEnergyRemoved += child->getEntity()->getMass() + child->getEnergyCenter()->getAvailableEnergy();
 
         getLessLoadedRunner()->addLife(child);
+
+
+        father->addChild(child->getEntity()->getId());
+        mother->addChild(child->getEntity()->getId());
+
+        child->addParent(father->getEntity()->getId());
+        child->addParent(mother->getEntity()->getId());
+        child->setNaturalMating(false);
 
         lifesAdded.emplace_back(child);
         newLifesAfterPopulationControl.emplace_back(child);

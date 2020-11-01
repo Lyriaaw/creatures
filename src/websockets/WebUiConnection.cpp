@@ -255,7 +255,15 @@ void WebUiConnection::sendNewCreatures(std::vector<Life *> creatures) {
     }
 }
 
+void WebUiConnection::sendNewSelectedCreature(int id) {
+    std::lock_guard<std::mutex> guard(clients_mutex);
 
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("selected_creature", {{"id", id}}).dump();
+
+        client->sendMessage(messageToSend);
+    }
+}
 
 void WebUiConnection::updateFarmClients() {
     std::lock_guard<std::mutex> guard(clients_mutex);

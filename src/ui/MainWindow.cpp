@@ -540,6 +540,12 @@ void MainWindow::updateSelectedCreature() {
     for (int jt = 0; jt < screens.size(); jt++) {
         screens.at(jt)->updateSelectedCreature();
     }
+
+    if (farmUi->getSelectedLife() != nullptr) {
+        webUiConnection->sendNewSelectedCreature(farmUi->getSelectedLife()->getEntity()->getId());
+    } else {
+        webUiConnection->sendNewSelectedCreature(-1);
+    }
 }
 
 void MainWindow::openScreen(int id) {
@@ -571,6 +577,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
             break;
         case Keyboard::Key::C:
             farmUi->selectedCreatureChange("DISMISS");
+            updateSelectedCreature();
             break;
         case Keyboard::Key::B:
             farmUi->selectedCreatureChange("BEST");
@@ -599,6 +606,7 @@ void MainWindow::handleKeyboardEvents(Event::KeyEvent event) {
 //            break;
         case Keyboard::Key::R:
             farmUi->selectedCreatureChange("RANDOM");
+            updateSelectedCreature();
             break;
     }
 }

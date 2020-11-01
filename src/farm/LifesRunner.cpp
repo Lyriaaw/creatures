@@ -582,6 +582,13 @@ bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
     if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
         child->getEntity()->setMass(totalGivenEnergy / 2.0);
         child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
+
+        performer->addChild(child->getEntity()->getId());
+        foundLife->addChild(child->getEntity()->getId());
+
+        child->addParent(performer->getEntity()->getId());
+        child->addParent(foundLife->getEntity()->getId());
+        child->setNaturalMating(true);
         addLifeToFarm(child);
 
 

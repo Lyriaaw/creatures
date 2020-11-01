@@ -150,6 +150,8 @@ nlohmann::json Life::initialDataJson() {
 
     life["id"] = entity->getId();
     life["hue"] = entity->getColor();
+    life["naturalMating"] = naturalMating;
+    life["parentsIds"] = parentsIds;
 
     return life;
 }
@@ -160,6 +162,7 @@ nlohmann::json Life::updateDataJson() {
     life["id"] = entity->getId();
     life["age"] = entity->getAge();
     life["alive"] = isAlive();
+    life["childrenIds"] = childrenIds;
 
     return life;
 }
@@ -244,3 +247,24 @@ const std::vector<Entity *> &Life::getCurrentAccessibleEntities() const {
 const std::vector<Tile *> &Life::getCurrentAccessibleTiles() const {
     return currentAccessibleTiles;
 }
+
+void Life::addChild(int childId) {
+    childrenIds.emplace_back(childId);
+}
+void Life::addParent(int parentId) {
+    parentsIds.emplace_back(parentId);
+}
+
+
+const std::vector<int> &Life::getParentsIds() const {
+    return parentsIds;
+}
+
+const std::vector<int> &Life::getChildrenIds() const {
+    return childrenIds;
+}
+
+void Life::setNaturalMating(bool naturalMating) {
+    Life::naturalMating = naturalMating;
+}
+

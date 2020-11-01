@@ -297,7 +297,7 @@ void Map::vegetalisation() {
             float tileAvailableEnergy = currentTile->getGround();
 
 
-            int foodToGenerate = int(tileAvailableEnergy / 2000.f);
+            int foodToGenerate = int(tileAvailableEnergy / 1000.f);
             float totalEnergyAdded = 0.f;
 
 //            if (tileAvailableEnergy > 1950) {
@@ -326,10 +326,10 @@ void Map::vegetalisation() {
 
 
                 //        float foodSize = ((rand() % 300) / 100.f) + 2;
-                float foodSize = 2;
+                float foodSize = 1;
 
                 Entity * entity = new Entity(point);
-                entity->setMass(2 * MASS_TO_SIZE_RATIO);
+                entity->setMass(foodSize * MASS_TO_SIZE_RATIO);
                 entity->setColor(0.28f);
                 entity->setBrightness(0.3f);
 

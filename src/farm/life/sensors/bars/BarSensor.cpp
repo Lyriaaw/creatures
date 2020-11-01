@@ -21,8 +21,16 @@ void BarSensor::findSelectedChunks() {
 
     Point sensorSimplePosition = sensorPosition.getTileCoordinates();
 
-    int minChunkX = std::min(sensorSimplePosition.getX(), currentSimplePosition.getX()) - 1;
-    int maxChunkX = std::max(sensorSimplePosition.getX(), currentSimplePosition.getX()) + 1;
+    int minChunkX = std::min(sensorSimplePosition.getX(), currentSimplePosition.getX());
+    int maxChunkX = std::max(sensorSimplePosition.getX(), currentSimplePosition.getX());
+
+    if (int(sensorX) % TILE_SIZE >= TILE_SIZE / 2) {
+        maxChunkX += 1;
+    }
+    if (int(sensorX) % TILE_SIZE <= TILE_SIZE / 2) {
+        minChunkX -= 1;
+    }
+
 
     if (minChunkX < 0) {
         minChunkX = 0;
@@ -32,8 +40,15 @@ void BarSensor::findSelectedChunks() {
     }
 
 
-    int minChunkY = std::min(sensorSimplePosition.getY(), currentSimplePosition.getY()) - 1;
-    int maxChunkY = std::max(sensorSimplePosition.getY(), currentSimplePosition.getY()) + 1;
+    int minChunkY = std::min(sensorSimplePosition.getY(), currentSimplePosition.getY());
+    int maxChunkY = std::max(sensorSimplePosition.getY(), currentSimplePosition.getY());
+
+    if (int(sensorY) % TILE_SIZE >= TILE_SIZE / 2) {
+        maxChunkY += 1;
+    }
+    if (int(sensorY) % TILE_SIZE <= TILE_SIZE / 2) {
+        minChunkY -= 1;
+    }
 
     if (minChunkY < 0) {
         minChunkY = 0;

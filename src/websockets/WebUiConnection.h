@@ -70,6 +70,8 @@ public:
     void sendInitialCreatures(int id);
 
     void sendNewCreatures(std::vector<Life *> creatures);
+
+    void sendNewSelectedCreature(int id);
 };
 
 
