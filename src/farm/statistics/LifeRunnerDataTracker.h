@@ -28,6 +28,8 @@ private:
     DataItem * tickTime;
     DataItem * tickPerSecond;
 
+    DataItem * lifesCount;
+
 public:
 
     LifeRunnerDataTracker();
@@ -61,6 +63,8 @@ public:
     DataItem *getTickPerSecond() const;
 
     DataItem *getMoveCreatures() const;
+
+    DataItem *getLifesCount() const;
 };
 
 

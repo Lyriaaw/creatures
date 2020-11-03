@@ -30,10 +30,12 @@ void LifesRunner::handleThread() {
                 removeDeadLifes();
                 tick++;
 
-                std::vector<Life *> currentLifes = lifes;
+                std::vector<Life *> currentLifes = getLifes();
                 for (int it = 0; it < currentLifes.size(); it++) {
                     currentLifes.at(it)->getEntity()->aTickHavePassed();
                 }
+
+                dataAnalyser.getLifesCount()->addValue(lifes.size());
 
                 tickEnd = std::chrono::system_clock::now();
                 std::chrono::duration<double> elapsed_time = tickEnd - tickStart;
@@ -80,7 +82,7 @@ void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 
-    std::vector<Life *> currentLifes = lifes;
+    std::vector<Life *> currentLifes = getLifes();
 
     std::chrono::system_clock::time_point chunkProcessingStart = std::chrono::system_clock::now();
     for (int it = 0; it < currentLifes.size(); it++) {
@@ -117,7 +119,7 @@ void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point brainProcessingStart = std::chrono::system_clock::now();
 
     for (int it = 0; it < currentLifes.size(); it++) {
-        Life *currentLife = lifes.at(it);
+        Life *currentLife = currentLifes.at(it);
         if (!currentLife->isAlive()) {
             continue;
         }
@@ -159,7 +161,7 @@ void LifesRunner::executeCreatureActions() {
     int mateFailureCount = 0;
     int mateSuccessCount = 0;
 
-    std::vector<Life *> currentLifes = lifes;
+    std::vector<Life *> currentLifes = getLifes();
 
     for (int it = 0; it < currentLifes.size(); it++) {
         Life * life = currentLifes.at(it);
@@ -265,19 +267,20 @@ void LifesRunner::executeCreatureActions() {
 void LifesRunner::moveCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    std::vector<Life *> currentLifes = lifes;
+    std::vector<Life *> currentLifes = getLifes();
 
 
     std::vector<Entity* > newEntities;
     for (int it = 0; it < currentLifes.size(); it++) {
         Life *currentLife = currentLifes.at(it);
-        Point tilePoint = currentLife->getEntity()->getTileCoordinates();
 
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
+
+        Point tilePoint = currentLife->getEntity()->getTileCoordinates();
 //        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
 
         double releasedHeat = 0.0;
-        if (tick % 10 == 0) {
+        if (currentLife->getEntity()->getAge() % 10 == 0) {
             releasedHeat = currentLife->giveawayEnergy();
             map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpHeat(releasedHeat);
         }
@@ -296,6 +299,8 @@ void LifesRunner::moveCreatures() {
 
 
 std::vector<Life *> LifesRunner::removeDeadLifes() {
+    std::lock_guard<std::mutex> guard(lifes_mutex);
+
     std::vector<Life *> newLifes;
     std::vector<Life *> deletedLifes;
     for (int it = 0; it < lifes.size(); it++) {
@@ -501,12 +506,12 @@ void LifesRunner::handleEatLife(Life * performer, ActionDTO action) {
     Point performerPoint = performer->getEntity()->getPosition();
     Point tilePoint = performerPoint.getTileCoordinates();
 
-    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addGround(wastedEnergy);
+    map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpGround(wastedEnergy);
 
     Tile * tile = map->getTileAt(tilePoint.getX(), tilePoint.getY());
 
-    tile->addGround(foundLife->getEnergyCenter()->getWastedEnergy());
-    tile->addHeat(foundLife->getEnergyCenter()->getAvailableEnergy());
+    tile->addTmpGround(foundLife->getEnergyCenter()->getWastedEnergy());
+    tile->addTmpHeat(foundLife->getEnergyCenter()->getAvailableEnergy());
 
     foundLife->getEnergyCenter()->setAvailableEnergy(0.0);
     foundLife->getEnergyCenter()->setWastedEnergy(0.0);
@@ -602,7 +607,7 @@ bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
 
 
 
-    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addTmpGround(totalGivenEnergy);
     recordMatingFailure(performer);
 
     return false;
@@ -701,6 +706,7 @@ void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
 
 json LifesRunner::asJson() {
     json times;
+    times["lifesCount"] = this->dataAnalyser.getLifesCount()->getAveragedLastValue();
     times["tickTime"] = this->dataAnalyser.getTickTime()->getAveragedLastValue();
     times["tickPerSecond"] = this->dataAnalyser.getTickPerSecond()->getAveragedLastValue();
     times["poopCount"] = this->dataAnalyser.getPoopCount()->getAveragedLastValue();
@@ -730,9 +736,9 @@ json LifesRunner::asJson() {
 }
 
 json LifesRunner::creaturesAsJson() {
-    std::vector<Life *> currentLifes = lifes;
+    std::vector<Life *> currentLifes = getLifes();
 
-    nlohmann::json lifesJSON;
+    json lifesJSON = json::array();
 
     int runnersSize = currentLifes.size();
 

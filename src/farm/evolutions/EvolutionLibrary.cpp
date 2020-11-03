@@ -7,6 +7,8 @@
 
 
 void EvolutionLibrary::addGenome(int creatureIndex, std::vector<Evolution *> genome) {
+    std::lock_guard<std::mutex> guard(genomes_mutex);
+
     creatureIndexes.emplace_back(creatureIndex);
     genomes.emplace_back(genome);
 }
@@ -55,3 +57,5 @@ void EvolutionLibrary::recordEvent(std::string event) {
 const std::vector<std::string> &EvolutionLibrary::getEvents() const {
     return events;
 }
+
+EvolutionLibrary::EvolutionLibrary() {}

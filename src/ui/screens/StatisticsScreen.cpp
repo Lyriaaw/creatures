@@ -114,22 +114,6 @@ void StatisticsScreen::loadGraphs() {
 
 
 
-    brainsGraph->windowResized(windowWidth, windowHeight);
-
-    Graph * runnersPopulationGraph = new Graph("Runners population", 0.f, 0.1f, 1.f, 0.8f);
-    runnersPopulationGraph->setGraphControlCenter(graphControlCenter);
-
-
-    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
-        RGBColor color = RGBColor(it / float(CONCURRENT_LIFE_RUNNER), 1.0, 0.5);
-
-        runnersPopulationGraph->addLine(farmUi->getFarm()->getDataAnalyser().getRunnersPopulation().at(it), 2, color.getRed(), color.getGreen(), color.getBlue());
-    }
-
-
-    runnersPopulationGraph->windowResized(windowWidth, windowHeight);
-
-
 
     Graph * actionsGraph = new Graph("Actions", 0.f, 0.1f, 1.f, 0.8f);
     actionsGraph->setGraphControlCenter(graphControlCenter);
@@ -158,7 +142,6 @@ void StatisticsScreen::loadGraphs() {
     graphs.emplace_back(brainTimeGraph);
     graphs.emplace_back(energyGraph);
     graphs.emplace_back(brainsGraph);
-    graphs.emplace_back(runnersPopulationGraph);
 }
 
 void StatisticsScreen::loadButtons(sf::Font *font) {

@@ -112,6 +112,12 @@ public:
     void lockTmpHeatAndTmpGround();
 
     void unlockTmpHeatAndTmpGround();
+
+    void addTmpGround(float value);
+
+    float getTmpGround() const;
+
+    float getAndClearTmpGround();
 };
 
 

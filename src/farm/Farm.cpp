@@ -22,40 +22,54 @@ Farm::Farm(): medianTick(0){
 }
 
 void Farm::initLifesRunners() {
-    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
-        LifesRunner * lifesRunner = new LifesRunner(it + 1);
-        lifesRunner->setGenerateEntities([&](Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
-            this->generateEntities(position, color, brightness, maxSize, totalEnergy, spreadingRatio);
-        });
-
-        lifesRunner->setGetAccessibleEntities([&](std::vector<Point> selectedChunks) {
-           return getAccessibleEntities(selectedChunks);
-        });
-
-        lifesRunner->setGetAccessibleTiles([&](Life * life, std::vector<Point> selectedChunks) {
-           return getAccessibleTiles(life, selectedChunks);
-        });
-
-        lifesRunner->setRecordExecutedAction([&](ActionDTO action) {
-           this->recordExecutedAction(action);
-        });
-
-        lifesRunner->setGetLifeFromId([&](int id) {
-           return this->getLifeFromId(id);
-        });
-
-        lifesRunner->setAddLifeToFarm([&](Life * life) {
-            this->addLifeToFarm(life);
-        });
-
-        lifesRunner->setMap(map);
-        lifesRunner->setCreatureNursery(nursery);
-        lifesRunner->setFarmControl(farmControl);
-
-        lifesRunner->handleThread();
-
-        lifesRunners.emplace_back(lifesRunner);
+    for (int it = 0; it < INITIAL_LIFE_RUNNERS_COUNT; it++) {
+        addNewRunner();
     }
+}
+
+void Farm::addNewRunner() {
+    int currentLifeRunnersSize = lifesRunners.size();
+
+    LifesRunner * lifesRunner = new LifesRunner(currentLifeRunnersSize + 1);
+    lifesRunner->setGenerateEntities([&](Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
+        this->generateEntities(position, color, brightness, maxSize, totalEnergy, spreadingRatio);
+    });
+
+    lifesRunner->setGetAccessibleEntities([&](std::vector<Point> selectedChunks) {
+        return getAccessibleEntities(selectedChunks);
+    });
+
+    lifesRunner->setGetAccessibleTiles([&](Life * life, std::vector<Point> selectedChunks) {
+        return getAccessibleTiles(life, selectedChunks);
+    });
+
+    lifesRunner->setRecordExecutedAction([&](ActionDTO action) {
+        this->recordExecutedAction(action);
+    });
+
+    lifesRunner->setGetLifeFromId([&](int id) {
+        return this->getLifeFromId(id);
+    });
+
+    lifesRunner->setAddLifeToFarm([&](Life * life) {
+        this->addLifeToFarm(life);
+    });
+
+    lifesRunner->setTriggerUpdate(triggerRunnerUpdate);
+    lifesRunner->setTriggerCreaturesUpdate(triggerRunnerCreaturesUpdate);
+
+    lifesRunner->setMap(map);
+    lifesRunner->setCreatureNursery(nursery);
+    lifesRunner->setFarmControl(farmControl);
+    lifesRunner->setTick(medianTick);
+    lifesRunner->setMedianTick(medianTick);
+
+    lifesRunners.emplace_back(lifesRunner);
+
+    triggerNewRunner(lifesRunner->getId());
+
+    lifesRunner->handleThread();
+
 }
 
 void Farm::InitFromRandom() {
@@ -94,7 +108,7 @@ void Farm::InitFromRandom() {
         initialLife->getEntity()->setMass(creatureEnergy);
         initialLife->getEnergyCenter()->setAvailableEnergy(creatureEnergy);
 
-        lifesRunners.at(it % CONCURRENT_LIFE_RUNNER)->addLife(initialLife);
+        lifesRunners.at(it % INITIAL_LIFE_RUNNERS_COUNT)->addLife(initialLife);
     }
 
     for (int it = 0; it < INITIAL_FOOD_COUNT; it++) {
@@ -219,10 +233,6 @@ void Farm::Tick(bool paused) {
     }
 
     usleep(10000);
-}
-
-void Farm::addNewRunner() {
-
 }
 
 void Farm::multithreadBrainProcessing(bool *paused) {
@@ -998,10 +1008,6 @@ void Farm::statistics() {
 //        std::cout << "ERROR : Lost total energy : " << dataAnalyser.getTotalEnergy()->getSecondToLastValue() - dataAnalyser.getTotalEnergy()->getLastValue() << std::endl;
 //    }
 
-    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
-        dataAnalyser.getRunnersPopulation().at(it)->addValue(lifesRunners.at(it)->getLifeCount());
-    }
-
 
 
     double totalTime = 0.0;
@@ -1387,7 +1393,7 @@ void Farm::fillEnergyDataAnalyser() {
     }
 
 
-    double heatEnergy(0.0), groundEnergy(0.0), addedHeatEnergy(0.0);
+    double heatEnergy(0.0), groundEnergy(0.0), addedHeatEnergy(0.0), addedGroundEnergy(0.0);
     double entitiesMass(0.0);
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
@@ -1396,6 +1402,7 @@ void Farm::fillEnergyDataAnalyser() {
             heatEnergy += currentTile->getHeat();
             groundEnergy += currentTile->getGround();
             addedHeatEnergy += currentTile->getTmpHeat();
+            addedGroundEnergy += currentTile->getTmpGround();
 
             for (auto const& entity : currentTile->lockOwnerGetEntities()) {
                 entitiesMass += entity->getMass();
@@ -1432,6 +1439,7 @@ void Farm::fillEnergyDataAnalyser() {
     int totalEnergy = heatEnergy
             + groundEnergy
             + addedHeatEnergy
+            + addedGroundEnergy
             + creaturesAvailableEnergy
             + creaturesMass
             + creaturesWasteEnergy
@@ -1442,6 +1450,7 @@ void Farm::fillEnergyDataAnalyser() {
     biomassDataTracker.getHeatEnergy()->addValue(heatEnergy);
     biomassDataTracker.getGroundEnergy()->addValue(groundEnergy);
     biomassDataTracker.getAddedHeatEnergy()->addValue(addedHeatEnergy);
+    biomassDataTracker.getAddedGroundEnergy()->addValue(addedGroundEnergy);
 
     biomassDataTracker.getEntitiesMass()->addValue(entitiesMass);
 
@@ -1477,4 +1486,16 @@ void Farm::setTriggerBiomassReportUpdate(const function<void()> &triggerBiomassR
 
 void Farm::setTriggerNewCreatures(const function<void(std::vector<Life *>)> &triggerNewCreatures) {
     Farm::triggerNewCreatures = triggerNewCreatures;
+}
+
+void Farm::setTriggerNewRunner(const function<void(int)> &triggerNewRunner) {
+    Farm::triggerNewRunner = triggerNewRunner;
+}
+
+void Farm::setTriggerRunnerUpdate(const function<void(int)> &triggerRunnerUpdate) {
+    Farm::triggerRunnerUpdate = triggerRunnerUpdate;
+}
+
+void Farm::setTriggerRunnerCreaturesUpdate(const function<void(int)> &triggerRunnerCreaturesUpdate) {
+    Farm::triggerRunnerCreaturesUpdate = triggerRunnerCreaturesUpdate;
 }

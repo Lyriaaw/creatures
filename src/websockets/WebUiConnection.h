@@ -72,6 +72,8 @@ public:
     void sendNewCreatures(std::vector<Life *> creatures);
 
     void sendNewSelectedCreature(int id);
+
+    void sendNewRunner(int id);
 };
 
 

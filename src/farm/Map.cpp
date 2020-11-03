@@ -186,11 +186,11 @@ void Map::processClimate() {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
             currentTile->decayPheromone();
-            currentTile->removeDeletedEntities();
 
             currentTile->lockHeatAndGround();
             currentTile->handleEntityDecay();
             currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
+            currentTile->lockOwnerAddGround(currentTile->getAndClearTmpGround());
 
             newGround[it][jt] = currentTile->getGround();
             newHeats[it][jt] = currentTile->getHeat();
@@ -261,6 +261,9 @@ void Map::processClimate() {
             currentTile->lockOwnerAddGround(currentTileHeat * heatToGroundRatio);
 
             currentTile->unlockHeatAndGround();
+
+            currentTile->removeDeletedEntities();
+
 
         }
     }

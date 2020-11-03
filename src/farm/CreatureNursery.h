@@ -22,7 +22,7 @@
 
 class CreatureNursery {
 private:
-    EvolutionLibrary evolutionLibrary;
+    EvolutionLibrary * evolutionLibrary;
 public:
     CreatureNursery();
 

@@ -63,6 +63,10 @@ private:
     std::function<void()> triggerUpdate;
     std::function<void()> triggerBiomassReportUpdate;
     std::function<void(std::vector<Life *> creatures)> triggerNewCreatures;
+    std::function<void(int id)> triggerNewRunner;
+
+    std::function<void(int id)> triggerRunnerUpdate;
+    std::function<void(int id)> triggerRunnerCreaturesUpdate;
 
     int medianTick;
 
@@ -201,6 +205,12 @@ public:
     void addNewRunner();
 
     void setTriggerNewCreatures(const std::function<void(std::vector<Life *>)> &triggerNewCreatures);
+
+    void setTriggerNewRunner(const std::function<void(int)> &triggerNewRunner);
+
+    void setTriggerRunnerUpdate(const std::function<void(int)> &triggerRunnerUpdate);
+
+    void setTriggerRunnerCreaturesUpdate(const std::function<void(int)> &triggerRunnerCreaturesUpdate);
 };
 
 

@@ -84,6 +84,24 @@ float Tile::getAndClearTmpHeat() {
     return currentValue;
 }
 
+void Tile::addTmpGround(float value) {
+    std::lock_guard<std::mutex> guard(tmp_ground_mutex);
+    tmp_ground += value;
+}
+float Tile::getTmpGround() const {
+    return tmp_ground;
+}
+float Tile::getAndClearTmpGround() {
+    std::lock_guard<std::mutex> guard(tmp_ground_mutex);
+
+    float currentValue = tmp_ground;
+    tmp_ground = 0;
+
+    return currentValue;
+}
+
+
+
 void Tile::setTmoHeat(float heat) {
     std::lock_guard<std::mutex> guard(tmp_heat_mutex);
     Tile::tmp_heat = heat;
@@ -101,7 +119,7 @@ void Tile::addHeight(float value) {
     height += value;
 }
 
-Tile::Tile(Point coordinates, float height, float heat, float ground) : coordinates(coordinates), height(height), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0), tmp_heat(0) {}
+Tile::Tile(Point coordinates, float height, float heat, float ground) : coordinates(coordinates), height(height), heat(heat), ground(ground), pheromoneColor(0), pheromoneQuantity(0), tmp_heat(0), tmp_ground(0) {}
 
 float Tile::getPheromoneColor() const {
     return pheromoneColor;

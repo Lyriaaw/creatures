@@ -58,9 +58,6 @@ DataAnalyser::DataAnalyser() {
     averageLinks = new DataItem("averageLinks", true);
 
 
-    for (int it = 0; it < CONCURRENT_LIFE_RUNNER; it++) {
-        runnersPopulation.emplace_back(new DataItem("Runner " + std::to_string(it + 1), true));
-    }
 
     poopCount = new DataItem("poopCount", true);
     pheromoneCount = new DataItem("pheromoneCount", true);

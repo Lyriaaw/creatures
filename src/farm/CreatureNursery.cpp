@@ -17,7 +17,7 @@
 using namespace std;
 
 
-CreatureNursery::CreatureNursery(): evolutionLibrary(EvolutionLibrary()){
+CreatureNursery::CreatureNursery(): evolutionLibrary(new EvolutionLibrary()){
 }
 
 Life * CreatureNursery::generateCreatureFromRandom() {
@@ -48,14 +48,14 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     colorEvolution->generateFromRandom(life);
     colorEvolution->perform(life);
     creatureGenome.emplace_back(colorEvolution);
-    evolutionLibrary.addEvolution(colorEvolution);
+    evolutionLibrary->addEvolution(colorEvolution);
 
     SizeEvolution * sizeEvolution = new SizeEvolution();
     sizeEvolution->setGenerationNumber(2);
     sizeEvolution->generateFromRandom(life);
     sizeEvolution->perform(life);
     creatureGenome.emplace_back(sizeEvolution);
-    evolutionLibrary.addEvolution(sizeEvolution);
+    evolutionLibrary->addEvolution(sizeEvolution);
 
 
 
@@ -63,48 +63,50 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     biasInputEvolution->setGenerationNumber(3);
     biasInputEvolution->perform(life);
     creatureGenome.emplace_back(biasInputEvolution);
-    evolutionLibrary.addEvolution(biasInputEvolution);
+    evolutionLibrary->addEvolution(biasInputEvolution);
 
     EnergySensorEvolution * energySensorInputEvolution = new EnergySensorEvolution();
     energySensorInputEvolution->setGenerationNumber(4);
     energySensorInputEvolution->perform(life);
     creatureGenome.emplace_back(energySensorInputEvolution);
-    evolutionLibrary.addEvolution(energySensorInputEvolution);
+    evolutionLibrary->addEvolution(energySensorInputEvolution);
 
     MassSensorEvolution * massSensorEvolution = new MassSensorEvolution();
     massSensorEvolution->setGenerationNumber(5);
     massSensorEvolution->perform(life);
     creatureGenome.emplace_back(massSensorEvolution);
-    evolutionLibrary.addEvolution(massSensorEvolution);
+    evolutionLibrary->addEvolution(massSensorEvolution);
 
 
-    double colorRotations[] = {0.0, 1.0};
 
-    for (int it = 0; it < 2; it++) {
-        HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
-        sensorEvol->setGenerationNumber(it + 10);
-        sensorEvol->generateFromRandom(life);
-        sensorEvol->setSensorLength(4);
-        sensorEvol->setSensorRotation(colorRotations[it]);
-
-        sensorEvol->perform(life);
-        creatureGenome.emplace_back(sensorEvol);
-        evolutionLibrary.addEvolution(sensorEvol);
-    }
 
     double distanceRotations[] = {0.0, -0.25, 0.25, 1.0};
 
     for (int it = 0; it < 4; it++) {
 
         DistanceBarSensorEvolution * sensorEvol = new DistanceBarSensorEvolution();
-        sensorEvol->setGenerationNumber(it + 20);
+        sensorEvol->setGenerationNumber(it + 10);
         sensorEvol->generateFromRandom(life);
         sensorEvol->setSensorLength(5);
         sensorEvol->setSensorRotation(distanceRotations[it]);
         sensorEvol->perform(life);
         creatureGenome.emplace_back(sensorEvol);
-        evolutionLibrary.addEvolution(sensorEvol);
+        evolutionLibrary->addEvolution(sensorEvol);
 
+    }
+
+    double colorRotations[] = {0.1, -0.1, 1.0};
+
+    for (int it = 0; it < 3; it++) {
+        HueBarSensorEvolution * sensorEvol = new HueBarSensorEvolution();
+        sensorEvol->setGenerationNumber(it + 20);
+        sensorEvol->generateFromRandom(life);
+        sensorEvol->setSensorLength(4);
+        sensorEvol->setSensorRotation(colorRotations[it]);
+
+        sensorEvol->perform(life);
+        creatureGenome.emplace_back(sensorEvol);
+        evolutionLibrary->addEvolution(sensorEvol);
     }
 
 
@@ -114,21 +116,21 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     pheromoneSensorEvolution->generateFromRandom(life);
     pheromoneSensorEvolution->perform(life);
     creatureGenome.emplace_back(pheromoneSensorEvolution);
-    evolutionLibrary.addEvolution(pheromoneSensorEvolution);
+    evolutionLibrary->addEvolution(pheromoneSensorEvolution);
 
     PheromoneSensorEvolution * pheromoneSensorEvolution2 = new PheromoneSensorEvolution();
     pheromoneSensorEvolution2->setGenerationNumber(31);
     pheromoneSensorEvolution2->generateFromRandom(life);
     pheromoneSensorEvolution2->perform(life);
     creatureGenome.emplace_back(pheromoneSensorEvolution2);
-    evolutionLibrary.addEvolution(pheromoneSensorEvolution2);
+    evolutionLibrary->addEvolution(pheromoneSensorEvolution2);
 //
 //    PheromoneSensorEvolution * pheromoneSensorEvolution3 = new PheromoneSensorEvolution();
 //    pheromoneSensorEvolution3->setGenerationNumber(32);
 //    pheromoneSensorEvolution3->generateFromRandom(life);
 //    pheromoneSensorEvolution3->perform(life);
 //    creatureGenome.emplace_back(pheromoneSensorEvolution3);
-//    evolutionLibrary.addEvolution(pheromoneSensorEvolution3);
+//    evolutionLibrary->addEvolution(pheromoneSensorEvolution3);
 
 
 
@@ -139,27 +141,27 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     speedEvolution->setGenerationNumber(40);
     speedEvolution->perform(life);
     creatureGenome.emplace_back(speedEvolution);
-    evolutionLibrary.addEvolution(speedEvolution);
+    evolutionLibrary->addEvolution(speedEvolution);
 
     RotationEvolution * rotationEvolution = new RotationEvolution();
     rotationEvolution->setGenerationNumber(41);
     rotationEvolution->perform(life);
     creatureGenome.emplace_back(rotationEvolution);
-    evolutionLibrary.addEvolution(rotationEvolution);
+    evolutionLibrary->addEvolution(rotationEvolution);
 
     MouthEvolution * mouthEvolution = new MouthEvolution();
     mouthEvolution->setGenerationNumber(42);
     mouthEvolution->generateFromRandom(life);
     mouthEvolution->perform(life);
     creatureGenome.emplace_back(mouthEvolution);
-    evolutionLibrary.addEvolution(mouthEvolution);
+    evolutionLibrary->addEvolution(mouthEvolution);
 
     GenitalsEvolution * genitalsEvolution = new GenitalsEvolution();
     genitalsEvolution->setGenerationNumber(43);
     genitalsEvolution->generateFromRandom(life);
     genitalsEvolution->perform(life);
     creatureGenome.emplace_back(genitalsEvolution);
-    evolutionLibrary.addEvolution(genitalsEvolution);
+    evolutionLibrary->addEvolution(genitalsEvolution);
 
 
     PheromoneEmitterEvolution * pheromoneEmitterEvolution = new PheromoneEmitterEvolution();
@@ -167,21 +169,21 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     pheromoneEmitterEvolution->generateFromRandom(life);
     pheromoneEmitterEvolution->perform(life);
     creatureGenome.emplace_back(pheromoneEmitterEvolution);
-    evolutionLibrary.addEvolution(pheromoneEmitterEvolution);
+    evolutionLibrary->addEvolution(pheromoneEmitterEvolution);
 
     PheromoneEmitterEvolution * pheromoneEmitterEvolution2 = new PheromoneEmitterEvolution();
     pheromoneEmitterEvolution2->setGenerationNumber(46);
     pheromoneEmitterEvolution2->generateFromRandom(life);
     pheromoneEmitterEvolution2->perform(life);
     creatureGenome.emplace_back(pheromoneEmitterEvolution2);
-    evolutionLibrary.addEvolution(pheromoneEmitterEvolution2);
+    evolutionLibrary->addEvolution(pheromoneEmitterEvolution2);
 
     MemoryEvolution * memoryEvolution = new MemoryEvolution();
     memoryEvolution->setGenerationNumber(50);
     memoryEvolution->generateFromRandom(life);
     memoryEvolution->perform(life);
     creatureGenome.emplace_back(memoryEvolution);
-    evolutionLibrary.addEvolution(memoryEvolution);
+    evolutionLibrary->addEvolution(memoryEvolution);
 
 
 
@@ -197,7 +199,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
             linkEvolution->generateFromNeurons(life, brain->getInputNeurons().at(it), brain->getOutputNeurons().at(jt));
             linkEvolution->perform(life);
             creatureGenome.emplace_back(linkEvolution);
-            evolutionLibrary.addEvolution(linkEvolution);
+            evolutionLibrary->addEvolution(linkEvolution);
 
         }
     }
@@ -209,9 +211,9 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
     life->connectSensorAndMuscles();
 
-    evolutionLibrary.addGenome(life->getEntity()->getId(), creatureGenome);
+    evolutionLibrary->addGenome(life->getEntity()->getId(), creatureGenome);
 
-    evolutionLibrary.setCurrentEvolutionNumber(1000);
+    evolutionLibrary->setCurrentEvolutionNumber(1000);
     return life;
 }
 
@@ -323,7 +325,7 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     }
 
     life->getBrain()->generateLinkGrid();
-    evolutionLibrary.addGenome(life->getEntity()->getId(), childGenome);
+    evolutionLibrary->addGenome(life->getEntity()->getId(), childGenome);
 
     life->connectSensorAndMuscles();
     return life;
@@ -389,12 +391,12 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolution(Life * life, s
         if (foundEvolution->isEnabled()) {
             return generateNeuronEvolutionFromLinkEvolution(leftNeuron, rightNeuron, foundEvolution, life);
         } else {
-            evolutionLibrary.recordEvent(std::to_string(leftNeuron->getGenerationNumber()) + " => " + std::to_string(rightNeuron->getGenerationNumber()) + " : Already a disabled evolution here");
+            evolutionLibrary->recordEvent(std::to_string(leftNeuron->getGenerationNumber()) + " => " + std::to_string(rightNeuron->getGenerationNumber()) + " : Already a disabled evolution here");
             return newEvolutions;
         }
 
     } else {
-        evolutionLibrary.recordEvent(std::to_string(leftNeuron->getGenerationNumber()) + " => " + std::to_string(rightNeuron->getGenerationNumber()) + " : New link evolution");
+        evolutionLibrary->recordEvent(std::to_string(leftNeuron->getGenerationNumber()) + " => " + std::to_string(rightNeuron->getGenerationNumber()) + " : New link evolution");
         return generateLinkEvolution(leftNeuron, rightNeuron, life);
     }
 
@@ -408,7 +410,7 @@ std::vector<Evolution *> CreatureNursery::generateLinkEvolution(Neuron * inputNe
     linkEvolution->generateGenerationNumber();
     linkEvolution->generateFromNeurons(life, inputNeuron, outputNeuron);
 
-    std::map<int, Evolution *> allEvolutions = evolutionLibrary.getAllEvolutions();
+    std::map<int, Evolution *> allEvolutions = evolutionLibrary->getAllEvolutions();
 
     bool found = false;
     for (auto const& row: allEvolutions) {
@@ -429,10 +431,10 @@ std::vector<Evolution *> CreatureNursery::generateLinkEvolution(Neuron * inputNe
     newEvolutions.emplace_back(linkEvolution);
 
     if (!found) {
-        evolutionLibrary.recordEvent("  - Created new evolution");
-        evolutionLibrary.addEvolution(linkEvolution);
+        evolutionLibrary->recordEvent("  - Created new evolution");
+        evolutionLibrary->addEvolution(linkEvolution);
     } else {
-        evolutionLibrary.recordEvent("  - Link evolution already exists in the library => " + std::to_string(linkEvolution->getGenerationNumber()));
+        evolutionLibrary->recordEvent("  - Link evolution already exists in the library => " + std::to_string(linkEvolution->getGenerationNumber()));
     }
 
     return newEvolutions;
@@ -454,9 +456,9 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
     neuronEvolution->generateGenerationNumber();
     neuronEvolution->generateFromXandY(neuronX, neuronY);
 
-    evolutionLibrary.recordEvent(std::to_string(inputNeuron->getGenerationNumber()) + " => " + std::to_string(outputNeuron->getGenerationNumber()) + " : New neuron");
-    evolutionLibrary.recordEvent("  - Initial generation number: " + std::to_string(neuronEvolution->getGenerationNumber()));
-    evolutionLibrary.recordEvent("  - X: " + std::to_string(neuronX) + " Y: " + std::to_string(neuronY));
+    evolutionLibrary->recordEvent(std::to_string(inputNeuron->getGenerationNumber()) + " => " + std::to_string(outputNeuron->getGenerationNumber()) + " : New neuron");
+    evolutionLibrary->recordEvent("  - Initial generation number: " + std::to_string(neuronEvolution->getGenerationNumber()));
+    evolutionLibrary->recordEvent("  - X: " + std::to_string(neuronX) + " Y: " + std::to_string(neuronY));
 
     Neuron * selectedNeuron = nullptr;
     bool found = false;
@@ -469,13 +471,13 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
         if (absX < 10 && absY < 10) {
             selectedNeuron = currentNeuron;
             found = true;
-            evolutionLibrary.recordEvent("  - Found another neuron in the brain already: " + std::to_string(currentNeuron->getGenerationNumber()) + " (" + std::to_string(neuronX) + " , " + std::to_string(neuronY) + ")");
+            evolutionLibrary->recordEvent("  - Found another neuron in the brain already: " + std::to_string(currentNeuron->getGenerationNumber()) + " (" + std::to_string(neuronX) + " , " + std::to_string(neuronY) + ")");
         }
     }
 
     bool isNew = true;
     if (!found) {
-        std::map<int, Evolution *> allEvolutions = evolutionLibrary.getAllEvolutions();
+        std::map<int, Evolution *> allEvolutions = evolutionLibrary->getAllEvolutions();
 
         for (auto const& currentEvolution : allEvolutions) {
 
@@ -492,7 +494,7 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
                 neuronEvolution->setGenerationNumber(currentNeuronEvolution->getGenerationNumber());
                 neuronEvolution->generateFromXandY(currentNeuronEvolution->getX(), currentNeuronEvolution->getY());
                 isNew = false;
-                evolutionLibrary.recordEvent("  - FFound another at the same place in the library: " + std::to_string(currentNeuronEvolution->getGenerationNumber()) + " (" + std::to_string(neuronEvolution->getX()) + " , " + std::to_string(neuronEvolution->getY()) + ")");
+                evolutionLibrary->recordEvent("  - FFound another at the same place in the library: " + std::to_string(currentNeuronEvolution->getGenerationNumber()) + " (" + std::to_string(neuronEvolution->getX()) + " , " + std::to_string(neuronEvolution->getY()) + ")");
             }
         }
     }
@@ -503,8 +505,8 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
         neuronEvolution->perform(life);
         newEvolutions.emplace_back(neuronEvolution);
         if (isNew) {
-            evolutionLibrary.recordEvent("  - No neuron found already. Will be added in the evolution library");
-            evolutionLibrary.addEvolution(neuronEvolution);
+            evolutionLibrary->recordEvent("  - No neuron found already. Will be added in the evolution library");
+            evolutionLibrary->addEvolution(neuronEvolution);
         }
         selectedNeuron = neuronEvolution->getNeuron();
     }
@@ -518,20 +520,20 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
 
     std::vector<Evolution *> outputLinkEvolutions = generateLinkEvolution(selectedNeuron, outputNeuron, life);
     newEvolutions.insert(newEvolutions.end(), outputLinkEvolutions.begin(), outputLinkEvolutions.end());
-    evolutionLibrary.recordEvent("  - Connected to right neuron: " + std::to_string(outputNeuron->getGenerationNumber()));
+    evolutionLibrary->recordEvent("  - Connected to right neuron: " + std::to_string(outputNeuron->getGenerationNumber()));
 
 
 
     std::vector<Evolution *> inputLinkEvolutions = generateLinkEvolution(inputNeuron, selectedNeuron, life);
     newEvolutions.insert(newEvolutions.end(), inputLinkEvolutions.begin(), inputLinkEvolutions.end());
-    evolutionLibrary.recordEvent("  - Connected to right neuron: " + std::to_string(inputNeuron->getGenerationNumber()));
+    evolutionLibrary->recordEvent("  - Connected to right neuron: " + std::to_string(inputNeuron->getGenerationNumber()));
 
 
-    evolutionLibrary.recordEvent("  - Connected to left neuron: " + std::to_string(inputNeuron->getGenerationNumber()));
+    evolutionLibrary->recordEvent("  - Connected to left neuron: " + std::to_string(inputNeuron->getGenerationNumber()));
 
     life->getBrain()->removeLink(inputNeuron->getGenerationNumber(), outputNeuron->getGenerationNumber());
     linkEvolution->disable();
-    evolutionLibrary.recordEvent("  - Removed link between and disabling evolution between " + std::to_string(inputNeuron->getGenerationNumber()) + " and " + std::to_string(outputNeuron->getGenerationNumber()));
+    evolutionLibrary->recordEvent("  - Removed link between and disabling evolution between " + std::to_string(inputNeuron->getGenerationNumber()) + " and " + std::to_string(outputNeuron->getGenerationNumber()));
 
 
     return newEvolutions;
@@ -539,7 +541,7 @@ std::vector<Evolution *> CreatureNursery::generateNeuronEvolutionFromLinkEvoluti
 
 
 const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {
-    return evolutionLibrary;
+    return *evolutionLibrary;
 }
 
 
@@ -548,7 +550,7 @@ const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {
 //sensorEvol->generateFromRandom(life);
 //sensorEvol->perform(life);
 //newEvolutions.emplace_back(sensorEvol);
-//evolutionLibrary.addEvolution(sensorEvol);
+//evolutionLibrary->addEvolution(sensorEvol);
 //
 //for (int jt = 0; jt < life->getBrain()->getOutputNeurons().size(); jt++) {
 //
@@ -557,6 +559,6 @@ const EvolutionLibrary &CreatureNursery::getEvolutionLibrary() const {
 //linkEvolution->generateFromNeurons(life, sensorEvol->getInputNeuron(), life->getBrain()->getOutputNeurons().at(jt));
 //linkEvolution->perform(life);
 //newEvolutions.emplace_back(linkEvolution);
-//evolutionLibrary.addEvolution(linkEvolution);
+//evolutionLibrary->addEvolution(linkEvolution);
 
 //}

@@ -7,6 +7,7 @@
 LifeRunnerDataTracker::LifeRunnerDataTracker() {
     tickTime = new DataItem("tickTime", true);
     tickPerSecond = new DataItem("tickPerSecond", true);
+    lifesCount = new DataItem("lifesCount", true);
 
 
     poopCount = new DataItem("poopCount", true);
@@ -83,6 +84,10 @@ DataItem *LifeRunnerDataTracker::getTickPerSecond() const {
 
 DataItem *LifeRunnerDataTracker::getMoveCreatures() const {
     return moveCreatures;
+}
+
+DataItem *LifeRunnerDataTracker::getLifesCount() const {
+    return lifesCount;
 }
 
 

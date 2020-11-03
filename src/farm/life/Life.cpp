@@ -98,7 +98,9 @@ void Life::processSelectedChunks(){
 std::vector<Point> Life::getSelectedChunks() {
     std::vector<Point> selectedChunks;
 
-    for (int it = 0; it < sensors.size(); it++) {
+    int sensorSize = sensors.size();
+
+    for (int it = 0; it < sensorSize; it++) {
         std::vector<Point> sensorSelectedChunks = sensors.at(it)->getSelectedChunks();
 
         for (int jt = 0; jt < sensorSelectedChunks.size(); jt++) {

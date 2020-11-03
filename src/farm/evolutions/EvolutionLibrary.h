@@ -10,7 +10,21 @@
 
 
 class EvolutionLibrary {
+private:
+    std::mutex genomes_mutex;
+
+    std::vector<int> creatureIndexes;
+    std::vector<std::vector<Evolution *>> genomes;
+
+    std::map<int, Evolution *> allEvolutions;
+
+    int currentEvolutionNumber;
+
+    std::vector<std::string> events;
+
 public:
+    EvolutionLibrary();
+
     void addGenome(int creatureIndex, std::vector<Evolution *> genome);
     std::vector<Evolution *> getGenomeFor(int creatureIndex) const;
 
@@ -27,15 +41,7 @@ public:
     const std::vector<std::string> &getEvents() const;
 
 
-private:
-    std::vector<int> creatureIndexes;
-    std::vector<std::vector<Evolution *>> genomes;
 
-    std::map<int, Evolution *> allEvolutions;
-
-    int currentEvolutionNumber;
-
-    std::vector<std::string> events;
 
 };
 

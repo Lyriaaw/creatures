@@ -142,14 +142,7 @@ void MainWindow::loadButtons() {
 
 void MainWindow::loadFarm() {
     farm = new Farm();
-    farm->InitFromRandom();
 
-    farmUi = new FarmUI(farm);
-    farmUi->setSelectedLifeChanged([&]() {
-        for (int it = 0; it < this->screens.size(); it++) {
-            screens.at(it)->updateSelectedCreature();
-        }
-    });
 
 
     webUiConnection = new WebUiConnection(farm);
@@ -165,23 +158,35 @@ void MainWindow::loadFarm() {
        webUiConnection->sendNewCreatures(creatures);
     });
 
+    farm->setTriggerNewRunner([&](int id) {
+        webUiConnection->sendNewRunner(id);
+    });
+
+    farm->setTriggerRunnerUpdate([&](int id) {
+        webUiConnection->updateRunnerClients(id);
+    });
+
+    farm->setTriggerRunnerCreaturesUpdate([&](int id) {
+        webUiConnection->updateCreaturesRunnerClients(id);
+    });
+
+
+    farm->InitFromRandom();
+
 
 
     farm->getMap()->setTriggerUpdate([&]() {
        webUiConnection->updateMapClients();
     });
 
-    for(auto const& runner : farm->getLifesRunners()) {
-        runner->setTriggerUpdate([&](int id) {
-            webUiConnection->updateRunnerClients(id);
-        });
 
-        runner->setTriggerCreaturesUpdate([&](int id) {
-            webUiConnection->updateCreaturesRunnerClients(id);
-        });
+    farmUi = new FarmUI(farm);
+    farmUi->setSelectedLifeChanged([&]() {
+        for (int it = 0; it < this->screens.size(); it++) {
+            screens.at(it)->updateSelectedCreature();
+        }
+    });
 
-
-    }
 
 
 

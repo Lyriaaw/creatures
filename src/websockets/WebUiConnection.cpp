@@ -162,8 +162,7 @@ void WebUiConnection::handleClientRequest(int id, json request) {
 
     if(request["component"] == "new_runner") {
         farm->fillEnergyDataAnalyser();
-        json report = farm->getBiomassDataTracker().getLastTickAsJson();
-        sendMessageToClient(id, sendEvent("biomass_report", report).dump(), true);
+        farm->addNewRunner();
     }
 
 
@@ -264,6 +263,31 @@ void WebUiConnection::sendNewSelectedCreature(int id) {
         client->sendMessage(messageToSend);
     }
 }
+
+void WebUiConnection::sendNewRunner(int id) {
+    LifesRunner * foundRunner = nullptr;
+
+    for (auto const& runner: farm->getLifesRunners()) {
+        if (runner->getId() == id) {
+            foundRunner = runner;
+            break;
+        }
+    }
+
+    if (foundRunner == nullptr) {
+        return;
+    }
+
+
+//    std::lock_guard<std::mutex> guard(clients_mutex);
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("new_runner", {{"runner", foundRunner->asJson()}}).dump();
+
+        client->sendMessage(messageToSend);
+    }
+}
+
+
 
 void WebUiConnection::updateFarmClients() {
     std::lock_guard<std::mutex> guard(clients_mutex);
