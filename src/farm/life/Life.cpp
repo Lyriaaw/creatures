@@ -60,7 +60,7 @@ double Life::giveawayEnergy() {
     }
 
     double sensorEnergy = sensors.size();
-    double biasEnergy = 10;
+    double biasEnergy = 1;
     double wastedEnergyCarrying = 0.01 * energyCenter->getWastedEnergy();
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy + wastedEnergyCarrying;

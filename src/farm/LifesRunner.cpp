@@ -620,7 +620,7 @@ bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
 void LifesRunner::recordMatingFailure(Life * performer) {
     Point point = performer->getEntity()->getTileCoordinates();
 
-    ActionDTO executedAction = ActionDTO(0, 0, "MATE");
+    ActionDTO executedAction = ActionDTO(0, 0, "MATE_FAILURE");
     executedAction.setTilePosition(point);
     executedAction.setTick(tick);
     recordExecutedAction(executedAction);

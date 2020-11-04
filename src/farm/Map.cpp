@@ -207,6 +207,7 @@ void Map::processClimate() {
             float availableHeat = currentTile->getHeat() / 10;
 
             if (availableGround == 0 && availableHeat == 0) {
+                currentTile->unlockHeatAndGround();
                 continue;
             }
 
@@ -219,6 +220,7 @@ void Map::processClimate() {
                     // If the other tile is lower than this one, we add some heat to be transfer
                     // the lowest the target tile, the biggest is the added energy
                     double heightDifference = (currentHeight - getTileAt(it + x, jt + y)->getHeight());
+                    heightDifference = std::min(heightDifference * 2, 0.5);
 
                     double transferedHeat = availableHeat + (heightDifference * availableHeat);
                     double transferedGround = availableGround + (heightDifference * availableGround);
@@ -250,15 +252,15 @@ void Map::processClimate() {
                 continue;
             }
 
-            currentTile->lockHeatAndGround();
+            currentTile->lockHeat();
 
             float heatToGroundRatio = 0.01f * VEGETALISATION_RATE;
             float currentTileHeat = currentTile->getHeat();
 
             currentTile->lockOwnerAddHeat(- 1 * currentTileHeat * heatToGroundRatio);
-            currentTile->lockOwnerAddGround(currentTileHeat * heatToGroundRatio);
+            currentTile->addGround(currentTileHeat * heatToGroundRatio);
 
-            currentTile->unlockHeatAndGround();
+            currentTile->unlockHeat();
 
 
 

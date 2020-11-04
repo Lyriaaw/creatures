@@ -118,6 +118,10 @@ public:
     float getTmpGround() const;
 
     float getAndClearTmpGround();
+
+    void lockHeat();
+
+    void unlockHeat();
 };
 
 

@@ -218,6 +218,19 @@ void Tile::lockHeatAndGround() {
     }
 }
 
+void Tile::lockHeat() {
+    while (!heat_mutex.try_lock()) {
+        usleep(10000);
+    }
+}
+
+void Tile::unlockHeat() {
+    heat_mutex.unlock();
+}
+
+
+
+
 void Tile::lockEntities() {
     while (!entities_mutex.try_lock()) {
         usleep(10000);

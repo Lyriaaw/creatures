@@ -1078,7 +1078,14 @@ std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChu
         Tile * currentTile = map->getTileAt(currentChunk.getX(), currentChunk.getY());
 
         std::vector<Entity *> tileEntities = currentTile->getEntities();
-        std::vector<Entity *> tileLifeEntity = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+
+        std::vector<Entity *> tileLifeEntity;
+        if (currentChunk.getX() < 0 || currentChunk.getX() >= TILE_COUNT_WIDTH || currentChunk.getY() < 0 || currentChunk.getY() >= TILE_COUNT_HEIGHT) {
+            std::cout << "ERROR, REQUESTED WRONG TILE => X: " << currentChunk.getX() << " Y: " << currentChunk.getY() << std::endl;
+        } else {
+            tileLifeEntity = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+        }
+
 
         accessibleEntities.insert(accessibleEntities.end(), tileEntities.begin(), tileEntities.end());
         accessibleEntities.insert(accessibleEntities.end(), tileLifeEntity.begin(), tileLifeEntity.end());

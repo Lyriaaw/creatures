@@ -46,7 +46,7 @@ sf::Color ActionsMinimap::getColorFromActionName(ActionDTO action) {
         return sf::Color(128, 0, 0);
     }
     if (action.getType() == "EAT_ENTITY") {
-        return sf::Color(0, 128, 0);
+        return sf::Color(0, 64, 0);
     }
 
     if (action.getType() == "BITE_LIFE") {
@@ -111,7 +111,7 @@ void ActionsMinimap::processRed() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newColor[it][jt] -= std::max(0.005 * newColor[it][jt], std::min(0.3, newColor[it][jt]));
+            newColor[it][jt] -= std::min(1.0, newColor[it][jt]);
         }
     }
 
@@ -167,7 +167,7 @@ void ActionsMinimap::processGreen() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newColor[it][jt] -= std::max(0.005 * newColor[it][jt], std::min(0.3, newColor[it][jt]));
+            newColor[it][jt] -= std::min(1.0, newColor[it][jt]);
         }
     }
 
@@ -222,7 +222,7 @@ void ActionsMinimap::processBlue() {
 
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
-            newColor[it][jt] -= std::max(0.005 * newColor[it][jt], std::min(0.3, newColor[it][jt]));
+            newColor[it][jt] -= std::min(1.0, newColor[it][jt]);
         }
     }
 
