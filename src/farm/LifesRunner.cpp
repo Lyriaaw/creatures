@@ -448,6 +448,7 @@ void LifesRunner::handlePheromoneEmission(Life * performer, ActionDTO action) {
 }
 
 void LifesRunner::handleBitingLife(Life * performer, ActionDTO action) {
+    return;
     if (!performer->getEntity()->tryLockInteraction()) {
         return;
     }
@@ -486,6 +487,7 @@ void LifesRunner::handleBitingLife(Life * performer, ActionDTO action) {
 }
 
 void LifesRunner::handleEatLife(Life * performer, ActionDTO action) {
+    return;
     if (!performer->getEntity()->tryLockInteraction()) {
         return;
     }

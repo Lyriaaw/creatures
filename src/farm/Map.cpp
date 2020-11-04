@@ -226,16 +226,15 @@ void Map::processClimate() {
                     double heightDifference = (currentHeight - getTileAt(it + x, jt + y)->getHeight());
 
                     double transferedHeat = availableHeat + (heightDifference * availableHeat);
-                    newHeats[it + x][jt + y] += transferedHeat;
-                    newHeats[it][jt] -= transferedHeat;
-
-
-
-
                     double transferedGround = availableGround + (heightDifference * availableGround);
 
-                    newGround[it + x][jt + y] += transferedGround;
-                    newGround[it][jt] -= transferedGround;
+
+                    Tile * targetTile = getTileAt(it + x, jt + y);
+                    targetTile->addTmpHeat(transferedHeat);
+                    targetTile->addTmpGround(transferedGround);
+
+                    currentTile->lockOwnerAddHeat(-1 * transferedHeat);
+                    currentTile->lockOwnerAddGround(-1 * transferedGround);
                 }
             }
 
@@ -246,8 +245,8 @@ void Map::processClimate() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
-            currentTile->lockOwnerSetGround(newGround[it][jt]);
-            currentTile->lockOwnerSetHeat(newHeats[it][jt]);
+            currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
+            currentTile->lockOwnerAddGround(currentTile->getAndClearTmpGround());
 
             if (currentTile->getHeat() <= 0) {
                 currentTile->unlockHeatAndGround();
