@@ -208,7 +208,7 @@ void Farm::Tick(bool paused) {
         map->setSpeedCorrectionRatio(mapTickDifference);
     }
 
-    if (tickCount % 100 == 0) {
+    if (tickCount % 10000 == 0 || tickCount == 1) {
         fillEnergyDataAnalyser();
         triggerBiomassReportUpdate();
     }
@@ -1075,7 +1075,9 @@ std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChu
     for (int jt = 0; jt < selectedChunks.size(); jt++) {
         Point currentChunk = selectedChunks.at(jt);
 
-        std::vector<Entity *> tileEntities = map->getTileAt(currentChunk.getX(), currentChunk.getY())->getEntities();
+        Tile * currentTile = map->getTileAt(currentChunk.getX(), currentChunk.getY());
+
+        std::vector<Entity *> tileEntities = currentTile->getEntities();
         std::vector<Entity *> tileLifeEntity = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
 
         accessibleEntities.insert(accessibleEntities.end(), tileEntities.begin(), tileEntities.end());
@@ -1375,6 +1377,11 @@ const vector<LifesRunner *> &Farm::getLifesRunners() const {
 
 
 void Farm::fillEnergyDataAnalyser() {
+    farmControl->setPaused(true);
+    usleep(2000000);
+
+
+
     std::vector<Life *> currentLifes = getLifes();
     for (int it = 0; it < currentLifes.size(); it++) {
         while (!currentLifes.at(it)->getEntity()->tryLockInteraction()) {
@@ -1457,6 +1464,8 @@ void Farm::fillEnergyDataAnalyser() {
     biomassDataTracker.getCreaturesAvailableEnergy()->addValue(creaturesAvailableEnergy);
     biomassDataTracker.getCreaturesMass()->addValue(creaturesMass);
     biomassDataTracker.getCreaturesWastedEnergy()->addValue(creaturesWasteEnergy);
+
+    farmControl->setPaused(false);
 
 }
 

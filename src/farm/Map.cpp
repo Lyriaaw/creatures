@@ -179,22 +179,16 @@ void Map::processClimate() {
     }
 
 
-    float newGround[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
-    float newHeats[TILE_COUNT_WIDTH][TILE_COUNT_HEIGHT];
-
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
             currentTile->decayPheromone();
+            currentTile->handleEntityDecay();
             currentTile->removeDeletedEntities();
 
-            currentTile->lockHeatAndGround();
-            currentTile->handleEntityDecay();
-            currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
-            currentTile->lockOwnerAddGround(currentTile->getAndClearTmpGround());
+            currentTile->addHeat(currentTile->getAndClearTmpHeat());
+            currentTile->addGround(currentTile->getAndClearTmpGround());
 
-            newGround[it][jt] = currentTile->getGround();
-            newHeats[it][jt] = currentTile->getHeat();
 
         }
     }
@@ -204,6 +198,7 @@ void Map::processClimate() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = tiles.at(it).at(jt);
+            currentTile->lockHeatAndGround();
 
             float availableGround = currentTile->getGround() / 1000.f;
 
@@ -238,6 +233,9 @@ void Map::processClimate() {
                 }
             }
 
+
+            currentTile->unlockHeatAndGround();
+
         }
     }
 
@@ -245,14 +243,14 @@ void Map::processClimate() {
     for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
-            currentTile->lockOwnerAddHeat(currentTile->getAndClearTmpHeat());
-            currentTile->lockOwnerAddGround(currentTile->getAndClearTmpGround());
+            currentTile->addHeat(currentTile->getAndClearTmpHeat());
+            currentTile->addGround(currentTile->getAndClearTmpGround());
 
             if (currentTile->getHeat() <= 0) {
-                currentTile->unlockHeatAndGround();
-
                 continue;
             }
+
+            currentTile->lockHeatAndGround();
 
             float heatToGroundRatio = 0.01f * VEGETALISATION_RATE;
             float currentTileHeat = currentTile->getHeat();
@@ -362,10 +360,6 @@ void Map::vegetalisation() {
 
 
 Tile * Map::getTileAt(int tileX, int tileY) {
-    while (!mapMutex.try_lock()) {
-        usleep(10);
-    }
-
     if (tileX < 0 || tileX >= TILE_COUNT_WIDTH || tileY < 0 || tileY >= TILE_COUNT_HEIGHT) {
         std::cout << "ERROR, REQUESTED WRONG TILE => X: " << tileX << " Y: " << tileY << std::endl;
         return tiles.at(0).at(0);
@@ -373,7 +367,6 @@ Tile * Map::getTileAt(int tileX, int tileY) {
 
 
     Tile * tile = tiles.at(tileX).at(tileY);
-    mapMutex.unlock();
 
     return tile;
 }

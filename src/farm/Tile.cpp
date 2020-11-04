@@ -145,7 +145,7 @@ void Tile::decayPheromone() {
         return;
     }
 
-    pheromoneQuantity -= (0.05 * pheromoneQuantity) * VEGETALISATION_RATE;
+    pheromoneQuantity -= (0.025 * pheromoneQuantity) * VEGETALISATION_RATE;
 
     if (pheromoneQuantity < 1.0) {
         pheromoneQuantity = 0;
@@ -183,11 +183,11 @@ void Tile::handleEntityDecay() {
         }
 
         if (entity->getMass() < 100) {
-            lockOwnerAddGround(entity->getMass());
+            addGround(entity->getMass());
             entity->setMass(0);
         } else {
-            lockOwnerAddGround(2.0 * VEGETALISATION_RATE);
-            entity->removeMass(2.0 * VEGETALISATION_RATE);
+            addGround(1.0 * VEGETALISATION_RATE);
+            entity->removeMass(1.0 * VEGETALISATION_RATE);
         }
         entity->unlockInteraction();
     }
