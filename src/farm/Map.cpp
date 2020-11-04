@@ -186,6 +186,7 @@ void Map::processClimate() {
         for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
             Tile * currentTile = getTileAt(it, jt);
             currentTile->decayPheromone();
+            currentTile->removeDeletedEntities();
 
             currentTile->lockHeatAndGround();
             currentTile->handleEntityDecay();
@@ -262,7 +263,6 @@ void Map::processClimate() {
 
             currentTile->unlockHeatAndGround();
 
-            currentTile->removeDeletedEntities();
 
 
         }

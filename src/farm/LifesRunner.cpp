@@ -323,12 +323,14 @@ void LifesRunner::checkAndHandleLifeDying(Life * life) {
     if (life->getEnergyCenter()->getAvailableEnergy() <= 0) {
         Point performerPoint = life->getEntity()->getPosition();
 
+        generateEntities(performerPoint, 0.2f, 0.3f, 500, life->getEnergyCenter()->getAvailableEnergy(), life->getEntity()->getSize());
         generateEntities(performerPoint, life->getEntity()->getColor(), 0.3f, 4000, life->getEntity()->getMass(), life->getEntity()->getSize());
         generateEntities(performerPoint, 0.04f, 0.2f, (0.1 * life->getEntity()->getSize() * MASS_TO_SIZE_RATIO), life->getEnergyCenter()->getWastedEnergy(), life->getEntity()->getSize());
 
 
         life->getEntity()->setMass(0.0);
         life->getEnergyCenter()->setWastedEnergy(0.0);
+        life->getEnergyCenter()->setAvailableEnergy(0.0);
     }
 }
 

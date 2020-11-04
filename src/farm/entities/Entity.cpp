@@ -8,7 +8,7 @@
 
 int Entity::GLOBAL_INDEX = 1;
 
-Entity::Entity(Point position): position(position), mass(0.0), age(0), isALife(false) {
+Entity::Entity(Point position): position(position), mass(0.0), age(0), rotation(0), isALife(false) {
     this->id = GLOBAL_INDEX;
     GLOBAL_INDEX++;
     this->exists = true;

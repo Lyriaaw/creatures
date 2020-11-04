@@ -2,6 +2,7 @@
 // Created by Amalric Lombard de Buffières on 8/9/20.
 //
 
+#include <unistd.h>
 #include "Life.h"
 #include "muscles/externals/Mouth.h"
 #include "muscles/internals/Movement.h"
@@ -66,6 +67,12 @@ double Life::giveawayEnergy() {
 
     usedEnergy *= (entity->getAge() / 1000.0);
 
+
+    while (!entity->tryLockInteraction()) {
+        usleep(5000);
+    }
+
+
     double currentEntityEnergy = this->energyCenter->getAvailableEnergy();
 
 
@@ -81,6 +88,8 @@ double Life::giveawayEnergy() {
     }
 
     this->energyCenter->setAvailableEnergy(currentEntityEnergy - usedEnergy);
+
+    entity->unlockInteraction();
 
     return usedEnergy;
 }
