@@ -170,6 +170,10 @@ void MainWindow::loadFarm() {
         webUiConnection->updateCreaturesRunnerClients(id);
     });
 
+    farm->getFarmControl()->setTriggerUpdate([&]() {
+       webUiConnection->updateFarmControl();
+    });
+
 
     farm->InitFromRandom();
 

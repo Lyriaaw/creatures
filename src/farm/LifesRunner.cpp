@@ -71,6 +71,10 @@ void LifesRunner::handleThread() {
                 usleep(secondToSleep * 1000000.0);
             }
 
+            if (this->farmControl->getWaitingTimeMs() != 0) {
+                usleep(this->farmControl->getWaitingTimeMs() * 1000);
+            }
+
         }
     };
 

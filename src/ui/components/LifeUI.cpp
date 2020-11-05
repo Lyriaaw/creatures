@@ -26,6 +26,12 @@ Life *LifeUI::getLife() const {
 }
 
 void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEntity) {
+
+    if (selectedEntity != nullptr && life->getEntity()->getId() == selectedEntity->getId()) {
+//        std::cout << "X: " << screenPoint.getX() << " => " <<
+        camera->setCenter(life->getEntity()->getPosition());
+    }
+
     Point screenPoint = camera->getScreenCoordinates(this->life->getEntity()->getPosition());
 
     if (!camera->shouldDisplayPoint(screenPoint)) {

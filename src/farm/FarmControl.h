@@ -4,12 +4,16 @@
 
 #ifndef CREATURES_FARMCONTROL_H
 #define CREATURES_FARMCONTROL_H
+#include <nlohmann/json.hpp>
 
 
 class FarmControl {
 private:
     bool running;
     bool paused;
+    int waitingTimeMs;
+
+    std::function<void()> triggerUpdate;
 
 public:
     FarmControl();
@@ -22,6 +26,14 @@ public:
     bool isPaused() const;
 
     void setPaused(bool paused);
+
+    void setTriggerUpdate(const std::function<void()> &triggerUpdate);
+
+    int getWaitingTimeMs() const;
+
+    void setWaitingTimeMs(int waitingTimeMs);
+
+    nlohmann::json asJSON();
 };
 
 

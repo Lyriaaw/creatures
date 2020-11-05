@@ -105,11 +105,32 @@ void WebUiConnection::handleClientMessage(int id, std::string message) {
         handleClientRequest(id, j);
     } else if (j["type"] == "map_generator") {
         handleNewMapGenerator(id, j);
+    } else if (j["type"] == "farm_control") {
+        handleNewFarmControl(id, j);
     } else {
         std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
     }
 
 }
+
+void WebUiConnection::handleNewFarmControl(int id, json newFarmControlJSON) {
+    FarmControl * farmControl = farm->getFarmControl();
+
+    try {
+        farmControl->setPaused(newFarmControlJSON["body"]["paused"]);
+
+        int waitingTime = std::stoi(newFarmControlJSON["body"]["waitingTimeMs"].dump());
+        farmControl->setWaitingTimeMs(waitingTime);
+
+    } catch (std::exception exception) {
+        std::cout << "ERROR parsing farm control dto JSON => " << exception.what()  << std::endl;
+        return;
+    }
+
+
+
+    sendMessageToClient(id, sendEvent("farm_control_update", farm->getFarmControl()->asJSON()).dump(), true);
+};
 
 void WebUiConnection::handleNewMapGenerator(int id, json newGeneratorJSON) {
     MapGeneratorControl * currentGeneratorControl = farm->getMap()->getMapGeneratorControl();
@@ -216,6 +237,19 @@ void WebUiConnection::sendInitialData(int id) {
 
 
     sendMessageToClient(id, sendEvent("initial_data", initialData).dump(), false);
+    sendMessageToClient(id, sendEvent("farm_control_update", farm->getFarmControl()->asJSON()).dump(), false);
+}
+
+void WebUiConnection::updateFarmControl() {
+
+    nlohmann::json farmControlJSON = farm->getFarmControl()->asJSON();
+
+    for (auto const& client : clients) {
+        std::string messageToSend = sendEvent("farm_control_update", farmControlJSON).dump();
+
+
+        client->sendMessage(messageToSend);
+    }
 }
 
 void WebUiConnection::sendInitialCreatures(int id) {

@@ -74,6 +74,10 @@ public:
     void sendNewSelectedCreature(int id);
 
     void sendNewRunner(int id);
+
+    void updateFarmControl();
+
+    void handleNewFarmControl(int id, json newFarmControlJSON);
 };
 
 

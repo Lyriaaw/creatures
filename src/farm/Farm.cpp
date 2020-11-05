@@ -233,6 +233,10 @@ void Farm::Tick(bool paused) {
     }
 
     usleep(10000);
+
+    if (this->farmControl->getWaitingTimeMs() != 0) {
+        usleep(this->farmControl->getWaitingTimeMs() * 1000);
+    }
 }
 
 void Farm::multithreadBrainProcessing(bool *paused) {

@@ -129,6 +129,10 @@ void Map::handleThread() {
             processClimate();
 
             usleep(std::max(int(10000 + std::max(-100000, int((10000 * speedCorrectionRatio)))), 0));
+
+            if (this->farmControl->getWaitingTimeMs() != 0) {
+                usleep(this->farmControl->getWaitingTimeMs() * 1000);
+            }
         }
     };
 
