@@ -186,8 +186,8 @@ void Tile::handleEntityDecay() {
             addGround(entity->getMass());
             entity->setMass(0);
         } else {
-            addGround(1.0 * VEGETALISATION_RATE);
-            entity->removeMass(1.0 * VEGETALISATION_RATE);
+            addGround(0.5 * VEGETALISATION_RATE);
+            entity->removeMass(0.5 * VEGETALISATION_RATE);
         }
         entity->unlockInteraction();
     }

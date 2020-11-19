@@ -7,15 +7,20 @@
 #include "muscles/externals/Mouth.h"
 #include "muscles/internals/Movement.h"
 
-void Life::processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
+void Life::saveAccessibleEntities(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
     this->currentAccessibleEntities = availableEntities;
     this->currentAccessibleTiles = availableTiles;
+}
+
+void Life::processSensors() {
 
     for (int it = 0; it < sensors.size(); it++) {
-        sensors.at(it)->fetchSensorValue(availableEntities, availableTiles);
+        sensors.at(it)->fetchSensorValue(currentAccessibleEntities, currentAccessibleTiles);
         sensors.at(it)->passValueToNeuron();
     }
 }
+
+
 void Life::processBrain() {
     for (int it = 0; it < brain->getLinks().size(); it++) {
         brain->getLinks().at(it)->getOutput()->clear();
@@ -33,10 +38,10 @@ void Life::processBrain() {
         }
     }
 }
-std::vector<ActionDTO> Life::executeExternalActions(std::vector<Entity *> availableEntities) {
+std::vector<ActionDTO> Life::executeExternalActions() {
     std::vector<ActionDTO> currentCreatureActions;
     for (int it = 0; it < externalMuscles.size(); it++) {
-        std::vector<ActionDTO> muscleActions = externalMuscles.at(it)->prepareActionDTO(availableEntities);
+        std::vector<ActionDTO> muscleActions = externalMuscles.at(it)->prepareActionDTO(currentAccessibleEntities);
 
         currentCreatureActions.insert(currentCreatureActions.begin(), muscleActions.begin(), muscleActions.end());
     }

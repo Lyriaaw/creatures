@@ -101,8 +101,7 @@ void LifesRunner::brainProcessing(bool paused) {
     dataAnalyser.getChunkSelection()->addValue(elapsed_timeChunk.count());
 
 
-
-    std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point accessibleEntitiesStart = std::chrono::system_clock::now();
     for (int it = 0; it < currentLifes.size(); it++) {
         Life *currentLife = currentLifes.at(it);
         if (!currentLife->isAlive()) {
@@ -111,7 +110,21 @@ void LifesRunner::brainProcessing(bool paused) {
 
         std::vector<Entity *> accessibleEntities = getAccessibleEntities(currentLife->getSelectedChunks());
         std::vector<Tile *> accessibleTiles = getAccessibleTiles(currentLife, currentLife->getSelectedChunks());
-        currentLife->processSensors(accessibleEntities, accessibleTiles);
+        currentLife->saveAccessibleEntities(accessibleEntities, accessibleTiles);
+    }
+    std::chrono::system_clock::time_point accessibleEntitiesEnd = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_timeAccessibleEntities = accessibleEntitiesEnd - accessibleEntitiesStart;
+    dataAnalyser.getAccessibleEntities()->addValue(elapsed_timeAccessibleEntities.count());
+
+
+    std::chrono::system_clock::time_point sensorProcessingStart = std::chrono::system_clock::now();
+    for (int it = 0; it < currentLifes.size(); it++) {
+        Life *currentLife = currentLifes.at(it);
+        if (!currentLife->isAlive()) {
+            continue;
+        }
+
+        currentLife->processSensors();
     }
     std::chrono::system_clock::time_point sensorProcessingEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_timeSensor = sensorProcessingEnd - sensorProcessingStart;
@@ -174,10 +187,9 @@ void LifesRunner::executeCreatureActions() {
             continue;
         }
 
-        std::vector<Point> selectedTiles = life->getSelectedChunks();
-        std::vector<Entity *> accessibleEntities = getAccessibleEntities(selectedTiles);
+        std::vector<Entity *> accessibleEntities = life->getCurrentAccessibleEntities();
 
-        std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions(accessibleEntities);
+        std::vector<ActionDTO> currentCreatureActions = life->executeExternalActions();
 
 
         for (auto const& action : currentCreatureActions) {
@@ -727,6 +739,7 @@ json LifesRunner::asJson() {
     times["biteLifeCount"] = this->dataAnalyser.getBiteLifeCount()->getAveragedLastValue();
     times["chunkSelection"] = this->dataAnalyser.getChunkSelection()->getAveragedLastValue();
     times["sensorProcessing"] = this->dataAnalyser.getSensorProcessing()->getAveragedLastValue();
+    times["accessibleEntities"] = this->dataAnalyser.getAccessibleEntities()->getAveragedLastValue();
     times["brainProcessing"] = this->dataAnalyser.getBrainProcessing()->getAveragedLastValue();
     times["externalActions"] = this->dataAnalyser.getExternalActions()->getAveragedLastValue();
     times["moveCreatures"] = this->dataAnalyser.getMoveCreatures()->getAveragedLastValue();

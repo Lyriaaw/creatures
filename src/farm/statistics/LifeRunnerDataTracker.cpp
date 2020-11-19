@@ -20,6 +20,7 @@ LifeRunnerDataTracker::LifeRunnerDataTracker() {
     biteLifeCount = new DataItem("biteLifeCount", true);
 
     chunkSelection = new DataItem("chunkSelection", true);
+    accessibleEntities = new DataItem("accessibleEntities", true);
     sensorProcessing = new DataItem("sensorProcessing", true);
     brainProcessing = new DataItem("brainProcessing", true);
     externalActions = new DataItem("externalActions", true);
@@ -88,6 +89,10 @@ DataItem *LifeRunnerDataTracker::getMoveCreatures() const {
 
 DataItem *LifeRunnerDataTracker::getLifesCount() const {
     return lifesCount;
+}
+
+DataItem *LifeRunnerDataTracker::getAccessibleEntities() const {
+    return accessibleEntities;
 }
 
 

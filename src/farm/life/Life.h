@@ -38,13 +38,14 @@ private:
 public:
     double giveawayEnergy();
 
-    void processSensors(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
+    void saveAccessibleEntities(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
+    void processSensors();
     void processBrain();
 
     void processSelectedChunks();
     std::vector<Point> getSelectedChunks();
 
-    std::vector<ActionDTO> executeExternalActions(std::vector<Entity *> availableEntities);
+    std::vector<ActionDTO> executeExternalActions();
     std::vector<Entity *> executeInternalActions();
 
 
@@ -95,6 +96,7 @@ public:
 
     void addChild(int childId);
     void addParent(int parentId);
+
 };
 
 

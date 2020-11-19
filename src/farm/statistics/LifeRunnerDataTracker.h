@@ -20,6 +20,7 @@ private:
     DataItem * biteLifeCount;
 
     DataItem * chunkSelection;
+    DataItem * accessibleEntities;
     DataItem * sensorProcessing;
     DataItem * brainProcessing;
     DataItem * externalActions;
@@ -65,6 +66,8 @@ public:
     DataItem *getMoveCreatures() const;
 
     DataItem *getLifesCount() const;
+
+    DataItem *getAccessibleEntities() const;
 };
 
 
