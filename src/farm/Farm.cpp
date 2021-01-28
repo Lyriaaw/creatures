@@ -1083,11 +1083,12 @@ std::vector<Entity *> Farm::getAccessibleEntities(std::vector<Point> selectedChu
 
         std::vector<Entity *> tileEntities = currentTile->getEntities();
 
-        std::vector<Entity *> tileLifeEntity;
+        std::vector<Entity *> tileLifeEntity = currentTile->getLifesEntities();
         if (currentChunk.getX() < 0 || currentChunk.getX() >= TILE_COUNT_WIDTH || currentChunk.getY() < 0 || currentChunk.getY() >= TILE_COUNT_HEIGHT) {
             std::cout << "ERROR, REQUESTED WRONG TILE => X: " << currentChunk.getX() << " Y: " << currentChunk.getY() << std::endl;
         } else {
-            tileLifeEntity = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+//            std::vector<Entity *> tileLifeEntity2 = entityGrid.at(currentChunk.getX()).at(currentChunk.getY());
+
         }
 
 
@@ -1121,6 +1122,15 @@ std::vector<Life *> Farm::getScoreSortedCreatures() {
 void Farm::sortCreatures() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
+    this->sorted = getLifes();
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+    double statisticsTime = elapsed_time.count();
+
+    dataAnalyser.getCreatureSortingTime()->addValue(statisticsTime);
+    return;
+
     std::vector<Life *> sortResult;
 
     std::vector<Life *> tmpLifes = getLifes();
@@ -1146,11 +1156,11 @@ void Farm::sortCreatures() {
     }
     this->sorted = sortResult;
 
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_time = end - start;
-    double statisticsTime = elapsed_time.count();
-
-    dataAnalyser.getCreatureSortingTime()->addValue(statisticsTime);
+//    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+//    std::chrono::duration<double> elapsed_time = end - start;
+//    double statisticsTime = elapsed_time.count();
+//
+//    dataAnalyser.getCreatureSortingTime()->addValue(statisticsTime);
 }
 
 

@@ -24,6 +24,11 @@ private:
     std::mutex entities_mutex;
     std::vector<Entity *> entities;
 
+    std::mutex lifes_mutex;
+    std::vector<Entity *> lifes;
+
+
+
     float heat;
     float ground;
     std::mutex ground_mutex;
@@ -122,6 +127,16 @@ public:
     void lockHeat();
 
     void unlockHeat();
+
+    void unlockLifes();
+
+    void lockLifes();
+
+    void addLife(Entity *life);
+
+    void removeLife(Entity *life);
+
+    std::vector<Entity *> getLifesEntities();
 };
 
 

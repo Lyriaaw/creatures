@@ -25,6 +25,7 @@ void LifesRunner::handleThread() {
     auto f = [&]() {
         while (farmControl->isRunning()) {
             if (!farmControl->isPaused()) {
+
                 moveCreatures();
                 brainProcessing(false);
                 removeDeadLifes();
@@ -290,16 +291,21 @@ void LifesRunner::moveCreatures() {
     for (int it = 0; it < currentLifes.size(); it++) {
         Life *currentLife = currentLifes.at(it);
 
+        Point positionBeforeMove = currentLife->getEntity()->getTileCoordinates();
+
         std::vector<Entity* > producedEntities = currentLife->executeInternalActions();
 
         Point tilePoint = currentLife->getEntity()->getTileCoordinates();
 //        newEntities.insert(newEntities.begin(), producedEntities.begin(), producedEntities.end());
 
-        double releasedHeat = 0.0;
-        if (currentLife->getEntity()->getAge() % 10 == 0) {
-            releasedHeat = currentLife->giveawayEnergy();
-            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpHeat(releasedHeat);
+        if (tilePoint.getX() != positionBeforeMove.getX() || tilePoint.getY() != positionBeforeMove.getY()) {
+            map->getTileAt(positionBeforeMove.getX(), positionBeforeMove.getY())->removeLife(currentLife->getEntity());
+            map->getTileAt(tilePoint.getX(), tilePoint.getY())->addLife(currentLife->getEntity());
         }
+
+        double releasedHeat = 0.0;
+        releasedHeat = currentLife->giveawayEnergy();
+        map->getTileAt(tilePoint.getX(), tilePoint.getY())->addTmpHeat(releasedHeat);
 
 
 

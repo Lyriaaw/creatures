@@ -18,7 +18,7 @@ void WebUiConnection::handleTread() {
 
 void WebUiConnection::threadLoop() {
     try{
-        auto const address = net::ip::make_address("127.0.0.1");
+        auto const address = net::ip::make_address("0.0.0.0");
         auto const port = static_cast<unsigned short>(25565);
 
         net::io_context ioc{1};
@@ -41,7 +41,11 @@ void WebUiConnection::threadLoop() {
                 });
 
                 client->setHandleClientMessage([&](int id, std::string message) {
-                   this->handleClientMessage(id, message);
+                    try {
+                        this->handleClientMessage(id, message);
+                    } catch (const std::exception& e) {
+                        std::cerr << "Error while receiving message: " << e.what() << std::endl;
+                    }
                 });
 
 
@@ -107,11 +111,30 @@ void WebUiConnection::handleClientMessage(int id, std::string message) {
         handleNewMapGenerator(id, j);
     } else if (j["type"] == "farm_control") {
         handleNewFarmControl(id, j);
+    } else if (j["type"] == "ping") {
+        handlePing(id, j);
     } else {
         std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
     }
 
 }
+
+void WebUiConnection::handlePing(int id, json ping) {
+
+
+//
+//
+    nlohmann::json result;
+    result["pingedAt"] = ping["pingedAt"];
+//
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    double statisticsTime = end.time_since_epoch().count();
+    result["serverTime"] = statisticsTime;
+
+    std::cout << "Ping !" << std::endl;
+
+    sendMessageToClient(id, sendEvent("ping", result).dump(), true);
+};
 
 void WebUiConnection::handleNewFarmControl(int id, json newFarmControlJSON) {
     FarmControl * farmControl = farm->getFarmControl();

@@ -7,7 +7,7 @@
 
 
 #include "UiComponent.h"
-#include "../../../../../../../../usr/local/Cellar/sfml/2.5.1/include/SFML/Graphics/RenderWindow.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
 #include "../minimaps/Minimap.h"
 
 class ViewSettings: public UiComponent {

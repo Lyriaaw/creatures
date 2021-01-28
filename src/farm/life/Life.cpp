@@ -70,7 +70,7 @@ double Life::giveawayEnergy() {
 
     double usedEnergy = sensorEnergy + biasEnergy + muscleEnergy + wastedEnergyCarrying;
 
-    usedEnergy *= (entity->getAge() / 1000.0);
+    usedEnergy *= (entity->getAge() / 10000.0);
 
 
     while (!entity->tryLockInteraction()) {

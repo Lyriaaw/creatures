@@ -41,7 +41,7 @@ MainWindow::MainWindow(): leftMouseButtonDown(false), rightMouseButtonDown(false
 void MainWindow::loadFont() {
     sf::Font * font = new Font();
 
-    if (!font->loadFromFile("/Users/lyriaaz/projects/perso/Creatures/assets/Montserrat.ttf")) {
+    if (!font->loadFromFile("/Users/lyriaaw/projects/perso/Creatures/assets/Montserrat.ttf")) {
         std::cout << "Font not loaded properly !" << std::endl;
     }
 

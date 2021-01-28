@@ -78,6 +78,8 @@ public:
     void updateFarmControl();
 
     void handleNewFarmControl(int id, json newFarmControlJSON);
+
+    void handlePing(int id, json ping);
 };
 
 

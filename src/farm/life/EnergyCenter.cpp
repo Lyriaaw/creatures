@@ -8,8 +8,11 @@ double EnergyCenter::addEnergy(double energyToAdd) {
     double massConverted = 0.0;
 
     if (entity->getMass() < maxMass) {
-        if (0.1 * energyToAdd < maxMass) {
-            massConverted = 0.1 * energyToAdd;
+        double massRatio = (entity->getMass() / maxMass);
+        double massConversionRatio = 1.0 - massRatio;
+
+        if (massConversionRatio * energyToAdd < maxMass) {
+            massConverted = massConversionRatio * energyToAdd;
         }
     }
 

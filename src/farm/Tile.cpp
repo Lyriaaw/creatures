@@ -162,11 +162,47 @@ void Tile::addEntity(Entity * entity) {
     entities.emplace_back(entity);
 }
 
+void Tile::addLife(Entity * life) {
+    std::lock_guard<std::mutex> guard(lifes_mutex);
+    lifes.emplace_back(life);
+}
+
+void Tile::removeLife(Entity * life) {
+    std::lock_guard<std::mutex> guard(lifes_mutex);
+
+    std::vector<Entity *> newLifes;
+    for (int it = 0; it < lifes.size(); it++) {
+
+        if (lifes.at(it)->getId() != life->getId()) {
+            newLifes.emplace_back(lifes.at(it));
+        }
+    }
+
+    lifes.clear();
+    lifes = newLifes;
+}
+
+
+
+
+
 std::vector<Entity *> Tile::getEntities() {
     std::lock_guard<std::mutex> guard(entities_mutex);
     std::vector<Entity *> givenEntities = entities;
     return givenEntities;
 }
+
+std::vector<Entity *> Tile::getLifesEntities() {
+    std::lock_guard<std::mutex> guard(lifes_mutex);
+
+
+    std::vector<Entity *> givenLifes = lifes;
+    return givenLifes;
+}
+
+
+
+
 
 std::vector<Entity *> Tile::lockOwnerGetEntities() {
     return entities;
@@ -209,6 +245,7 @@ void Tile::removeDeletedEntities() {
 }
 
 
+
 void Tile::lockHeatAndGround() {
     while (!ground_mutex.try_lock()) {
         usleep(10000);
@@ -239,6 +276,16 @@ void Tile::lockEntities() {
 
 void Tile::unlockEntities() {
     entities_mutex.unlock();
+}
+
+void Tile::lockLifes() {
+    while (!lifes_mutex.try_lock()) {
+        usleep(10000);
+    }
+}
+
+void Tile::unlockLifes() {
+    lifes_mutex.unlock();
 }
 
 
@@ -272,3 +319,4 @@ void Tile::unlockTmpHeatAndTmpGround() {
     tmp_ground_mutex.unlock();
     tmp_heat_mutex.unlock();
 }
+
