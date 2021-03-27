@@ -4,7 +4,8 @@
 
 #include "MapGeneratorControl.h"
 
-MapGeneratorControl::MapGeneratorControl(): positionRatio(1.5), zOrdinate(0.8), waterLevel(0.45), layers(4) {
+//MapGeneratorControl::MapGeneratorControl(): positionRatio(1.5), zOrdinate(0.8), waterLevel(0.45), layers(4) {
+MapGeneratorControl::MapGeneratorControl(): positionRatio(1.87), zOrdinate(0.8), waterLevel(0.42), layers(1) {
 
 }
 
