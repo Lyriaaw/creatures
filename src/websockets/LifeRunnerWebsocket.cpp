@@ -5,8 +5,9 @@
 #include "LifeRunnerWebsocket.h"
 #include "WebUiClient.h"
 
-LifeRunnerWebsocket::LifeRunnerWebsocket(int port) : port(port) {
-
+LifeRunnerWebsocket::LifeRunnerWebsocket(int port) : port(port), totalConnection(0) {
+    std::cout << "Starting life runner websocket on port " << port << std::endl;
+    handleTread();
 }
 
 void LifeRunnerWebsocket::handleTread() {
@@ -21,7 +22,7 @@ void LifeRunnerWebsocket::handleTread() {
 void LifeRunnerWebsocket::threadLoop() {
     try{
         auto const address = net::ip::make_address("0.0.0.0");
-        auto const port = static_cast<unsigned short>(25565);
+        auto const port = static_cast<unsigned short>(LifeRunnerWebsocket::port);
 
         net::io_context ioc{1};
 
@@ -118,4 +119,8 @@ void LifeRunnerWebsocket::handleClientMessage(int id, std::string message) {
 //        std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
 //    }
 
+}
+
+int LifeRunnerWebsocket::getPort() const {
+    return port;
 }

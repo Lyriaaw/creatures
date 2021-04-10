@@ -8,6 +8,8 @@
 LifesRunner::LifesRunner(int id): id(id), tick(0) {
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
+
+    websocket = new LifeRunnerWebsocket(25000 + id);
 }
 
 void LifesRunner::addLife(Life * life) {
@@ -750,30 +752,11 @@ void LifesRunner::setCreatureNursery(CreatureNursery *creatureNursery) {
 
 json LifesRunner::asJson() {
     json times;
-    times["lifesCount"] = this->dataAnalyser.getLifesCount()->getAveragedLastValue();
-    times["tickTime"] = this->dataAnalyser.getTickTime()->getAveragedLastValue();
-    times["tickPerSecond"] = this->dataAnalyser.getTickPerSecond()->getAveragedLastValue();
-    times["poopCount"] = this->dataAnalyser.getPoopCount()->getAveragedLastValue();
-    times["pheromoneCount"] = this->dataAnalyser.getPheromoneCount()->getAveragedLastValue();
-    times["eatCount"] = this->dataAnalyser.getEatCount()->getAveragedLastValue();
-    times["eatLifeCount"] = this->dataAnalyser.getEatLifeCount()->getAveragedLastValue();
-    times["mateSuccessCount"] = this->dataAnalyser.getMateSuccessCount()->getAveragedLastValue();
-    times["mateFailureCount"] = this->dataAnalyser.getMateFailureCount()->getAveragedLastValue();
-    times["biteCount"] = this->dataAnalyser.getBiteCount()->getAveragedLastValue();
-    times["biteLifeCount"] = this->dataAnalyser.getBiteLifeCount()->getAveragedLastValue();
-    times["chunkSelection"] = this->dataAnalyser.getChunkSelection()->getAveragedLastValue();
-    times["sensorProcessing"] = this->dataAnalyser.getSensorProcessing()->getAveragedLastValue();
-    times["accessibleEntities"] = this->dataAnalyser.getAccessibleEntities()->getAveragedLastValue();
-    times["brainProcessing"] = this->dataAnalyser.getBrainProcessing()->getAveragedLastValue();
-    times["externalActions"] = this->dataAnalyser.getExternalActions()->getAveragedLastValue();
-    times["moveCreatures"] = this->dataAnalyser.getMoveCreatures()->getAveragedLastValue();
 
 
     nlohmann::json result = {
         {"id", this->id},
-        {"tick", this->tick},
-        {"creatures_count", this->lifes.size()},
-        {"times", times},
+        {"port", this->websocket->getPort()},
     };
 
 

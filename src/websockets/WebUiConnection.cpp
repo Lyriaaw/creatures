@@ -103,16 +103,15 @@ void WebUiConnection::handleClientMessage(int id, std::string message) {
         return;
     }
 
+
     json j = json::parse(message);
 
-    if (j["type"] == "request") {
+    if (j["type"] == "get") {
         handleClientRequest(id, j);
     } else if (j["type"] == "map_generator") {
         handleNewMapGenerator(id, j);
     } else if (j["type"] == "farm_control") {
         handleNewFarmControl(id, j);
-    } else if (j["type"] == "ping") {
-        handlePing(id, j);
     } else {
         std::cout << "Unrecognized messsage from client id " << id << " => " << message << std::endl;
     }
@@ -123,17 +122,18 @@ void WebUiConnection::handlePing(int id, json ping) {
 
 
 //
-//
-    nlohmann::json result;
-    result["pingedAt"] = ping["pingedAt"];
-//
     std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
     double statisticsTime = end.time_since_epoch().count();
-    result["serverTime"] = statisticsTime;
 
-    std::cout << "Ping !" << std::endl;
 
-    sendMessageToClient(id, sendEvent("ping", result).dump(), true);
+    json pingData = {
+        {"sent_at", ping["sent_at"]},
+        {"server_time", statisticsTime},
+        {"type", "ping"},
+    };
+//
+
+    sendMessageToClient(id, pingData.dump(), true);
 };
 
 void WebUiConnection::handleNewFarmControl(int id, json newFarmControlJSON) {
@@ -197,20 +197,40 @@ void WebUiConnection::handleNewMapGenerator(int id, json newGeneratorJSON) {
 };
 
 void WebUiConnection::handleClientRequest(int id, json request) {
-    if(request["component"] == "biomass_report") {
+    if(request["endpoint"] == "biomass_report") {
         farm->fillEnergyDataAnalyser();
         json report = farm->getBiomassDataTracker().getLastTickAsJson();
         sendMessageToClient(id, sendEvent("biomass_report", report).dump(), true);
         return;
     }
 
-    if(request["component"] == "new_runner") {
+    if(request["endpoint"] == "new_runner") {
         farm->fillEnergyDataAnalyser();
         farm->addNewRunner();
     }
 
 
+    if(request["endpoint"] == "ping") {
+        handlePing(id, request["body"]);
+    }
+
+    if(request["endpoint"] == "runners") {
+        sendRunnersJSON(id);
+    }
+
+
+
+
 }
+
+void WebUiConnection::sendRunnersJSON(int id) {
+    json runnersData = {
+            {"runners", farm->getRunnersJSON()},
+            {"type", "runners"},
+    };
+
+    sendMessageToClient(id, runnersData.dump(), true);
+};
 
 
 
@@ -239,28 +259,29 @@ void WebUiConnection::sendMessageToClient(int id, std::string message, bool lock
 
 
 json WebUiConnection::sendEvent(std::string type, json JSONBody) {
-    return {{
-        "event", {
-            {"type", type},
-            {"body", JSONBody}
-        }
-    }};
+    return {
+        {"type", type},
+        {"body", JSONBody}
+    };
 }
 
 
 void WebUiConnection::sendInitialData(int id) {
     nlohmann::json lifesJSON;
 
+//    json initialData = {
+//        {"farm", getFarmObject()},
+//        {"runners", farm->getRunnersJSON()},
+//        {"map", farm->getMap()->asJson()},
+//        {"mapGenerator", farm->getMap()->getMapGeneratorControl()->asJson()},
+//    };
     json initialData = {
-        {"farm", getFarmObject()},
-        {"runners", farm->getRunnersJSON()},
-        {"map", farm->getMap()->asJson()},
-        {"mapGenerator", farm->getMap()->getMapGeneratorControl()->asJson()},
+        {"type", "connection_successful"},
     };
 
 
-    sendMessageToClient(id, sendEvent("initial_data", initialData).dump(), false);
-    sendMessageToClient(id, sendEvent("farm_control_update", farm->getFarmControl()->asJSON()).dump(), false);
+    sendMessageToClient(id, initialData.dump(), false);
+//    sendMessageToClient(id, sendEvent("farm_control_update", farm->getFarmControl()->asJSON()).dump(), false);
 }
 
 void WebUiConnection::updateFarmControl() {
@@ -438,3 +459,4 @@ json WebUiConnection::getFarmObject() {
         {"uptime", farm->uptime()},
     };
 }
+

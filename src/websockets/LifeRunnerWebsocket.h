@@ -42,6 +42,8 @@ public:
     void clientDisconnected(int id);
 
     void handleClientMessage(int id, std::string message);
+
+    int getPort() const;
 };
 
 

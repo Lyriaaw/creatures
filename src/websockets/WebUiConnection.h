@@ -80,6 +80,8 @@ public:
     void handleNewFarmControl(int id, json newFarmControlJSON);
 
     void handlePing(int id, json ping);
+
+    void sendRunnersJSON(int id);
 };
 
 
