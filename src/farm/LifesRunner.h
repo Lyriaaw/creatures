@@ -12,6 +12,7 @@
 #include "Map.h"
 #include "CreatureNursery.h"
 #include "statistics/LifeRunnerDataTracker.h"
+#include "../websockets/LifeRunnerWebsocket.h"
 
 class LifesRunner {
 private:
@@ -23,6 +24,8 @@ private:
     std::mutex lifes_mutex;
 
     LifeRunnerDataTracker dataAnalyser;
+
+    LifeRunnerWebsocket *websocket;
 
     std::function<void(Point, float, float, double, double, double)> generateEntities;
     std::function<std::vector<Entity *>(std::vector<Point> selectedChunks)> getAccessibleEntities;
@@ -129,6 +132,8 @@ public:
     void setMedianTick(int medianTick);
 
     nlohmann::basic_json<> creaturesAsJson();
+
+    void saveOnMongo();
 };
 
 

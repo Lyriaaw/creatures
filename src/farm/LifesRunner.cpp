@@ -51,6 +51,9 @@ void LifesRunner::handleThread() {
 
                 dataAnalyser.getTickPerSecond()->addValue(1.0 / tickTime);
 
+                saveOnMongo();
+
+
 
             } else {
                 usleep(500000);
@@ -279,6 +282,7 @@ void LifesRunner::executeCreatureActions() {
     std::chrono::system_clock::time_point externalActionsEnd = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_timeActions = externalActionsEnd - externalActionsStart;
     dataAnalyser.getExternalActions()->addValue(elapsed_timeActions.count());
+
 }
 
 void LifesRunner::moveCreatures() {
@@ -355,6 +359,20 @@ void LifesRunner::checkAndHandleLifeDying(Life * life) {
         life->getEnergyCenter()->setAvailableEnergy(0.0);
     }
 }
+
+
+
+
+// Mongo
+
+
+void LifesRunner::saveOnMongo() {
+
+}
+
+
+
+
 
 
 
