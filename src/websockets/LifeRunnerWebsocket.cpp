@@ -5,7 +5,7 @@
 #include "LifeRunnerWebsocket.h"
 #include "WebUiClient.h"
 
-LifeRunnerWebsocket::LifeRunnerWebsocket(int port) : port(port), totalConnection(0) {
+LifeRunnerWebsocket::LifeRunnerWebsocket(int id) : id(id), port(25000 + id), totalConnection(0) {
     std::cout << "Starting life runner websocket on port " << port << std::endl;
     handleTread();
 }
@@ -33,11 +33,10 @@ void LifeRunnerWebsocket::threadLoop() {
             tcp::socket socket{ioc};
 
             acceptor.accept(socket);
-            std::cout << "Received ..." << std::endl;
             totalConnection++;
 
             auto f = [&](tcp::socket socket) {
-                LifeRunnerWebsocketClient * client = new LifeRunnerWebsocketClient(totalConnection);
+                LifeRunnerWebsocketClient * client = new LifeRunnerWebsocketClient(this->id, totalConnection);
 
                 client->setClientDisconnected([&](int id) {
                     this->clientDisconnected(id);
@@ -54,6 +53,7 @@ void LifeRunnerWebsocket::threadLoop() {
 
                 clients.emplace_back(client);
                 client->initClient(std::move(socket));
+                sendConnectionSuccessful(client->getId());
                 client->do_session();
             };
 
@@ -121,6 +121,48 @@ void LifeRunnerWebsocket::handleClientMessage(int id, std::string message) {
 
 }
 
+void LifeRunnerWebsocket::sendConnectionSuccessful(int id) {
+    json initialData = {
+            {"type", "connection_successful"},
+    };
+//
+//
+    sendMessageToClient(id, initialData.dump(), false);
+////    sendMessageToClient(id, sendEvent("farm_control_update", farm->getFarmControl()->asJSON()).dump(), false);
+}
+
+
+void LifeRunnerWebsocket::sendMessageToClient(int id, std::string message, bool lockOwner) {
+    if (!lockOwner) {
+        std::lock_guard<std::mutex> guard(clients_mutex);
+    }
+
+    LifeRunnerWebsocketClient * client = nullptr;
+
+    for (int it = 0; it < clients.size(); it++) {
+        if (clients.at(it)->getId() == id) {
+            client = clients.at(it);
+            it = clients.size();
+        }
+    }
+
+    if (client == nullptr) {
+        std::cout << "Error while trying to handle client message. Id " << id << " not found" << std::endl;
+        return;
+    }
+
+
+    client->sendMessage(message);
+}
+
+void LifeRunnerWebsocket::broadcastMessage(json message){
+    for (auto const& client : clients) {
+
+        client->sendMessage(message.dump());
+    }
+}
+
 int LifeRunnerWebsocket::getPort() const {
     return port;
 }
+

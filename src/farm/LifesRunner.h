@@ -13,6 +13,7 @@
 #include "CreatureNursery.h"
 #include "statistics/LifeRunnerDataTracker.h"
 #include "../websockets/LifeRunnerWebsocket.h"
+using json = nlohmann::json;
 
 class LifesRunner {
 private:
@@ -47,7 +48,6 @@ private:
     std::chrono::system_clock::time_point tickStart;
     std::chrono::system_clock::time_point tickEnd;
 
-    std::function<void(int id)> triggerUpdate;
     std::function<void(int id)> triggerCreaturesUpdate;
 
     int medianTick;
@@ -60,6 +60,7 @@ public:
     int getLifeCount();
 
     void brainProcessing(bool paused);
+    void triggerUpdate();
 
     void moveCreatures();
 
@@ -124,8 +125,6 @@ public:
     int getId() const;
 
     void setId(int id);
-
-    void setTriggerUpdate(const std::function<void(int)> &triggerUpdate);
 
     void setTriggerCreaturesUpdate(const std::function<void(int)> &triggerCreaturesUpdate);
 

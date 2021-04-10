@@ -25,6 +25,7 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 class LifeRunnerWebsocket {
 private:
+    int id;
     int port;
     std::vector<LifeRunnerWebsocketClient *> clients;
     std::mutex clients_mutex;
@@ -33,7 +34,7 @@ private:
 
 
 public:
-    LifeRunnerWebsocket(int port);
+    LifeRunnerWebsocket(int id);
 
     void handleTread();
 
@@ -44,6 +45,12 @@ public:
     void handleClientMessage(int id, std::string message);
 
     int getPort() const;
+
+    void sendConnectionSuccessful(int id);
+
+    void sendMessageToClient(int id, std::string message, bool lockOwner);
+
+    void broadcastMessage(json message);
 };
 
 

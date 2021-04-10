@@ -5,11 +5,13 @@
 #include "LifesRunner.h"
 #include "../websockets/WebUiConnection.h"
 
+void triggerUpdate();
+
 LifesRunner::LifesRunner(int id): id(id), tick(0) {
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 
-    websocket = new LifeRunnerWebsocket(25000 + id);
+    websocket = new LifeRunnerWebsocket( id);
 }
 
 void LifesRunner::addLife(Life * life) {
@@ -56,6 +58,8 @@ void LifesRunner::handleThread() {
                 saveOnMongo();
 
 
+                triggerUpdate();
+
 
             } else {
                 usleep(500000);
@@ -63,12 +67,11 @@ void LifesRunner::handleThread() {
 
             tickStart = std::chrono::system_clock::now();
 
-            if (tick % 100 == 0 && !farmControl->isPaused()) {
-                triggerUpdate(id);
-            }
-            if (tick % 25 == 0 && !farmControl->isPaused()) {
-                triggerCreaturesUpdate(id);
-            }
+//            if (tick % 100 == 0 && !farmControl->isPaused()) {
+//            }
+//            if (tick % 25 == 0 && !farmControl->isPaused()) {
+//                triggerCreaturesUpdate(id);
+//            }
 
 
 
@@ -86,6 +89,16 @@ void LifesRunner::handleThread() {
 
     std::thread runnerThread(f);
     runnerThread.detach();
+}
+
+void LifesRunner::triggerUpdate() {
+    json data = {
+        {"type", "life_runner_progress"},
+        {"tick", this->tick},
+        {"tps", this->dataAnalyser.getTickPerSecond()->getAveragedLastValue()},
+        {"creatures_count", this->lifes.size()},
+    };
+    websocket->broadcastMessage(data);
 }
 
 void LifesRunner::brainProcessing(bool paused) {
@@ -801,9 +814,6 @@ void LifesRunner::setId(int id) {
     LifesRunner::id = id;
 }
 
-void LifesRunner::setTriggerUpdate(const std::function<void(int)> &triggerUpdate) {
-    LifesRunner::triggerUpdate = triggerUpdate;
-}
 
 void LifesRunner::setMedianTick(int medianTick) {
     LifesRunner::medianTick = medianTick;

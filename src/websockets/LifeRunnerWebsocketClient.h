@@ -22,13 +22,14 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 class LifeRunnerWebsocketClient {
 private:
     websocket::stream<tcp::socket> * ws{};
+    int lifeRunnerId;
     int id;
 
     std::function<void(int id)> clientDisconnected;
     std::function<void(int id, std::string message)> handleClientMessage;
 
 public:
-    LifeRunnerWebsocketClient(int id);
+    LifeRunnerWebsocketClient(int lifeRunnerId, int id);
 
     void setClientDisconnected(const std::function<void(int)> &clientDisconnected);
 

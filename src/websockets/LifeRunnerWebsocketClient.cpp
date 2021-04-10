@@ -2,12 +2,13 @@
 // Created by Amalric Lombard de Buffieres on 10/04/2021.
 //
 
+#include <nlohmann/json.hpp>
 #include "LifeRunnerWebsocketClient.h"
 
-LifeRunnerWebsocketClient::LifeRunnerWebsocketClient(int id) : id(id) {}
+LifeRunnerWebsocketClient::LifeRunnerWebsocketClient(int lifeRunnerId, int id) : lifeRunnerId(lifeRunnerId), id(id) {}
 
 void LifeRunnerWebsocketClient::initClient(tcp::socket socket) {
-    std::cout << "Client connected" << std::endl;
+    std::cout << "Client connected to liferunner " << this->lifeRunnerId << std::endl;
     ws = new websocket::stream<tcp::socket>(std::move(socket));
     ws->set_option(websocket::stream_base::decorator(
             [](websocket::response_type& res){

@@ -177,7 +177,7 @@ void Map::processClimate() {
         dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
         tick++;
 
-        triggerUpdate();
+//        triggerUpdate();
 
         return;
     }
@@ -280,7 +280,7 @@ void Map::processClimate() {
     dataAnalyser.getVegetalisationTime()->addValue(elapsed_time.count());
     tick++;
 
-    triggerUpdate();
+//    triggerUpdate();
 
 }
 

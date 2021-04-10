@@ -30,7 +30,6 @@ void WebUiConnection::threadLoop() {
             tcp::socket socket{ioc};
 
             acceptor.accept(socket);
-            std::cout << "Received ..." << std::endl;
             totalConnection++;
 
             auto f = [&](tcp::socket socket) {

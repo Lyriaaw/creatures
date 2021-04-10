@@ -55,7 +55,6 @@ void Farm::addNewRunner() {
         this->addLifeToFarm(life);
     });
 
-    lifesRunner->setTriggerUpdate(triggerRunnerUpdate);
     lifesRunner->setTriggerCreaturesUpdate(triggerRunnerCreaturesUpdate);
 
     lifesRunner->setMap(map);
@@ -1037,7 +1036,7 @@ void Farm::statistics() {
 
     dataAnalyser.getZero()->addValue(0);
 
-    triggerUpdate();
+//    triggerUpdate();
 }
 
 void Farm::generateEntityGrid() {
