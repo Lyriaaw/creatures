@@ -133,6 +133,12 @@ public:
     nlohmann::basic_json<> creaturesAsJson();
 
     void saveOnMongo();
+
+    void newCreatureInfo(Life * life);
+
+    void initialCreaturesInfo();
+
+    void deadCreaturesInfo(std::vector<Life *> lifes);
 };
 
 

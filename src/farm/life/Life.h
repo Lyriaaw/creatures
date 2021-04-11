@@ -97,6 +97,7 @@ public:
     void addChild(int childId);
     void addParent(int parentId);
 
+    nlohmann::json deathDataJSON();
 };
 
 

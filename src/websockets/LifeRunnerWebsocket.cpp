@@ -54,6 +54,7 @@ void LifeRunnerWebsocket::threadLoop() {
                 clients.emplace_back(client);
                 client->initClient(std::move(socket));
                 sendConnectionSuccessful(client->getId());
+                triggerNewConnection();
                 client->do_session();
             };
 
@@ -164,5 +165,9 @@ void LifeRunnerWebsocket::broadcastMessage(json message){
 
 int LifeRunnerWebsocket::getPort() const {
     return port;
+}
+
+void LifeRunnerWebsocket::setTriggerNewConnection(const std::function<void()> &triggerNewConnection) {
+    LifeRunnerWebsocket::triggerNewConnection = triggerNewConnection;
 }
 

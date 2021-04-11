@@ -179,6 +179,19 @@ nlohmann::json Life::updateDataJson() {
     life["age"] = entity->getAge();
     life["alive"] = isAlive();
     life["childrenIds"] = childrenIds;
+    life["x"] = entity->getPosition().getX();
+    life["y"] = entity->getPosition().getY();
+    life["size"] = entity->getSize();
+    life["rotation"] = entity->getRotation();
+
+    return life;
+}
+
+nlohmann::json Life::deathDataJSON() {
+    nlohmann::json life;
+
+    life["id"] = entity->getId();
+    life["age"] = entity->getAge();
 
     return life;
 }

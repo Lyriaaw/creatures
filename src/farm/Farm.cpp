@@ -145,7 +145,6 @@ void Farm::addLifeToFarm(Life * life) {
 
     std::vector<Life *> tmp;
     tmp.emplace_back(life);
-    triggerNewCreatures(tmp);
 
     std::lock_guard<std::mutex> guard(add_mutex);
     lifesAdded.emplace_back(life);
@@ -783,8 +782,6 @@ void Farm::populationControl() {
         lifesAdded.emplace_back(child);
         newLifesAfterPopulationControl.emplace_back(child);
     }
-
-    triggerNewCreatures(newLifesAfterPopulationControl);
 
     map->removeEnergyFromGround(totalEnergyRemoved);
 

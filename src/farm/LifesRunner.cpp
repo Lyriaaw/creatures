@@ -12,12 +12,16 @@ LifesRunner::LifesRunner(int id): id(id), tick(0) {
     tickEnd = std::chrono::system_clock::now();
 
     websocket = new LifeRunnerWebsocket( id);
+    websocket->setTriggerNewConnection([&]() {
+        initialCreaturesInfo();
+    });
 }
 
 void LifesRunner::addLife(Life * life) {
     std::lock_guard<std::mutex> guard(lifes_mutex);
 
     lifes.emplace_back(life);
+    newCreatureInfo(life);
 }
 
 
@@ -92,14 +96,72 @@ void LifesRunner::handleThread() {
 }
 
 void LifesRunner::triggerUpdate() {
+    json lifesUpdateJSON = json::array();
+    std::vector<Life *> currentLifes = getLifes();
+
+    int runnersSize = currentLifes.size();
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        lifesUpdateJSON[it] = currentLifes.at(it)->updateDataJson();
+    }
+
     json data = {
         {"type", "life_runner_progress"},
         {"tick", this->tick},
         {"tps", this->dataAnalyser.getTickPerSecond()->getAveragedLastValue()},
         {"creatures_count", this->lifes.size()},
+        {"lifes", lifesUpdateJSON},
     };
     websocket->broadcastMessage(data);
 }
+
+void LifesRunner::newCreatureInfo(Life * life) {
+    json data = {
+        {"type", "new_creature"},
+        {"life", life->initialDataJson()},
+        {"update", life->updateDataJson()},
+    };
+    websocket->broadcastMessage(data);
+}
+
+void LifesRunner::deadCreaturesInfo(std::vector<Life *> deadLifes) {
+    json lifesJSON = json::array();
+
+    int runnersSize = deadLifes.size();
+
+    for (int it = 0; it < deadLifes.size(); it++) {
+        lifesJSON[it] = deadLifes.at(it)->deathDataJSON();
+    }
+
+    json data = {
+            {"type", "dead_lifes"},
+            {"lifes", lifesJSON},
+    };
+    websocket->broadcastMessage(data);
+}
+
+void LifesRunner::initialCreaturesInfo() {
+    std::vector<Life *> currentLifes = getLifes();
+
+    json lifesJSON = json::array();
+    json lifesUpdateJSON = json::array();
+
+    int runnersSize = currentLifes.size();
+
+    for (int it = 0; it < currentLifes.size(); it++) {
+        lifesJSON[it] = currentLifes.at(it)->initialDataJson();
+        lifesUpdateJSON[it] = currentLifes.at(it)->updateDataJson();
+    }
+
+    json data = {
+        {"type", "initial_creatures"},
+        {"id", this->getId()},
+        {"lifes", lifesJSON},
+        {"lifesUpdated", lifesUpdateJSON},
+    };
+    websocket->broadcastMessage(data);
+}
+
 
 void LifesRunner::brainProcessing(bool paused) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -352,6 +414,10 @@ std::vector<Life *> LifesRunner::removeDeadLifes() {
             deadLifeIds.emplace_back(lifes.at(it)->getEntity()->getId());
             deletedLifes.emplace_back(lifes.at(it));
         }
+    }
+
+    if (!deletedLifes.empty()) {
+        deadCreaturesInfo(deletedLifes);
     }
 
     lifes.clear();

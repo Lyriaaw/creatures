@@ -4,7 +4,7 @@
 
 #include "FarmControl.h"
 
-FarmControl::FarmControl(): running(true), paused(true), waitingTimeMs(0) {}
+FarmControl::FarmControl(): running(true), paused(true), waitingTimeMs(10) {}
 
 bool FarmControl::isRunning() const {
     return running;

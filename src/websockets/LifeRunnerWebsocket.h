@@ -32,6 +32,8 @@ private:
 
     int totalConnection;
 
+    std::function<void()> triggerNewConnection;
+
 
 public:
     LifeRunnerWebsocket(int id);
@@ -51,6 +53,8 @@ public:
     void sendMessageToClient(int id, std::string message, bool lockOwner);
 
     void broadcastMessage(json message);
+
+    void setTriggerNewConnection(const std::function<void()> &triggerNewConnection);
 };
 
 
