@@ -70,6 +70,8 @@ public:
     MapGeneratorControl *getMapGeneratorControl() const;
 
     nlohmann::basic_json<> asJson();
+
+    nlohmann::basic_json<> getTerrainJSON();
 };
 
 

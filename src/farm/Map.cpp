@@ -419,6 +419,41 @@ json Map::asJson() {
     return runner;
 }
 
+
+
+json Map::getTerrainJSON() {
+    nlohmann::json terrain;
+
+
+    for (int it = 0; it < TILE_COUNT_WIDTH; it++) {
+        nlohmann::json terrainColumn;
+        for (int jt = 0; jt < TILE_COUNT_HEIGHT; jt++) {
+            Tile * currentTile = getTileAt(it, jt);
+            terrainColumn[jt] = currentTile->asJSON();
+        }
+        terrain[it] = terrainColumn;
+    }
+
+
+
+
+
+
+
+    json mapData = {
+            {"chunk_count_width", CHUNK_COUNT_WIDTH},
+            {"chunk_count_height", CHUNK_COUNT_HEIGHT},
+            {"tile_per_chunk", TILE_PER_CHUNK},
+            {"tile_size", TILE_SIZE},
+            {"terrain", terrain},
+            {"type", "map"}
+    };
+
+    return mapData;
+}
+
+
+
 void Map::setTriggerUpdate(const function<void()> &triggerUpdate) {
     Map::triggerUpdate = triggerUpdate;
 }

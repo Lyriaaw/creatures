@@ -320,3 +320,10 @@ void Tile::unlockTmpHeatAndTmpGround() {
     tmp_heat_mutex.unlock();
 }
 
+nlohmann::json Tile::asJSON() {
+    nlohmann::json tileData = {
+            {"height", height}
+    };
+
+    return tileData;
+}

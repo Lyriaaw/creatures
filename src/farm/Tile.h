@@ -8,6 +8,8 @@
 
 #include "../utils/Point.h"
 #include "entities/Entity.h"
+#include <nlohmann/json.hpp>
+
 
 class Tile {
 private:
@@ -137,6 +139,8 @@ public:
     void removeLife(Entity *life);
 
     std::vector<Entity *> getLifesEntities();
+
+    nlohmann::basic_json<> asJSON();
 };
 
 

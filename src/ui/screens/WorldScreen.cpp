@@ -114,6 +114,8 @@ void WorldScreen::mouseScrolled(float delta, int mouseX, int mouseY) {
     Point newCameraCenter = {newX, newY};
     camera->setCenter(newCameraCenter);
 
+    std::cout << camera->getZoom() << std::endl;
+
 
     farmUi->mouseMoved(mouseWorldCoordinates, camera);
 }

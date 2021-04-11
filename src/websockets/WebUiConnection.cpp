@@ -217,10 +217,21 @@ void WebUiConnection::handleClientRequest(int id, json request) {
         sendRunnersJSON(id);
     }
 
+    if(request["endpoint"] == "map") {
+        sendMapJSON(id);
+    }
+
+
+
 
 
 
 }
+
+void WebUiConnection::sendMapJSON(int id) {
+    sendMessageToClient(id, farm->getMap()->getTerrainJSON().dump(), true);
+};
+
 
 void WebUiConnection::sendRunnersJSON(int id) {
     json runnersData = {

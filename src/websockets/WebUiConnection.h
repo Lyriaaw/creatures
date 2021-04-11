@@ -82,6 +82,8 @@ public:
     void handlePing(int id, json ping);
 
     void sendRunnersJSON(int id);
+
+    void sendMapJSON(int id);
 };
 
 
