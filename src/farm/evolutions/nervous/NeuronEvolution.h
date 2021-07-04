@@ -29,6 +29,10 @@ public:
     float getX() const;
 
     float getY() const;
+
+    void saveInMongo(MongoClient *client, int farmId);
+    bsoncxx::builder::stream::document generateMongoVariables() override;
+
 };
 
 

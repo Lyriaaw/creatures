@@ -22,12 +22,14 @@
 
 class CreatureNursery {
 private:
+    int farmId;
+    MongoClient * mongoClient;
     EvolutionLibrary * evolutionLibrary;
 public:
-    CreatureNursery();
+    CreatureNursery(int farmId);
 
     Life * generateCreatureFromRandom();
-    Life * Mate(Life * father, Life * mother);
+    Life * Mate(Life * father, Life * mother, MongoClient * mongoClient, int tick);
 
     const EvolutionLibrary &getEvolutionLibrary() const;
 

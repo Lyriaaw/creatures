@@ -9,6 +9,10 @@
 #include "../entities/Creature.h"
 #include "../brain/BrainConnector.h"
 #include "../life/Life.h"
+#include "../../mongo/MongoClient.h"
+#include <thread>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
 
 class Evolution {
 protected:
@@ -33,6 +37,9 @@ public:
     virtual std::string getName() = 0;
 
     virtual Evolution * generateWithMate(Evolution * mate) = 0;
+
+    virtual void saveInMongo(MongoClient * client, int farmId) = 0;
+    virtual bsoncxx::builder::stream::document generateMongoVariables() = 0;
 
 
     int getGenerationNumber();

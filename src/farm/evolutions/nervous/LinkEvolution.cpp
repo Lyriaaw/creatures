@@ -129,3 +129,46 @@ int LinkEvolution::getInputGenerationNumber() const {
 int LinkEvolution::getOutputGenerationNumber() const {
     return outputGenerationNumber;
 }
+
+
+
+void LinkEvolution::saveInMongo(MongoClient *client, int farmId) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "farmId" << farmId
+            << "evolution_number" << this->generationNumber
+            << "type" << "link"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "input_generation_number" << this->inputGenerationNumber
+            << "output_generation_number" << this->outputGenerationNumber
+            << "weight" << this->weight
+            << bsoncxx::builder::stream::close_document;
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        client->saveEvolution(doc_value.view());
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving mouth evolution: " << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+
+bsoncxx::builder::stream::document LinkEvolution::generateMongoVariables() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "evolution_number" << this->generationNumber
+            << "type" << "link"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "input_generation_number" << this->inputGenerationNumber
+            << "output_generation_number" << this->outputGenerationNumber
+            << "weight" << this->weight
+            << bsoncxx::builder::stream::close_document;
+
+    return builder;
+}

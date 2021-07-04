@@ -17,10 +17,24 @@
 #include "life/Life.h"
 #include "LifesRunner.h"
 #include "statistics/BiomassDataTracker.h"
+#include "../mongo/MongoClient.h"
 #include <thread>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/helpers.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
+
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
 
 class Farm {
 private:
+
+    int farmId;
 
     FarmControl * farmControl;
 
@@ -71,6 +85,8 @@ private:
     int medianTick;
 
     BiomassDataTracker biomassDataTracker;
+
+    MongoClient * mongoClient;
 
 public:
     Farm();
@@ -211,6 +227,8 @@ public:
     void setTriggerRunnerUpdate(const std::function<void(int)> &triggerRunnerUpdate);
 
     void setTriggerRunnerCreaturesUpdate(const std::function<void(int)> &triggerRunnerCreaturesUpdate);
+
+    void saveToMongo();
 };
 
 

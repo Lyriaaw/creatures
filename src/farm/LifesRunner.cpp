@@ -7,7 +7,7 @@
 
 void triggerUpdate();
 
-LifesRunner::LifesRunner(int id): id(id), tick(0) {
+LifesRunner::LifesRunner(int id, int farmId): id(id), farmId(farmId), tick(0), mongoClient(new MongoClient()) {
     tickStart = std::chrono::system_clock::now();
     tickEnd = std::chrono::system_clock::now();
 
@@ -412,6 +412,7 @@ std::vector<Life *> LifesRunner::removeDeadLifes() {
             newLifes.emplace_back(lifes.at(it));
         } else {
             deadLifeIds.emplace_back(lifes.at(it)->getEntity()->getId());
+            lifes.at(it)->recordDeathToMongo(mongoClient, tick);
             deletedLifes.emplace_back(lifes.at(it));
         }
     }
@@ -683,7 +684,7 @@ bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
         return false;
     }
 //
-    Life * child = this->creatureNursery->Mate(performer, foundLife);
+    Life * child = this->creatureNursery->Mate(performer, foundLife, mongoClient, tick);
 
     double givenEnergyToChildGoal = child->getEnergyCenter()->getMaxMass() / 2.f;
 
@@ -716,8 +717,7 @@ bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
         performer->addChild(child->getEntity()->getId());
         foundLife->addChild(child->getEntity()->getId());
 
-        child->addParent(performer->getEntity()->getId());
-        child->addParent(foundLife->getEntity()->getId());
+
         child->setNaturalMating(true);
         addLifeToFarm(child);
 
@@ -726,6 +726,8 @@ bool LifesRunner::handleMating(Life * performer, ActionDTO action) {
         executedAction.setTilePosition(tileChildPosition);
         executedAction.setTick(tick);
         recordExecutedAction(executedAction);
+
+        child->saveToMongo(mongoClient);
 
         return true;
     }

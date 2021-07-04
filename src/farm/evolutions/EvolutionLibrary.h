@@ -11,6 +11,9 @@
 
 class EvolutionLibrary {
 private:
+    MongoClient * mongoClient;
+    int farmId;
+
     std::mutex genomes_mutex;
 
     std::vector<int> creatureIndexes;
@@ -23,9 +26,9 @@ private:
     std::vector<std::string> events;
 
 public:
-    EvolutionLibrary();
+    EvolutionLibrary(MongoClient * mongoClient, int farmId);
 
-    void addGenome(int creatureIndex, std::vector<Evolution *> genome);
+    void addGenome(int farmId, int creatureIndex, std::vector<Evolution *> genome);
     std::vector<Evolution *> getGenomeFor(int creatureIndex) const;
 
     int getCurrentEvolutionNumber() const;
@@ -41,8 +44,7 @@ public:
     const std::vector<std::string> &getEvents() const;
 
 
-
-
+    void saveGenomeToMongo(int farmId, int creatureIndex, std::vector<Evolution *> genome, MongoClient * mongoClient);
 };
 
 

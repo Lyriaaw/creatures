@@ -25,6 +25,9 @@ public:
     std::string getName() override;
 
 
+    void saveInMongo(MongoClient *client, int farmId);
+
+    bsoncxx::builder::stream::document generateMongoVariables() override;
 };
 
 

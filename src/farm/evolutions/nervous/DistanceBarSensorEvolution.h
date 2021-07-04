@@ -21,10 +21,14 @@ public:
     void setSensorLength(float sensorLength);
 
     void setSensorRotation(float sensorRotation);
+    void saveInMongo(MongoClient *client, int farmId);
+    bsoncxx::builder::stream::document generateMongoVariables() override;
+
 
 private:
     float sensorLength;
     float sensorRotation;
+
 };
 
 

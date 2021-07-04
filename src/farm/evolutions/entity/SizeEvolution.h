@@ -19,7 +19,12 @@ public:
     Evolution * generateWithMate(Evolution * mate) override;
     Evolution * generateFromCastedMate(SizeEvolution * mate);
 
-    std::string getName() override;};
+    std::string getName() override;
+
+    void saveInMongo(MongoClient *client, int farmId);
+
+    bsoncxx::builder::stream::document generateMongoVariables() override;
+};
 
 
 #endif //CREATURES_SIZEEVOLUTION_H

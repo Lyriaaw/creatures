@@ -33,6 +33,10 @@ public:
     float getWeight() const;
 
     void changeEvolutionNumberIfAlreadyExists(std::map<int, Evolution *> currentWholeGenome);
+
+    void saveInMongo(MongoClient *client, int farmId);
+    bsoncxx::builder::stream::document generateMongoVariables() override;
+
 };
 
 

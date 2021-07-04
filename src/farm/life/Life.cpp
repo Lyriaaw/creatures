@@ -6,6 +6,12 @@
 #include "Life.h"
 #include "muscles/externals/Mouth.h"
 #include "muscles/internals/Movement.h"
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <thread>
+
+
+Life::Life(int farmId) : farmId(farmId) {}
 
 void Life::saveAccessibleEntities(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles) {
     this->currentAccessibleEntities = availableEntities;
@@ -161,6 +167,59 @@ std::vector<Point> Life::getSelectedChunks() {
     return selectedChunks;
 }
 
+void Life::saveToMongo(MongoClient * client) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    auto array_builder = bsoncxx::builder::basic::array{};
+    for (int it = 0; it < parentsIds.size(); it++) {
+        array_builder.append(parentsIds[it]);
+    }
+
+    builder
+        << "farmId" << farmId
+        << "id" << this->entity->getId()
+        << "birth_tick" << this->birthTick
+        << "hue" << this->entity->getColor()
+        << "naturalMating" << this->naturalMating
+        << "parentsIds" << array_builder;
+
+
+
+
+
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        mongoId = client->saveLife(doc_value.view());
+
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving creature: " << entity->getId() << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+
+void Life::recordDeathToMongo(MongoClient * client, int tick) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder << "$set" << bsoncxx::builder::stream::open_document << "death_tick" << tick << bsoncxx::builder::stream::close_document;
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        client->updateLife(doc_value.view(), farmId, this->entity->getId());
+
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving creature: " << entity->getId() << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+
+
+
+
 nlohmann::json Life::initialDataJson() {
     nlohmann::json life;
 
@@ -178,7 +237,7 @@ nlohmann::json Life::updateDataJson() {
     life["id"] = entity->getId();
     life["age"] = entity->getAge();
     life["alive"] = isAlive();
-    life["childrenIds"] = childrenIds;
+//    life["childrenIds"] = childrenIds;
     life["x"] = entity->getPosition().getX();
     life["y"] = entity->getPosition().getY();
     life["size"] = entity->getSize();
@@ -296,4 +355,14 @@ const std::vector<int> &Life::getChildrenIds() const {
 void Life::setNaturalMating(bool naturalMating) {
     Life::naturalMating = naturalMating;
 }
+
+int Life::getBirthTick() const {
+    return birthTick;
+}
+
+void Life::setBirthTick(int birthTick) {
+    Life::birthTick = birthTick;
+}
+
+
 

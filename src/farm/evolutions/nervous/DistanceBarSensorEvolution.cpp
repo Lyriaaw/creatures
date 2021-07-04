@@ -99,3 +99,45 @@ void DistanceBarSensorEvolution::setSensorLength(float sensorLength) {
 void DistanceBarSensorEvolution::setSensorRotation(float sensorRotation) {
     DistanceBarSensorEvolution::sensorRotation = sensorRotation;
 }
+
+
+
+void DistanceBarSensorEvolution::saveInMongo(MongoClient *client, int farmId) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "farmId" << farmId
+            << "evolution_number" << this->generationNumber
+            << "type" << "sensor_bar/distance"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "length" << this->sensorLength
+            << "rotation" << this->sensorRotation
+            << bsoncxx::builder::stream::close_document;
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        client->saveEvolution(doc_value.view());
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving mouth evolution: " << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+
+
+bsoncxx::builder::stream::document DistanceBarSensorEvolution::generateMongoVariables() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "evolution_number" << this->generationNumber
+            << "type" << "sensor_bar/distance"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "length" << this->sensorLength
+            << "rotation" << this->sensorRotation
+            << bsoncxx::builder::stream::close_document;
+
+    return builder;
+}

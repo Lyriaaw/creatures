@@ -17,7 +17,9 @@
 using namespace std;
 
 
-CreatureNursery::CreatureNursery(): evolutionLibrary(new EvolutionLibrary()){
+CreatureNursery::CreatureNursery(int farmId): farmId(farmId){
+    mongoClient = new MongoClient();
+    evolutionLibrary = new EvolutionLibrary(mongoClient, farmId);
 }
 
 Life * CreatureNursery::generateCreatureFromRandom() {
@@ -35,7 +37,7 @@ Life * CreatureNursery::generateCreatureFromRandom() {
     Brain * brain = new Brain();
     EnergyCenter * energyCenter = new EnergyCenter(entity);
 
-    Life * life = new Life();
+    Life * life = new Life(farmId);
     life->setEntity(entity);
     life->setBrain(brain);
     life->setEntity(entity);
@@ -211,14 +213,19 @@ Life * CreatureNursery::generateCreatureFromRandom() {
 
     life->connectSensorAndMuscles();
 
-    evolutionLibrary->addGenome(life->getEntity()->getId(), creatureGenome);
+    evolutionLibrary->addGenome(farmId, life->getEntity()->getId(), creatureGenome);
+    evolutionLibrary->saveGenomeToMongo(farmId, life->getEntity()->getId(), creatureGenome, mongoClient);
 
     evolutionLibrary->setCurrentEvolutionNumber(1000);
+    life->setBirthTick(0);
+
+    life->saveToMongo(mongoClient);
+
     return life;
 }
 
 
-Life * CreatureNursery::Mate(Life * father, Life * mother) {
+Life * CreatureNursery::Mate(Life * father, Life * mother, MongoClient * mongoClient, int tick) {
 
     std::vector<Evolution *> fatherGenome = this->getEvolutionLibrary().getGenomeFor(father->getEntity()->getId());
     std::vector<Evolution *> motherGenome = this->getEvolutionLibrary().getGenomeFor(mother->getEntity()->getId());
@@ -308,10 +315,13 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
 
     EnergyCenter * energyCenter = new EnergyCenter(childEntity);
 
-    Life * life = new Life();
+    Life * life = new Life(farmId);
     life->setEntity(childEntity);
     life->setBrain(childBrain);
     life->setEnergyCenter(energyCenter);
+    life->addParent(father->getEntity()->getId());
+    life->addParent(mother->getEntity()->getId());
+    life->setBirthTick(tick);
 
 
     for (int it = 0; it < childGenome.size(); it++) {
@@ -325,7 +335,8 @@ Life * CreatureNursery::Mate(Life * father, Life * mother) {
     }
 
     life->getBrain()->generateLinkGrid();
-    evolutionLibrary->addGenome(life->getEntity()->getId(), childGenome);
+    evolutionLibrary->addGenome(farmId, life->getEntity()->getId(), childGenome);
+    evolutionLibrary->saveGenomeToMongo(farmId, life->getEntity()->getId(), childGenome, mongoClient);
 
     life->connectSensorAndMuscles();
     return life;

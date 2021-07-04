@@ -74,3 +74,42 @@ float NeuronEvolution::getY() const {
     return y;
 }
 
+
+
+void NeuronEvolution::saveInMongo(MongoClient *client, int farmId) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "farmId" << farmId
+            << "evolution_number" << this->generationNumber
+            << "type" << "neuron"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "x" << this->x
+            << "y" << this->y
+            << bsoncxx::builder::stream::close_document;
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        client->saveEvolution(doc_value.view());
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving mouth evolution: " << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+bsoncxx::builder::stream::document NeuronEvolution::generateMongoVariables() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "evolution_number" << this->generationNumber
+            << "type" << "sensor_bar/distance"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "x" << this->x
+            << "y" << this->y
+            << bsoncxx::builder::stream::close_document;
+
+    return builder;
+}

@@ -5,6 +5,8 @@
 #include "SpeedEvolution.h"
 #include "../../life/muscles/internals/Movement.h"
 
+bsoncxx::builder::stream::document generateMongoVariables();
+
 SpeedEvolution::SpeedEvolution(): Evolution() {
 
 }
@@ -38,4 +40,33 @@ Evolution * SpeedEvolution::generateWithMate(Evolution * mate) {
 
 std::string SpeedEvolution::getName() {
     return "Speed";
+}
+
+
+void SpeedEvolution::saveInMongo(MongoClient *client, int farmId) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "farmId" << farmId
+            << "evolution_number" << this->generationNumber
+            << "type" << "speed";
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        client->saveEvolution(doc_value.view());
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving mouth evolution: " << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+bsoncxx::builder::stream::document SpeedEvolution::generateMongoVariables() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "evolution_number" << this->generationNumber
+            << "type" << "speed";
+
+    return builder;
 }

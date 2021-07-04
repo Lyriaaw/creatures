@@ -12,9 +12,17 @@
 
 using namespace std;
 
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
+
 Farm::Farm(): medianTick(0){
+    this->farmId = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+    mongoClient = new MongoClient();
+
     farmControl = new FarmControl();
-    nursery = new CreatureNursery();
+    nursery = new CreatureNursery(farmId);
 
 
     tickStart = std::chrono::system_clock::now();
@@ -30,7 +38,7 @@ void Farm::initLifesRunners() {
 void Farm::addNewRunner() {
     int currentLifeRunnersSize = lifesRunners.size();
 
-    LifesRunner * lifesRunner = new LifesRunner(currentLifeRunnersSize + 1);
+    LifesRunner * lifesRunner = new LifesRunner(currentLifeRunnersSize + 1, farmId);
     lifesRunner->setGenerateEntities([&](Point position, float color, float brightness, double maxSize, double totalEnergy, double spreadingRatio) {
         this->generateEntities(position, color, brightness, maxSize, totalEnergy, spreadingRatio);
     });
@@ -72,10 +80,15 @@ void Farm::addNewRunner() {
 }
 
 void Farm::InitFromRandom() {
+
     random_device rd;
     mt19937 mt(rd());
     uniform_real_distribution<double> distWidth(0, FARM_WIDTH);
     uniform_real_distribution<double> distHeight(0, FARM_HEIGHT);
+
+
+
+
 
     map = new Map(farmControl);
     map->setRecordAddedEntitiesToFarm([&](std::vector<Entity *> entities) {
@@ -138,6 +151,7 @@ void Farm::InitFromRandom() {
 
     tickFarmStarted = std::chrono::system_clock::now();
 
+    saveToMongo();
 }
 
 void Farm::addLifeToFarm(Life * life) {
@@ -650,61 +664,61 @@ void Farm::recordExecutedAction(ActionDTO action) {
 
 
 bool Farm::handleMating(Life * father, int entityId) {
-    Life * foundLife = getLifeFromId(entityId);
-    if (foundLife == nullptr) {
-        return false;
-    }
-
-
-    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 3.f && father->getEntity()->getAge() > 10;
-    bool motherCanReproduce = foundLife->getEntity()->getMass() > foundLife->getEnergyCenter()->getMaxMass() / 3.f && foundLife->getEntity()->getAge() > 10;
-
-    if (!fatherCanReproduce || !motherCanReproduce) {
-        return false;
-    }
+//    Life * foundLife = getLifeFromId(entityId);
+//    if (foundLife == nullptr) {
+//        return false;
+//    }
 //
-    Life * child = this->nursery->Mate(father, foundLife);
-
-    double givenEnergyToChildGoal = child->getEnergyCenter()->getMaxMass() / 2.f;
-
-    double givenFatherEnergy = std::min(father->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
-    double givenMotherEnergy = std::min(foundLife->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
-
-    double actualGivenFatherEnergy = father->getEntity()->removeMass(givenFatherEnergy);
-    double actualGivenMotherEnergy = foundLife->getEntity()->removeMass(givenMotherEnergy);
-
-    if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
-        std::cout << "Wrong energy given" << std::endl;
-    }
-
-
-    double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
-
-    checkAndHandleLifeDying(father);
-    checkAndHandleLifeDying(foundLife);
-
-
-    Point childCoordinate = child->getEntity()->getPosition();
-    Point tileChildPosition = childCoordinate.getTileCoordinates();
-
-    if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
-        child->getEntity()->setMass(totalGivenEnergy / 2.0);
-        child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
-        getLessLoadedRunner()->addLife(child);
-        lifesAdded.emplace_back(child);
-
-
-        std::lock_guard<std::mutex> guard(executed_actions_mutex);
-        ActionDTO executedAction = ActionDTO(0, 0, "MATE");
-        executedAction.setTilePosition(tileChildPosition);
-        executedActions.emplace_back(executedAction);
-
-        return true;
-    }
-
-
-
-    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
+//
+//    bool fatherCanReproduce = father->getEntity()->getMass() > father->getEnergyCenter()->getMaxMass() / 3.f && father->getEntity()->getAge() > 10;
+//    bool motherCanReproduce = foundLife->getEntity()->getMass() > foundLife->getEnergyCenter()->getMaxMass() / 3.f && foundLife->getEntity()->getAge() > 10;
+//
+//    if (!fatherCanReproduce || !motherCanReproduce) {
+//        return false;
+//    }
+////
+//    Life * child = this->nursery->Mate(father, foundLife);
+//
+//    double givenEnergyToChildGoal = child->getEnergyCenter()->getMaxMass() / 2.f;
+//
+//    double givenFatherEnergy = std::min(father->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
+//    double givenMotherEnergy = std::min(foundLife->getEntity()->getMass() / 4.0, givenEnergyToChildGoal / 2.0);
+//
+//    double actualGivenFatherEnergy = father->getEntity()->removeMass(givenFatherEnergy);
+//    double actualGivenMotherEnergy = foundLife->getEntity()->removeMass(givenMotherEnergy);
+//
+//    if (givenFatherEnergy != actualGivenFatherEnergy || givenMotherEnergy != actualGivenMotherEnergy) {
+//        std::cout << "Wrong energy given" << std::endl;
+//    }
+//
+//
+//    double totalGivenEnergy = actualGivenFatherEnergy + actualGivenMotherEnergy;
+//
+//    checkAndHandleLifeDying(father);
+//    checkAndHandleLifeDying(foundLife);
+//
+//
+//    Point childCoordinate = child->getEntity()->getPosition();
+//    Point tileChildPosition = childCoordinate.getTileCoordinates();
+//
+//    if (totalGivenEnergy > givenEnergyToChildGoal / 2.0) {
+//        child->getEntity()->setMass(totalGivenEnergy / 2.0);
+//        child->getEnergyCenter()->setAvailableEnergy(totalGivenEnergy / 2.0);
+//        getLessLoadedRunner()->addLife(child);
+//        lifesAdded.emplace_back(child);
+//
+//
+//        std::lock_guard<std::mutex> guard(executed_actions_mutex);
+//        ActionDTO executedAction = ActionDTO(0, 0, "MATE");
+//        executedAction.setTilePosition(tileChildPosition);
+//        executedActions.emplace_back(executedAction);
+//
+//        return true;
+//    }
+//
+//
+//
+//    map->getTileAt(tileChildPosition.getX(), tileChildPosition.getY())->addGround(totalGivenEnergy);
 
 //    if (givenMotherEnergy + givenFatherEnergy == 0) {
 //        std::cout << "New child " << child->getCreature()->getId() << " Energy: " << givenMotherEnergy + givenFatherEnergy << std::endl;
@@ -756,7 +770,7 @@ void Farm::populationControl() {
         Life * father = sortedConnectors.at(fatherIndex);
         Life * mother = sortedConnectors.at(motherIndex);
 
-        Life * child = this->nursery->Mate(father, mother);
+        Life * child = this->nursery->Mate(father, mother, mongoClient, tickCount);
         child->getEntity()->setMass(child->getEnergyCenter()->getMaxMass() / 3.01f);
         child->getEnergyCenter()->setAvailableEnergy(child->getEnergyCenter()->getMaxMass() / 3.01f);
         Entity * childCreature = child->getEntity();
@@ -1524,4 +1538,17 @@ void Farm::setTriggerRunnerUpdate(const function<void(int)> &triggerRunnerUpdate
 
 void Farm::setTriggerRunnerCreaturesUpdate(const function<void(int)> &triggerRunnerCreaturesUpdate) {
     Farm::triggerRunnerCreaturesUpdate = triggerRunnerCreaturesUpdate;
+}
+
+
+
+void Farm::saveToMongo() {
+    nlohmann::json farmJSON;
+
+    farmJSON["farm_id"] = this->farmId;
+
+
+
+
+    mongoClient->saveFarm(farmJSON);
 }

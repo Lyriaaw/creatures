@@ -39,3 +39,33 @@ Evolution * RotationEvolution::generateWithMate(Evolution * mate) {
 std::string RotationEvolution::getName() {
     return "Rotation";
 }
+
+
+
+void RotationEvolution::saveInMongo(MongoClient *client, int farmId) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "farmId" << farmId
+            << "evolution_number" << this->generationNumber
+            << "type" << "rotation";
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        client->saveEvolution(doc_value.view());
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving mouth evolution: " << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+bsoncxx::builder::stream::document RotationEvolution::generateMongoVariables() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "evolution_number" << this->generationNumber
+            << "type" << "rotation";
+
+    return builder;
+}

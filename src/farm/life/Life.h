@@ -14,11 +14,14 @@
 #include "../Tile.h"
 #include "../brain/Brain.h"
 #include "EnergyCenter.h"
+#include "../../mongo/MongoClient.h"
 #include <nlohmann/json.hpp>
 
 class Life {
 private:
     Entity * entity;
+
+    int farmId;
 
     std::vector<Entity *> currentAccessibleEntities;
     std::vector<Tile *> currentAccessibleTiles;
@@ -33,9 +36,13 @@ private:
     EnergyCenter * energyCenter;
 
     bool naturalMating;
+    int birthTick;
+    std::string mongoId;
     std::vector<int> parentsIds;
     std::vector<int> childrenIds;
 public:
+    Life(int farmId);
+
     double giveawayEnergy();
 
     void saveAccessibleEntities(std::vector<Entity *> availableEntities, std::vector<Tile *> availableTiles);
@@ -98,6 +105,14 @@ public:
     void addParent(int parentId);
 
     nlohmann::json deathDataJSON();
+
+    void saveToMongo(MongoClient * client);
+
+    void recordDeathToMongo(MongoClient *client, int tick);
+
+    int getBirthTick() const;
+
+    void setBirthTick(int birthTick);
 };
 
 

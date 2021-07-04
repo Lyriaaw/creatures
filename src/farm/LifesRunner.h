@@ -19,6 +19,10 @@ class LifesRunner {
 private:
     int id;
 
+    MongoClient * mongoClient;
+
+    int farmId;
+
     std::vector<Life *> lifes;
     std::vector<int> deadLifeIds;
 
@@ -53,7 +57,7 @@ private:
     int medianTick;
 
 public:
-    LifesRunner(int id);
+    LifesRunner(int id, int farmId);
 
     void addLife(Life *life);
 

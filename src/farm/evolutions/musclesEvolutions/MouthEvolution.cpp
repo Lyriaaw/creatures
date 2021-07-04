@@ -5,6 +5,7 @@
 #include "MouthEvolution.h"
 #include "../../life/muscles/externals/Mouth.h"
 
+
 MouthEvolution::MouthEvolution(): Evolution() {
 
 }
@@ -91,4 +92,41 @@ Evolution * MouthEvolution::generateFromCastedMate(MouthEvolution * mate) {
 
 std::string MouthEvolution::getName() {
     return "Mouth";
+}
+
+void MouthEvolution::saveInMongo(MongoClient *client, int farmId) {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+        << "farmId" << farmId
+        << "evolution_number" << this->generationNumber
+        << "type" << "mouth"
+        << "variables"
+        << bsoncxx::builder::stream::open_document
+        << "rotation" << this->rotation
+        << bsoncxx::builder::stream::close_document;
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+//
+//
+    try {
+        client->saveEvolution(doc_value.view());
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving mouth evolution: " << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
+}
+
+
+bsoncxx::builder::stream::document MouthEvolution::generateMongoVariables() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+    builder
+            << "evolution_number" << this->generationNumber
+            << "type" << "mouth"
+            << "variables"
+            << bsoncxx::builder::stream::open_document
+            << "rotation" << this->rotation
+            << bsoncxx::builder::stream::close_document;
+
+    return builder;
 }

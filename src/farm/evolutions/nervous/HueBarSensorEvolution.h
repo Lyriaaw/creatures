@@ -24,11 +24,14 @@ public:
     void setSensorRotation(float sensorRotation);
 
     void setSensorColor(float sensorColor);
+    void saveInMongo(MongoClient *client, int farmId);
+    bsoncxx::builder::stream::document generateMongoVariables() override;
 
 private:
     float sensorLength;
     float sensorRotation;
     float sensorColor;
+
 
 };
 
