@@ -82,15 +82,7 @@ void LifeUI::draw(sf::RenderWindow *window, Camera *camera, Entity *selectedEnti
         if (currentMuscle->getName() == "GENITALS") {
             relativeMuscleSize = this->life->getEntity()->getSize() / 4.f;
         }
-        if (currentMuscle->getName() == "CAPTURE_GROUND") {
-            relativeMuscleSize = this->life->getEntity()->getSize() / 10.f;
 
-        }
-        if (currentMuscle->getName() == "DUPLICATION") {
-            relativeMuscleSize = this->life->getEntity()->getSize() / 10.f;
-            muscleColor = this->color;
-
-        }
 
         float muscleSize = (((currentMuscle->getValue() / 2.f) + 0.5) * relativeMuscleSize) * camera->getZoom();
 

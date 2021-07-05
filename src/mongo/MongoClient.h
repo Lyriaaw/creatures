@@ -19,11 +19,12 @@ private:
     mongocxx::collection creatures;
     mongocxx::collection evolutions;
     mongocxx::collection genomes;
+    mongocxx::collection lifeRunners;
 
 public:
     MongoClient();
 
-    void saveFarm(nlohmann::json json);
+    void saveFarm(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc);
     std::string saveLife(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc);
 
     void saveEvolution(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc);
@@ -31,6 +32,25 @@ public:
     void saveGenome(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc);
 
     void updateLife(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc, int farmId, int creatureId);
+
+    nlohmann::json fetchFarms();
+
+    nlohmann::json fetchFarm(std::string farmId);
+
+    nlohmann::json fetchAllCreaturesFromFarm(std::string farmId);
+
+    void saveLifeRunnerData(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc);
+
+    void processLifeRunnersData(std::string farmId);
+
+    void updateFarm(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc, int farmId);
+
+
+    void saveFarmDataProcessProgress(std::string step, double progressionPercentage, int farmId);
+
+    nlohmann::json fetchAllRunnersFromFarm(int farmId);
+
+    const mongocxx::collection &getLifeRunners() const;
 };
 
 

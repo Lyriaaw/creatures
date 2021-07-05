@@ -19,6 +19,8 @@ public:
     std::string getName() override;
 
     void setColor(double color);
+
+    nlohmann::json toJson();
 };
 
 

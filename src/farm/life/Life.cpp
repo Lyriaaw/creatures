@@ -228,6 +228,14 @@ nlohmann::json Life::initialDataJson() {
     life["naturalMating"] = naturalMating;
     life["parentsIds"] = parentsIds;
 
+    nlohmann::json externalMusclesJSON = nlohmann::json::array();
+    for (int it = 0; it < externalMuscles.size(); it++) {
+        externalMusclesJSON[it] = externalMuscles.at(it)->toJson();
+    }
+
+    life["externalMuscles"] = externalMusclesJSON;
+
+
     return life;
 }
 

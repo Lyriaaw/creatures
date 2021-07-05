@@ -195,6 +195,11 @@ void MainWindow::loadFarm() {
 
 
     webUiConnection->handleTread();
+
+
+    managementWebsocket = new ManagementWebsocket(26000);
+    managementWebsocket->handleTread();
+
 }
 
 void MainWindow::loadScreens() {

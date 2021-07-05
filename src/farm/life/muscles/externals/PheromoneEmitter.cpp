@@ -25,9 +25,21 @@ PheromoneEmitter::PheromoneEmitter(float rotation, Entity *entity) : ExternalMus
 }
 
 std::string PheromoneEmitter::getName() {
-    return "MOUTH";
+    return "PHEROMONE_EMITTER";
 }
 
 void PheromoneEmitter::setColor(double color) {
     PheromoneEmitter::color = color;
+}
+
+
+nlohmann::json PheromoneEmitter::toJson() {
+    nlohmann::json json;
+
+    json["type"] = "pheromone_emitter";
+    json["rotation"] = rotation;
+    json["size"] = 0.1;
+    json["color"] = this->color;
+
+    return json;
 }

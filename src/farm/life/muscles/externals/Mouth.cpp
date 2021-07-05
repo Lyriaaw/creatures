@@ -78,3 +78,13 @@ Mouth::Mouth(float rotation, Entity *entity) : ExternalMuscle(rotation, entity) 
 std::string Mouth::getName() {
     return "MOUTH";
 }
+
+nlohmann::json Mouth::toJson() {
+    nlohmann::json json;
+
+    json["type"] = "genitals";
+    json["rotation"] = rotation;
+    json["size"] = 0.33;
+
+    return json;
+}

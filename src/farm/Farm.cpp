@@ -8,6 +8,8 @@
 #include <sstream>
 #include <iomanip>
 #include <zconf.h>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
 
 
 using namespace std;
@@ -1543,12 +1545,15 @@ void Farm::setTriggerRunnerCreaturesUpdate(const function<void(int)> &triggerRun
 
 
 void Farm::saveToMongo() {
-    nlohmann::json farmJSON;
-
-    farmJSON["farm_id"] = this->farmId;
-
-
+    auto builder = bsoncxx::builder::stream::document{};
+    builder << "farm_id" << farmId;
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
 
 
-    mongoClient->saveFarm(farmJSON);
+    try {
+        mongoClient->saveFarm(doc_value.view());
+
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving farm: " << farmId << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
 }

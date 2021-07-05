@@ -4,6 +4,15 @@
 
 #include "LifesRunner.h"
 #include "../websockets/WebUiConnection.h"
+#include <thread>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
 
 void triggerUpdate();
 
@@ -449,6 +458,40 @@ void LifesRunner::checkAndHandleLifeDying(Life * life) {
 
 
 void LifesRunner::saveOnMongo() {
+    auto builder = bsoncxx::builder::stream::document{};
+
+
+    builder
+            << "farmId" << farmId
+            << "id" << id
+            << "tick" << this->tick
+            << "poopCount" << this->dataAnalyser.getPoopCount()->getLastValue()
+            << "pheromoneCount" << this->dataAnalyser.getPheromoneCount()->getLastValue()
+            << "eatCount" << this->dataAnalyser.getEatCount()->getLastValue()
+            << "eatLifeCount" << this->dataAnalyser.getEatLifeCount()->getLastValue()
+            << "mateFailureCount" << this->dataAnalyser.getMateFailureCount()->getLastValue()
+            << "mateSuccessCount" << this->dataAnalyser.getMateSuccessCount()->getLastValue()
+            << "biteCount" << this->dataAnalyser.getBiteCount()->getLastValue()
+            << "biteLifeCount" << this->dataAnalyser.getBiteLifeCount()->getLastValue()
+            << "chunkSelection" << this->dataAnalyser.getChunkSelection()->getLastValue()
+            << "accessibleEntities" << this->dataAnalyser.getAccessibleEntities()->getLastValue()
+            << "sensorProcessing" << this->dataAnalyser.getSensorProcessing()->getLastValue()
+            << "brainProcessing" << this->dataAnalyser.getBrainProcessing()->getLastValue()
+            << "externalActions" << this->dataAnalyser.getExternalActions()->getLastValue()
+            << "moveCreatures" << this->dataAnalyser.getMoveCreatures()->getLastValue()
+            << "tickTime" << this->dataAnalyser.getTickTime()->getLastValue()
+            << "tickPerSecond" << this->dataAnalyser.getTickPerSecond()->getLastValue()
+            << "lifesCount" << this->dataAnalyser.getLifesCount()->getLastValue();
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+
+
+    try {
+        mongoClient->saveLifeRunnerData(doc_value.view());
+
+    } catch (const std::exception& e) {
+        std::cout << "Error while saving lifeRunner: " << this->id << " in thread " << std::this_thread::get_id() << " -> " << e.what() <<  std::endl;
+    }
 
 }
 

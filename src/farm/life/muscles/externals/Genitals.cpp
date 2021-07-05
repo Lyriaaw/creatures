@@ -61,3 +61,13 @@ Genitals::Genitals(float rotation, Entity *entity) : ExternalMuscle(rotation, en
 std::string Genitals::getName() {
     return "GENITALS";
 }
+
+nlohmann::json Genitals::toJson() {
+    nlohmann::json json;
+
+    json["type"] = "genitals";
+    json["rotation"] = rotation;
+    json["size"] = 0.25;
+
+    return json;
+}

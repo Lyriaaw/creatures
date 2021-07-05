@@ -6,6 +6,7 @@
 #define CREATURES_EXTERNALMUSCLE_H
 
 
+#include <nlohmann/json.hpp>
 #include "../Muscle.h"
 
 class ExternalMuscle: public Muscle {
@@ -13,6 +14,8 @@ public:
     ExternalMuscle(float rotation, Entity *entity);
 
     virtual std::vector<ActionDTO> prepareActionDTO(std::vector<Entity *> accessibleEntities) = 0;
+
+    virtual nlohmann::json toJson() = 0;
 
 };
 

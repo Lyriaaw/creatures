@@ -21,6 +21,8 @@ void WebUiConnection::threadLoop() {
         auto const address = net::ip::make_address("0.0.0.0");
         auto const port = static_cast<unsigned short>(25565);
 
+        std::cout << "Starting farm control websocket on port " << 25565 << std::endl;
+
         net::io_context ioc{1};
 
         tcp::acceptor acceptor{ioc, {address, port}};

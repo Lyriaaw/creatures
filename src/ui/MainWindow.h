@@ -13,6 +13,7 @@
 #include "screens/Screen.h"
 #include "components/Button.h"
 #include "../websockets/WebUiConnection.h"
+#include "../websockets/ManagementWebsocket.h"
 
 
 class MainWindow {
@@ -69,6 +70,7 @@ private:
     std::vector<UiComponent *> uiComponents;
 
     WebUiConnection * webUiConnection;
+    ManagementWebsocket * managementWebsocket;
 
 
 
