@@ -30,6 +30,8 @@ json ExplorerFarms::handleRequest() {
         response =  handleFarmRequest();
     } else if (params["endpoint"] == "process_life_runners") {
         response =  handleProcessLifeRunnersRequest();
+    } else if (params["endpoint"] == "fetch_statistics_series") {
+        response =  handleFetchStatisticsSeries();
     }
 
 
@@ -38,6 +40,7 @@ json ExplorerFarms::handleRequest() {
         {"type", "response"},
         {"request", {
             {"params", params},
+            {"body", body},
         }},
         {"response", response},
     };
@@ -58,6 +61,23 @@ json ExplorerFarms::handleProcessLifeRunnersRequest() {
     dataAnalyser->handleTread();
 
     return {};
+}
+
+
+
+
+
+json ExplorerFarms::handleFetchStatisticsSeries() {
+    if (params["verb"] != "get") {
+        return handleNotYetImplemented();
+    }
+
+    std::string farmIdString = body["farm_id"];
+    std::string seriesName = body["series_name"];
+
+
+
+    return mongoClient->fetchStatisticsSeries(farmIdString, seriesName);
 }
 
 

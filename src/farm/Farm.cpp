@@ -217,6 +217,8 @@ void Farm::Tick(bool paused) {
     }
 
 
+
+
     if (map->getTick() != 0) {
         double mapTickDifference = map->getTick() - medianTick;
         map->setSpeedCorrectionRatio(mapTickDifference);
@@ -772,7 +774,7 @@ void Farm::populationControl() {
         Life * father = sortedConnectors.at(fatherIndex);
         Life * mother = sortedConnectors.at(motherIndex);
 
-        Life * child = this->nursery->Mate(father, mother, mongoClient, tickCount);
+        Life * child = this->nursery->Mate(father, mother, mongoClient, medianTick);
         child->getEntity()->setMass(child->getEnergyCenter()->getMaxMass() / 3.01f);
         child->getEnergyCenter()->setAvailableEnergy(child->getEnergyCenter()->getMaxMass() / 3.01f);
         Entity * childCreature = child->getEntity();
@@ -797,6 +799,7 @@ void Farm::populationControl() {
 
         lifesAdded.emplace_back(child);
         newLifesAfterPopulationControl.emplace_back(child);
+        child->saveToMongo(mongoClient);
     }
 
     map->removeEnergyFromGround(totalEnergyRemoved);

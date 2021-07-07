@@ -32,6 +32,7 @@ MongoClient::MongoClient() {
     evolutions = db["creatures_evolutions"];
     genomes = db["creatures_genomes"];
     lifeRunners = db["creatures_life_runners"];
+    statistics_series = db["creatures_statistics"];
 
 
 }
@@ -45,14 +46,22 @@ void MongoClient::updateFarm(bsoncxx::view_or_value<bsoncxx::document::view, bso
 }
 
 
+void MongoClient::saveStatisticsSeries(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc) {
+    bsoncxx::stdx::optional<mongocxx::result::insert_one> result =  statistics_series.insert_one(doc, {});
+}
+
+
 
 nlohmann::json MongoClient::fetchFarms() {
     nlohmann::json farmsJSONArray = nlohmann::json::array();
 
+    mongocxx::options::find opts{};
+    opts.projection(document{} << "_id" << 1 << "farm_id" << 1 << finalize);
+
     mongocxx::cursor cursor = farms.find(
             document{} << "farm_id" << open_document <<
                        "$exists" << true
-                       << close_document << finalize);
+                       << close_document << finalize, opts);
 
 
     for(auto doc : cursor) {
@@ -65,6 +74,10 @@ nlohmann::json MongoClient::fetchFarms() {
     }
 
     return farmsJSONArray;
+}
+
+int MongoClient::countCreaturesFromFarm(int farmId) {
+    return creatures.count_documents(document{} << "farmId" << farmId << finalize);
 }
 
 
@@ -120,6 +133,25 @@ nlohmann::json MongoClient::fetchFarm(std::string farmId) {
 
 
     return farmJSON;
+}
+
+
+
+
+
+
+nlohmann::json MongoClient::fetchStatisticsSeries(std::string farmId, std::string seriesName) {
+    int farmIdInt = std::stoi(farmId);
+
+    bsoncxx::stdx::optional<bsoncxx::document::value> maybe_result = statistics_series.find_one(document{} << "farm_id" << farmIdInt << "type" << seriesName << finalize);
+    if(!maybe_result) {
+        return {"error", "farm_not_found"};
+    }
+
+    nlohmann::json seriesJSON = nlohmann::json::parse(bsoncxx::to_json(*maybe_result));
+
+
+    return seriesJSON;
 }
 
 

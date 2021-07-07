@@ -9,11 +9,14 @@
 
 #include "../../mongo/MongoClient.h"
 #include <thread>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
 
 class LifeRunnerDataAnalyser {
 private:
     MongoClient * mongoClient;
     int farmId;
+    int tickCount;
 
 public:
     LifeRunnerDataAnalyser(int farmId);
@@ -22,6 +25,8 @@ public:
     void handleProcess();
 
     void saveFarmDataProcessProgress(std::string step, double progressionPercentage, int farmId);
+
+    std::vector<bsoncxx::document::value> processCreatures();
 };
 
 

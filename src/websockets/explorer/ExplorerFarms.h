@@ -35,6 +35,7 @@ public:
 
     json handleProcessLifeRunnersRequest();
 
+    json handleFetchStatisticsSeries();
 };
 
 

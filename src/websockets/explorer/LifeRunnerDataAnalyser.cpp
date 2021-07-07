@@ -3,8 +3,7 @@
 //
 
 #include "LifeRunnerDataAnalyser.h"
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
+
 #include <iostream>
 
 using bsoncxx::builder::stream::close_array;
@@ -14,7 +13,7 @@ using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::open_document;
 
-LifeRunnerDataAnalyser::LifeRunnerDataAnalyser(int farmId): farmId(farmId), mongoClient(new MongoClient()) {
+LifeRunnerDataAnalyser::LifeRunnerDataAnalyser(int farmId): farmId(farmId), mongoClient(new MongoClient()), tickCount(0) {
 
 }
 
@@ -42,8 +41,96 @@ void LifeRunnerDataAnalyser::saveFarmDataProcessProgress(std::string step, doubl
     mongoClient->updateFarm(doc_value.view(), farmId);
 }
 
+
+std::vector<bsoncxx::document::value> LifeRunnerDataAnalyser::processCreatures() {
+    saveFarmDataProcessProgress("Fetching creatures", 0, farmId);
+
+    auto creatures = mongoClient->fetchAllCreaturesFromFarm(std::to_string(farmId));
+    auto creaturesCount = mongoClient->countCreaturesFromFarm(farmId);
+
+    std::vector<int> births;
+    std::vector<int> deaths;
+    std::vector<std::vector<double>> colors;
+
+    births.resize(tickCount);
+    deaths.resize(tickCount);
+    colors.resize(tickCount);
+
+    for (int it = 0; it < creatures.size(); it++) {
+
+        if (it % 100 == 0) {
+            saveFarmDataProcessProgress("Processing creatures", (it / ((double) creaturesCount)) * 100, farmId);
+        }
+
+        int birthTick = std::stoi(creatures.at(it)["birth_tick"].dump());
+        int deathTick = creatures.at(it).find("death_tick") != creatures.at(it).end() ? std::stoi(creatures.at(it)["death_tick"].dump()) : (tickCount - 1);
+        double hue = std::stod(creatures.at(it)["hue"].dump());
+
+        for (int jt = birthTick; jt < deathTick; jt++) {
+            colors.at(jt).emplace_back(hue);
+        }
+
+        deaths.at(deathTick) += 1;
+        births.at(birthTick) += 1;
+
+    }
+
+    std::vector<std::map<double, int>> colorsMap;
+
+    auto birthsBuilder = bsoncxx::builder::basic::array{};
+    auto deathsBuilder = bsoncxx::builder::basic::array{};
+    auto colorsBuilder = bsoncxx::builder::basic::array{};
+
+
+    for (int it = 0; it < tickCount; it++) {
+        if (it % 100 == 0) {
+            saveFarmDataProcessProgress("Processing colors", (it / ((double) tickCount)) * 100, farmId);
+        }
+
+
+        std::map<double, int> tickColorMap;
+
+        auto tickColors = colors.at(it);
+
+        for (int jt = 0; jt < tickColors.size(); jt++) {
+            double currentColor = tickColors.at(jt);
+
+            if (!tickColorMap[currentColor]) {
+                tickColorMap[currentColor] = 0;
+            }
+            tickColorMap[currentColor] += 1;
+        }
+
+        birthsBuilder.append(births.at(it));
+        deathsBuilder.append(deaths.at(it));
+
+        auto tickColorsBuilder = bsoncxx::builder::basic::array{};
+
+
+        for (auto const& row: tickColorMap) {
+            auto currentCreatureColor = bsoncxx::builder::stream::document{};
+
+            currentCreatureColor << "color" << row.first << "count" << row.second;
+            tickColorsBuilder.append(currentCreatureColor);
+        }
+
+        colorsBuilder.append(tickColorsBuilder);
+    }
+
+
+    std::vector<bsoncxx::document::value> documents;
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "births" << "farm_id" << farmId << "values" << birthsBuilder << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "deaths" << "farm_id" << farmId << "values" << deathsBuilder << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "colors" << "farm_id" << farmId << "values" << colorsBuilder << finalize);
+
+
+    return documents;
+}
+
 void LifeRunnerDataAnalyser::handleProcess() {
     saveFarmDataProcessProgress("Processing", 0, farmId);
+
+
 
     auto order = document{} << "$natural" << -1 << finalize;
     auto opts = mongocxx::options::find{};
@@ -79,7 +166,6 @@ void LifeRunnerDataAnalyser::handleProcess() {
     std::vector<double> tickTime;
 
 
-    int tickCount = 0;
     int index = 0;
 
     for(auto doc : cursor) {
@@ -90,28 +176,29 @@ void LifeRunnerDataAnalyser::handleProcess() {
 
         if (index == 0) {
             tickCount = tickInt;
-            tps.resize(tickInt, 0);
-            runnersCount.resize(tickInt, 0);
-            creaturesCount.resize(tickInt, 0);
+            tps.resize(tickInt + 1, 0);
+            runnersCount.resize(tickInt + 1, 0);
+            creaturesCount.resize(tickInt + 1, 0);
 
-            poopCount.resize(tickInt, 0);
-            pheromoneCount.resize(tickInt, 0);
-            eatCount.resize(tickInt, 0);
-            eatLifeCount.resize(tickInt, 0);
-            mateFailureCount.resize(tickInt, 0);
-            mateSuccessCount.resize(tickInt, 0);
-            biteCount.resize(tickInt, 0);
-            biteLifeCount.resize(tickInt, 0);
+            poopCount.resize(tickInt + 1, 0);
+            pheromoneCount.resize(tickInt + 1, 0);
+            eatCount.resize(tickInt + 1, 0);
+            eatLifeCount.resize(tickInt + 1, 0);
+            mateFailureCount.resize(tickInt + 1, 0);
+            mateSuccessCount.resize(tickInt + 1, 0);
+            biteCount.resize(tickInt + 1, 0);
+            biteLifeCount.resize(tickInt + 1, 0);
 
-            chunkSelection.resize(tickInt, 0);
-            accessibleEntities.resize(tickInt, 0);
-            sensorProcessing.resize(tickInt, 0);
-            brainProcessing.resize(tickInt, 0);
-            externalActions.resize(tickInt, 0);
-            moveCreatures.resize(tickInt, 0);
-            tickTime.resize(tickInt, 0);
+            chunkSelection.resize(tickInt + 1, 0);
+            accessibleEntities.resize(tickInt + 1, 0);
+            sensorProcessing.resize(tickInt + 1, 0);
+            brainProcessing.resize(tickInt + 1, 0);
+            externalActions.resize(tickInt + 1, 0);
+            moveCreatures.resize(tickInt + 1, 0);
+            tickTime.resize(tickInt + 1, 0);
 
         }
+
 
         if (index % 100 == 0) {
             saveFarmDataProcessProgress("Adding data", (index / (double) lifeRunnersDocumentsCount) * 100, farmId);
@@ -145,6 +232,8 @@ void LifeRunnerDataAnalyser::handleProcess() {
 
         index++;
     }
+
+
 
 
     auto tpsJSONArray = bsoncxx::builder::basic::array{};
@@ -200,38 +289,46 @@ void LifeRunnerDataAnalyser::handleProcess() {
 
 
 
-    auto builder = bsoncxx::builder::stream::document{};
-    builder << "$set" << bsoncxx::builder::stream::open_document
-            << "tps" << tpsJSONArray
-            << "runnersCount" << runnersCountJSONArray
-            << "creaturesCount" << creaturesCountJSONArray
-            << "actions" << bsoncxx::builder::stream::open_document
-            << "poopCount" << poopCountJSONArray
-            << "pheromoneCount" << pheromoneCountJSONArray
-            << "eatCount" << eatCountJSONArray
-            << "eatLifeCount" << eatLifeCountJSONArray
-            << "mateFailureCount" << mateFailureCountJSONArray
-            << "mateSuccessCount" << mateSuccessCountJSONArray
-            << "biteCount" << biteCountJSONArray
-            << "biteLifeCount" << biteLifeCountJSONArray
-            << close_document
-            << "times" << open_document
-            << "chunkSelection" << chunkSelectionJSONArray
-            << "accessibleEntities" << accessibleEntitiesJSONArray
-            << "sensorProcessing" << sensorProcessingJSONArray
-            << "brainProcessing" << brainProcessingJSONArray
-            << "externalActions" << externalActionsJSONArray
-            << "moveCreatures" << moveCreaturesJSONArray
-            << "tickTime" << tickTimeJSONArray
-            << bsoncxx::builder::stream::close_document
-            << bsoncxx::builder::stream::close_document;
 
+    std::vector<bsoncxx::document::value> documents;
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "tps" << "farm_id" << farmId << "values" << tpsJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "runnersCount" << "farm_id" << farmId << "values" << runnersCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "creaturesCount" << "farm_id" << farmId << "values" << creaturesCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "poopCount" << "farm_id" << farmId << "values" << poopCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "pheromoneCount" << "farm_id" << farmId << "values" << pheromoneCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "eatCount" << "farm_id" << farmId << "values" << eatCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "eatLifeCount" << "farm_id" << farmId << "values" << eatLifeCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "mateFailureCount" << "farm_id" << farmId << "values" << mateFailureCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "mateSuccessCount" << "farm_id" << farmId << "values" << mateSuccessCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "biteCount" << "farm_id" << farmId << "values" << biteCountJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "biteLifeCount" << "farm_id" << farmId << "values" << biteLifeCountJSONArray << finalize);
 
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "chunkSelection" << "farm_id" << farmId << "values" << chunkSelectionJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "accessibleEntities" << "farm_id" << farmId << "values" << accessibleEntitiesJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "sensorProcessing" << "farm_id" << farmId << "values" << sensorProcessingJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "brainProcessing" << "farm_id" << farmId << "values" << brainProcessingJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "externalActions" << "farm_id" << farmId << "values" << externalActionsJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "moveCreatures" << "farm_id" << farmId << "values" << moveCreaturesJSONArray << finalize);
+    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "tickTime" << "farm_id" << farmId << "values" << tickTimeJSONArray << finalize);
 
-    saveFarmDataProcessProgress("Saving", 0, farmId);
-    bsoncxx::document::value doc_value = builder  << bsoncxx::builder::stream::finalize;
+    auto creaturesData = processCreatures();
+    documents.insert(documents.end(), creaturesData.begin(), creaturesData.end());
+
+    for (int it = 0; it < documents.size(); it++) {
+        mongoClient->saveStatisticsSeries(documents.at(it).view());
+    }
 
     saveFarmDataProcessProgress("Finished", 100, farmId);
 
-    mongoClient->updateFarm(doc_value.view(), farmId);
+
+
+
+
+
+//    auto builder = bsoncxx::builder::stream::document{};
+//    builder << "$set" << bsoncxx::builder::stream::open_document
+//            << "tps" << tpsJSONArray
+//            << "runnersCount" << runnersCountJSONArray
+//
+//    mongoClient->updateFarm(doc_value.view(), farmId);
 }

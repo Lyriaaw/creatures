@@ -20,6 +20,7 @@ private:
     mongocxx::collection evolutions;
     mongocxx::collection genomes;
     mongocxx::collection lifeRunners;
+    mongocxx::collection statistics_series;
 
 public:
     MongoClient();
@@ -51,6 +52,12 @@ public:
     nlohmann::json fetchAllRunnersFromFarm(int farmId);
 
     const mongocxx::collection &getLifeRunners() const;
+
+    int countCreaturesFromFarm(int farmId);
+
+    void saveStatisticsSeries(bsoncxx::view_or_value<bsoncxx::document::view, bsoncxx::document::value> doc);
+
+    nlohmann::json fetchStatisticsSeries(std::string farmId, std::string seriesName);
 };
 
 
