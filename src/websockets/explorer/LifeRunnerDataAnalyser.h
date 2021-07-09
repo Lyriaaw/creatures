@@ -8,6 +8,7 @@
 
 
 #include "../../mongo/MongoClient.h"
+#include "../../farm/statistics/ProcessedStatisticSeries.h"
 #include <thread>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
@@ -26,7 +27,7 @@ public:
 
     void saveFarmDataProcessProgress(std::string step, double progressionPercentage, int farmId);
 
-    std::vector<bsoncxx::document::value> processCreatures();
+    std::vector<ProcessedStatisticSeries *>  processCreatures();
 };
 
 

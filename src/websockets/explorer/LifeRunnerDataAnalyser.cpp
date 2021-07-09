@@ -3,6 +3,7 @@
 //
 
 #include "LifeRunnerDataAnalyser.h"
+#include "../../farm/statistics/ProcessedStatisticSeries.h"
 
 #include <iostream>
 
@@ -42,14 +43,14 @@ void LifeRunnerDataAnalyser::saveFarmDataProcessProgress(std::string step, doubl
 }
 
 
-std::vector<bsoncxx::document::value> LifeRunnerDataAnalyser::processCreatures() {
+std::vector<ProcessedStatisticSeries *> LifeRunnerDataAnalyser::processCreatures() {
     saveFarmDataProcessProgress("Fetching creatures", 0, farmId);
 
     auto creatures = mongoClient->fetchAllCreaturesFromFarm(std::to_string(farmId));
     auto creaturesCount = mongoClient->countCreaturesFromFarm(farmId);
 
-    std::vector<int> births;
-    std::vector<int> deaths;
+    std::vector<double> births;
+    std::vector<double> deaths;
     std::vector<std::vector<double>> colors;
 
     births.resize(tickCount);
@@ -77,54 +78,15 @@ std::vector<bsoncxx::document::value> LifeRunnerDataAnalyser::processCreatures()
 
     std::vector<std::map<double, int>> colorsMap;
 
-    auto birthsBuilder = bsoncxx::builder::basic::array{};
-    auto deathsBuilder = bsoncxx::builder::basic::array{};
-    auto colorsBuilder = bsoncxx::builder::basic::array{};
+    std::vector<ProcessedStatisticSeries *> series;
+
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "deaths", deaths));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "births", births));
 
 
-    for (int it = 0; it < tickCount; it++) {
-        if (it % 100 == 0) {
-            saveFarmDataProcessProgress("Processing colors", (it / ((double) tickCount)) * 100, farmId);
-        }
 
 
-        std::map<double, int> tickColorMap;
-
-        auto tickColors = colors.at(it);
-
-        for (int jt = 0; jt < tickColors.size(); jt++) {
-            double currentColor = tickColors.at(jt);
-
-            if (!tickColorMap[currentColor]) {
-                tickColorMap[currentColor] = 0;
-            }
-            tickColorMap[currentColor] += 1;
-        }
-
-        birthsBuilder.append(births.at(it));
-        deathsBuilder.append(deaths.at(it));
-
-        auto tickColorsBuilder = bsoncxx::builder::basic::array{};
-
-
-        for (auto const& row: tickColorMap) {
-            auto currentCreatureColor = bsoncxx::builder::stream::document{};
-
-            currentCreatureColor << "color" << row.first << "count" << row.second;
-            tickColorsBuilder.append(currentCreatureColor);
-        }
-
-        colorsBuilder.append(tickColorsBuilder);
-    }
-
-
-    std::vector<bsoncxx::document::value> documents;
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "births" << "farm_id" << farmId << "values" << birthsBuilder << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "deaths" << "farm_id" << farmId << "values" << deathsBuilder << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "colors" << "farm_id" << farmId << "values" << colorsBuilder << finalize);
-
-
-    return documents;
+    return series;
 }
 
 void LifeRunnerDataAnalyser::handleProcess() {
@@ -145,17 +107,17 @@ void LifeRunnerDataAnalyser::handleProcess() {
     mongocxx::cursor cursor = lifeRunnersCollection.find(document{} << "farmId" << farmId << finalize, opts);
 
     std::vector<double> tps;
-    std::vector<int> runnersCount;
-    std::vector<int> creaturesCount;
+    std::vector<double> runnersCount;
+    std::vector<double> creaturesCount;
 
-    std::vector<int> poopCount;
-    std::vector<int> pheromoneCount;
-    std::vector<int> eatCount;
-    std::vector<int> eatLifeCount;
-    std::vector<int> mateFailureCount;
-    std::vector<int> mateSuccessCount;
-    std::vector<int> biteCount;
-    std::vector<int> biteLifeCount;
+    std::vector<double> poopCount;
+    std::vector<double> pheromoneCount;
+    std::vector<double> eatCount;
+    std::vector<double> eatLifeCount;
+    std::vector<double> mateFailureCount;
+    std::vector<double> mateSuccessCount;
+    std::vector<double> biteCount;
+    std::vector<double> biteLifeCount;
 
     std::vector<double> chunkSelection;
     std::vector<double> accessibleEntities;
@@ -233,90 +195,43 @@ void LifeRunnerDataAnalyser::handleProcess() {
         index++;
     }
 
+    saveFarmDataProcessProgress("Creating series", 0, farmId);
 
 
+    std::vector<ProcessedStatisticSeries *> series;
 
-    auto tpsJSONArray = bsoncxx::builder::basic::array{};
-    auto runnersCountJSONArray = bsoncxx::builder::basic::array{};
-    auto creaturesCountJSONArray = bsoncxx::builder::basic::array{};
-    auto poopCountJSONArray = bsoncxx::builder::basic::array{};
-    auto pheromoneCountJSONArray = bsoncxx::builder::basic::array{};
-    auto eatCountJSONArray = bsoncxx::builder::basic::array{};
-    auto eatLifeCountJSONArray = bsoncxx::builder::basic::array{};
-    auto mateFailureCountJSONArray = bsoncxx::builder::basic::array{};
-    auto mateSuccessCountJSONArray = bsoncxx::builder::basic::array{};
-    auto biteCountJSONArray = bsoncxx::builder::basic::array{};
-    auto biteLifeCountJSONArray = bsoncxx::builder::basic::array{};
-    auto chunkSelectionJSONArray = bsoncxx::builder::basic::array{};
-    auto accessibleEntitiesJSONArray = bsoncxx::builder::basic::array{};
-    auto sensorProcessingJSONArray = bsoncxx::builder::basic::array{};
-    auto brainProcessingJSONArray = bsoncxx::builder::basic::array{};
-    auto externalActionsJSONArray = bsoncxx::builder::basic::array{};
-    auto moveCreaturesJSONArray = bsoncxx::builder::basic::array{};
-    auto tickTimeJSONArray = bsoncxx::builder::basic::array{};
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "tps", tps));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "creaturesCount", creaturesCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "runnersCount", runnersCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "poopCount", poopCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "pheromoneCount", pheromoneCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "eatCount", eatCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "eatLifeCount", eatLifeCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "mateFailureCount", mateFailureCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "mateSuccessCount", mateSuccessCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "biteCount", biteCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "biteLifeCount", biteLifeCount));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "chunkSelection", chunkSelection));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "accessibleEntities", accessibleEntities));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "sensorProcessing", sensorProcessing));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "brainProcessing", brainProcessing));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "externalActions", externalActions));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "moveCreatures", moveCreatures));
+    series.emplace_back(new ProcessedStatisticSeries(farmId, "tickTime", tickTime));
 
-    auto array_builder = bsoncxx::builder::basic::array{};
+    std::vector<ProcessedStatisticSeries *> creaturesSeries = processCreatures();
+    series.insert(series.end(), creaturesSeries.begin(), creaturesSeries.end());
 
+    for (int it = 0; it < series.size(); it++) {
+        saveFarmDataProcessProgress("Processing statistics", (it / (double) series.size()) * 100, farmId);
 
-    for (int it = 0; it < tickCount; it++) {
-
-        if (index % 100 == 0) {
-            saveFarmDataProcessProgress("Creating json", (it / (double) tickCount) * 100, farmId);
-        }
-
-
-        tps[it] = tps[it] / ((double) runnersCount[it]);
-
-        tpsJSONArray.append(tps.at(it));
-        runnersCountJSONArray.append(runnersCount.at(it));
-        creaturesCountJSONArray.append(creaturesCount.at(it));
-        poopCountJSONArray.append(poopCount.at(it));
-        pheromoneCountJSONArray.append(pheromoneCount.at(it));
-        eatCountJSONArray.append(eatCount.at(it));
-        eatLifeCountJSONArray.append(eatLifeCount.at(it));
-        mateFailureCountJSONArray.append(mateFailureCount.at(it));
-        mateSuccessCountJSONArray.append(mateSuccessCount.at(it));
-        biteCountJSONArray.append(biteCount.at(it));
-        biteLifeCountJSONArray.append(biteLifeCount.at(it));
-        chunkSelectionJSONArray.append(chunkSelection.at(it));
-        accessibleEntitiesJSONArray.append(accessibleEntities.at(it));
-        sensorProcessingJSONArray.append(sensorProcessing.at(it));
-        brainProcessingJSONArray.append(brainProcessing.at(it));
-        externalActionsJSONArray.append(externalActions.at(it));
-        moveCreaturesJSONArray.append(moveCreatures.at(it));
-        tickTimeJSONArray.append(tickTime.at(it));
+        series.at(it)->process();
+        series.at(it)->saveToMongo();
     }
 
 
 
 
-    std::vector<bsoncxx::document::value> documents;
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "tps" << "farm_id" << farmId << "values" << tpsJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "runnersCount" << "farm_id" << farmId << "values" << runnersCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "creaturesCount" << "farm_id" << farmId << "values" << creaturesCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "poopCount" << "farm_id" << farmId << "values" << poopCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "pheromoneCount" << "farm_id" << farmId << "values" << pheromoneCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "eatCount" << "farm_id" << farmId << "values" << eatCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "eatLifeCount" << "farm_id" << farmId << "values" << eatLifeCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "mateFailureCount" << "farm_id" << farmId << "values" << mateFailureCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "mateSuccessCount" << "farm_id" << farmId << "values" << mateSuccessCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "biteCount" << "farm_id" << farmId << "values" << biteCountJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "biteLifeCount" << "farm_id" << farmId << "values" << biteLifeCountJSONArray << finalize);
-
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "chunkSelection" << "farm_id" << farmId << "values" << chunkSelectionJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "accessibleEntities" << "farm_id" << farmId << "values" << accessibleEntitiesJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "sensorProcessing" << "farm_id" << farmId << "values" << sensorProcessingJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "brainProcessing" << "farm_id" << farmId << "values" << brainProcessingJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "externalActions" << "farm_id" << farmId << "values" << externalActionsJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "moveCreatures" << "farm_id" << farmId << "values" << moveCreaturesJSONArray << finalize);
-    documents.emplace_back(bsoncxx::builder::stream::document{} << "type" << "tickTime" << "farm_id" << farmId << "values" << tickTimeJSONArray << finalize);
-
-    auto creaturesData = processCreatures();
-    documents.insert(documents.end(), creaturesData.begin(), creaturesData.end());
-
-    for (int it = 0; it < documents.size(); it++) {
-        mongoClient->saveStatisticsSeries(documents.at(it).view());
-    }
 
     saveFarmDataProcessProgress("Finished", 100, farmId);
 

@@ -465,23 +465,23 @@ void LifesRunner::saveOnMongo() {
             << "farmId" << farmId
             << "id" << id
             << "tick" << this->tick
-            << "poopCount" << this->dataAnalyser.getPoopCount()->getLastValue()
-            << "pheromoneCount" << this->dataAnalyser.getPheromoneCount()->getLastValue()
-            << "eatCount" << this->dataAnalyser.getEatCount()->getLastValue()
-            << "eatLifeCount" << this->dataAnalyser.getEatLifeCount()->getLastValue()
-            << "mateFailureCount" << this->dataAnalyser.getMateFailureCount()->getLastValue()
-            << "mateSuccessCount" << this->dataAnalyser.getMateSuccessCount()->getLastValue()
-            << "biteCount" << this->dataAnalyser.getBiteCount()->getLastValue()
-            << "biteLifeCount" << this->dataAnalyser.getBiteLifeCount()->getLastValue()
-            << "chunkSelection" << this->dataAnalyser.getChunkSelection()->getLastValue()
-            << "accessibleEntities" << this->dataAnalyser.getAccessibleEntities()->getLastValue()
-            << "sensorProcessing" << this->dataAnalyser.getSensorProcessing()->getLastValue()
-            << "brainProcessing" << this->dataAnalyser.getBrainProcessing()->getLastValue()
-            << "externalActions" << this->dataAnalyser.getExternalActions()->getLastValue()
-            << "moveCreatures" << this->dataAnalyser.getMoveCreatures()->getLastValue()
-            << "tickTime" << this->dataAnalyser.getTickTime()->getLastValue()
-            << "tickPerSecond" << this->dataAnalyser.getTickPerSecond()->getLastValue()
-            << "lifesCount" << this->dataAnalyser.getLifesCount()->getLastValue();
+            << "poopCount" << this->dataAnalyser.getPoopCount()->getAveragedLastValue()
+            << "pheromoneCount" << this->dataAnalyser.getPheromoneCount()->getAveragedLastValue()
+            << "eatCount" << this->dataAnalyser.getEatCount()->getAveragedLastValue()
+            << "eatLifeCount" << this->dataAnalyser.getEatLifeCount()->getAveragedLastValue()
+            << "mateFailureCount" << this->dataAnalyser.getMateFailureCount()->getAveragedLastValue()
+            << "mateSuccessCount" << this->dataAnalyser.getMateSuccessCount()->getAveragedLastValue()
+            << "biteCount" << this->dataAnalyser.getBiteCount()->getAveragedLastValue()
+            << "biteLifeCount" << this->dataAnalyser.getBiteLifeCount()->getAveragedLastValue()
+            << "chunkSelection" << this->dataAnalyser.getChunkSelection()->getAveragedLastValue()
+            << "accessibleEntities" << this->dataAnalyser.getAccessibleEntities()->getAveragedLastValue()
+            << "sensorProcessing" << this->dataAnalyser.getSensorProcessing()->getAveragedLastValue()
+            << "brainProcessing" << this->dataAnalyser.getBrainProcessing()->getAveragedLastValue()
+            << "externalActions" << this->dataAnalyser.getExternalActions()->getAveragedLastValue()
+            << "moveCreatures" << this->dataAnalyser.getMoveCreatures()->getAveragedLastValue()
+            << "tickTime" << this->dataAnalyser.getTickTime()->getAveragedLastValue()
+            << "tickPerSecond" << this->dataAnalyser.getTickPerSecond()->getAveragedLastValue()
+            << "lifesCount" << this->dataAnalyser.getLifesCount()->getAveragedLastValue();
 
     bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
 
